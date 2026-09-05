@@ -1,0 +1,461 @@
+.dashboard-wrapper {
+    background-color: #f4f5f9;
+    min-height: 100vh;
+}
+
+/* Curved Sidebar Nav - Green Theme */
+.sidebar-nav {
+    width: 80px;
+    background-color: #198754;
+    /* Forest / Emerald Green */
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+.nav-item-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+/* Sidebar Item Hover & Active State */
+.nav-item-btn:hover,
+.nav-item-btn.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Header Nav Links Hover & Active State */
+.nav-link-custom {
+    color: #6c757d;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+
+.nav-link-custom:hover {
+    color: #fd7e14 !important;
+    /* Orange accent on hover */
+    background-color: rgba(253, 126, 20, 0.1);
+    /* Soft Orange background */
+}
+
+.nav-link-custom.active-link {
+    color: #198754 !important;
+    /* Green for Active link */
+    font-weight: 700;
+}
+
+/* Main Dashboard Cards */
+.quick-card {
+    min-width: 130px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quick-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dashboard-card {
+    border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Promo Banner - Green to Orange Gradient */
+.promo-card {
+    background: linear-gradient(135deg, #198754 0%, #157347 60%, #fd7e14 100%);
+    min-height: 200px;
+}
+
+/* Theme Utilities */
+.theme-text {
+    color: #198754 !important;
+}
+
+.btn-theme {
+    background-color: #fd7e14 !important;
+    /* Orange CTA Buttons */
+    border-color: #fd7e14 !important;
+}
+
+.btn-theme:hover {
+    background-color: #e86b02 !important;
+    border-color: #e86b02 !important;
+}
+
+.extra-small {
+    font-size: 0.75rem;
+}
+
+/* Custom Styling para sa Service Dropdown */
+.custom-select-dropdown {
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #2b2b2b;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover at Focus States */
+.custom-select-dropdown:hover {
+    background-color: #e9ecef !important;
+}
+
+.custom-select-dropdown:focus {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15) !important;
+    /* Green glow focus */
+    border-color: #198754 !important;
+}
+
+/* Dropdown Options Styling */
+.custom-select-dropdown option {
+    padding: 10px;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.custom-select-dropdown option:hover,
+.custom-select-dropdown option:checked {
+    background-color: #198754 !important;
+    /* Green background sa napiling option */
+    color: #ffffff !important;
+}
+
+/* Hover effect sa name ng provider */
+.provider-name-text {
+    transition: all 0.2s ease-in-out;
+}
+
+.provider-link:hover .provider-name-text {
+    color: #0d6efd;
+    /* Magiging kulay asul kapag in-hover */
+    text-decoration: underline;
+}
+
+/* Optional: Zoom effect sa Profile Avatar kapag in-hover */
+.provider-avatar {
+    transition: transform 0.2s ease-in-out;
+}
+
+.provider-avatar:hover {
+    transform: scale(1.08);
+}
+
+
+/*PROFILE DESIGN*/
+
+/* Layout Base */
+.profile-page-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.profile-main-content {
+    flex: 1;
+    margin-left: 80px;
+    /* Space para sa ating floating sidebar */
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Header Bar */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-header h2 {
+    font-size: 1.8rem;
+    color: #005b3c;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-box {
+    background: #ffffff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+}
+
+.icon-btn {
+    background: #ffffff;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    color: #00b176;
+    font-size: 1.1rem;
+}
+
+/* Profile Card */
+.profile-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e6f7f2;
+}
+
+.info-section {
+    flex: 1;
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.info-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+}
+
+.edit-btn {
+    background: #f0f0f0;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #555;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 20px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.info-grid p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-grid i {
+    color: #00b176;
+}
+
+.social-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.social-links a {
+    width: 32px;
+    height: 32px;
+    background-color: #e6f7f2;
+    color: #00b176;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.social-links a:hover {
+    background-color: #00b176;
+    color: #ffffff;
+}
+
+/* Grid Layout para sa Bottom Cards */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.dashboard-box {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-box h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #222;
+    font-size: 1.1rem;
+}
+
+/* Activity Items */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f9fbfb;
+    padding: 12px 16px;
+    border-radius: 16px;
+}
+
+.activity-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: #e6f7f2;
+    color: #00b176;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-details h5 {
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+}
+
+.activity-details p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: #e1f7ec;
+    color: #00b176;
+}
+
+.status-badge.in-progress {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Right Column */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card-preview {
+    background: #f4f7f6;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: monospace;
+    letter-spacing: 1px;
+    color: #444;
+    margin-bottom: 12px;
+}
+
+.payment-icons {
+    display: flex;
+    gap: 15px;
+    font-size: 1.5rem;
+    color: #00b176;
+}
+
+/* Membership Card */
+.membership-card {
+    background: linear-gradient(135deg, #00b176, #008f5f);
+    color: #ffffff;
+}
+
+.membership-card h4 {
+    color: #ffffff;
+}
+
+.membership-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.membership-card ul li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upgrade-btn {
+    width: 100%;
+    background: #ffffff;
+    color: #008f5f;
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.upgrade-btn:hover {
+    opacity: 0.9;
+}
+
+

@@ -1,0 +1,227 @@
+.green-wavy-sidebar {
+    width: 64px;
+    height: fit-content;
+    background-color: #00b176;
+    /* Emerald Green */
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    /* Gitna vertically sa gilid ng screen */
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 1000;
+
+    /* Shape ng sidebar container */
+    border-radius: 0 32px 32px 0;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: visible !important;
+    /* Siguradong makakalabas ang pill sa kanan */
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    width: 100%;
+}
+
+.top-brand-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    color: #00b176;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    margin-left: 12px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+}
+
+.nav-items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    width: 100%;
+    padding-left: 12px;
+}
+
+/* Individual Icon Link Base */
+.sidebar-btn {
+    position: relative;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    width: 40px;
+    /* Sukat kapag normal/icon lang */
+    height: 42px;
+    padding-left: 10px;
+    border-radius: 21px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.sidebar-btn i {
+    min-width: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Text Label Inside Button */
+.link-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-left: 10px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.2s ease, transform 0.25s ease;
+    text-transform: uppercase;
+}
+
+/* HOVER EFFECT: Green background pill at Dark Green na text para kitang-kita */
+.sidebar-btn:hover {
+    width: 150px;
+    /* Lalabas at hahaba pakanan */
+    background-color: #e6f7f2;
+    /* Soft light-green pill background */
+    color: #005b3c;
+    /* Dark Green Text at Icon para malinaw basahin */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    z-index: 10;
+}
+
+.sidebar-btn:hover .link-text {
+    opacity: 1;
+    transform: translateX(0);
+    color: #005b3c;
+    /* Siguradong Madilim na Green ang Sulat */
+}
+
+/* ACTIVE STATE (Kapag na-click na): Puti na Background at Inset Curved Notch */
+.sidebar-btn.active {
+    width: 160px;
+    background-color: #f8f9fa;
+    /* Match sa background color ng Dashboard */
+    color: #00b176;
+    border-top-left-radius: 21px;
+    border-bottom-left-radius: 21px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    font-weight: bold;
+    z-index: 5;
+    box-shadow: none;
+}
+
+.sidebar-btn.active .link-text {
+    opacity: 1;
+    transform: translateX(0);
+    color: #00b176;
+}
+
+.sidebar-btn.active .badge-pill,
+.sidebar-btn.active .badge-dot-yellow,
+.sidebar-btn.active .badge-dot-lightgreen {
+    display: none;
+}
+
+/* Curved Notch Cutouts para sa Active State */
+.sidebar-btn.active::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    border-bottom-right-radius: 16px;
+    box-shadow: 5px 5px 0 5px #f8f9fa;
+    pointer-events: none;
+}
+
+.sidebar-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    border-top-right-radius: 16px;
+    box-shadow: 5px -5px 0 5px #f8f9fa;
+    pointer-events: none;
+}
+
+/* Indicators / Badges */
+.badge-pill {
+    position: absolute;
+    left: 24px;
+    top: 18px;
+    width: 10px;
+    height: 5px;
+    border-radius: 3px;
+    background-color: #2ed573;
+}
+
+.badge-dot-yellow {
+    position: absolute;
+    left: 24px;
+    top: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #ffbe76;
+}
+
+.badge-dot-lightgreen {
+    position: absolute;
+    left: 24px;
+    top: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #7bed9f;
+}
+
+.top-brand-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    margin-left: 12px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.top-brand-icon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Style para sakto ang fit ng Logo Image sa loob ng box */
+.brand-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* O puwedeng 'contain' kung ayaw mong mag-crop ang logo */
+    border-radius: 12px;
+}

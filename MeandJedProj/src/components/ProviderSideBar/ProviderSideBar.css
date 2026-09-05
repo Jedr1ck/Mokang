@@ -1,0 +1,411 @@
+/* =========================================
+   PROVIDER SIDEBAR
+   ========================================= */
+
+.provider-sidebar {
+    width: 64px;
+    height: fit-content;
+
+    background-color: #00b176;
+
+    padding: 20px 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    position: fixed;
+
+    top: 50%;
+    left: 0;
+
+    transform: translateY(-50%);
+
+    z-index: 1000;
+
+    border-radius: 0 32px 32px 0;
+
+    box-shadow:
+        2px 4px 12px rgba(0, 0, 0, 0.08);
+
+    overflow: visible !important;
+}
+
+
+/* =========================================
+   SIDEBAR CONTENT
+   ========================================= */
+
+.provider-sidebar-content {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+    width: 100%;
+}
+
+
+/* =========================================
+   LOGO
+   ========================================= */
+
+.provider-top-brand-icon {
+    width: 40px;
+    height: 40px;
+
+    background-color: #ffffff;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 12px;
+
+    margin-bottom: 4px;
+
+    flex-shrink: 0;
+
+    text-decoration: none;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.provider-top-brand-icon:hover {
+    transform: scale(1.05);
+
+    box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================
+   LOGO IMAGE
+   ========================================= */
+
+.provider-brand-logo-img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 12px;
+}
+
+
+/* =========================================
+   NAVIGATION
+   ========================================= */
+
+.provider-nav-items-container {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    align-items: flex-start;
+
+    width: 100%;
+
+    padding-left: 12px;
+}
+
+
+/* =========================================
+   SIDEBAR BUTTON
+   ========================================= */
+
+.provider-sidebar-btn {
+    position: relative;
+
+    width: 40px;
+    height: 42px;
+
+    padding-left: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    border-radius: 21px;
+
+    color: rgba(255, 255, 255, 0.9);
+
+    font-size: 18px;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    z-index: 1;
+
+    transition:
+        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* =========================================
+   ICON
+   ========================================= */
+
+.provider-sidebar-btn i {
+    min-width: 20px;
+
+    display: flex;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   TEXT
+   ========================================= */
+
+.provider-link-text {
+    font-size: 0.85rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+
+    margin-left: 10px;
+
+    opacity: 0;
+
+    transform: translateX(-10px);
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.25s ease;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================
+   HOVER
+   ONLY HOVER WILL EXPAND
+   ========================================= */
+
+.provider-sidebar-btn:hover {
+    width: 180px;
+
+    background-color: #e6f7f2;
+
+    color: #005b3c;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.12);
+
+    z-index: 20;
+}
+
+
+.provider-sidebar-btn:hover .provider-link-text {
+    opacity: 1;
+
+    transform: translateX(0);
+
+    pointer-events: auto;
+
+    color: #005b3c;
+}
+
+
+/* =========================================
+   ACTIVE
+   IMPORTANT:
+   ACTIVE DOES NOT EXPAND
+   ========================================= */
+
+.provider-sidebar-btn.active {
+    width: 40px;
+
+    height: 42px;
+
+    background-color: #f8f9fa;
+
+    color: #00b176;
+
+    border-radius: 21px;
+
+    font-weight: bold;
+
+    z-index: 5;
+
+    box-shadow: none;
+}
+
+
+/* =========================================
+   ACTIVE TEXT STAYS HIDDEN
+   ========================================= */
+
+.provider-sidebar-btn.active .provider-link-text {
+    opacity: 0;
+
+    transform: translateX(-10px);
+
+    pointer-events: none;
+
+    color: #00b176;
+}
+
+
+/* =========================================
+   ACTIVE + HOVER
+   When mouse is over active item,
+   THEN it expands.
+   ========================================= */
+
+.provider-sidebar-btn.active:hover {
+    width: 180px;
+
+    background-color: #f8f9fa;
+
+    color: #00b176;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.12);
+
+    z-index: 20;
+}
+
+
+.provider-sidebar-btn.active:hover .provider-link-text {
+    opacity: 1;
+
+    transform: translateX(0);
+
+    pointer-events: auto;
+
+    color: #00b176;
+}
+
+
+/* =========================================
+   REMOVE OLD ACTIVE NOTCH
+   ========================================= */
+
+.provider-sidebar-btn.active::before,
+.provider-sidebar-btn.active::after {
+    display: none;
+
+    content: none;
+}
+
+
+/* =========================================
+   NOTIFICATION DOT
+   ========================================= */
+
+.badge-dot-yellow {
+    position: absolute;
+
+    left: 24px;
+    top: 10px;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background-color: #ffbe76;
+}
+
+
+/* =========================================
+   LIGHT GREEN DOT
+   ========================================= */
+
+.badge-dot-lightgreen {
+    position: absolute;
+
+    left: 24px;
+    top: 10px;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background-color: #7bed9f;
+}
+
+
+/* =========================================
+   ACTIVE NOTIFICATION DOT
+   ========================================= */
+
+.provider-sidebar-btn.active .badge-dot-yellow,
+.provider-sidebar-btn.active .badge-dot-lightgreen {
+    display: none;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .provider-sidebar {
+        width: 60px;
+    }
+
+    .provider-nav-items-container {
+        padding-left: 10px;
+    }
+
+    .provider-sidebar-btn {
+        width: 40px;
+    }
+
+    .provider-sidebar-btn:hover,
+    .provider-sidebar-btn.active:hover {
+        width: 170px;
+    }
+
+}
+
+.provider-logout-btn {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+}
+
+.provider-logout-btn:hover {
+    width: 150px;
+    background-color: #e6f7f2;
+    color: #005b3c;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.provider-logout-btn .provider-link-text {
+    color: inherit;
+}
