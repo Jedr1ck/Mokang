@@ -46,6 +46,10 @@ const ProviderAuth = () => {
 
         mobileNumber: '',
 
+        gender: '',
+
+        address: '',
+
         otpCode: '',
 
         serviceCategory: '',
@@ -229,27 +233,13 @@ const ProviderAuth = () => {
         }
 
 
-        const newOtp =
-            Math.floor(
-                100000 +
-                Math.random() * 900000
-            ).toString();
-
-
+        const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
         setGeneratedOtp(newOtp);
-
         setOtpSent(true);
-
         setIsOtpVerified(false);
-
         setOtpError('');
-
         setTimer(60);
-
-
-        alert(
-            `[DEMO OTP CODE]: Ang iyong OTP ay ${newOtp}`
-        );
+        alert(`[DEMO OTP CODE]: Ang iyong OTP ay ${newOtp}`);
 
     };
 
@@ -272,19 +262,11 @@ const ProviderAuth = () => {
 
 
         if (formData.otpCode === generatedOtp) {
-
             setIsOtpVerified(true);
-
             setOtpError('');
-
         } else {
-
             setIsOtpVerified(false);
-
-            setOtpError(
-                "Maling OTP code! Pakisubukan ulit."
-            );
-
+            setOtpError("Maling OTP code! Pakisubukan ulit.");
         }
 
     };
@@ -337,8 +319,10 @@ const ProviderAuth = () => {
         if (!/^[A-Za-z][A-Za-z .'-]{1,149}$/.test(formData.fullName.trim()) ||
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ||
             !/^\+?\d{10,15}$/.test(mobileNumber) ||
+            !formData.gender ||
+            formData.address.trim().length < 10 ||
             !Number.isInteger(Number(formData.experienceYears)) || Number(formData.experienceYears) < 0 || Number(formData.experienceYears) > 80) {
-            alert('Please enter valid name, email, mobile number, and experience (0–80 years).');
+            alert('Please enter valid name, gender, address, email, mobile number, and experience (0–80 years).');
             return;
         }
         if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/.test(formData.password)) {
@@ -367,10 +351,15 @@ const ProviderAuth = () => {
                 full_name: formData.fullName.trim(),
                 email: formData.email.trim(),
                 mobile_number: mobileNumber,
+                gender: formData.gender,
+                address: formData.address.trim(),
                 password: formData.password,
                 role: 'provider',
                 business_name: formData.fullName.trim(),
+                service_category: formData.serviceCategory,
+                experience_years: Number(formData.experienceYears),
             });
+            localStorage.setItem('access_token', response.access_token);
             localStorage.setItem('user', JSON.stringify(response.user));
             localStorage.setItem('loggedInProvider', JSON.stringify(response.user));
             alert(`Welcome, ${formData.fullName.trim()}! Your provider account has been created successfully.`);
@@ -460,6 +449,54 @@ const ProviderAuth = () => {
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 maxLength="254"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* GENDER */}
+
+                        <div className="input-group mb-2">
+
+                            <span className="input-group-text bg-light border-0">
+                                <i className="bi bi-gender-ambiguous"></i>
+                            </span>
+
+                            <select
+                                name="gender"
+                                className="form-select bg-light border-0"
+                                value={formData.gender}
+                                onChange={handleInputChange}
+                                required
+                            >
+                                <option value="" disabled>Select Gender</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+
+                        </div>
+
+
+                        {/* ADDRESS */}
+
+                        <div className="input-group mb-2">
+
+                            <span className="input-group-text bg-light border-0">
+                                <i className="bi bi-geo-alt"></i>
+                            </span>
+
+                            <input
+                                type="text"
+                                name="address"
+                                className="form-control bg-light border-0"
+                                placeholder="Address"
+                                value={formData.address}
+                                onChange={handleInputChange}
+                                minLength="10"
+                                maxLength="500"
                                 required
                             />
 

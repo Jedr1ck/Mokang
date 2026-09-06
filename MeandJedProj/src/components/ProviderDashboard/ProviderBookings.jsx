@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProviderSideBar from "../ProviderSideBar/ProviderSideBar";
 
@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./ProviderBookings.css";
+import { getMyBookings, updateBookingStatus } from "../../services/api";
 
 
 const ProviderBookings = () => {
@@ -53,7 +54,7 @@ const ProviderBookings = () => {
     // BOOKING DATA
     // =====================================================
 
-    const [bookings, setBookings] = useState([
+    const [bookings, setBookings] = useState([]); /*
 
         {
             id: 1,
@@ -270,7 +271,39 @@ const ProviderBookings = () => {
                 "Sep 02, 2026 • 09:15 AM"
         }
 
-    ]);
+    ]); */
+
+    const [loadingBookings, setLoadingBookings] = useState(true);
+    const [bookingError, setBookingError] = useState('');
+
+    useEffect(() => {
+        let active = true;
+        getMyBookings()
+            .then((items) => {
+                if (!active) return;
+                setBookings(items.map((booking) => ({
+                    id: booking.id,
+                    requestNo: booking.bookingCode,
+                    customerName: booking.customerName || 'Homeowner',
+                    phone: booking.customerPhone || 'Not provided',
+                    email: booking.customerEmail || 'Not provided',
+                    service: booking.category || 'Service request',
+                    category: booking.category || 'Uncategorized',
+                    location: booking.address,
+                    fullAddress: booking.address,
+                    date: new Date(`${booking.preferredDate}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+                    time: booking.preferredTime,
+                    status: booking.status === 'Pending' ? 'New' : booking.status,
+                    estimatedFee: 'Not specified',
+                    description: booking.description,
+                    specialInstructions: 'None',
+                    requestedAt: 'Recently requested'
+                })));
+            })
+            .catch((error) => { if (active) { setBookingError(error.message); setBookings([]); } })
+            .finally(() => { if (active) setLoadingBookings(false); });
+        return () => { active = false; };
+    }, []);
 
 
     // =====================================================
@@ -472,32 +505,12 @@ const ProviderBookings = () => {
         if (!confirmAction) return;
 
 
-        const updatedBooking = {
-
-            ...booking,
-
-            status: "Confirmed"
-
-        };
-
-
-        setBookings(prev =>
-            prev.map(item =>
-                item.id === id
-                    ? updatedBooking
-                    : item
-            )
-        );
-
-
-        setSelectedBooking(
-            updatedBooking
-        );
-
-
-        alert(
-            `${booking.requestNo} has been accepted.`
-        );
+        updateBookingStatus(id, 'Accepted').then(() => {
+            const updatedBooking = { ...booking, status: 'Accepted' };
+            setBookings(prev => prev.map(item => item.id === id ? updatedBooking : item));
+            setSelectedBooking(updatedBooking);
+            alert(`${booking.requestNo} has been accepted.`);
+        }).catch((error) => alert(error.message));
 
     };
 
@@ -526,32 +539,12 @@ const ProviderBookings = () => {
         if (!confirmAction) return;
 
 
-        const updatedBooking = {
-
-            ...booking,
-
-            status: "Declined"
-
-        };
-
-
-        setBookings(prev =>
-            prev.map(item =>
-                item.id === id
-                    ? updatedBooking
-                    : item
-            )
-        );
-
-
-        setSelectedBooking(
-            updatedBooking
-        );
-
-
-        alert(
-            `${booking.requestNo} has been declined.`
-        );
+        updateBookingStatus(id, 'Cancelled').then(() => {
+            const updatedBooking = { ...booking, status: 'Cancelled' };
+            setBookings(prev => prev.map(item => item.id === id ? updatedBooking : item));
+            setSelectedBooking(updatedBooking);
+            alert(`${booking.requestNo} has been declined.`);
+        }).catch((error) => alert(error.message));
 
     };
 
@@ -959,7 +952,7 @@ const ProviderBookings = () => {
                                 </h3>
 
                                 <p>
-                                    Try another filter or search keyword.
+                                    {loadingBookings ? 'Loading booking requests...' : bookingError || 'No booking requests have been assigned to this provider yet.'}
                                 </p>
 
                             </div>

@@ -1,16 +1,10 @@
 
--- Create database
 CREATE DATABASE IF NOT EXISTS Smarthome
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
--- Select database
 USE Smarthome;
 
-
--- ============================================
--- USERS TABLE
--- ============================================
 
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -20,6 +14,10 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
 
     mobile_number VARCHAR(30),
+
+    gender VARCHAR(30),
+
+    address VARCHAR(500),
 
     password_hash VARCHAR(255) NOT NULL,
 
@@ -38,9 +36,7 @@ CREATE TABLE users (
 );
 
 
--- ============================================
--- PROVIDER PROFILES TABLE
--- ============================================
+
 
 CREATE TABLE provider_profiles (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -68,10 +64,6 @@ CREATE TABLE provider_profiles (
 );
 
 
--- ============================================
--- SERVICE CATEGORIES TABLE
--- ============================================
-
 CREATE TABLE service_categories (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
@@ -81,9 +73,6 @@ CREATE TABLE service_categories (
 );
 
 
--- ============================================
--- DEFAULT SERVICE CATEGORIES
--- ============================================
 
 INSERT IGNORE INTO service_categories (name)
 VALUES
@@ -95,10 +84,6 @@ VALUES
     ('Appliance Repair'),
     ('Gardening');
 
-
--- ============================================
--- PROVIDER SERVICES TABLE
--- ============================================
 
 CREATE TABLE provider_services (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -122,9 +107,6 @@ CREATE TABLE provider_services (
 );
 
 
--- ============================================
--- BOOKINGS TABLE
--- ============================================
 
 CREATE TABLE bookings (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -173,9 +155,7 @@ CREATE TABLE bookings (
 );
 
 
--- ============================================
--- BOOKING STATUS HISTORY TABLE
--- ============================================
+
 
 CREATE TABLE booking_status_history (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -200,9 +180,6 @@ CREATE TABLE booking_status_history (
 );
 
 
--- ============================================
--- MESSAGES TABLE
--- ============================================
 
 CREATE TABLE messages (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -231,9 +208,6 @@ CREATE TABLE messages (
 );
 
 
--- ============================================
--- NOTIFICATIONS TABLE
--- ============================================
 
 CREATE TABLE notifications (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -256,9 +230,7 @@ CREATE TABLE notifications (
 );
 
 
--- ============================================
--- REVIEWS TABLE
--- ============================================
+
 
 CREATE TABLE reviews (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,

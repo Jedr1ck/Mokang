@@ -7,6 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import '../../ProviderDashboard.css';
+import { getMessages, getMyBookings } from '../../services/api';
+import Messages from '../HomeOwnerDashboard/Messages';
 
 const ProviderDashboard = () => {
     const navigate = useNavigate();
@@ -18,6 +20,8 @@ const ProviderDashboard = () => {
     });
 
     const [activeSection, setActiveSection] = useState('dashboard');
+    const [bookings, setBookings] = useState([]);
+    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -44,6 +48,17 @@ const ProviderDashboard = () => {
             }
         }
     }, []);
+
+    useEffect(() => {
+        getMyBookings().then(setBookings).catch((error) => console.error('Unable to load provider bookings:', error));
+        getMessages().then(setMessages).catch((error) => console.error('Unable to load provider messages:', error));
+    }, []);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const todaysBookings = bookings.filter((booking) => booking.preferredDate === today);
+    const pendingBookings = bookings.filter((booking) => booking.status === 'Pending');
+    const ongoingBookings = bookings.filter((booking) => ['Accepted', 'On the Way', 'In Progress'].includes(booking.status));
+    const completedBookings = bookings.filter((booking) => booking.status === 'Completed');
 
     /*
      * Keep dashboard section synchronized
@@ -278,12 +293,12 @@ const ProviderDashboard = () => {
                                     </span>
 
                                     <strong>
-                                        5
+                                        {todaysBookings.length}
                                     </strong>
 
                                     <small>
                                         <i className="bi bi-arrow-up"></i>
-                                        2 new today
+                                        {todaysBookings.length} scheduled today
                                     </small>
                                 </div>
 
@@ -303,7 +318,7 @@ const ProviderDashboard = () => {
                                     </span>
 
                                     <strong>
-                                        3
+                                        {pendingBookings.length}
                                     </strong>
 
                                     <small>
@@ -327,7 +342,7 @@ const ProviderDashboard = () => {
                                     </span>
 
                                     <strong>
-                                        2
+                                        {ongoingBookings.length}
                                     </strong>
 
                                     <small>
@@ -351,7 +366,7 @@ const ProviderDashboard = () => {
                                     </span>
 
                                     <strong>
-                                        28
+                                        {completedBookings.length}
                                     </strong>
 
                                     <small>
@@ -375,11 +390,11 @@ const ProviderDashboard = () => {
                                     </span>
 
                                     <strong>
-                                        4.9
+                                        N/A
                                     </strong>
 
                                     <small>
-                                        From 32 reviews
+                                        No reviews yet
                                     </small>
                                 </div>
 
@@ -399,11 +414,11 @@ const ProviderDashboard = () => {
                                     </span>
 
                                     <strong>
-                                        ₱24,850
+                                        ₱0
                                     </strong>
 
                                     <small>
-                                        This month
+                                        No payment data
                                     </small>
                                 </div>
 
@@ -454,136 +469,21 @@ const ProviderDashboard = () => {
 
 
                                 <div className="provider-schedule-list">
-
-
-                                    {/* Schedule 1 */}
-                                    <div className="provider-schedule-item">
-
-                                        <div className="provider-time">
-                                            <strong>
-                                                09:00 AM
-                                            </strong>
-
-                                            <span>
-                                                11:00 AM
-                                            </span>
+                                    {todaysBookings.length === 0 ? <p>No bookings scheduled for today.</p> : todaysBookings.map((booking) => (
+                                        <div className="provider-schedule-item" key={booking.id}>
+                                            <div className="provider-time">
+                                                <strong>{booking.preferredTime}</strong>
+                                                <span>{booking.status}</span>
+                                            </div>
+                                            <div className="provider-schedule-line"></div>
+                                            <div className="provider-schedule-details">
+                                                <h4>{booking.category || 'Service request'}</h4>
+                                                <p><i className="bi bi-person"></i>{booking.customerName || 'Homeowner'}</p>
+                                                <p><i className="bi bi-geo-alt"></i>{booking.address}</p>
+                                            </div>
+                                            <span className="provider-status confirmed">{booking.status}</span>
                                         </div>
-
-
-                                        <div className="provider-schedule-line"></div>
-
-
-                                        <div className="provider-schedule-details">
-
-                                            <h4>
-                                                Electrical Wiring
-                                            </h4>
-
-                                            <p>
-                                                <i className="bi bi-person"></i>
-                                                Juan Dela Cruz
-                                            </p>
-
-                                            <p>
-                                                <i className="bi bi-geo-alt"></i>
-                                                Brgy. 12, Subdivision
-                                            </p>
-
-                                        </div>
-
-
-                                        <span className="provider-status ongoing">
-                                            Ongoing
-                                        </span>
-
-                                    </div>
-
-
-                                    {/* Schedule 2 */}
-                                    <div className="provider-schedule-item">
-
-                                        <div className="provider-time">
-                                            <strong>
-                                                01:00 PM
-                                            </strong>
-
-                                            <span>
-                                                03:00 PM
-                                            </span>
-                                        </div>
-
-
-                                        <div className="provider-schedule-line"></div>
-
-
-                                        <div className="provider-schedule-details">
-
-                                            <h4>
-                                                Air Conditioner Service
-                                            </h4>
-
-                                            <p>
-                                                <i className="bi bi-person"></i>
-                                                Maria Santos
-                                            </p>
-
-                                            <p>
-                                                <i className="bi bi-geo-alt"></i>
-                                                Block 4 Lot 12, Phase 2
-                                            </p>
-
-                                        </div>
-
-
-                                        <span className="provider-status confirmed">
-                                            Confirmed
-                                        </span>
-
-                                    </div>
-
-
-                                    {/* Schedule 3 */}
-                                    <div className="provider-schedule-item">
-
-                                        <div className="provider-time">
-                                            <strong>
-                                                04:00 PM
-                                            </strong>
-
-                                            <span>
-                                                05:30 PM
-                                            </span>
-                                        </div>
-
-
-                                        <div className="provider-schedule-line"></div>
-
-
-                                        <div className="provider-schedule-details">
-
-                                            <h4>
-                                                Plumbing Repair
-                                            </h4>
-
-                                            <p>
-                                                <i className="bi bi-person"></i>
-                                                Ana Reyes
-                                            </p>
-
-                                            <p>
-                                                <i className="bi bi-geo-alt"></i>
-                                                Phase 1, Brgy. 8
-                                            </p>
-
-                                        </div>
-
-
-                                        <span className="provider-status confirmed">
-                                            Confirmed
-                                        </span>
-
-                                    </div>
-
+                                    ))}
                                 </div>
 
                             </div>
@@ -624,115 +524,16 @@ const ProviderDashboard = () => {
 
 
                                 <div className="provider-notification-list">
-
-
-                                    {/* Notification 1 */}
-                                    <div className="provider-notification-item unread">
-
-                                        <div className="provider-notification-icon green">
-                                            <i className="bi bi-calendar-plus"></i>
+                                    {bookings.length === 0 ? <p>No booking notifications yet.</p> : bookings.slice(0, 4).map((booking) => (
+                                        <div className="provider-notification-item unread" key={booking.id}>
+                                            <div className="provider-notification-icon green"><i className="bi bi-calendar-plus"></i></div>
+                                            <div className="provider-notification-content">
+                                                <strong>{booking.status === 'Pending' ? 'New booking request' : 'Booking updated'}</strong>
+                                                <p>{booking.customerName || 'Homeowner'} requested {booking.category || 'a service'}.</p>
+                                                <small>{booking.preferredDate}</small>
+                                            </div>
                                         </div>
-
-                                        <div className="provider-notification-content">
-
-                                            <strong>
-                                                New booking request
-                                            </strong>
-
-                                            <p>
-                                                Juan Dela Cruz requested
-                                                Electrical Wiring.
-                                            </p>
-
-                                            <small>
-                                                10 minutes ago
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* Notification 2 */}
-                                    <div className="provider-notification-item unread">
-
-                                        <div className="provider-notification-icon orange">
-                                            <i className="bi bi-star-fill"></i>
-                                        </div>
-
-                                        <div className="provider-notification-content">
-
-                                            <strong>
-                                                New customer review
-                                            </strong>
-
-                                            <p>
-                                                Maria Santos gave you a
-                                                5-star rating.
-                                            </p>
-
-                                            <small>
-                                                1 hour ago
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* Notification 3 */}
-                                    <div className="provider-notification-item">
-
-                                        <div className="provider-notification-icon blue">
-                                            <i className="bi bi-wallet2"></i>
-                                        </div>
-
-                                        <div className="provider-notification-content">
-
-                                            <strong>
-                                                Payment received
-                                            </strong>
-
-                                            <p>
-                                                ₱1,200 payment has been
-                                                added to your earnings.
-                                            </p>
-
-                                            <small>
-                                                Yesterday
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* Notification 4 */}
-                                    <div className="provider-notification-item">
-
-                                        <div className="provider-notification-icon purple">
-                                            <i className="bi bi-check-circle"></i>
-                                        </div>
-
-                                        <div className="provider-notification-content">
-
-                                            <strong>
-                                                Job completed
-                                            </strong>
-
-                                            <p>
-                                                Air Conditioner Service
-                                                was marked completed.
-                                            </p>
-
-                                            <small>
-                                                Yesterday
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
+                                    ))}
                                 </div>
 
 
@@ -934,13 +735,7 @@ const ProviderDashboard = () => {
 
 
                 {activeSection === 'messages' && (
-                    <div className="provider-placeholder-page">
-                        <i className="bi bi-chat-dots"></i>
-                        <h2>Messages</h2>
-                        <p>
-                            Communicate with your homeowners.
-                        </p>
-                    </div>
+                    <Messages embedded />
                 )}
 
 
@@ -1000,7 +795,7 @@ const ProviderDashboard = () => {
 
             </main>
 
-        </div>
+        </div >
     );
 };
 
