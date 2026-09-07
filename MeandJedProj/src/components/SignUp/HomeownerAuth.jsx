@@ -371,7 +371,7 @@ const HomeownerAuth = () => {
                                 <p className="text-white opacity-75 mb-4">Enter your personal details and start journey with us</p>
                                 <button className="btn btn-outline-light rounded-pill px-5 py-2 fw-bold" onClick={toggleForm}>
                                     SIGN UP
-                                </button>
+                                </button>z
                             </div>
                         </div>
 

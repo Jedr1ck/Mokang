@@ -1,0 +1,9 @@
+{
+    "name": "mokang-workspace",
+    "private": true,
+    "scripts": {
+        "dev": "npm --prefix MeandJedProj run dev",
+        "build": "npm --prefix MeandJedProj run build",
+        "lint": "npm --prefix MeandJedProj run lint"
+    }
+}

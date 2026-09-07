@@ -7,8 +7,9 @@ import LandingPage from "./pages/LandingPage";
 // AUTH
 // =====================================================
 
-import HomeownerAuth from "./components/SignUp/HomeownerAuth";
+import HomeownerAuthSimple from "./components/SignUp/HomeownerAuthSimple";
 import ProviderAuth from "./components/SignUp/ProviderAuth";
+import AdminAuth from "./components/SignUp/AdminAuth";
 
 
 // =====================================================
@@ -62,12 +63,17 @@ function App() {
 
         <Route
           path="/auth/homeowner"
-          element={<HomeownerAuth />}
+          element={<HomeownerAuthSimple />}
         />
 
         <Route
           path="/auth/provider"
           element={<ProviderAuth />}
+        />
+
+        <Route
+          path="/admin-login"
+          element={<AdminAuth />}
         />
 
 

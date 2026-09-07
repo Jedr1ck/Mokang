@@ -8,6 +8,7 @@ import "../../index.css";
 import { login, register } from '../../services/api';
 
 
+
 const ProviderAuth = () => {
 
     const navigate = useNavigate();

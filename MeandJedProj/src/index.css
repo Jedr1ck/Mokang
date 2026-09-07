@@ -1745,3 +1745,628 @@ html {
   background-color: #c05a1d;
   color: #ffffff;
 }
+
+/* =========================================================
+   ADMIN AUTHENTICATION
+   ========================================================= */
+
+.admin-auth-page {
+  min-height: 100vh;
+  width: 100%;
+
+  background: #f5f6f5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.admin-auth-container {
+  width: 900px;
+  max-width: 100%;
+
+  min-height: 570px;
+
+  background: #ffffff;
+
+  border-radius: 28px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   FORM CONTAINERS
+   ========================================================= */
+
+.admin-form-container {
+  position: absolute;
+
+  top: 0;
+  height: 100%;
+
+  width: 50%;
+
+  transition:
+    all 0.6s ease-in-out;
+}
+
+
+.admin-login-container {
+  left: 0;
+
+  z-index: 2;
+}
+
+
+.admin-create-container {
+  left: 0;
+
+  opacity: 0;
+
+  z-index: 1;
+}
+
+
+/* =========================================================
+   CREATE MODE
+   ========================================================= */
+
+.admin-create-active .admin-login-container {
+  transform: translateX(100%);
+
+  opacity: 0;
+}
+
+
+.admin-create-active .admin-create-container {
+  transform: translateX(100%);
+
+  opacity: 1;
+
+  z-index: 5;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.admin-auth-form {
+  height: 100%;
+
+  padding: 45px 55px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  text-align: center;
+}
+
+
+.admin-auth-form h1 {
+  margin: 12px 0 8px;
+
+  color: #168b5a;
+
+  font-size: 31px;
+
+  font-weight: 800;
+}
+
+
+.admin-auth-form p {
+  color: #858b88;
+
+  font-size: 13px;
+
+  margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   ADMIN ICON
+   ========================================================= */
+
+.admin-icon-circle {
+  width: 65px;
+  height: 65px;
+
+  border-radius: 50%;
+
+  background: #e5f7ef;
+
+  color: #168b5a;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  font-size: 27px;
+}
+
+
+/* =========================================================
+   INPUT GROUP
+   ========================================================= */
+
+.admin-input-group {
+  width: 100%;
+
+  height: 50px;
+
+  background: #f5f6f7;
+
+  border-radius: 9px;
+
+  margin-bottom: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 15px;
+
+  transition: 0.2s;
+}
+
+
+.admin-input-group:focus-within {
+  background: #eef8f3;
+
+  box-shadow:
+    0 0 0 2px rgba(22, 139, 90, 0.12);
+}
+
+
+.admin-input-group>i {
+  color: #168b5a;
+
+  font-size: 17px;
+
+  margin-right: 12px;
+}
+
+
+.admin-input-group input {
+  width: 100%;
+
+  height: 100%;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  font-size: 14px;
+
+  color: #333;
+}
+
+
+.admin-input-group input::placeholder {
+  color: #969c99;
+}
+
+
+/* =========================================================
+   PASSWORD TOGGLE
+   ========================================================= */
+
+.password-toggle {
+  border: none;
+
+  background: transparent;
+
+  color: #7f8984;
+
+  cursor: pointer;
+
+  font-size: 16px;
+
+  padding: 5px;
+}
+
+
+.password-toggle:hover {
+  color: #168b5a;
+}
+
+
+/* =========================================================
+   PASSWORD STRENGTH
+   ========================================================= */
+
+.password-strength-box {
+  width: 100%;
+
+  text-align: left;
+
+  margin-top: -4px;
+
+  margin-bottom: 10px;
+}
+
+
+.password-bars {
+  display: flex;
+
+  gap: 5px;
+
+  width: 100%;
+
+  margin-bottom: 5px;
+}
+
+
+.password-bars span {
+  height: 4px;
+
+  flex: 1;
+
+  border-radius: 5px;
+
+  background: #dfe4e1;
+}
+
+
+.password-bars .strength-active {
+  background: #168b5a;
+}
+
+
+.password-strength-box small {
+  color: #d48a00;
+
+  font-size: 10px;
+}
+
+
+.password-strength-box small.strong-text {
+  color: #168b5a;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
+
+.admin-error {
+  width: 100%;
+
+  color: #dc3545;
+
+  font-size: 10px;
+
+  text-align: left;
+
+  margin-top: -5px;
+
+  margin-bottom: 8px;
+}
+
+
+.admin-error i {
+  margin-right: 5px;
+}
+
+
+/* =========================================================
+   MAIN BUTTON
+   ========================================================= */
+
+.admin-main-button {
+  border: none;
+
+  background: #ff7818;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  padding: 13px 40px;
+
+  min-width: 170px;
+
+  border-radius: 30px;
+
+  cursor: pointer;
+
+  margin-top: 10px;
+
+  transition: 0.2s;
+}
+
+
+.admin-main-button:hover {
+  background: #e9660b;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 5px 14px rgba(255, 120, 24, 0.25);
+}
+
+
+/* =========================================================
+   SECURITY NOTE
+   ========================================================= */
+
+.admin-security-note {
+  color: #929a96;
+
+  font-size: 10px;
+
+  margin-top: 18px;
+}
+
+
+.admin-security-note i {
+  color: #168b5a;
+
+  margin-right: 5px;
+}
+
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.admin-overlay-container {
+  position: absolute;
+
+  top: 0;
+
+  left: 50%;
+
+  width: 50%;
+
+  height: 100%;
+
+  overflow: hidden;
+
+  z-index: 100;
+
+  transition:
+    transform 0.6s ease-in-out;
+}
+
+
+.admin-create-active .admin-overlay-container {
+  transform: translateX(-100%);
+}
+
+
+.admin-overlay {
+  position: relative;
+
+  left: -100%;
+
+  width: 200%;
+
+  height: 100%;
+
+  background: #168b5a;
+
+  color: white;
+
+  transform: translateX(0);
+
+  transition:
+    transform 0.6s ease-in-out;
+}
+
+
+.admin-create-active .admin-overlay {
+  transform: translateX(50%);
+}
+
+
+/* =========================================================
+   OVERLAY PANELS
+   ========================================================= */
+
+.admin-overlay-panel {
+  position: absolute;
+
+  top: 0;
+
+  width: 50%;
+
+  height: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  padding: 35px 50px;
+}
+
+
+.admin-overlay-left {
+  left: 0;
+}
+
+
+.admin-overlay-right {
+  right: 0;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.admin-brand {
+  align-self: flex-start;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  font-size: 18px;
+
+  font-weight: 800;
+}
+
+
+.admin-brand i {
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   OVERLAY CONTENT
+   ========================================================= */
+
+.admin-overlay-content {
+  margin: auto 0;
+
+  max-width: 310px;
+}
+
+
+.admin-overlay-icon {
+  width: 65px;
+  height: 65px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin: 0 auto 20px;
+
+  font-size: 27px;
+}
+
+
+.admin-overlay-content h2 {
+  font-size: 29px;
+
+  font-weight: 800;
+
+  margin-bottom: 12px;
+}
+
+
+.admin-overlay-content p {
+  color: rgba(255, 255, 255, 0.78);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+  margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   OUTLINE BUTTON
+   ========================================================= */
+
+.admin-outline-button {
+  border: 1px solid rgba(255, 255, 255, 0.9);
+
+  background: transparent;
+
+  color: white;
+
+  padding: 11px 30px;
+
+  border-radius: 30px;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+.admin-outline-button:hover {
+  background: white;
+
+  color: #168b5a;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 750px) {
+
+  .admin-auth-container {
+    min-height: 650px;
+  }
+
+
+  .admin-form-container {
+    width: 100%;
+  }
+
+
+  .admin-overlay-container {
+    display: none;
+  }
+
+
+  .admin-login-container,
+  .admin-create-container {
+    left: 0;
+  }
+
+
+  .admin-create-active .admin-login-container {
+    transform: translateX(-100%);
+  }
+
+
+  .admin-create-active .admin-create-container {
+    transform: translateX(0);
+  }
+
+
+  .admin-auth-form {
+    padding: 35px 30px;
+  }
+
+}
