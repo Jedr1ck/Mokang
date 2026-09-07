@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProviderSideBar from "../ProviderSideBar/ProviderSideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./ProviderJobs.css";
+import { getMyBookings, sendMessage, updateBookingStatus } from "../../services/api";
 
 const ProviderJobs = () => {
     const [selectedJob, setSelectedJob] = useState(null);
@@ -10,73 +11,27 @@ const ProviderJobs = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [message, setMessage] = useState("");
 
-    // DEMO JOB DATA
-    const [jobs, setJobs] = useState([
-        {
-            id: 1,
-            requestNo: "REQ-2026-001",
-            customerName: "Juan Dela Cruz",
-            service: "Electrical Repair",
-            location: "Brgy. Rizal, Silay City",
-            contact: "0912-345-6789",
-            date: "September 3, 2026",
-            time: "9:00 AM - 11:00 AM",
-            status: "Accepted",
-            amount: "₱1,500",
-            description:
-                "May problema po sa electrical wiring ng living room. Biglang namamatay ang ilaw at may amoy sunog kapag ginagamit ang outlet.",
-            photo:
-                "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=800&q=80"
-        },
-        {
-            id: 2,
-            requestNo: "REQ-2026-002",
-            customerName: "Maria Santos",
-            service: "Aircon Cleaning",
-            location: "Brgy. E. Lopez, Silay City",
-            contact: "0920-456-7890",
-            date: "September 3, 2026",
-            time: "1:00 PM - 3:00 PM",
-            status: "On the Way",
-            amount: "₱1,200",
-            description:
-                "Hindi na po malamig ang aircon. Gusto ko rin pong ipa-general cleaning.",
-            photo:
-                "https://images.unsplash.com/photo-1631545806609-1b6e85b1e0f6?auto=format&fit=crop&w=800&q=80"
-        },
-        {
-            id: 3,
-            requestNo: "REQ-2026-003",
-            customerName: "Ana Reyes",
-            service: "Plumbing Repair",
-            location: "Brgy. Guinhalaran, Silay City",
-            contact: "0931-567-8901",
-            date: "September 4, 2026",
-            time: "10:00 AM - 12:00 PM",
-            status: "In Progress",
-            amount: "₱950",
-            description:
-                "May tumutulong tubig sa ilalim ng kitchen sink at kailangan pong ipaayos agad.",
-            photo:
-                "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=800&q=80"
-        },
-        {
-            id: 4,
-            requestNo: "REQ-2026-004",
-            customerName: "Robert Garcia",
-            service: "House Cleaning",
-            location: "Brgy. II, Silay City",
-            contact: "0945-678-9012",
-            date: "September 5, 2026",
-            time: "8:00 AM - 11:00 AM",
-            status: "Completed",
-            amount: "₱1,800",
-            description:
-                "Full house cleaning po including living room, bedrooms, kitchen, and bathroom.",
-            photo:
-                "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80"
-        }
-    ]);
+    const [jobs, setJobs] = useState([]);
+
+    useEffect(() => {
+        getMyBookings().then((bookings) => setJobs(bookings
+            .filter((booking) => booking.status !== "Pending" && booking.status !== "Cancelled")
+            .map((booking) => ({
+                id: booking.id,
+                recipientId: booking.homeownerId,
+                requestNo: booking.bookingCode,
+                customerName: booking.customerName || "Homeowner",
+                service: booking.category || "Service request",
+                location: booking.address,
+                contact: booking.customerPhone || "Not provided",
+                date: new Date(`${booking.preferredDate}T00:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+                time: booking.preferredTime,
+                status: booking.status,
+                amount: "Not specified",
+                description: booking.description,
+                photo: ""
+            })))).catch((error) => alert(error.message));
+    }, []);
 
     const openDetails = (job) => {
         setSelectedJob(job);
@@ -96,13 +51,12 @@ const ProviderJobs = () => {
             status: newStatus
         };
 
-        setJobs((previousJobs) =>
-            previousJobs.map((job) =>
-                job.id === selectedJob.id ? updatedJob : job
-            )
-        );
-
-        setSelectedJob(updatedJob);
+        updateBookingStatus(selectedJob.id, newStatus)
+            .then(() => {
+                setJobs((previousJobs) => previousJobs.map((job) => job.id === selectedJob.id ? updatedJob : job));
+                setSelectedJob(updatedJob);
+            })
+            .catch((error) => alert(error.message));
     };
 
     const openMessage = (job) => {
@@ -110,16 +64,18 @@ const ProviderJobs = () => {
         setShowMessage(true);
     };
 
-    const sendMessage = () => {
+    const handleSendMessage = async () => {
         if (!message.trim() || message.trim().length > 1000) {
             alert("Enter a message between 1 and 1,000 characters.");
             return;
         }
 
-        alert(`Message sent to ${selectedJob.customerName}!`);
-
-        setMessage("");
-        setShowMessage(false);
+        try {
+            await sendMessage(selectedJob.recipientId, message.trim(), selectedJob.id);
+            alert(`Message sent to ${selectedJob.customerName}!`);
+            setMessage("");
+            setShowMessage(false);
+        } catch (error) { alert(error.message); }
     };
 
     const getStatusClass = (status) => {
@@ -906,7 +862,7 @@ const ProviderJobs = () => {
 
                             <button
                                 className="btn btn-success rounded-pill px-4"
-                                onClick={sendMessage}
+                                onClick={handleSendMessage}
                             >
                                 <i className="bi bi-send me-2"></i>
                                 Send Message

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { api } from '../../services/api';
 
-const BookingModal = ({ show, handleClose, initialCategory = 'Electrical' }) => {
+const BookingModal = ({ show, handleClose, initialCategory = 'Electrical', providerId = null }) => {
     const navigate = useNavigate();
     const [bookingSubmitted, setBookingSubmitted] = useState(false);
     const [formError, setFormError] = useState('');
@@ -15,6 +15,13 @@ const BookingModal = ({ show, handleClose, initialCategory = 'Electrical' }) => 
         description: '',
         photo: null
     });
+
+    useEffect(() => {
+        if (show) {
+            setFormData((previous) => ({ ...previous, category: initialCategory || '' }));
+            setFormError('');
+        }
+    }, [show, initialCategory]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -36,19 +43,22 @@ const BookingModal = ({ show, handleClose, initialCategory = 'Electrical' }) => 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const today = new Date().toISOString().split('T')[0];
-        if (formData.preferredDate < today || formData.address.trim().length < 10 || formData.description.trim().length < 10) {
-            setFormError('Choose today or a future date; address and description must each be at least 10 characters.');
+        if (!formData.category.trim() || formData.preferredDate < today || formData.address.trim().length < 10 || formData.description.trim().length < 10) {
+            setFormError('Choose a service category, a future date, and provide an address and description of at least 10 characters.');
             return;
         }
         setFormError('');
         try {
-            await api('/bookings', { method: 'POST', body: JSON.stringify({
-                category: formData.category,
-                preferred_date: formData.preferredDate,
-                preferred_time: formData.preferredTime,
-                address: formData.address,
-                description: formData.description
-            }) });
+            await api('/bookings', {
+                method: 'POST', body: JSON.stringify({
+                    category: formData.category,
+                    provider_id: providerId,
+                    preferred_date: formData.preferredDate,
+                    preferred_time: formData.preferredTime,
+                    address: formData.address,
+                    description: formData.description
+                })
+            });
             setBookingSubmitted(true);
         } catch (error) { alert(error.message); }
     };

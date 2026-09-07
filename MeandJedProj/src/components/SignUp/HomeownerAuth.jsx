@@ -18,6 +18,8 @@ const HomeownerAuth = () => {
         fullName: '',
         email: '',
         mobileNumber: '',
+        gender: '',
+        address: '',
         otp: '',
         password: '',
         confirmPassword: '',
@@ -93,6 +95,10 @@ const HomeownerAuth = () => {
             alert('Enter a valid mobile number.');
             return;
         }
+        if (!formData.gender || formData.address.trim().length < 10) {
+            alert('Please select your gender and enter an address of at least 10 characters.');
+            return;
+        }
         if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/.test(formData.password)) {
             setPasswordError('Password must be 8+ characters and include uppercase, lowercase, and a number.');
             return;
@@ -115,9 +121,12 @@ const HomeownerAuth = () => {
                 full_name: formData.fullName.trim(),
                 email: formData.email.trim(),
                 mobile_number: phone,
+                gender: formData.gender,
+                address: formData.address.trim(),
                 password: formData.password,
                 role: 'homeowner',
             });
+            localStorage.setItem('access_token', response.access_token);
             localStorage.setItem('user', JSON.stringify(response.user));
             alert('Matagumpay ang iyong Registration bilang Homeowner!');
             navigate('/homeowner-dashboard');
@@ -189,6 +198,39 @@ const HomeownerAuth = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 maxLength="254"
+                                required
+                            />
+                        </div>
+
+                        {/* Gender and Address */}
+                        <div className="input-group mb-2">
+                            <span className="input-group-text bg-light border-0"><i className="bi bi-gender-ambiguous"></i></span>
+                            <select
+                                name="gender"
+                                className="form-select bg-light border-0 shadow-none"
+                                value={formData.gender}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="" disabled>Select Gender</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+
+                        <div className="input-group mb-2">
+                            <span className="input-group-text bg-light border-0"><i className="bi bi-geo-alt"></i></span>
+                            <input
+                                type="text"
+                                name="address"
+                                className="form-control bg-light border-0 shadow-none"
+                                placeholder="Address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                minLength="10"
+                                maxLength="500"
                                 required
                             />
                         </div>

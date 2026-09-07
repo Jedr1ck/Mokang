@@ -1,51 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "../../HomeownerDashboard.css";
-
-// Sample Data ng mga Service Providers na may Availability
-const MOCK_PROVIDERS = [
-    {
-        id: 1,
-        name: "Juan Dela Cruz",
-        category: "Electrician",
-        location: "Libertad",
-        rating: 4.9,
-        reviews: 28,
-        rate: "₱350/hr",
-        experience: "5 years exp",
-        availability: "Available Today",
-        availabilityType: "today",
-        image: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop&q=80"
-    },
-    {
-        id: 2,
-        name: "Mario Bros Repairs",
-        category: "Plumber",
-        location: "Libertad",
-        rating: 4.7,
-        reviews: 15,
-        rate: "₱400/hr",
-        experience: "3 years exp",
-        availability: "Available Tomorrow",
-        availabilityType: "tomorrow",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
-    },
-    {
-        id: 3,
-        name: "Elena Cool Services",
-        category: "Aircon Technician",
-        location: "Libertad",
-        rating: 5.0,
-        reviews: 19,
-        rate: "₱500/unit",
-        experience: "4 years exp",
-        availability: "Available Today",
-        availabilityType: "today",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
-    }
-];
+import { getProviders } from '../../services/api';
 
 const CATEGORIES = [
     "All",
@@ -73,8 +31,18 @@ const FindService = () => {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchLocation, setSearchLocation] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [providers, setProviders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
-    const filteredProviders = MOCK_PROVIDERS.filter((provider) => {
+    useEffect(() => {
+        getProviders()
+            .then(setProviders)
+            .catch((error) => setLoadError(error.message))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const filteredProviders = providers.filter((provider) => {
         const matchesCategory = selectedCategory === 'All' || provider.category === selectedCategory;
         const matchesLocation = provider.location.toLowerCase().includes(searchLocation.toLowerCase().trim());
         const matchesQuery = provider.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
@@ -171,7 +139,11 @@ const FindService = () => {
 
             {/* Results Grid */}
             <div className="row g-4">
-                {filteredProviders.length > 0 ? (
+                {loading ? (
+                    <div className="col-12 text-center py-5"><div className="spinner-border text-success" role="status"></div></div>
+                ) : loadError ? (
+                    <div className="col-12 text-center py-5"><h5 className="fw-bold">Unable to load service providers</h5><p className="text-muted small">{loadError}</p></div>
+                ) : filteredProviders.length > 0 ? (
                     filteredProviders.map((provider) => (
                         <div key={provider.id} className="col-md-6 col-lg-4">
                             <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden provider-card">

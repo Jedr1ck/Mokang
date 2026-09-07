@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
+import { getMessages, sendMessage } from '../../services/api';
 
-const Messages = () => {
-    // Sample Chat Conversations
-    const [conversations, setConversations] = useState([
+const Messages = ({ embedded = false }) => {
+    const currentUserId = Number(JSON.parse(localStorage.getItem('user') || '{}').id);
+    const [conversations, setConversations] = useState([]); /*
         {
             id: 1,
             name: 'Mario Plumbing Services',
@@ -44,15 +45,33 @@ const Messages = () => {
                 { id: 301, sender: 'provider', text: 'All main breakers are checked and secure.', time: 'Aug 25' }
             ]
         }
-    ]);
+    ]); */
 
     const [activeChatId, setActiveChatId] = useState(1);
     const [newMessage, setNewMessage] = useState('');
     const [messageError, setMessageError] = useState('');
 
+    useEffect(() => {
+        getMessages().then((rows) => {
+            const grouped = new Map();
+            rows.forEach((row) => {
+                const otherId = row.senderId === currentUserId ? row.recipientId : row.senderId;
+                const otherName = row.senderId === currentUserId ? row.recipientName : row.senderName;
+                const conversation = grouped.get(otherId) || { id: otherId, recipientId: otherId, name: otherName, avatar: '', lastMessage: '', time: '', unread: false, online: false, messages: [] };
+                conversation.messages.push({ id: row.id, sender: row.senderId === currentUserId ? 'user' : 'provider', text: row.body, time: new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+                conversation.lastMessage = row.body;
+                conversation.time = new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                grouped.set(otherId, conversation);
+            });
+            const loaded = [...grouped.values()];
+            setConversations(loaded);
+            setActiveChatId(loaded[0]?.id || null);
+        }).catch((error) => setMessageError(error.message));
+    }, [currentUserId]);
+
     const activeChat = conversations.find(c => c.id === activeChatId);
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         const cleanMessage = newMessage.trim();
         if (!cleanMessage || cleanMessage.length > 1000) {
@@ -61,38 +80,26 @@ const Messages = () => {
         }
         setMessageError('');
 
-        const updatedConversations = conversations.map(c => {
-            if (c.id === activeChatId) {
-                const updatedMsgs = [
-                    ...c.messages,
-                    {
-                        id: Date.now(),
-                        sender: 'user',
-                        text: cleanMessage,
-                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    }
-                ];
-                return { ...c, messages: updatedMsgs, lastMessage: cleanMessage, time: 'Just now' };
-            }
-            return c;
-        });
-
-        setConversations(updatedConversations);
-        setNewMessage('');
+        try {
+            const result = await sendMessage(activeChat.recipientId, cleanMessage);
+            const updatedConversations = conversations.map((conversation) => conversation.id === activeChatId ? { ...conversation, messages: [...conversation.messages, { id: result.id, sender: 'user', text: cleanMessage, time: 'Just now' }], lastMessage: cleanMessage, time: 'Just now' } : conversation);
+            setConversations(updatedConversations);
+            setNewMessage('');
+        } catch (error) { setMessageError(error.message); }
     };
 
     return (
-        <div className="profile-page-container">
+        <div className={embedded ? 'messages-embedded' : 'profile-page-container'}>
             {/* Sidebar */}
-            <HomeownerSideBar />
+            {!embedded && <HomeownerSideBar />}
 
             {/* Main Content Area */}
-            <main className="profile-main-content">
+            <main className={embedded ? 'messages-embedded-main' : 'profile-main-content'} style={embedded ? { width: '100%', padding: 0 } : undefined}>
                 <header className="profile-header">
                     <h2>Messages</h2>
                 </header>
 
-                <div style={chatContainerStyle}>
+                <div style={embedded ? { ...chatContainerStyle, marginTop: 0, height: 'calc(100vh - 210px)' } : chatContainerStyle}>
 
                     {/* Left Panel: Contact List */}
                     <div style={sidebarListStyle}>

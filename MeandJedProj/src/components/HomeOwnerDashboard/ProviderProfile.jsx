@@ -203,7 +203,8 @@ const ProviderProfile = () => {
             <BookingModal
                 show={showBookingModal}
                 handleClose={() => setShowBookingModal(false)}
-                initialCategory={`${PROVIDER_DATA.category} - ${PROVIDER_DATA.name}`}
+                providerId={Number(id) || PROVIDER_DATA.id}
+                initialCategory="Electrical"
             />
         </div>
     );
