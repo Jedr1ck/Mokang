@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import HomeownerAuthSimple from "./components/SignUp/HomeownerAuthSimple";
 import ProviderAuth from "./components/SignUp/ProviderAuth";
 import AdminAuth from "./components/SignUp/AdminAuth";
+import AdminDashboard from "./components/AdminDashboard";
 
 
 // =====================================================
@@ -74,6 +75,11 @@ function App() {
         <Route
           path="/admin-login"
           element={<AdminAuth />}
+        />
+
+        <Route
+          path="/admin-dashboard"
+          element={<AdminDashboard />}
         />
 
 

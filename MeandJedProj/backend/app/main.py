@@ -75,6 +75,10 @@ class Login(BaseModel):
  email: EmailStr
  password: str = Field(min_length=1, max_length=128)
 
+class AdminCredentials(BaseModel):
+ username: str = Field(min_length=3, max_length=150)
+ password: str = Field(min_length=8, max_length=128)
+
 class BookingIn(BaseModel):
  category: str = Field(min_length=2, max_length=100)
  preferred_date: date
@@ -151,6 +155,24 @@ def register(x:Register,s:Session=Depends(db)):
 def login(x:Login,s:Session=Depends(db)):
  u=s.query(User).filter(User.email==x.email).first()
  if not u or not pwd.verify(x.password,u.password_hash): raise HTTPException(status.HTTP_401_UNAUTHORIZED,'Invalid email or password')
+ token=jwt.encode({'sub':str(u.id),'exp':datetime.utcnow()+timedelta(days=1)},SECRET_KEY,algorithm=ALGORITHM); return {'access_token':token,'token_type':'bearer','user':user_out(u)}
+@app.get('/auth/admin/exists')
+def admin_exists(s:Session=Depends(db)):
+ return {'exists':s.query(User).filter(User.role=='admin',User.is_active.is_(True)).first() is not None}
+@app.post('/auth/admin/register')
+def register_admin(x:AdminCredentials,s:Session=Depends(db)):
+ if s.query(User).filter(User.role=='admin',User.is_active.is_(True)).first(): raise HTTPException(409,'An admin account already exists')
+ username=x.username.strip()
+ if not username: raise HTTPException(422,'Username cannot be blank')
+ admin_email=f'{username.lower()}@admin.smarthome.local'
+ if s.query(User).filter(User.email==admin_email).first(): raise HTTPException(409,'Admin username is already in use')
+ u=User(full_name=username,email=admin_email,address='SmartHome Administration',password_hash=pwd.hash(x.password),role='admin'); s.add(u); s.commit(); s.refresh(u)
+ return {'message':'Admin account created successfully','user':user_out(u)}
+@app.post('/auth/admin/login')
+def login_admin(x:AdminCredentials,s:Session=Depends(db)):
+ username=x.username.strip()
+ u=s.query(User).filter(User.role=='admin',User.full_name==username,User.is_active.is_(True)).first()
+ if not u or not pwd.verify(x.password,u.password_hash): raise HTTPException(status.HTTP_401_UNAUTHORIZED,'Invalid admin username or password')
  token=jwt.encode({'sub':str(u.id),'exp':datetime.utcnow()+timedelta(days=1)},SECRET_KEY,algorithm=ALGORITHM); return {'access_token':token,'token_type':'bearer','user':user_out(u)}
 @app.get('/auth/me')
 def me(u:User=Depends(current)): return user_out(u)

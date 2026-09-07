@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { adminExists, loginAdmin, registerAdmin } from "../../services/api";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -12,9 +13,7 @@ const AdminAuth = () => {
 
     const navigate = useNavigate();
 
-    const [isCreateMode, setIsCreateMode] = useState(
-        () => !localStorage.getItem("adminAccount")
-    );
+    const [isCreateMode, setIsCreateMode] = useState(true);
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -25,6 +24,13 @@ const AdminAuth = () => {
 
     const [passwordError, setPasswordError] = useState("");
     const [confirmError, setConfirmError] = useState("");
+    const [formError, setFormError] = useState("");
+
+    React.useEffect(() => {
+        adminExists()
+            .then(({ exists }) => setIsCreateMode(!exists))
+            .catch(() => setFormError("Unable to connect to the server."));
+    }, []);
 
     // =========================================
     // PASSWORD STRENGTH
@@ -138,7 +144,7 @@ const AdminAuth = () => {
     // LOGIN
     // =========================================
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
 
         e.preventDefault();
 
@@ -152,33 +158,13 @@ const AdminAuth = () => {
             return;
         }
 
-        const savedAdmin = JSON.parse(
-            localStorage.getItem("adminAccount") || "null"
-        );
-
-        if (!savedAdmin) {
-            alert("No admin account exists yet. Create the first admin account.");
-            setIsCreateMode(true);
-            return;
+        setFormError("");
+        try {
+            await loginAdmin(username.trim(), password);
+            navigate("/admin-dashboard");
+        } catch (error) {
+            setFormError(error.message);
         }
-
-        if (
-            savedAdmin.username !== username.trim() ||
-            savedAdmin.password !== password
-        ) {
-            alert("Invalid admin username or password.");
-            return;
-        }
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify({
-                username: savedAdmin.username,
-                role: "admin"
-            })
-        );
-
-        navigate("/admin-dashboard");
     };
 
 
@@ -186,12 +172,13 @@ const AdminAuth = () => {
     // CREATE ADMIN ACCOUNT
     // =========================================
 
-    const handleCreateAdmin = (e) => {
+    const handleCreateAdmin = async (e) => {
 
         e.preventDefault();
 
         setPasswordError("");
         setConfirmError("");
+        setFormError("");
 
         if (!username.trim()) {
 
@@ -220,30 +207,15 @@ const AdminAuth = () => {
             return;
         }
 
-        if (localStorage.getItem("adminAccount")) {
-            alert("Only one admin account can be created.");
+        try {
+            await registerAdmin(username.trim(), password);
+            alert("Admin account created successfully. You can now log in.");
             setIsCreateMode(false);
-            return;
+            setPassword("");
+            setConfirmPassword("");
+        } catch (error) {
+            setFormError(error.message);
         }
-
-        localStorage.setItem(
-            "adminAccount",
-            JSON.stringify({
-                username: username.trim(),
-                password
-            })
-        );
-
-        alert(
-            "Admin account created successfully. You can now log in."
-        );
-
-        setIsCreateMode(false);
-
-        setPassword("");
-        setConfirmPassword("");
-        setPasswordError("");
-        setConfirmError("");
     };
 
 
@@ -261,6 +233,7 @@ const AdminAuth = () => {
 
         setPasswordError("");
         setConfirmError("");
+        setFormError("");
     };
 
 
@@ -375,6 +348,8 @@ const AdminAuth = () => {
                         >
                             LOG IN
                         </button>
+
+                        {formError && <div className="admin-error">{formError}</div>}
 
 
                         <small className="admin-security-note">
@@ -591,6 +566,8 @@ const AdminAuth = () => {
                         >
                             CREATE ADMIN
                         </button>
+
+                        {formError && <div className="admin-error">{formError}</div>}
 
 
                         <small className="admin-security-note">
