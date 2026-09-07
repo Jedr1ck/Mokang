@@ -4,11 +4,12 @@ from datetime import datetime, timedelta, date, time
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import create_engine, Column, BigInteger, String, Text, Boolean, Date, Time, DateTime, ForeignKey, DECIMAL
+from sqlalchemy import create_engine, Column, BigInteger, String, Text, Boolean, Date, Time, DateTime, ForeignKey, DECIMAL, func
 from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parents[1] / '.env')
@@ -116,6 +117,9 @@ app=FastAPI(title='Me and Jed API',version='1.0.0')
 app.add_middleware(CORSMiddleware,allow_origins=os.getenv('CORS_ORIGINS','http://localhost:5173,http://localhost:5174').split(','),allow_credentials=True,allow_methods=['*'],allow_headers=['*'])
 @app.get('/health')
 def health(): return {'status':'ok'}
+@app.get('/public/stats')
+def public_stats(s:Session=Depends(db)):
+ return {'userCount':s.query(func.count(User.id)).filter(User.is_active.is_(True)).scalar() or 0}
 @app.post('/messages')
 def send_message(x:MessageIn,u:User=Depends(current),s:Session=Depends(db)):
  recipient=s.get(User,x.recipient_id)

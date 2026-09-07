@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import background from "../../assets/images/hero-background.png";
+import { getPublicStats } from "../../services/api";
 
 function Hero() {
     const [showPanel, setShowPanel] = useState(false);
+    const [userCount, setUserCount] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        getPublicStats()
+            .then(({ userCount: count }) => setUserCount(count))
+            .catch(() => setUserCount(0));
+    }, []);
 
     return (
         <section
@@ -82,7 +90,7 @@ function Hero() {
                     </div>
 
                     <p>
-                        Trusted by 2000+ HomeOwners and ServiceProvider
+                        Trusted by {userCount ?? "..."} HomeOwners and ServiceProvider
                     </p>
                 </div>
             </div>
