@@ -47,6 +47,16 @@ const BookingModal = ({ show, handleClose, initialCategory = 'Electrical', provi
             setFormError('Choose a service category, a future date, and provide an address and description of at least 10 characters.');
             return;
         }
+
+        const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const role = currentUser.role || currentUser.userRole || currentUser.accountType || '';
+        const isHomeowner = role === 'homeowner' || (!role && window.location.pathname.includes('/homeowner-dashboard'));
+
+        if (!currentUser || !isHomeowner) {
+            setFormError('Only homeowners can create bookings. Please log in with a homeowner account.');
+            return;
+        }
+
         setFormError('');
         try {
             await api('/bookings', {
@@ -60,7 +70,12 @@ const BookingModal = ({ show, handleClose, initialCategory = 'Electrical', provi
                 })
             });
             setBookingSubmitted(true);
-        } catch (error) { alert(error.message); }
+        } catch (error) {
+            const message = error?.message || 'Request failed';
+            setFormError(message.includes('Homeowners only')
+                ? 'Only homeowners can create bookings. Please log in with a homeowner account.'
+                : message);
+        }
     };
 
     const resetAndClose = () => {

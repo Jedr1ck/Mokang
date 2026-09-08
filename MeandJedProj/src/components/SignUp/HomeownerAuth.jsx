@@ -127,7 +127,7 @@ const HomeownerAuth = () => {
                 role: 'homeowner',
             });
             localStorage.setItem('access_token', response.access_token);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.setItem('user', JSON.stringify({ ...response.user, role: response.user.role || 'homeowner' }));
             alert('Matagumpay ang iyong Registration bilang Homeowner!');
             navigate('/homeowner-dashboard');
         } catch (error) {
@@ -146,7 +146,7 @@ const HomeownerAuth = () => {
 
         try {
             const response = await login(loginEmail.trim(), loginPassword);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.setItem('user', JSON.stringify({ ...response.user, role: response.user.role || 'homeowner' }));
             navigate('/homeowner-dashboard');
         } catch (error) {
             alert(error.message);

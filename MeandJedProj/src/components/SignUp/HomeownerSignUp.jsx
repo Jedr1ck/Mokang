@@ -99,7 +99,8 @@ const HomeownerSignUp = () => {
         localStorage.setItem('user', JSON.stringify({
             fullName: formData.fullName,
             email: formData.email,
-            mobileNumber: formData.mobileNumber
+            mobileNumber: formData.mobileNumber,
+            role: 'homeowner'
         }));
 
         // 2. Alert at Redirect papunta sa Dashboard

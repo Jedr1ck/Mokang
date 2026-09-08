@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date, time
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import create_engine, Column, BigInteger, String, Text, Boolean, Date, Time, DateTime, ForeignKey, DECIMAL, func
+from sqlalchemy import create_engine, Column, BigInteger, String, Text, Boolean, Date, Time, DateTime, ForeignKey, DECIMAL, func, and_, or_
 from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from jose import jwt, JWTError
@@ -44,6 +44,25 @@ def current(token:str=Depends(oauth2), s:Session=Depends(db)):
 def user_out(u): return {'id':u.id,'fullName':u.full_name,'email':u.email,'mobileNumber':u.mobile_number,'gender':u.gender,'address':u.address,'role':u.role}
 PHONE_PATTERN = r'^\+?[0-9]{10,15}$'
 BOOKING_STATUSES = {'Pending', 'Accepted', 'On the Way', 'In Progress', 'Completed', 'Cancelled'}
+CATEGORY_ALIASES = {
+ 'electrical': {'electrical', 'electrical repair', 'wiring', 'lighting', 'circuit', 'outlet', 'fan'},
+ 'plumbing': {'plumbing', 'pipe', 'leak', 'drain', 'water', 'sink'},
+ 'carpentry': {'carpentry', 'woodwork', 'cabinet', 'door', 'furniture'},
+ 'cleaning': {'cleaning', 'house cleaning', 'ac cleaning', 'aircon cleaning', 'maintenance', 'general service'},
+ 'painting': {'painting', 'paint', 'repaint', 'wall paint'},
+ 'appliance repair': {'appliance repair', 'appliance', 'aircon', 'ac repair', 'refrigerator', 'washing machine'},
+ 'gardening': {'gardening', 'garden', 'landscaping', 'lawn'}
+}
+
+def normalize_category_name(category_name:str|None)->str|None:
+ if not category_name: return None
+ raw = category_name.strip()
+ if not raw: return None
+ lowered = raw.lower()
+ for canonical, aliases in CATEGORY_ALIASES.items():
+  if lowered == canonical or lowered in aliases or any(alias in lowered for alias in aliases):
+   return canonical.title() if canonical != 'appliance repair' else 'Appliance Repair'
+ return raw
 
 class Register(BaseModel):
  full_name: str = Field(min_length=2, max_length=150)
@@ -146,10 +165,14 @@ def register(x:Register,s:Session=Depends(db)):
  u=User(full_name=x.full_name,email=x.email,mobile_number=x.mobile_number,gender=x.gender,address=x.address,password_hash=pwd.hash(x.password),role=x.role); s.add(u); s.flush()
  if x.role=='provider':
   profile=ProviderProfile(user_id=u.id,business_name=x.business_name or x.full_name,location=x.location or x.address,experience_years=x.experience_years or 0); s.add(profile); s.flush()
-  category_names={'plumbing':'Plumbing','electrical':'Electrical','cleaning':'Cleaning','appliance':'Appliance Repair','carpentry':'Carpentry','painting':'Painting'}
-  category_name=category_names.get((x.service_category or '').lower(), x.service_category)
-  category=s.query(Category).filter(Category.name.ilike(category_name)).first() if category_name else None
-  if category: s.add(ProviderService(provider_id=profile.id,category_id=category.id,title=category.name))
+  category_name = normalize_category_name(x.service_category)
+  if category_name:
+   category = s.query(Category).filter(Category.name.ilike(category_name)).first()
+   if not category:
+    category = Category(name=category_name, description=f'Auto-created category for {category_name}')
+    s.add(category); s.flush()
+   if not s.query(ProviderService).filter_by(provider_id=profile.id, category_id=category.id).first():
+    s.add(ProviderService(provider_id=profile.id, category_id=category.id, title=category.name))
  s.commit(); token=jwt.encode({'sub':str(u.id),'exp':datetime.utcnow()+timedelta(days=1)},SECRET_KEY,algorithm=ALGORITHM); return {'message':'Registration successful','access_token':token,'token_type':'bearer','user':user_out(u)}
 @app.post('/auth/login')
 def login(x:Login,s:Session=Depends(db)):
@@ -192,7 +215,11 @@ def providers(q:str|None=None,location:str|None=None,category:str|None=None,s:Se
 @app.post('/bookings')
 def create_booking(x:BookingIn,u:User=Depends(current),s:Session=Depends(db)):
  if u.role!='homeowner': raise HTTPException(403,'Homeowners only')
- c=s.query(Category).filter(Category.name.ilike(x.category)).first()
+ category_name = normalize_category_name(x.category)
+ c=s.query(Category).filter(Category.name.ilike(category_name)).first() if category_name else None
+ if not c and category_name:
+  c = Category(name=category_name, description=f'Auto-created category for {category_name}')
+  s.add(c); s.flush()
  b=Booking(booking_code='REQ-'+uuid.uuid4().hex[:8].upper(),homeowner_id=u.id,provider_id=x.provider_id,category_id=c.id if c else None,preferred_date=x.preferred_date,preferred_time=x.preferred_time,address=x.address,description=x.description,status='Pending'); s.add(b); s.commit(); s.refresh(b); return booking_out(b)
 def booking_out(b): return {'id':b.id,'bookingCode':b.booking_code,'category':b.category.name if b.category else None,'preferredDate':str(b.preferred_date),'preferredTime':str(b.preferred_time),'address':b.address,'description':b.description,'status':b.status,'providerId':b.provider_id,'homeownerId':b.homeowner_id,'customerName':b.homeowner.full_name if b.homeowner else None,'customerPhone':b.homeowner.mobile_number if b.homeowner else None,'customerEmail':b.homeowner.email if b.homeowner else None}
 @app.get('/bookings/my')
@@ -200,7 +227,14 @@ def my_bookings(u:User=Depends(current),s:Session=Depends(db)):
  q=s.query(Booking)
  if u.role=='homeowner': q=q.filter(Booking.homeowner_id==u.id)
  elif u.role=='provider':
-  p=s.query(ProviderProfile).filter_by(user_id=u.id).first(); q=q.filter(Booking.provider_id==p.id) if p else q.filter(False)
+  p=s.query(ProviderProfile).filter_by(user_id=u.id).first()
+  if not p:
+   return []
+  provider_category_ids = [row.category_id for row in s.query(ProviderService.category_id).filter_by(provider_id=p.id).all()]
+  if provider_category_ids:
+   q=q.filter(or_(Booking.provider_id==p.id,and_(Booking.provider_id.is_(None),Booking.category_id.in_(provider_category_ids))))
+  else:
+   q=q.filter(or_(Booking.provider_id==p.id,Booking.provider_id.is_(None)))
  return [booking_out(b) for b in q.order_by(Booking.created_at.desc()).all()]
 @app.patch('/bookings/{booking_id}/status')
 def change_status(booking_id:int,x:StatusIn,u:User=Depends(current),s:Session=Depends(db)):

@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../index.css';
 import background from '../../assets/images/hero-background.png';
+import { login, register } from '../../services/api';
 
 const HomeownerAuthSimple = () => {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ const HomeownerAuthSimple = () => {
         }));
     };
 
-    const handleRegisterSubmit = (event) => {
+    const handleRegisterSubmit = async (event) => {
         event.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
@@ -43,39 +44,57 @@ const HomeownerAuthSimple = () => {
             return;
         }
 
-        setPasswordError('');
-        const savedAccounts = JSON.parse(localStorage.getItem('savedAccounts') || '[]');
-        const account = {
-            id: Date.now(),
-            name: formData.fullName.trim(),
-            email: formData.email.trim(),
-            age: formData.age,
-            gender: formData.gender,
-            location: formData.location,
-            password: formData.password,
-            role: 'homeowner'
-        };
+        try {
+            setPasswordError('');
+            const response = await register({
+                full_name: formData.fullName.trim(),
+                email: formData.email.trim(),
+                mobile_number: null,
+                gender: formData.gender,
+                address: formData.location.trim(),
+                password: formData.password,
+                role: 'homeowner'
+            });
 
-        localStorage.setItem('savedAccounts', JSON.stringify([...savedAccounts, account]));
-        localStorage.setItem('user', JSON.stringify(account));
-        alert('Matagumpay ang iyong Registration bilang Homeowner!');
-        navigate('/homeowner-dashboard');
+            const account = { ...response.user, role: response.user.role || 'homeowner' };
+            localStorage.setItem('access_token', response.access_token);
+            localStorage.setItem('user', JSON.stringify(account));
+
+            const savedAccounts = JSON.parse(localStorage.getItem('savedAccounts') || '[]');
+            localStorage.setItem('savedAccounts', JSON.stringify([...savedAccounts, account]));
+
+            alert('Matagumpay ang iyong Registration bilang Homeowner!');
+            navigate('/homeowner-dashboard');
+        } catch (error) {
+            alert(error.message);
+        }
     };
 
-    const handleLoginSubmit = (event) => {
+    const handleLoginSubmit = async (event) => {
         event.preventDefault();
-        const savedAccounts = JSON.parse(localStorage.getItem('savedAccounts') || '[]');
-        const account = savedAccounts.find(
-            (savedAccount) => savedAccount.email?.toLowerCase() === loginEmail.trim().toLowerCase()
-        );
 
-        if (!account || account.password !== loginPassword) {
-            alert('Maling email o password. Pakisubukan ulit.');
-            return;
+        try {
+            const response = await login(loginEmail.trim(), loginPassword);
+            const account = { ...response.user, role: response.user.role || 'homeowner' };
+            localStorage.setItem('user', JSON.stringify(account));
+            localStorage.setItem('access_token', response.access_token);
+
+            const savedAccounts = JSON.parse(localStorage.getItem('savedAccounts') || '[]');
+            const existingIndex = savedAccounts.findIndex(
+                (savedAccount) => savedAccount.email?.toLowerCase() === account.email?.toLowerCase()
+            );
+
+            if (existingIndex >= 0) {
+                savedAccounts[existingIndex] = account;
+                localStorage.setItem('savedAccounts', JSON.stringify(savedAccounts));
+            } else {
+                localStorage.setItem('savedAccounts', JSON.stringify([...savedAccounts, account]));
+            }
+
+            navigate('/homeowner-dashboard');
+        } catch (error) {
+            alert(error.message || 'Maling email o password. Pakisubukan ulit.');
         }
-
-        localStorage.setItem('user', JSON.stringify(account));
-        navigate('/homeowner-dashboard');
     };
 
     const toggleForm = () => {
