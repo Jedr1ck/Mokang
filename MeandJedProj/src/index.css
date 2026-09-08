@@ -2055,21 +2055,20 @@ html {
 
 .admin-error {
   width: 100%;
-
-  color: #dc3545;
-
-  font-size: 10px;
-
-  text-align: left;
-
-  margin-top: -5px;
-
-  margin-bottom: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fff3f3;
+  border: 1px solid #f5b5b5;
+  color: #d93025;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
 }
 
-
 .admin-error i {
-  margin-right: 5px;
+  margin-right: 6px;
 }
 
 
@@ -2369,4 +2368,1223 @@ html {
     padding: 35px 30px;
   }
 
+}
+
+/* =========================================================
+   HOMEOWNER AUTH - PASSWORD VISIBILITY
+   ========================================================= */
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper .password-input {
+  padding-right: 48px;
+  margin-bottom: 0 !important;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: #6c757d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: #153e2d;
+  background: rgba(21, 62, 45, 0.08);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid #ff7a18;
+  outline-offset: 1px;
+}
+
+
+/* =========================================================
+   REGISTRATION SUCCESS MODAL
+   ========================================================= */
+
+.registration-success-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 31, 21, 0.58);
+  backdrop-filter: blur(5px);
+  animation: registrationModalFade 0.2s ease-out;
+}
+
+.registration-success-modal {
+  width: min(430px, 100%);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 34px 32px 30px;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  animation: registrationModalPop 0.28s ease-out;
+}
+
+.registration-success-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f7ef;
+  color: #198754;
+  font-size: 38px;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 7px #f4fbf7;
+}
+
+.registration-success-modal h3 {
+  margin: 0 0 10px;
+  color: #153e2d;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.registration-success-modal p {
+  margin: 0 auto 24px;
+  max-width: 350px;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.registration-success-button {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 22px;
+  background: #ff7a18;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 122, 24, 0.24);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.registration-success-button:hover {
+  background: #ed6d0b;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(255, 122, 24, 0.3);
+}
+
+.registration-success-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   MODAL ANIMATIONS
+   ========================================================= */
+
+@keyframes registrationModalFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes registrationModalPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .registration-success-modal {
+    padding: 30px 22px 24px;
+    border-radius: 20px;
+  }
+
+  .registration-success-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 32px;
+  }
+}
+
+/* =========================================================
+   PROVIDER / HOMEOWNER AUTH - PASSWORD VISIBILITY
+   ========================================================= */
+
+.password-input {
+  padding-right: 50px !important;
+}
+
+.password-toggle {
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  transform: translateY(-50%) !important;
+
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border: none !important;
+  background: transparent !important;
+
+  color: #6c757d !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+  z-index: 10 !important;
+}
+
+.password-toggle:hover {
+  color: #153e2d !important;
+  background: rgba(21, 62, 45, 0.08) !important;
+}
+
+.password-toggle:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.password-toggle i {
+  font-size: 17px;
+}
+
+/* =========================================================
+   REGISTRATION SUCCESS MODAL
+   ========================================================= */
+
+.registration-success-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(10, 31, 21, 0.58);
+
+  backdrop-filter: blur(5px);
+
+  animation: registrationModalFade 0.2s ease-out;
+}
+
+
+.registration-success-modal {
+  width: min(430px, 100%);
+
+  background: #ffffff;
+
+  border-radius: 24px;
+
+  padding: 34px 32px 30px;
+
+  text-align: center;
+
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.28);
+
+  animation: registrationModalPop 0.28s ease-out;
+}
+
+
+/* =========================================================
+   SUCCESS CHECK ICON
+   ========================================================= */
+
+.registration-success-icon {
+  width: 72px;
+  height: 72px;
+
+  margin: 0 auto 18px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e8f7ef;
+
+  color: #198754;
+
+  font-size: 38px;
+
+  font-weight: 700;
+
+  box-shadow:
+    inset 0 0 0 7px #f4fbf7;
+}
+
+
+.registration-success-modal h3 {
+  margin: 0 0 10px;
+
+  color: #153e2d;
+
+  font-size: 25px;
+
+  font-weight: 800;
+}
+
+
+.registration-success-modal p {
+  margin: 0 auto 24px;
+
+  max-width: 350px;
+
+  color: #667085;
+
+  font-size: 14px;
+
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   SUCCESS BUTTON
+   ========================================================= */
+
+.registration-success-button {
+  width: 100%;
+
+  border: 0;
+
+  border-radius: 999px;
+
+  padding: 12px 22px;
+
+  background: #ff7a18;
+
+  color: #ffffff;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 20px rgba(255, 122, 24, 0.24);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.registration-success-button:hover {
+  background: #ed6d0b;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 24px rgba(255, 122, 24, 0.3);
+}
+
+
+.registration-success-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   MODAL ANIMATIONS
+   ========================================================= */
+
+@keyframes registrationModalFade {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+@keyframes registrationModalPop {
+
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .registration-success-modal {
+    padding: 30px 22px 24px;
+
+    border-radius: 20px;
+  }
+
+
+  .registration-success-icon {
+    width: 64px;
+    height: 64px;
+
+    font-size: 32px;
+  }
+
+}
+
+
+/* =========================================================
+   PROVIDER SERVICE CATEGORY DROPDOWN - FIXED
+   ========================================================= */
+
+/* Keep the category control at the same height as the other inputs */
+.provider-category-select {
+  height: 45px !important;
+  max-height: 45px;
+}
+
+/* Custom provider category dropdown container */
+.provider-category-dropdown {
+  position: relative;
+  flex: 1 1 auto;
+  width: 1%;
+}
+
+/* Custom dropdown options */
+.provider-category-options {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 3000;
+
+  max-height: 230px;
+  overflow-y: auto;
+
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+  scrollbar-width: thin;
+}
+
+/* Category dropdown button */
+.provider-category-dropdown>button {
+  width: 100%;
+  min-height: 45px;
+  height: 45px !important;
+
+  border-radius: 0 0.375rem 0.375rem 0;
+  text-align: left;
+
+  padding-right: 40px;
+
+  color: #212529;
+}
+
+.provider-category-dropdown>button:focus {
+  box-shadow: none !important;
+  border-color: transparent !important;
+  outline: none;
+}
+
+/* Individual category options */
+.provider-category-option {
+  display: block;
+  width: 100%;
+
+  border: none;
+
+  background: #ffffff;
+
+  padding: 10px 14px;
+
+  text-align: left;
+
+  font-size: 15px;
+  color: #212529;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.provider-category-option:hover {
+  background: #f1f8f4 !important;
+  color: #198754 !important;
+}
+
+.provider-category-option.selected {
+  background: #e9f7f0 !important;
+  color: #198754 !important;
+  font-weight: 600;
+}
+
+/* Provider category dropdown scrollbar */
+.provider-category-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.provider-category-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.provider-category-options::-webkit-scrollbar-thumb {
+  background: #b8b8b8;
+  border-radius: 10px;
+}
+
+.provider-category-options::-webkit-scrollbar-thumb:hover {
+  background: #888888;
+}
+
+
+/* =========================================================
+   PROVIDER AUTH FORM - INPUT HEIGHT CONSISTENCY
+   ========================================================= */
+
+.auth-container .input-group {
+  min-height: 45px;
+}
+
+.auth-container .input-group .form-control,
+.auth-container .input-group .form-select,
+.auth-container .input-group .input-group-text {
+  min-height: 45px;
+}
+
+.auth-container .provider-category-dropdown {
+  min-height: 45px;
+}
+
+
+/* =========================================================
+   MOBILE PROVIDER CATEGORY DROPDOWN
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .provider-category-options {
+    max-height: 210px;
+  }
+
+  .provider-category-option {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+}
+
+/* =========================================================
+   LANDING PAGE SERVICES SLIDER
+   ========================================================= */
+
+.services-slider-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1390px;
+  margin: 0 auto;
+}
+
+
+/* ===============================
+   SLIDER VIEWPORT
+   =============================== */
+
+.services-slider {
+  width: 100%;
+  overflow: hidden;
+}
+
+
+/* ===============================
+   SLIDER TRACK
+   =============================== */
+
+.services-slider-track {
+  display: flex;
+  width: 100%;
+
+  transition: transform 0.55s ease-in-out;
+}
+
+
+/* ===============================
+   EACH SLIDE
+   =============================== */
+
+.service-slide {
+  min-width: 100%;
+  width: 100%;
+  flex: 0 0 100%;
+}
+
+
+/* ===============================
+   SERVICE GRID
+   4 COLUMNS × 2 ROWS
+   =============================== */
+
+.service-slide .service-grid {
+  width: 100%;
+  max-width: none;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 24px;
+
+  margin: 0;
+}
+
+
+/* ===============================
+   SERVICE CARD
+   =============================== */
+
+.service-slide .service-card {
+  min-height: 238px;
+
+  padding: 20px 16px;
+
+  border: 1px solid #e1e8df;
+  border-radius: 10px;
+
+  background: #f7f9f5;
+
+  color: #153b29;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.service-slide .service-card:hover {
+  transform: translateY(-4px);
+
+  border-color: #cfded2;
+
+  box-shadow:
+    0 10px 24px rgba(36, 91, 57, 0.10);
+}
+
+
+/* ===============================
+   SERVICE IMAGE BOX
+   =============================== */
+
+.service-slide .service-image {
+  width: 100%;
+  height: 132px;
+
+  margin: 0 0 18px;
+
+  background: #e2ebe2;
+
+  border-radius: 8px;
+}
+
+
+/* ===============================
+   SERVICE NAME
+   =============================== */
+
+.service-slide .service-card p {
+  margin: 0;
+
+  color: #153b29;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  text-align: center;
+
+  line-height: 1.35;
+}
+
+
+/* =========================================================
+   SLIDE ARROWS
+   ========================================================= */
+
+.service-slide-arrow {
+  position: absolute;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 48px;
+  height: 48px;
+
+  border: 1px solid #dce6de;
+
+  border-radius: 50%;
+
+  background: white;
+
+  color: #153b29;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  z-index: 20;
+
+  box-shadow:
+    0 5px 15px rgba(36, 91, 57, 0.12);
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.service-slide-arrow:hover {
+  background: #153b29;
+
+  color: white;
+
+  transform: translateY(-50%) scale(1.05);
+}
+
+
+.service-slide-arrow-left {
+  left: -24px;
+}
+
+
+.service-slide-arrow-right {
+  right: -24px;
+}
+
+
+/* =========================================================
+   MORE SERVICES BAR
+   ========================================================= */
+
+.more-service {
+  width: 100%;
+
+  min-height: 58px;
+
+  margin-top: 28px;
+
+  padding: 0 20px;
+
+  background: #fafafa;
+
+  border: 1px solid #e5ebe6;
+
+  border-radius: 8px;
+
+  color: #68766d;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 25px;
+
+  font-size: 13px;
+}
+
+
+/* ===============================
+   SLIDE INDICATORS
+   =============================== */
+
+.service-slide-indicator {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+}
+
+
+.service-slide-indicator span {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #d3ddd5;
+
+  transition: all 0.2s ease;
+}
+
+
+.service-slide-indicator span.active {
+  width: 20px;
+
+  border-radius: 10px;
+
+  background: #153b29;
+}
+
+
+/* ===============================
+   VIEW MORE BUTTON
+   =============================== */
+
+.more-service-button {
+  border: none;
+
+  background: transparent;
+
+  color: #153b29;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  cursor: pointer;
+}
+
+
+.more-service-button:hover {
+  color: #e06b16;
+}
+
+
+.more-service-button i {
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .service-slide .service-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 14px;
+  }
+
+  .service-slide .service-card {
+    min-height: 190px;
+  }
+
+  .service-slide .service-image {
+    height: 105px;
+  }
+
+  .service-slide-arrow-left {
+    left: -12px;
+  }
+
+  .service-slide-arrow-right {
+    right: -12px;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .services-slider-wrapper {
+    padding: 0 12px;
+  }
+
+  .service-slide .service-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px;
+  }
+
+  .service-slide .service-card {
+    min-height: 160px;
+
+    padding: 12px 8px;
+  }
+
+  .service-slide .service-image {
+    height: 85px;
+
+    margin-bottom: 12px;
+  }
+
+  .service-slide .service-card p {
+    font-size: 12px;
+  }
+
+  .service-slide-arrow {
+    width: 38px;
+    height: 38px;
+
+    font-size: 18px;
+  }
+
+  .service-slide-arrow-left {
+    left: -5px;
+  }
+
+  .service-slide-arrow-right {
+    right: -5px;
+  }
+
+  .more-service {
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    padding: 12px;
+  }
+
+}
+
+/* =========================================================
+   ADMIN REGISTRATION SUCCESS MODAL
+   ========================================================= */
+
+.admin-success-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(21, 59, 41, 0.45);
+
+  backdrop-filter: blur(4px);
+}
+
+
+/* ===============================
+   MODAL
+   =============================== */
+
+.admin-success-modal {
+  width: 420px;
+
+  max-width: 100%;
+
+  padding: 38px 32px;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  text-align: center;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.20);
+
+  animation: adminSuccessPop 0.25s ease-out;
+}
+
+
+/* ===============================
+   SUCCESS ICON
+   =============================== */
+
+.admin-success-icon {
+  width: 70px;
+
+  height: 70px;
+
+  margin: 0 auto 18px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #e5f7ef;
+
+  color: #168b5a;
+
+  font-size: 36px;
+
+  font-weight: 700;
+}
+
+
+/* ===============================
+   TITLE
+   =============================== */
+
+.admin-success-modal h2 {
+  margin: 0 0 10px;
+
+  color: #153b29;
+
+  font-size: 25px;
+
+  font-weight: 800;
+}
+
+
+/* ===============================
+   MESSAGE
+   =============================== */
+
+.admin-success-modal p {
+  margin: 0;
+
+  color: #68766d;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+.admin-success-modal .admin-success-subtext {
+  margin-top: 5px;
+
+  font-size: 13px;
+
+  color: #8a948e;
+}
+
+
+/* ===============================
+   BUTTON
+   =============================== */
+
+.admin-success-button {
+  width: 100%;
+
+  margin-top: 25px;
+
+  padding: 12px 20px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #168b5a;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.admin-success-button:hover {
+  background: #117449;
+
+  transform: translateY(-1px);
+}
+
+
+/* ===============================
+   ANIMATION
+   =============================== */
+
+@keyframes adminSuccessPop {
+
+  from {
+    opacity: 0;
+
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+
+}
+
+
+/* ===============================
+   MOBILE
+   =============================== */
+
+@media (max-width: 600px) {
+
+  .admin-success-modal {
+    padding: 30px 22px;
+  }
+
+  .admin-success-modal h2 {
+    font-size: 22px;
+  }
+
+}
+
+/* =========================================================
+   ADMIN AUTH - PASSWORD EYE ICON FIX
+   ========================================================= */
+
+.admin-input-group {
+  position: relative !important;
+}
+
+
+/* Password input needs space for the eye */
+.admin-input-group input {
+  padding-right: 52px !important;
+}
+
+
+/* Eye button */
+.admin-input-group .password-toggle {
+  position: absolute !important;
+
+  top: 50% !important;
+  right: 12px !important;
+
+  transform: translateY(-50%) !important;
+
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border: none !important;
+
+  background: transparent !important;
+
+  color: #6c757d !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  cursor: pointer !important;
+
+  z-index: 10 !important;
+
+  box-shadow: none !important;
+}
+
+
+/* Hover */
+.admin-input-group .password-toggle:hover {
+  color: #153b29 !important;
+
+  background: rgba(21, 59, 41, 0.08) !important;
+
+  border-radius: 50%;
+}
+
+
+/* Focus */
+.admin-input-group .password-toggle:focus {
+  outline: none !important;
+
+  box-shadow: none !important;
+}
+
+
+/* Eye icon */
+.admin-input-group .password-toggle i {
+  font-size: 17px !important;
+
+  line-height: 1 !important;
 }

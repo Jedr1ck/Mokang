@@ -25,12 +25,14 @@ const AdminAuth = () => {
     const [passwordError, setPasswordError] = useState("");
     const [confirmError, setConfirmError] = useState("");
     const [formError, setFormError] = useState("");
+    const [adminAlreadyExists, setAdminAlreadyExists] = useState(false);
 
-    React.useEffect(() => {
-        adminExists()
-            .then(({ exists }) => setIsCreateMode(!exists))
-            .catch(() => setFormError("Unable to connect to the server."));
-    }, []);
+    // Registration success popup
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    // Do not check admin existence when the page loads.
+    // The user should be able to fill out the Create Admin form.
+    // The existing-admin check happens only when CREATE ADMIN is clicked.
 
     // =========================================
     // PASSWORD STRENGTH
@@ -173,7 +175,6 @@ const AdminAuth = () => {
     // =========================================
 
     const handleCreateAdmin = async (e) => {
-
         e.preventDefault();
 
         setPasswordError("");
@@ -181,40 +182,53 @@ const AdminAuth = () => {
         setFormError("");
 
         if (!username.trim()) {
-
             alert("Please enter an admin username.");
-
             return;
         }
 
-
         if (!isStrongPassword) {
-
             setPasswordError(
                 "Password must contain at least 8 characters, uppercase, lowercase, number, and special character."
             );
-
             return;
         }
 
-
         if (password !== confirmPassword) {
-
-            setConfirmError(
-                "Passwords do not match."
-            );
-
+            setConfirmError("Passwords do not match.");
             return;
         }
 
         try {
+            // Check if an admin already exists ONLY after
+            // the user clicks CREATE ADMIN.
+            const { exists } = await adminExists();
+
+            if (exists) {
+                setFormError(
+                    "An admin account already exists. This account cannot be registered."
+                );
+
+                return;
+            }
+
+            // Only create the account if there is no existing admin.
             await registerAdmin(username.trim(), password);
-            alert("Admin account created successfully. You can now log in.");
+
+            setAdminAlreadyExists(true);
             setIsCreateMode(false);
+
             setPassword("");
             setConfirmPassword("");
+            setPasswordError("");
+            setConfirmError("");
+            setFormError("");
+
+            setShowSuccessModal(true);
+
         } catch (error) {
-            setFormError(error.message);
+            setFormError(
+                error.message || "Unable to create admin account."
+            );
         }
     };
 
@@ -224,6 +238,21 @@ const AdminAuth = () => {
     // =========================================
 
     const switchMode = () => {
+
+        setShowSuccessModal(false);
+
+        // Only one administrator account is allowed.
+        // Do not allow the user to return to Create Admin
+        // once an administrator already exists.
+        if (adminAlreadyExists) {
+            setIsCreateMode(false);
+            setPassword("");
+            setConfirmPassword("");
+            setPasswordError("");
+            setConfirmError("");
+            setFormError("An admin account already exists. Please log in.");
+            return;
+        }
 
         setIsCreateMode((prev) => !prev);
 
@@ -349,7 +378,12 @@ const AdminAuth = () => {
                             LOG IN
                         </button>
 
-                        {formError && <div className="admin-error">{formError}</div>}
+                        {formError && (
+                            <div className="admin-error">
+                                <i className="bi bi-exclamation-triangle-fill"></i>
+                                {formError}
+                            </div>
+                        )}
 
 
                         <small className="admin-security-note">
@@ -563,11 +597,17 @@ const AdminAuth = () => {
                         <button
                             type="submit"
                             className="admin-main-button"
+                            disabled={adminAlreadyExists}
                         >
                             CREATE ADMIN
                         </button>
 
-                        {formError && <div className="admin-error">{formError}</div>}
+                        {formError && (
+                            <div className="admin-error">
+                                <i className="bi bi-exclamation-triangle-fill"></i>
+                                {formError}
+                            </div>
+                        )}
 
 
                         <small className="admin-security-note">
@@ -625,13 +665,15 @@ const AdminAuth = () => {
                                     and system activities.
                                 </p>
 
-                                <button
-                                    type="button"
-                                    className="admin-outline-button"
-                                    onClick={switchMode}
-                                >
-                                    CREATE ADMIN
-                                </button>
+                                {!adminAlreadyExists && (
+                                    <button
+                                        type="button"
+                                        className="admin-outline-button"
+                                        onClick={switchMode}
+                                    >
+                                        CREATE ADMIN
+                                    </button>
+                                )}
 
                             </div>
 
@@ -686,6 +728,96 @@ const AdminAuth = () => {
                     </div>
 
                 </div>
+
+                {/* =================================
+                    REGISTRATION SUCCESS POPUP
+                ================================== */}
+
+                {showSuccessModal && (
+                    <div
+                        className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                        style={{
+                            backgroundColor: "rgba(21, 59, 41, 0.45)",
+                            backdropFilter: "blur(4px)",
+                            WebkitBackdropFilter: "blur(4px)",
+                            zIndex: 9999,
+                            padding: "20px"
+                        }}
+                    >
+                        <div
+                            className="bg-white text-center rounded-4 shadow-lg"
+                            style={{
+                                width: "420px",
+                                maxWidth: "100%",
+                                padding: "36px 30px"
+                            }}
+                        >
+                            <div
+                                className="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-3"
+                                style={{
+                                    width: "70px",
+                                    height: "70px",
+                                    backgroundColor: "#e5f7ef",
+                                    color: "#168b5a",
+                                    fontSize: "34px"
+                                }}
+                            >
+                                <i className="bi bi-check-lg"></i>
+                            </div>
+
+                            <h2
+                                className="fw-bold mb-2"
+                                style={{ color: "#153b29" }}
+                            >
+                                Registration Successful!
+                            </h2>
+
+                            <p
+                                className="mb-1"
+                                style={{
+                                    color: "#68766d",
+                                    fontSize: "14px",
+                                    lineHeight: "1.6"
+                                }}
+                            >
+                                Your administrator account has been created
+                                successfully.
+                            </p>
+
+                            <p
+                                className="mb-0"
+                                style={{
+                                    color: "#8a948e",
+                                    fontSize: "13px"
+                                }}
+                            >
+                                You can now log in using your admin credentials.
+                            </p>
+
+                            <button
+                                type="button"
+                                className="btn w-100 mt-4 fw-bold text-white"
+                                style={{
+                                    backgroundColor: "#168b5a",
+                                    borderRadius: "8px",
+                                    padding: "12px 20px"
+                                }}
+                                onClick={() => {
+                                    setShowSuccessModal(false);
+                                    setAdminAlreadyExists(true);
+                                    setIsCreateMode(false);
+                                    setPassword("");
+                                    setConfirmPassword("");
+                                    setFormError("");
+                                    setPasswordError("");
+                                    setConfirmError("");
+                                }}
+                            >
+                                OK, Go to Log in
+                            </button>
+                        </div>
+                    </div>
+                )}
 
             </div>
 

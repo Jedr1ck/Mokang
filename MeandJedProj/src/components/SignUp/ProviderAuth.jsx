@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,8 +6,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import "../../index.css";
 import { login, register } from '../../services/api';
-
-
 
 const ProviderAuth = () => {
 
@@ -18,6 +16,107 @@ const ProviderAuth = () => {
     // =========================================
 
     const [isSignUp, setIsSignUp] = useState(false);
+
+
+    // =========================================
+    // PASSWORD VISIBILITY
+    // =========================================
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
+
+
+    // =========================================
+    // REGISTRATION SUCCESS MODAL
+    // =========================================
+
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+
+    // =========================================
+    // SERVICE CATEGORY DROPDOWN
+    // =========================================
+
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+
+    const categoryDropdownRef = useRef(null);
+
+
+    // =========================================
+    // SERVICE CATEGORIES
+    // =========================================
+
+    const serviceCategories = [
+        {
+            value: 'electrician',
+            label: 'Electrician'
+        },
+        {
+            value: 'plumber',
+            label: 'Plumber'
+        },
+        {
+            value: 'aircon-technician',
+            label: 'Aircon Technician'
+        },
+        {
+            value: 'carpenter',
+            label: 'Carpenter'
+        },
+        {
+            value: 'pest-control-technician',
+            label: 'Pest Control Technician'
+        },
+        {
+            value: 'painter',
+            label: 'Painter'
+        },
+        {
+            value: 'appliance-repair-technician',
+            label: 'Appliance Repair Technician'
+        },
+        {
+            value: 'locksmith',
+            label: 'Locksmith'
+        },
+        {
+            value: 'deep-cleaner',
+            label: 'Deep Cleaner'
+        },
+        {
+            value: 'massage-therapist',
+            label: 'Massage Therapist'
+        },
+        {
+            value: 'hair-stylist-barber',
+            label: 'Hair Stylist / Barber'
+        },
+        {
+            value: 'nail-technician',
+            label: 'Nail Technician (Manicurist/Pedicurist)'
+        },
+        {
+            value: 'makeup-artist',
+            label: 'Makeup Artist'
+        },
+        {
+            value: 'private-nurse-caregiver',
+            label: 'Private Nurse / Caregiver'
+        },
+        {
+            value: 'physical-therapist',
+            label: 'Physical Therapist'
+        },
+        {
+            value: 'computer-cctv-technician',
+            label: 'Computer / CCTV Technician'
+        },
+        {
+            value: 'private-tutor-personal-fitness-trainer',
+            label: 'Private Tutor / Personal Fitness Trainer'
+        }
+    ];
 
 
     // =========================================
@@ -84,6 +183,42 @@ const ProviderAuth = () => {
 
 
     // =========================================
+    // CLOSE CATEGORY DROPDOWN WHEN CLICKING OUTSIDE
+    // =========================================
+
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
+
+            if (
+                categoryDropdownRef.current &&
+                !categoryDropdownRef.current.contains(event.target)
+            ) {
+
+                setShowCategoryDropdown(false);
+
+            }
+
+        };
+
+        document.addEventListener(
+            'mousedown',
+            handleClickOutside
+        );
+
+        return () => {
+
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside
+            );
+
+        };
+
+    }, []);
+
+
+    // =========================================
     // OTP TIMER
     // =========================================
 
@@ -120,11 +255,16 @@ const ProviderAuth = () => {
 
         setIsSignUp((prev) => !prev);
 
-        // Reset OTP when changing form
+        setShowCategoryDropdown(false);
+
         setOtpSent(false);
+
         setTimer(0);
+
         setGeneratedOtp('');
+
         setIsOtpVerified(false);
+
         setOtpError('');
 
     };
@@ -151,6 +291,16 @@ const ProviderAuth = () => {
         }
 
 
+        if (
+            name === 'password' ||
+            name === 'confirmPassword'
+        ) {
+
+            setOtpError('');
+
+        }
+
+
         setFormData((prev) => ({
 
             ...prev,
@@ -161,6 +311,25 @@ const ProviderAuth = () => {
                     : value
 
         }));
+
+    };
+
+
+    // =========================================
+    // SELECT SERVICE CATEGORY
+    // =========================================
+
+    const handleCategorySelect = (category) => {
+
+        setFormData((prev) => ({
+
+            ...prev,
+
+            serviceCategory: category.value
+
+        }));
+
+        setShowCategoryDropdown(false);
 
     };
 
@@ -200,12 +369,31 @@ const ProviderAuth = () => {
         } = e.target;
 
 
-        const file = files && files.length > 0 ? files[0] : null;
-        if (file && (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024)) {
-            alert('Please upload an image file no larger than 5 MB.');
+        const file =
+            files && files.length > 0
+                ? files[0]
+                : null;
+
+
+        if (
+            file &&
+            (
+                !file.type.startsWith('image/') ||
+                file.size > 5 * 1024 * 1024
+            )
+        ) {
+
+            alert(
+                'Please upload an image file no larger than 5 MB.'
+            );
+
             e.target.value = '';
+
             return;
+
         }
+
+
         setFormData((prev) => ({
 
             ...prev,
@@ -223,10 +411,14 @@ const ProviderAuth = () => {
 
     const handleSendOtp = () => {
 
-        if (!/^\+?\d{10,15}$/.test(formData.mobileNumber.replace(/[\s-]/g, ''))) {
+        if (
+            !/^\+?\d{10,15}$/.test(
+                formData.mobileNumber.replace(/[\s-]/g, '')
+            )
+        ) {
 
             alert(
-                "Mangyaring ilagay muna ang iyong Mobile Number."
+                'Mangyaring ilagay muna ang iyong Mobile Number.'
             );
 
             return;
@@ -234,13 +426,27 @@ const ProviderAuth = () => {
         }
 
 
-        const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        const newOtp =
+            Math.floor(
+                100000 +
+                Math.random() * 900000
+            ).toString();
+
+
         setGeneratedOtp(newOtp);
+
         setOtpSent(true);
+
         setIsOtpVerified(false);
+
         setOtpError('');
+
         setTimer(60);
-        alert(`[DEMO OTP CODE]: Ang iyong OTP ay ${newOtp}`);
+
+
+        alert(
+            `[DEMO OTP CODE]: Ang iyong OTP ay ${newOtp}`
+        );
 
     };
 
@@ -254,7 +460,7 @@ const ProviderAuth = () => {
         if (!/^\d{6}$/.test(formData.otpCode)) {
 
             setOtpError(
-                "Mangyaring ilagay ang 6-digit OTP."
+                'Mangyaring ilagay ang 6-digit OTP.'
             );
 
             return;
@@ -263,11 +469,19 @@ const ProviderAuth = () => {
 
 
         if (formData.otpCode === generatedOtp) {
+
             setIsOtpVerified(true);
+
             setOtpError('');
+
         } else {
+
             setIsOtpVerified(false);
-            setOtpError("Maling OTP code! Pakisubukan ulit.");
+
+            setOtpError(
+                'Maling OTP code! Pakisubukan ulit.'
+            );
+
         }
 
     };
@@ -282,14 +496,15 @@ const ProviderAuth = () => {
         e.preventDefault();
 
 
-        // Basic validation
         if (
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email) ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                loginData.email
+            ) ||
             !loginData.password
         ) {
 
             alert(
-                "Mangyaring ilagay ang iyong email at password."
+                'Mangyaring ilagay ang iyong email at password.'
             );
 
             return;
@@ -298,12 +513,56 @@ const ProviderAuth = () => {
 
 
         try {
-            const response = await login(loginData.email.trim(), loginData.password);
-            localStorage.setItem('user', JSON.stringify(response.user));
-            localStorage.setItem('loggedInProvider', JSON.stringify(response.user));
+
+            const response = await login(
+                loginData.email.trim(),
+                loginData.password
+            );
+
+
+            const account = {
+
+                ...response.user,
+
+                role:
+                    response.user.role ||
+                    'provider'
+
+            };
+
+
+            // Save authentication ONLY after successful login
+
+            localStorage.setItem(
+                'user',
+                JSON.stringify(account)
+            );
+
+
+            localStorage.setItem(
+                'access_token',
+                response.access_token
+            );
+
+
+            localStorage.setItem(
+                'loggedInProvider',
+                JSON.stringify(account)
+            );
+
+
+            // Go to dashboard only after login
+
             navigate('/provider-dashboard');
+
+
         } catch (error) {
-            alert(error.message);
+
+            alert(
+                error.message ||
+                'Maling email o password. Pakisubukan ulit.'
+            );
+
         }
 
     };
@@ -314,61 +573,305 @@ const ProviderAuth = () => {
     // =========================================
 
     const handleRegisterSubmit = async (e) => {
+
         e.preventDefault();
 
-        const mobileNumber = formData.mobileNumber.replace(/[\s-]/g, '');
-        if (!/^[A-Za-z][A-Za-z .'-]{1,149}$/.test(formData.fullName.trim()) ||
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ||
-            !/^\+?\d{10,15}$/.test(mobileNumber) ||
+
+        const mobileNumber =
+            formData.mobileNumber.replace(
+                /[\s-]/g,
+                ''
+            );
+
+
+        // =====================================
+        // BASIC VALIDATION
+        // =====================================
+
+        if (
+            !/^[A-Za-z][A-Za-z .'-]{1,149}$/.test(
+                formData.fullName.trim()
+            ) ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                formData.email
+            ) ||
+            !/^\+?\d{10,15}$/.test(
+                mobileNumber
+            ) ||
             !formData.gender ||
             formData.address.trim().length < 10 ||
-            !Number.isInteger(Number(formData.experienceYears)) || Number(formData.experienceYears) < 0 || Number(formData.experienceYears) > 80) {
-            alert('Please enter valid name, gender, address, email, mobile number, and experience (0–80 years).');
+            !formData.serviceCategory ||
+            !Number.isInteger(
+                Number(formData.experienceYears)
+            ) ||
+            Number(formData.experienceYears) < 0 ||
+            Number(formData.experienceYears) > 80
+        ) {
+
+            alert(
+                'Please enter valid name, gender, address, email, mobile number, service category, and experience (0–80 years).'
+            );
+
             return;
-        }
-        if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/.test(formData.password)) {
-            alert('Password must be 8+ characters and include uppercase, lowercase, and a number.');
-            return;
-        }
-        if (!formData.idFront || !formData.idBack) {
-            alert('Please upload both sides of a valid ID.');
-            return;
-        }
-        if (!isOtpVerified) {
-            alert('Kailangan muna i-verify ang iyong OTP code bago magpatuloy.');
-            return;
-        }
-        if (formData.password !== formData.confirmPassword) {
-            alert('Hindi magkatugma ang Password at Confirm Password!');
-            return;
-        }
-        if (!formData.agreeTerms) {
-            alert('Kailangan mong tanggapin ang Terms and Conditions.');
-            return;
+
         }
 
-        try {
-            const response = await register({
-                full_name: formData.fullName.trim(),
-                email: formData.email.trim(),
-                mobile_number: mobileNumber,
-                gender: formData.gender,
-                address: formData.address.trim(),
-                password: formData.password,
-                role: 'provider',
-                business_name: formData.fullName.trim(),
-                service_category: formData.serviceCategory,
-                experience_years: Number(formData.experienceYears),
-            });
-            localStorage.setItem('access_token', response.access_token);
-            localStorage.setItem('user', JSON.stringify(response.user));
-            localStorage.setItem('loggedInProvider', JSON.stringify(response.user));
-            alert(`Welcome, ${formData.fullName.trim()}! Your provider account has been created successfully.`);
-            navigate('/provider-dashboard');
-        } catch (error) {
-            alert(error.message);
+
+        // =====================================
+        // PASSWORD VALIDATION
+        // =====================================
+
+        if (
+            !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/.test(
+                formData.password
+            )
+        ) {
+
+            alert(
+                'Password must be 8+ characters and include uppercase, lowercase, and a number.'
+            );
+
+            return;
+
         }
+
+
+        // =====================================
+        // VALID ID
+        // =====================================
+
+        if (
+            !formData.idFront ||
+            !formData.idBack
+        ) {
+
+            alert(
+                'Please upload both sides of a valid ID.'
+            );
+
+            return;
+
+        }
+
+
+        // =====================================
+        // OTP
+        // =====================================
+
+        if (!isOtpVerified) {
+
+            alert(
+                'Kailangan muna i-verify ang iyong OTP code bago magpatuloy.'
+            );
+
+            return;
+
+        }
+
+
+        // =====================================
+        // PASSWORD MATCH
+        // =====================================
+
+        if (
+            formData.password !==
+            formData.confirmPassword
+        ) {
+
+            alert(
+                'Hindi magkatugma ang Password at Confirm Password!'
+            );
+
+            return;
+
+        }
+
+
+        // =====================================
+        // TERMS
+        // =====================================
+
+        if (!formData.agreeTerms) {
+
+            alert(
+                'Kailangan mong tanggapin ang Terms and Conditions.'
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response = await register({
+
+                full_name:
+                    formData.fullName.trim(),
+
+                email:
+                    formData.email.trim(),
+
+                mobile_number:
+                    mobileNumber,
+
+                gender:
+                    formData.gender,
+
+                address:
+                    formData.address.trim(),
+
+                password:
+                    formData.password,
+
+                role:
+                    'provider',
+
+                business_name:
+                    formData.fullName.trim(),
+
+                service_category:
+                    formData.serviceCategory,
+
+                experience_years:
+                    Number(
+                        formData.experienceYears
+                    )
+
+            });
+
+
+            const account = {
+
+                ...response.user,
+
+                role:
+                    response.user.role ||
+                    'provider'
+
+            };
+
+
+            // =====================================
+            // IMPORTANT
+            // =====================================
+            // DO NOT save access_token here.
+            // Provider must login first.
+            // =====================================
+
+
+            // Save registered account
+
+            const savedAccounts =
+                JSON.parse(
+                    localStorage.getItem(
+                        'savedAccounts'
+                    ) || '[]'
+                );
+
+
+            const existingIndex =
+                savedAccounts.findIndex(
+                    (savedAccount) =>
+                        savedAccount.email
+                            ?.toLowerCase() ===
+                        account.email
+                            ?.toLowerCase()
+                );
+
+
+            if (existingIndex >= 0) {
+
+                savedAccounts[existingIndex] =
+                    account;
+
+                localStorage.setItem(
+                    'savedAccounts',
+                    JSON.stringify(
+                        savedAccounts
+                    )
+                );
+
+            } else {
+
+                localStorage.setItem(
+                    'savedAccounts',
+                    JSON.stringify([
+                        ...savedAccounts,
+                        account
+                    ])
+                );
+
+            }
+
+
+            // Put registered email into login
+
+            setLoginData({
+
+                email:
+                    formData.email.trim(),
+
+                password: ''
+
+            });
+
+
+            // Go to login state
+
+            setIsSignUp(false);
+
+            setShowCategoryDropdown(false);
+
+
+            // Show success modal
+
+            setShowSuccessModal(true);
+
+
+        } catch (error) {
+
+            alert(
+                error.message ||
+                'Hindi matagumpay ang registration. Pakisubukan ulit.'
+            );
+
+        }
+
     };
+
+
+    // =========================================
+    // SUCCESS MODAL OK
+    // =========================================
+
+    const handleSuccessModalOk = () => {
+
+        setShowSuccessModal(false);
+
+        setIsSignUp(false);
+
+        setLoginData((prev) => ({
+
+            ...prev,
+
+            password: ''
+
+        }));
+
+    };
+
+
+    // =========================================
+    // GET SELECTED CATEGORY LABEL
+    // =========================================
+
+    const selectedCategory =
+        serviceCategories.find(
+            (category) =>
+                category.value ===
+                formData.serviceCategory
+        );
 
 
     // =========================================
@@ -381,8 +884,8 @@ const ProviderAuth = () => {
 
             <div
                 className={`auth-container ${isSignUp
-                    ? 'right-panel-active'
-                    : ''
+                        ? 'right-panel-active'
+                        : ''
                     }`}
                 style={{
                     minHeight: '700px'
@@ -471,11 +974,27 @@ const ProviderAuth = () => {
                                 onChange={handleInputChange}
                                 required
                             >
-                                <option value="" disabled>Select Gender</option>
-                                <option value="female">Female</option>
-                                <option value="male">Male</option>
-                                <option value="non-binary">Non-binary</option>
-                                <option value="prefer-not-to-say">Prefer not to say</option>
+
+                                <option value="" disabled>
+                                    Select Gender
+                                </option>
+
+                                <option value="female">
+                                    Female
+                                </option>
+
+                                <option value="male">
+                                    Male
+                                </option>
+
+                                <option value="non-binary">
+                                    Non-binary
+                                </option>
+
+                                <option value="prefer-not-to-say">
+                                    Prefer not to say
+                                </option>
+
                             </select>
 
                         </div>
@@ -533,7 +1052,7 @@ const ProviderAuth = () => {
                             >
                                 {timer > 0
                                     ? `${timer}s`
-                                    : "Send OTP"}
+                                    : 'Send OTP'}
                             </button>
 
                         </div>
@@ -568,15 +1087,15 @@ const ProviderAuth = () => {
                                     <button
                                         type="button"
                                         className={`btn ${isOtpVerified
-                                            ? 'btn-success'
-                                            : 'btn-dark'
+                                                ? 'btn-success'
+                                                : 'btn-dark'
                                             } text-white text-nowrap btn-sm fw-bold`}
                                         onClick={handleVerifyOtp}
                                         disabled={isOtpVerified}
                                     >
                                         {isOtpVerified
-                                            ? "Verified ✓"
-                                            : "Verify"}
+                                            ? 'Verified ✓'
+                                            : 'Verify'}
                                     </button>
 
                                 </div>
@@ -604,51 +1123,132 @@ const ProviderAuth = () => {
                         )}
 
 
-                        {/* SERVICE CATEGORY */}
+                        {/* =====================================
+                            SERVICE CATEGORY CUSTOM DROPDOWN
+                        ====================================== */}
 
-                        <div className="input-group mb-2">
+                        <div
+                            className="input-group mb-2"
+                            ref={categoryDropdownRef}
+                        >
 
                             <span className="input-group-text bg-light border-0">
                                 <i className="bi bi-tools"></i>
                             </span>
 
-                            <select
-                                name="serviceCategory"
-                                className="form-select bg-light border-0"
-                                value={formData.serviceCategory}
-                                onChange={handleInputChange}
-                                required
+
+                            <div
+                                className="provider-category-dropdown"
+                                style={{
+                                    position: 'relative',
+                                    flex: '1 1 auto',
+                                    width: '1%'
+                                }}
                             >
 
-                                <option value="" disabled>
-                                    Select Service Category
-                                </option>
+                                {/* SELECTED CATEGORY */}
 
-                                <option value="plumbing">
-                                    Plumbing Services
-                                </option>
+                                <button
+                                    type="button"
+                                    className="form-select bg-light border-0 text-start"
+                                    style={{
+                                        height: '100%',
+                                        minHeight: '45px',
+                                        paddingRight: '40px'
+                                    }}
+                                    onClick={() =>
+                                        setShowCategoryDropdown(
+                                            (prev) => !prev
+                                        )
+                                    }
+                                >
 
-                                <option value="electrical">
-                                    Electrical Repair
-                                </option>
+                                    <span
+                                        className={
+                                            selectedCategory
+                                                ? 'text-dark'
+                                                : 'text-muted'
+                                        }
+                                    >
+                                        {selectedCategory
+                                            ? selectedCategory.label
+                                            : 'Select Service Category'}
+                                    </span>
 
-                                <option value="cleaning">
-                                    Home Cleaning
-                                </option>
+                                </button>
 
-                                <option value="appliance">
-                                    Appliance Repair
-                                </option>
 
-                                <option value="carpentry">
-                                    Carpentry & Woodwork
-                                </option>
+                                {/* CUSTOM OPTIONS */}
 
-                                <option value="painting">
-                                    Painting Services
-                                </option>
+                                {showCategoryDropdown && (
 
-                            </select>
+                                    <div
+                                        className="provider-category-options"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 'calc(100% + 2px)',
+                                            left: 0,
+                                            right: 0,
+                                            zIndex: 3000,
+                                            maxHeight: '230px',
+                                            overflowY: 'auto',
+                                            background: '#ffffff',
+                                            border: '1px solid #dee2e6',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
+                                        }}
+                                    >
+
+                                        {serviceCategories.map(
+                                            (category) => (
+
+                                                <button
+                                                    key={
+                                                        category.value
+                                                    }
+                                                    type="button"
+                                                    className={`provider-category-option ${formData.serviceCategory ===
+                                                            category.value
+                                                            ? 'selected'
+                                                            : ''
+                                                        }`}
+                                                    onClick={() =>
+                                                        handleCategorySelect(
+                                                            category
+                                                        )
+                                                    }
+                                                    style={{
+                                                        display: 'block',
+                                                        width: '100%',
+                                                        border: 'none',
+                                                        background:
+                                                            formData.serviceCategory ===
+                                                                category.value
+                                                                ? '#e9f7f0'
+                                                                : '#ffffff',
+                                                        padding:
+                                                            '10px 14px',
+                                                        textAlign:
+                                                            'left',
+                                                        fontSize:
+                                                            '15px',
+                                                        color:
+                                                            '#212529',
+                                                        cursor:
+                                                            'pointer'
+                                                    }}
+                                                >
+                                                    {category.label}
+                                                </button>
+
+                                            )
+                                        )}
+
+                                    </div>
+
+                                )}
+
+                            </div>
 
                         </div>
 
@@ -671,8 +1271,6 @@ const ProviderAuth = () => {
                                 step="1"
                                 value={formData.experienceYears}
                                 onChange={handleInputChange}
-                                minLength="8"
-                                maxLength="128"
                                 required
                             />
 
@@ -738,9 +1336,13 @@ const ProviderAuth = () => {
                             </span>
 
                             <input
-                                type="password"
+                                type={
+                                    showPassword
+                                        ? 'text'
+                                        : 'password'
+                                }
                                 name="password"
-                                className="form-control bg-light border-0"
+                                className="form-control bg-light border-0 password-input"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleInputChange}
@@ -748,6 +1350,30 @@ const ProviderAuth = () => {
                                 maxLength="128"
                                 required
                             />
+
+                            <button
+                                type="button"
+                                className="btn password-toggle"
+                                onClick={() =>
+                                    setShowPassword(
+                                        (prev) => !prev
+                                    )
+                                }
+                                aria-label={
+                                    showPassword
+                                        ? 'Hide password'
+                                        : 'Show password'
+                                }
+                            >
+
+                                <i
+                                    className={`bi ${showPassword
+                                            ? 'bi-eye-slash'
+                                            : 'bi-eye'
+                                        }`}
+                                ></i>
+
+                            </button>
 
                         </div>
 
@@ -761,14 +1387,42 @@ const ProviderAuth = () => {
                             </span>
 
                             <input
-                                type="password"
+                                type={
+                                    showConfirmPassword
+                                        ? 'text'
+                                        : 'password'
+                                }
                                 name="confirmPassword"
-                                className="form-control bg-light border-0"
+                                className="form-control bg-light border-0 password-input"
                                 placeholder="Confirm Password"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 required
                             />
+
+                            <button
+                                type="button"
+                                className="btn password-toggle"
+                                onClick={() =>
+                                    setShowConfirmPassword(
+                                        (prev) => !prev
+                                    )
+                                }
+                                aria-label={
+                                    showConfirmPassword
+                                        ? 'Hide confirm password'
+                                        : 'Show confirm password'
+                                }
+                            >
+
+                                <i
+                                    className={`bi ${showConfirmPassword
+                                            ? 'bi-eye-slash'
+                                            : 'bi-eye'
+                                        }`}
+                                ></i>
+
+                            </button>
 
                         </div>
 
@@ -839,7 +1493,9 @@ const ProviderAuth = () => {
                             <a
                                 href="#facebook"
                                 className="social"
-                                onClick={(e) => e.preventDefault()}
+                                onClick={(e) =>
+                                    e.preventDefault()
+                                }
                             >
                                 <i className="bi bi-facebook"></i>
                             </a>
@@ -847,7 +1503,9 @@ const ProviderAuth = () => {
                             <a
                                 href="#google"
                                 className="social"
-                                onClick={(e) => e.preventDefault()}
+                                onClick={(e) =>
+                                    e.preventDefault()
+                                }
                             >
                                 <i className="bi bi-google"></i>
                             </a>
@@ -855,7 +1513,9 @@ const ProviderAuth = () => {
                             <a
                                 href="#linkedin"
                                 className="social"
-                                onClick={(e) => e.preventDefault()}
+                                onClick={(e) =>
+                                    e.preventDefault()
+                                }
                             >
                                 <i className="bi bi-linkedin"></i>
                             </a>
@@ -890,7 +1550,7 @@ const ProviderAuth = () => {
                         </div>
 
 
-                        {/* PASSWORD */}
+                        {/* LOGIN PASSWORD */}
 
                         <div className="input-group mb-4">
 
@@ -899,15 +1559,43 @@ const ProviderAuth = () => {
                             </span>
 
                             <input
-                                type="password"
+                                type={
+                                    showLoginPassword
+                                        ? 'text'
+                                        : 'password'
+                                }
                                 name="password"
-                                className="form-control bg-light border-0 shadow-none"
+                                className="form-control bg-light border-0 shadow-none password-input"
                                 placeholder="Password"
                                 value={loginData.password}
                                 onChange={handleLoginChange}
                                 maxLength="128"
                                 required
                             />
+
+                            <button
+                                type="button"
+                                className="btn password-toggle"
+                                onClick={() =>
+                                    setShowLoginPassword(
+                                        (prev) => !prev
+                                    )
+                                }
+                                aria-label={
+                                    showLoginPassword
+                                        ? 'Hide password'
+                                        : 'Show password'
+                                }
+                            >
+
+                                <i
+                                    className={`bi ${showLoginPassword
+                                            ? 'bi-eye-slash'
+                                            : 'bi-eye'
+                                        }`}
+                                ></i>
+
+                            </button>
 
                         </div>
 
@@ -962,6 +1650,7 @@ const ProviderAuth = () => {
                                 </p>
 
                                 <button
+                                    type="button"
                                     className="btn btn-outline-light rounded-pill px-5 py-2 fw-bold"
                                     onClick={toggleForm}
                                 >
@@ -1000,6 +1689,7 @@ const ProviderAuth = () => {
                                 </p>
 
                                 <button
+                                    type="button"
                                     className="btn btn-outline-light rounded-pill px-5 py-2 fw-bold"
                                     onClick={toggleForm}
                                 >
@@ -1014,6 +1704,57 @@ const ProviderAuth = () => {
 
                 </div>
 
+
+                {/* =====================================
+                    REGISTRATION SUCCESS MODAL
+                ====================================== */}
+
+                {showSuccessModal && (
+
+                    <div
+                        className="registration-success-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="provider-registration-success-title"
+                    >
+
+                        <div className="registration-success-modal">
+
+                            <div className="registration-success-icon">
+
+                                <i className="bi bi-check-lg"></i>
+
+                            </div>
+
+
+                            <h3 id="provider-registration-success-title">
+                                Registration Successful!
+                            </h3>
+
+
+                            <p>
+                                Your provider account has been
+                                successfully created.
+                                <br />
+                                Please log in using your registered
+                                email and password.
+                            </p>
+
+
+                            <button
+                                type="button"
+                                className="registration-success-button"
+                                onClick={handleSuccessModalOk}
+                            >
+                                OK, Go to Log in
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                )}
+
             </div>
 
         </div>
@@ -1021,6 +1762,5 @@ const ProviderAuth = () => {
     );
 
 };
-
 
 export default ProviderAuth;
