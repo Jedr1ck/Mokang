@@ -2130,7 +2130,6 @@ html {
   margin-right: 5px;
 }
 
-
 /* =========================================================
    OVERLAY
    ========================================================= */
@@ -2139,14 +2138,13 @@ html {
   position: absolute;
 
   top: 0;
-
   left: 50%;
 
   width: 50%;
-
   height: 100%;
 
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   z-index: 100;
 
@@ -2163,15 +2161,17 @@ html {
 .admin-overlay {
   position: relative;
 
-  left: -100%;
-
-  width: 200%;
-
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  height: auto;
 
   background: #168b5a;
 
   color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   transform: translateX(0);
 
@@ -2181,7 +2181,7 @@ html {
 
 
 .admin-create-active .admin-overlay {
-  transform: translateX(50%);
+  transform: translateX(0);
 }
 
 
@@ -2190,13 +2190,14 @@ html {
    ========================================================= */
 
 .admin-overlay-panel {
-  position: absolute;
+  position: relative;
 
   top: 0;
+  left: 0;
 
-  width: 50%;
-
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  height: auto;
 
   display: flex;
 
@@ -2206,7 +2207,7 @@ html {
 
   text-align: center;
 
-  padding: 35px 50px;
+  padding: 35px 45px;
 }
 
 
@@ -3052,6 +3053,22 @@ html {
   background: #e2ebe2;
 
   border-radius: 8px;
+
+  overflow: hidden;
+}
+
+
+/* ===============================
+   SERVICE IMAGE
+   =============================== */
+
+.service-slide .service-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
 }
 
 
@@ -3524,12 +3541,14 @@ html {
 
 
 /* Password input needs space for the eye */
+
 .admin-input-group input {
   padding-right: 52px !important;
 }
 
 
 /* Eye button */
+
 .admin-input-group .password-toggle {
   position: absolute !important;
 
@@ -3565,6 +3584,7 @@ html {
 
 
 /* Hover */
+
 .admin-input-group .password-toggle:hover {
   color: #153b29 !important;
 
@@ -3575,6 +3595,7 @@ html {
 
 
 /* Focus */
+
 .admin-input-group .password-toggle:focus {
   outline: none !important;
 
@@ -3583,8 +3604,251 @@ html {
 
 
 /* Eye icon */
+
 .admin-input-group .password-toggle i {
   font-size: 17px !important;
 
   line-height: 1 !important;
+}
+
+
+/* =========================================================
+   ADMIN INFORMATION - GREEN SIDE
+   ========================================================= */
+
+.admin-overlay-content {
+  width: 100%;
+
+  max-width: 470px;
+
+  margin: 0 auto;
+
+  text-align: center;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   ADMIN ICON
+   ========================================================= */
+
+.admin-overlay-content .admin-overlay-icon {
+  width: 76px;
+
+  height: 76px;
+
+  margin: 0 auto 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  color: #ffffff;
+
+  font-size: 32px;
+}
+
+
+/* =========================================================
+   ADMIN TITLE
+   ========================================================= */
+
+.admin-overlay-content h2 {
+  margin: 0 0 10px;
+
+  color: #ffffff;
+
+  font-size: 30px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   ADMIN DESCRIPTION
+   ========================================================= */
+
+.admin-overlay-content>p {
+  margin: 0 auto 22px;
+
+  max-width: 390px;
+
+  color: rgba(255, 255, 255, 0.88);
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   ADMIN INFORMATION LIST
+   ========================================================= */
+
+.admin-info-list {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+
+  text-align: left;
+}
+
+
+/* =========================================================
+   INFORMATION ITEM
+   ========================================================= */
+
+.admin-info-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 10px 13px;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* Hover */
+
+.admin-info-item:hover {
+  background: rgba(255, 255, 255, 0.13);
+
+  transform: translateX(3px);
+}
+
+
+/* =========================================================
+   INFORMATION ICON
+   ========================================================= */
+
+.admin-info-item>i {
+  width: 36px;
+
+  height: 36px;
+
+  min-width: 36px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  color: #ffffff;
+
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   INFORMATION TITLE
+   ========================================================= */
+
+.admin-info-item strong {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   INFORMATION DESCRIPTION
+   ========================================================= */
+
+.admin-info-item span {
+  display: block;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  font-size: 10px;
+
+  line-height: 1.35;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .admin-overlay-content {
+    max-width: 420px;
+  }
+
+  .admin-overlay-content h2 {
+    font-size: 27px;
+  }
+
+  .admin-overlay-content>p {
+    font-size: 12px;
+  }
+
+  .admin-info-item {
+    padding: 9px 11px;
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  .admin-info-list {
+    gap: 7px;
+  }
+
+  .admin-info-item {
+    padding: 8px 10px;
+  }
+
+  .admin-info-item>i {
+    width: 32px;
+
+    height: 32px;
+
+    min-width: 32px;
+
+    font-size: 14px;
+  }
+
+  .admin-info-item strong {
+    font-size: 11px;
+  }
+
+  .admin-info-item span {
+    font-size: 9px;
+  }
+
 }
