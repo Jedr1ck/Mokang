@@ -226,6 +226,7 @@ const chatContainerStyle = {
     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
     marginTop: '20px',
     height: 'calc(100vh - 160px)',
+    minHeight: 0,
     overflow: 'hidden'
 };
 
@@ -279,17 +280,21 @@ const onlineDotStyle = {
 const chatAreaStyle = {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#fafafa'
+    backgroundColor: '#fafafa',
+    minHeight: 0,
+    height: '100%'
 };
 
 const chatHeaderStyle = {
     padding: '12px 20px',
     borderBottom: '1px solid #e5e7eb',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    flexShrink: 0
 };
 
 const chatBodyStyle = {
     flex: 1,
+    minHeight: 0,
     padding: '20px',
     overflowY: 'auto',
     display: 'flex',
@@ -310,10 +315,12 @@ const messageBubbleStyle = {
 
 const chatInputFormStyle = {
     display: 'flex',
+    alignItems: 'center',
     padding: '15px',
     backgroundColor: '#fff',
     borderTop: '1px solid #e5e7eb',
-    gap: '10px'
+    gap: '10px',
+    flexShrink: 0
 };
 
 const messageInputStyle = {

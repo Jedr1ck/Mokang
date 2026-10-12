@@ -409,3 +409,103 @@
 .provider-logout-btn .provider-link-text {
     color: inherit;
 }
+
+.provider-logout-modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(20, 28, 25, 0.45);
+    z-index: 2000;
+    padding: 20px;
+}
+
+.provider-logout-modal {
+    position: relative;
+    width: min(520px, 90vw);
+    background: #f3f4f5;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+    padding: 30px 28px 22px;
+    border: 1px solid rgba(16, 74, 60, 0.08);
+}
+
+.provider-logout-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.provider-logout-modal-content h3 {
+    margin: 0;
+    font-size: 2.1rem;
+    color: #1b1b1b;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.provider-logout-modal-content p {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+.provider-logout-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    align-items: center;
+}
+
+.provider-logout-confirm-btn,
+.provider-logout-cancel-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 28px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.provider-logout-confirm-btn {
+    background: linear-gradient(135deg, #1e8fd8, #2f6df6);
+    color: #fff;
+    min-width: 110px;
+    box-shadow: 0 8px 18px rgba(47, 109, 246, 0.28);
+}
+
+.provider-logout-cancel-btn {
+    background: #e5e7eb;
+    color: #1f2937;
+    min-width: 120px;
+}
+
+.provider-logout-confirm-btn:hover,
+.provider-logout-cancel-btn:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+    .provider-logout-modal {
+        padding: 22px 20px 18px;
+    }
+
+    .provider-logout-modal-content h3 {
+        font-size: 1.8rem;
+    }
+
+    .provider-logout-modal-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .provider-logout-confirm-btn,
+    .provider-logout-cancel-btn {
+        padding: 10px 18px;
+        font-size: 0.95rem;
+    }
+}

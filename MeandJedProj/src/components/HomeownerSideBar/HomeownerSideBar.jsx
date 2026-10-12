@@ -1,5 +1,6 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './HomeownerSideBar.css';
 
@@ -10,7 +11,24 @@ import myLogo from '../../assets/images/logo.png';
 
 const HomeownerSideBar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const isActive = (path) => location.pathname === path;
+
+    const handleLogout = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('loggedInHomeowner');
+        setShowLogoutModal(false);
+        navigate('/');
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
+    };
 
     return (
         <aside className="green-wavy-sidebar">
@@ -73,17 +91,56 @@ const HomeownerSideBar = () => {
                         <span className="link-text">Settings</span>
                     </Link>
 
-                    <Link
-                        to="/logout"
-                        className={`sidebar-btn ${isActive('/logout') ? 'active' : ''}`}
+                    <button
+                        type="button"
+                        className="sidebar-btn homeowner-logout-btn"
+                        onClick={handleLogout}
                     >
                         <i className="bi bi-box-arrow-right"></i>
                         <span className="badge-dot-lightgreen"></span>
                         <span className="link-text">Logout</span>
-                    </Link>
+                    </button>
                 </nav>
 
             </div>
+
+            {showLogoutModal && createPortal(
+                <div
+                    className="homeowner-logout-modal-overlay"
+                    onClick={cancelLogout}
+                >
+                    <div
+                        className="homeowner-logout-modal"
+                        onClick={(event) => event.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="homeowner-logout-title"
+                    >
+                        <div className="homeowner-logout-modal-content">
+                            <h3 id="homeowner-logout-title">Logout</h3>
+                            <p>Are you sure you want to log out?</p>
+                        </div>
+
+                        <div className="homeowner-logout-modal-actions">
+                            <button
+                                type="button"
+                                className="homeowner-logout-confirm-btn"
+                                onClick={confirmLogout}
+                            >
+                                OK
+                            </button>
+                            <button
+                                type="button"
+                                className="homeowner-logout-cancel-btn"
+                                onClick={cancelLogout}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </aside>
     );
 };

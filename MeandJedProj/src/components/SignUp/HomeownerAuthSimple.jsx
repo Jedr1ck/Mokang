@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -27,12 +27,8 @@ const HomeownerAuthSimple = () => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
-        age: '',
-        gender: '',
-        location: '',
         password: '',
-        confirmPassword: '',
-        agreeTerms: false
+        confirmPassword: ''
     });
 
     // =========================
@@ -66,21 +62,12 @@ const HomeownerAuthSimple = () => {
             return;
         }
 
-        // Check terms
-        if (!formData.agreeTerms) {
-            alert('Paki-sang-ayunan ang Terms and Conditions.');
-            return;
-        }
-
         try {
             setPasswordError('');
 
             const response = await register({
                 full_name: formData.fullName.trim(),
                 email: formData.email.trim(),
-                mobile_number: null,
-                gender: formData.gender,
-                address: formData.location.trim(),
                 password: formData.password,
                 role: 'homeowner'
             });
@@ -263,6 +250,8 @@ const HomeownerAuthSimple = () => {
                             placeholder="Full Name"
                             value={formData.fullName}
                             onChange={handleChange}
+                            minLength="2"
+                            maxLength="150"
                             required
                         />
 
@@ -273,58 +262,6 @@ const HomeownerAuthSimple = () => {
                             name="email"
                             placeholder="Email Address"
                             value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-
-                        {/* Age */}
-                        <input
-                            className="form-control bg-light border-0 mb-2"
-                            type="number"
-                            name="age"
-                            placeholder="Age"
-                            min="1"
-                            max="120"
-                            value={formData.age}
-                            onChange={handleChange}
-                            required
-                        />
-
-                        {/* Gender */}
-                        <select
-                            className="form-select bg-light border-0 mb-2"
-                            name="gender"
-                            value={formData.gender}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="" disabled>
-                                Select Gender
-                            </option>
-
-                            <option value="Male">
-                                Male
-                            </option>
-
-                            <option value="Female">
-                                Female
-                            </option>
-
-                            <option value="Other">
-                                Other
-                            </option>
-
-                            <option value="Prefer not to say">
-                                Prefer not to say
-                            </option>
-                        </select>
-
-                        {/* Location */}
-                        <input
-                            className="form-control bg-light border-0 mb-2"
-                            name="location"
-                            placeholder="Location"
-                            value={formData.location}
                             onChange={handleChange}
                             required
                         />
@@ -345,6 +282,10 @@ const HomeownerAuthSimple = () => {
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
+                                minLength="8"
+                                maxLength="128"
+                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,128}"
+                                title="Use at least 8 characters, including uppercase, lowercase, and a number."
                                 required
                             />
 
@@ -393,6 +334,8 @@ const HomeownerAuthSimple = () => {
                                 placeholder="Confirm Password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
+                                minLength="8"
+                                maxLength="128"
                                 required
                             />
 
@@ -431,28 +374,6 @@ const HomeownerAuthSimple = () => {
                                 {passwordError}
                             </div>
                         )}
-
-                        {/* Terms */}
-                        <div className="form-check mb-3 text-start w-100">
-
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id="homeownerTerms"
-                                name="agreeTerms"
-                                checked={formData.agreeTerms}
-                                onChange={handleChange}
-                                required
-                            />
-
-                            <label
-                                className="form-check-label small text-muted"
-                                htmlFor="homeownerTerms"
-                            >
-                                I agree to the Terms and Conditions
-                            </label>
-
-                        </div>
 
                         {/* Sign Up Button */}
                         <button

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"; import { createPortal } from "react-dom"; import { useNavigate } from "react-router-dom";
 
 import { api, logout } from "../../services/api";
 
@@ -38,6 +37,8 @@ function AdminDashboard() {
 
     const [sidebarOpen, setSidebarOpen] =
         useState(true);
+    const [showLogoutModal, setShowLogoutModal] =
+        useState(false);
 
 
     /* =========================================================
@@ -92,16 +93,22 @@ function AdminDashboard() {
     ========================================================= */
 
     const handleLogout = () => {
+        setShowLogoutModal(true);
+    };
 
+    const confirmLogout = () => {
         logout();
-
+        setShowLogoutModal(false);
         navigate(
             "/admin-login",
             {
                 replace: true,
             }
         );
+    };
 
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
 
@@ -210,198 +217,154 @@ function AdminDashboard() {
     ========================================================= */
 
     return (
+        <>
+            <div
+                className={`
+                    admin-dashboard-page
+                    ${sidebarOpen
+                        ? "sidebar-open"
+                        : "sidebar-collapsed"
+                    }
+                `}
+            >
+                <SideBarAdmin
+                    activePage={activePage}
+                    setActivePage={handlePageChange}
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    handleLogout={handleLogout}
+                />
 
-        <div
-            className={`
-                admin-dashboard-page
-                ${sidebarOpen
-                    ? "sidebar-open"
-                    : "sidebar-collapsed"
-                }
-            `}
-        >
+                <main className="admin-main-content">
+                    <header className="admin-topbar">
+                        <div className="admin-topbar-left">
+                            <button
+                                type="button"
+                                className="admin-sidebar-toggle"
+                                onClick={() =>
+                                    setSidebarOpen(
+                                        (previous) =>
+                                            !previous
+                                    )
+                                }
+                                title="Toggle sidebar"
+                                aria-label="Toggle sidebar"
+                            >
+                                <i className="bi bi-list"></i>
+                            </button>
 
-
-            {/* =================================================
-                SIDEBAR
-            ================================================= */}
-
-            <SideBarAdmin
-                activePage={activePage}
-                setActivePage={handlePageChange}
-                sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
-                handleLogout={handleLogout}
-            />
-
-
-            {/* =================================================
-                MAIN AREA
-            ================================================= */}
-
-            <main className="admin-main-content">
-
-
-                {/* =================================================
-                    TOPBAR
-                ================================================= */}
-
-                <header className="admin-topbar">
-
-                    <div className="admin-topbar-left">
-
-                        {/* MENU BUTTON */}
-
-                        <button
-                            type="button"
-                            className="admin-sidebar-toggle"
-                            onClick={() =>
-                                setSidebarOpen(
-                                    (previous) =>
-                                        !previous
-                                )
-                            }
-                            title="Toggle sidebar"
-                            aria-label="Toggle sidebar"
-                        >
-
-                            <i className="bi bi-list"></i>
-
-                        </button>
-
-
-                        {/* PAGE TITLE */}
-
-                        <div className="admin-page-heading">
-
-                            <span>
-                                ADMINISTRATION
-                            </span>
-
-                            <h1>
-                                {activePage}
-                            </h1>
-
-                        </div>
-
-                    </div>
-
-
-                    {/* =================================================
-                        TOPBAR RIGHT
-                    ================================================= */}
-
-                    <div className="admin-topbar-right">
-
-
-                        {/* NOTIFICATION */}
-
-                        <button
-                            type="button"
-                            className="admin-topbar-icon-button"
-                            onClick={() =>
-                                handlePageChange(
-                                    "Notification"
-                                )
-                            }
-                            title="Notifications"
-                        >
-
-                            <i className="bi bi-bell"></i>
-
-                            <span className="admin-topbar-notification-dot">
-                            </span>
-
-                        </button>
-
-
-                        {/* PROFILE */}
-
-                        <button
-                            type="button"
-                            className="admin-profile-button"
-                            onClick={() =>
-                                handlePageChange(
-                                    "Admin Profile"
-                                )
-                            }
-                            title="Administrator Profile"
-                        >
-
-                            <div className="admin-profile-avatar">
-
-                                <i className="bi bi-person-fill"></i>
-
-                            </div>
-
-
-                            <div className="admin-profile-info">
-
-                                <strong>
-
-                                    {user?.fullName ||
-                                        user?.username ||
-                                        user?.name ||
-                                        "Administrator"}
-
-                                </strong>
-
+                            <div className="admin-page-heading">
                                 <span>
-                                    Administrator
+                                    ADMINISTRATION
                                 </span>
 
+                                <h1>
+                                    {activePage}
+                                </h1>
                             </div>
+                        </div>
 
+                        <div className="admin-topbar-right">
+                            <button
+                                type="button"
+                                className="admin-topbar-icon-button"
+                                onClick={() =>
+                                    handlePageChange(
+                                        "Notification"
+                                    )
+                                }
+                                title="Notifications"
+                            >
+                                <i className="bi bi-bell"></i>
+                                <span className="admin-topbar-notification-dot"></span>
+                            </button>
 
-                            <i className="bi bi-chevron-down"></i>
+                            <button
+                                type="button"
+                                className="admin-profile-button"
+                                onClick={() =>
+                                    handlePageChange(
+                                        "Admin Profile"
+                                    )
+                                }
+                                title="Administrator Profile"
+                            >
+                                <div className="admin-profile-avatar">
+                                    <i className="bi bi-person-fill"></i>
+                                </div>
 
-                        </button>
+                                <div className="admin-profile-info">
+                                    <strong>
+                                        {user?.fullName ||
+                                            user?.username ||
+                                            user?.name ||
+                                            "Administrator"}
+                                    </strong>
 
+                                    <span>
+                                        Administrator
+                                    </span>
+                                </div>
+
+                                <i className="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                    </header>
+
+                    <section className="admin-content-container">
+                        <div className="admin-breadcrumb">
+                            <i className="bi bi-house-door-fill"></i>
+                            <span>Admin</span>
+                            <i className="bi bi-chevron-right"></i>
+                            <span className="current">{activePage}</span>
+                        </div>
+
+                        <div className="admin-page-content">
+                            {renderPageContent()}
+                        </div>
+                    </section>
+                </main>
+            </div>
+
+            {showLogoutModal && createPortal(
+                <div
+                    className="admin-logout-modal-overlay"
+                    onClick={cancelLogout}
+                >
+                    <div
+                        className="admin-logout-modal"
+                        onClick={(event) => event.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="admin-logout-title"
+                    >
+                        <div className="admin-logout-modal-content">
+                            <h3 id="admin-logout-title">Logout</h3>
+                            <p>Are you sure you want to log out?</p>
+                        </div>
+
+                        <div className="admin-logout-modal-actions">
+                            <button
+                                type="button"
+                                className="admin-logout-confirm-btn"
+                                onClick={confirmLogout}
+                            >
+                                OK
+                            </button>
+
+                            <button
+                                type="button"
+                                className="admin-logout-cancel-btn"
+                                onClick={cancelLogout}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
-
-                </header>
-
-
-                {/* =================================================
-                    PAGE CONTENT
-                ================================================= */}
-
-                <section className="admin-content-container">
-
-
-                    {/* BREADCRUMB */}
-
-                    <div className="admin-breadcrumb">
-
-                        <i className="bi bi-house-door-fill"></i>
-
-                        <span>
-                            Admin
-                        </span>
-
-                        <i className="bi bi-chevron-right"></i>
-
-                        <span className="current">
-                            {activePage}
-                        </span>
-
-                    </div>
-
-
-                    {/* PAGE */}
-
-                    <div className="admin-page-content">
-
-                        {renderPageContent()}
-
-                    </div>
-
-                </section>
-
-            </main>
-
-        </div>
-
+                </div>,
+                document.body
+            )}
+        </>
     );
 
 }

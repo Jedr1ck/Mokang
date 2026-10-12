@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -165,8 +165,8 @@ function DashboardOverview() {
 
                             <i
                                 className={`bi ${showAllBookings
-                                        ? "bi-chevron-up"
-                                        : "bi-arrow-right"
+                                    ? "bi-chevron-up"
+                                    : "bi-arrow-right"
                                     }`}
                             ></i>
                         </button>
@@ -203,7 +203,7 @@ function DashboardOverview() {
                                             <td>
                                                 <span
                                                     className={`admin-status ${booking.status
-                                                            ?.toLowerCase()
+                                                        ?.toLowerCase()
                                                         }`}
                                                 >
                                                     {booking.status}
@@ -267,8 +267,8 @@ function DashboardOverview() {
 
                             <i
                                 className={`bi ${showAllCustomers
-                                        ? "bi-chevron-up"
-                                        : "bi-arrow-right"
+                                    ? "bi-chevron-up"
+                                    : "bi-arrow-right"
                                     }`}
                             ></i>
                         </button>
@@ -366,8 +366,8 @@ function DashboardOverview() {
 
                             <i
                                 className={`bi ${showAllApprovals
-                                        ? "bi-chevron-up"
-                                        : "bi-arrow-right"
+                                    ? "bi-chevron-up"
+                                    : "bi-arrow-right"
                                     }`}
                             ></i>
                         </button>
@@ -472,8 +472,8 @@ function DashboardOverview() {
 
                             <i
                                 className={`bi ${showAllAnnouncements
-                                        ? "bi-chevron-up"
-                                        : "bi-arrow-right"
+                                    ? "bi-chevron-up"
+                                    : "bi-arrow-right"
                                     }`}
                             ></i>
                         </button>

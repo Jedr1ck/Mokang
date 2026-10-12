@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./AdminDashboard.css";
 
 function ReportsAnalytics() {
-    const [reports, setReports] = useState([]);
+    const [reports] = useState([]);
 
     const [reportType, setReportType] = useState("All");
     const [dateRange, setDateRange] = useState("All Time");

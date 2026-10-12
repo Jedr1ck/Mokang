@@ -1,9 +1,9 @@
 
-CREATE DATABASE IF NOT EXISTS Smarthome
+CREATE DATABASE IF NOT EXISTS Smarthomes
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
-USE Smarthome;
+USE Smarthomes;
 
 
 CREATE TABLE users (
@@ -12,12 +12,6 @@ CREATE TABLE users (
     full_name VARCHAR(150) NOT NULL,
 
     email VARCHAR(255) NOT NULL UNIQUE,
-
-    mobile_number VARCHAR(30),
-
-    gender VARCHAR(30),
-
-    address VARCHAR(500),
 
     password_hash VARCHAR(255) NOT NULL,
 
@@ -33,6 +27,21 @@ CREATE TABLE users (
 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE user_profiles (
+    user_id BIGINT PRIMARY KEY,
+
+    mobile_number VARCHAR(30),
+
+    gender VARCHAR(30),
+
+    address VARCHAR(500),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
 );
 
 
@@ -237,10 +246,6 @@ CREATE TABLE reviews (
 
     booking_id BIGINT NOT NULL UNIQUE,
 
-    reviewer_id BIGINT NOT NULL,
-
-    provider_id BIGINT NOT NULL,
-
     rating TINYINT NOT NULL,
 
     comment TEXT,
@@ -248,11 +253,5 @@ CREATE TABLE reviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (booking_id)
-        REFERENCES bookings(id),
-
-    FOREIGN KEY (reviewer_id)
-        REFERENCES users(id),
-
-    FOREIGN KEY (provider_id)
-        REFERENCES provider_profiles(id)
+        REFERENCES bookings(id)
 );

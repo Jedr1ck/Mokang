@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -11,6 +12,7 @@ const ProviderSideBar = () => {
 
     const location = useLocation();
     const navigate = useNavigate();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 
     // =========================================
@@ -27,28 +29,18 @@ const ProviderSideBar = () => {
     // =========================================
 
     const handleLogout = () => {
+        setShowLogoutModal(true);
+    };
 
-        const confirmLogout =
-            window.confirm(
-                "Are you sure you want to logout?"
-            );
-
-        if (!confirmLogout) {
-            return;
-        }
-
-
-        // Remove provider login information
+    const confirmLogout = () => {
         localStorage.removeItem("user");
-
-        localStorage.removeItem(
-            "loggedInProvider"
-        );
-
-
-        // Return to landing page
+        localStorage.removeItem("loggedInProvider");
+        setShowLogoutModal(false);
         navigate("/");
+    };
 
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
 
@@ -94,8 +86,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-dashboard"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Dashboard"
                     >
@@ -118,8 +110,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-bookings"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Booking System"
                     >
@@ -144,8 +136,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-jobs"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="My Jobs"
                     >
@@ -168,8 +160,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-schedule"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Schedule"
                     >
@@ -192,8 +184,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-messages"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Messages"
                     >
@@ -218,8 +210,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-reviews"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Ratings & Reviews"
                     >
@@ -242,8 +234,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-earnings"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Earnings"
                     >
@@ -266,8 +258,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-notifications"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Notifications"
                     >
@@ -292,8 +284,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-profile"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="My Profile"
                     >
@@ -316,8 +308,8 @@ const ProviderSideBar = () => {
                         className={`provider-sidebar-btn ${isActive(
                             "/provider-availability"
                         )
-                                ? "active"
-                                : ""
+                            ? "active"
+                            : ""
                             }`}
                         title="Availability"
                     >
@@ -354,6 +346,50 @@ const ProviderSideBar = () => {
                 </nav>
 
             </div>
+
+            {showLogoutModal && createPortal(
+                <div
+                    className="provider-logout-modal-overlay"
+                    onClick={cancelLogout}
+                >
+                    <div
+                        className="provider-logout-modal"
+                        onClick={(event) => event.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="provider-logout-title"
+                    >
+                        <div className="provider-logout-modal-content">
+                            <h3 id="provider-logout-title">
+                                Logout
+                            </h3>
+
+                            <p>
+                                Are you sure you want to log out?
+                            </p>
+                        </div>
+
+                        <div className="provider-logout-modal-actions">
+                            <button
+                                type="button"
+                                className="provider-logout-confirm-btn"
+                                onClick={confirmLogout}
+                            >
+                                OK
+                            </button>
+
+                            <button
+                                type="button"
+                                className="provider-logout-cancel-btn"
+                                onClick={cancelLogout}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
 
         </aside>
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -337,6 +337,21 @@ function Notifications() {
                         <span>System</span>
                         <strong>
                             {systemCount}
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div className="admin-management-summary-card">
+
+                    <div className="admin-summary-icon">
+                        <i className="bi bi-calendar-check-fill"></i>
+                    </div>
+
+                    <div>
+                        <span>Bookings</span>
+                        <strong>
+                            {bookingCount}
                         </strong>
                     </div>
 

@@ -225,3 +225,110 @@
     /* O puwedeng 'contain' kung ayaw mong mag-crop ang logo */
     border-radius: 12px;
 }
+
+.homeowner-logout-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+
+.homeowner-logout-modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(20, 28, 25, 0.45);
+    z-index: 2000;
+    padding: 20px;
+}
+
+.homeowner-logout-modal {
+    position: relative;
+    width: min(520px, 90vw);
+    background: #f3f4f5;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+    padding: 30px 28px 22px;
+    border: 1px solid rgba(16, 74, 60, 0.08);
+}
+
+.homeowner-logout-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.homeowner-logout-modal-content h3 {
+    margin: 0;
+    font-size: 2.1rem;
+    color: #1b1b1b;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.homeowner-logout-modal-content p {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+.homeowner-logout-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    align-items: center;
+}
+
+.homeowner-logout-confirm-btn,
+.homeowner-logout-cancel-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 28px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.homeowner-logout-confirm-btn {
+    background: linear-gradient(135deg, #1e8fd8, #2f6df6);
+    color: #fff;
+    min-width: 110px;
+    box-shadow: 0 8px 18px rgba(47, 109, 246, 0.28);
+}
+
+.homeowner-logout-cancel-btn {
+    background: #e5e7eb;
+    color: #1f2937;
+    min-width: 120px;
+}
+
+.homeowner-logout-confirm-btn:hover,
+.homeowner-logout-cancel-btn:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+    .homeowner-logout-modal {
+        padding: 22px 20px 18px;
+    }
+
+    .homeowner-logout-modal-content h3 {
+        font-size: 1.8rem;
+    }
+
+    .homeowner-logout-modal-actions {
+        justify-content: flex-end;
+    }
+
+    .homeowner-logout-confirm-btn,
+    .homeowner-logout-cancel-btn {
+        padding: 10px 18px;
+        font-size: 0.95rem;
+    }
+}
