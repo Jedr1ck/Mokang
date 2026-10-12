@@ -183,6 +183,27 @@ section h2 {
   color: #245b39;
 }
 
+/* Remove ALL hover effects from About feature cards */
+.about-section .feature-card,
+.about-section .feature-card:hover,
+.about-section .feature-card:focus,
+.about-section .feature-card:focus-within,
+.about-section .feature-card:active {
+  transform: none !important;
+  border-color: #e1e8df !important;
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.10) !important;
+  filter: none !important;
+  transition: none !important;
+  cursor: default !important;
+}
+
+.about-section .feature-card:hover .feature-number,
+.about-section .feature-card:focus-within .feature-number {
+  transform: none !important;
+  filter: none !important;
+}
+
+
 /* ================= SERVICES ================= */
 
 .service-search {
@@ -299,6 +320,7 @@ section h2 {
   background: #fff3e8;
 }
 
+
 /* ================= HOW IT WORKS ================= */
 
 .steps-container {
@@ -314,10 +336,21 @@ section h2 {
   align-items: center;
 }
 
+/* Step card - no hover animation */
 .step {
   width: 120px;
+  transform: none;
+  transition: none;
+  cursor: default;
 }
 
+.step:hover,
+.step:focus-within {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Step icon */
 .step-icon {
   width: 72px;
   height: 72px;
@@ -329,14 +362,24 @@ section h2 {
   justify-content: center;
   font-size: 35px;
   color: #ff7200;
+  transform: none;
+  transition: none;
 }
 
+.step-icon:hover {
+  transform: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Step heading */
 .step h3 {
   margin-top: 10px;
   font-size: 15px;
   color: #245b39;
 }
 
+/* Step number */
 .step h3 span {
   display: inline-flex;
   align-items: center;
@@ -350,6 +393,7 @@ section h2 {
   margin-right: 5px;
 }
 
+/* Step description */
 .step p {
   font-size: 11px;
   line-height: 1.35;
@@ -357,10 +401,18 @@ section h2 {
   margin-top: 12px;
 }
 
+/* Arrow between steps */
 .step-arrow {
   color: #ff7200;
   font-size: 25px;
   margin: 0 12px;
+  transform: none;
+  transition: none;
+}
+
+.step-arrow:hover {
+  transform: none;
+  color: #ff7200;
 }
 
 /* ================= WHY CHOOSE ================= */
@@ -467,7 +519,10 @@ section h2 {
   border-radius: 10px;
   box-shadow: 0 7px 20px rgba(0, 0, 0, 0.10);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  /* Removed hover animation */
+  transform: none;
+  transition: none;
 }
 
 .review-card::after {
@@ -480,19 +535,19 @@ section h2 {
   font-size: 74px;
   line-height: 1;
   pointer-events: none;
-  transition: color 0.2s ease;
 }
 
+/* Keep the original appearance when hovered */
 .review-card:hover,
 .review-card:focus-within {
-  border-color: #ffb276;
-  box-shadow: 0 14px 30px rgba(36, 91, 57, 0.14);
-  transform: translateY(-5px);
+  border-color: transparent;
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.10);
+  transform: none;
 }
 
 .review-card:hover::after,
 .review-card:focus-within::after {
-  color: #ffe1ca;
+  color: #fff1e6;
 }
 
 .stars {
@@ -3337,6 +3392,188 @@ html {
     padding: 12px;
   }
 
+}
+
+
+/* =========================================================
+   SPRINT 2 - CLICKABLE SERVICE CARDS
+   Keeps the original card design and hover animation
+   ========================================================= */
+
+.service-slide .service-card-clickable {
+  width: 100%;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.service-slide .service-card-clickable:hover {
+  transform: translateY(-4px);
+  border-color: #cfded2;
+  box-shadow: 0 10px 24px rgba(36, 91, 57, 0.10);
+}
+
+.service-slide .service-card-clickable:focus-visible {
+  outline: 3px solid #e86f1b;
+  outline-offset: 3px;
+}
+
+/* Small hint inside the original service card */
+.service-card-hint {
+  display: block;
+  margin-top: 8px;
+  color: #e06b16;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   SERVICE DETAILS MODAL
+   ========================================================= */
+
+.service-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 35, 24, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.service-modal {
+  position: relative;
+  width: min(480px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid #e2e9e2;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #153b29;
+  text-align: left;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: serviceModalAppear 0.2s ease-out;
+}
+
+.service-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e2e9e2;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #153b29;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.service-modal-image {
+  display: block;
+  width: 100%;
+  height: 180px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.service-modal h3 {
+  margin: 0 36px 8px 0;
+  color: #153b29;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.service-modal-description {
+  margin: 0 0 16px;
+  color: #68766d;
+  font-size: 13px;
+}
+
+.service-modal-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-modal-task-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #40594a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.service-modal-task-list li i {
+  margin-top: 3px;
+  color: #e86f1b;
+}
+
+.service-modal-close-button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 7px;
+  background: #e86f1b;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.service-modal-close-button:hover {
+  background: #cc5d12;
+}
+
+.service-modal-close:hover {
+  background: #fff1e6;
+  color: #cc5d12;
+}
+
+.service-modal-close:focus-visible,
+.service-modal-close-button:focus-visible {
+  outline: 3px solid #e86f1b;
+  outline-offset: 3px;
+}
+
+@keyframes serviceModalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .service-modal {
+    padding: 20px;
+  }
+
+  .service-modal-image {
+    height: 140px;
+  }
+
+  .service-modal h3 {
+    font-size: 20px;
+  }
 }
 
 /* =========================================================

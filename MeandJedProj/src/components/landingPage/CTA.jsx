@@ -1,12 +1,16 @@
+
+import { useNavigate } from "react-router-dom";
 import background from "../../assets/images/hero-background.png";
 
 function CTA() {
-    // Handler para mag-scroll paitaas sa tuktok ng pahina
-    const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth" // Swabe ang pag-scroll paitaas
-        });
+    const navigate = useNavigate();
+
+    const handleFindService = () => {
+        navigate("/auth/homeowner");
+    };
+
+    const handleBecomeProvider = () => {
+        navigate("/auth/provider");
     };
 
     return (
@@ -25,17 +29,25 @@ function CTA() {
                 </h2>
 
                 <p>
-                    Join thousands of happy homeowner
+                    Join thousands of happy homeowners
                     <br />
                     and verified professionals today
                 </p>
 
                 <div className="cta-buttons">
-                    <button className="btn btn-brand" onClick={scrollToTop}>
+                    <button
+                        type="button"
+                        className="btn btn-brand"
+                        onClick={handleFindService}
+                    >
                         Find a Service
                     </button>
 
-                    <button className="btn btn-brand-outline" onClick={scrollToTop}>
+                    <button
+                        type="button"
+                        className="btn btn-brand-outline"
+                        onClick={handleBecomeProvider}
+                    >
                         Become a Provider
                     </button>
                 </div>
