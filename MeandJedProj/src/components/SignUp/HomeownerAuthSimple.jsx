@@ -14,6 +14,7 @@ const HomeownerAuthSimple = () => {
     // Login states
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
+    const [loginError, setLoginError] = useState('');
     const [showLoginPassword, setShowLoginPassword] = useState(false);
 
     // Registration states
@@ -31,30 +32,29 @@ const HomeownerAuthSimple = () => {
         confirmPassword: ''
     });
 
-    // =========================
     // HANDLE REGISTRATION INPUT
-    // =========================
     const handleChange = (event) => {
         const { name, value, type, checked } = event.target;
 
+        const sanitizedValue =
+            name === 'fullName'
+                ? value.replace(/[^A-Za-z. ]/g, '')
+                : value;
+
         setFormData((previous) => ({
             ...previous,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? checked : sanitizedValue
         }));
 
-        // Remove password error while typing
         if (name === 'password' || name === 'confirmPassword') {
             setPasswordError('');
         }
     };
 
-    // =========================
     // HOMEOWNER REGISTRATION
-    // =========================
     const handleRegisterSubmit = async (event) => {
         event.preventDefault();
 
-        // Check password match
         if (formData.password !== formData.confirmPassword) {
             setPasswordError(
                 'Hindi nagtutugma ang Password at Confirm Password.'
@@ -78,8 +78,7 @@ const HomeownerAuthSimple = () => {
             };
 
             // Save account information locally.
-            // DO NOT save access_token here because the user
-            // should log in first before entering the dashboard.
+            // The user must log in before entering the dashboard.
             const savedAccounts = JSON.parse(
                 localStorage.getItem('savedAccounts') || '[]'
             );
@@ -92,6 +91,7 @@ const HomeownerAuthSimple = () => {
 
             if (existingIndex >= 0) {
                 savedAccounts[existingIndex] = account;
+
                 localStorage.setItem(
                     'savedAccounts',
                     JSON.stringify(savedAccounts)
@@ -103,16 +103,14 @@ const HomeownerAuthSimple = () => {
                 );
             }
 
-            // Automatically place registered email in login form
+            // Place registered email in the login form.
             setLoginEmail(formData.email.trim());
             setLoginPassword('');
+            setLoginError('');
 
-            // Switch to login form
+            // Switch to login and show success modal.
             setIsSignUp(false);
-
-            // Show styled success modal
             setShowSuccessModal(true);
-
         } catch (error) {
             alert(
                 error.message ||
@@ -121,11 +119,10 @@ const HomeownerAuthSimple = () => {
         }
     };
 
-    // =========================
     // HOMEOWNER LOGIN
-    // =========================
     const handleLoginSubmit = async (event) => {
         event.preventDefault();
+        setLoginError('');
 
         try {
             const response = await login(
@@ -138,7 +135,7 @@ const HomeownerAuthSimple = () => {
                 role: response.user.role || 'homeowner'
             };
 
-            // Save authenticated user ONLY after successful login
+            // Save authenticated user only after successful login.
             localStorage.setItem(
                 'user',
                 JSON.stringify(account)
@@ -149,7 +146,7 @@ const HomeownerAuthSimple = () => {
                 response.access_token
             );
 
-            // Update saved accounts
+            // Update saved accounts.
             const savedAccounts = JSON.parse(
                 localStorage.getItem('savedAccounts') || '[]'
             );
@@ -177,36 +174,27 @@ const HomeownerAuthSimple = () => {
                 );
             }
 
-            // ONLY NOW go to dashboard
+            // Navigate only after successful login.
             navigate('/homeowner-dashboard');
-
         } catch (error) {
-            alert(
-                error.message ||
-                'Maling email o password. Pakisubukan ulit.'
-            );
+            // Same message regardless of which credential is incorrect.
+            setLoginError('Invalid email or password.');
         }
     };
 
-    // =========================
     // SWITCH LOGIN / SIGN UP
-    // =========================
     const toggleForm = () => {
         setIsSignUp((previous) => !previous);
         setPasswordError('');
+        setLoginError('');
     };
 
-    // =========================
-    // SUCCESS MODAL OK
-    // =========================
+    // SUCCESS MODAL OK BUTTON
     const handleSuccessModalOk = () => {
         setShowSuccessModal(false);
-
-        // Make sure user stays on LOGIN
         setIsSignUp(false);
-
-        // Clear password so user must manually log in
         setLoginPassword('');
+        setLoginError('');
     };
 
     return (
@@ -219,22 +207,16 @@ const HomeownerAuthSimple = () => {
                 backgroundRepeat: 'no-repeat'
             }}
         >
-
             <div
                 className={`auth-container ${isSignUp ? 'right-panel-active' : ''
                     }`}
             >
-
-                {/* =====================================================
-                    SIGN UP FORM
-                ====================================================== */}
+                {/* SIGN UP FORM */}
                 <div className="form-container sign-up-container">
-
                     <form
                         onSubmit={handleRegisterSubmit}
                         className="d-flex flex-column align-items-center justify-content-center h-100 px-4 text-center"
                     >
-
                         <h2 className="fw-bold mb-2 theme-text">
                             Create Account
                         </h2>
@@ -243,19 +225,22 @@ const HomeownerAuthSimple = () => {
                             or use your details for homeowner registration:
                         </span>
 
-                        {/* Full Name */}
+                        {/* FULL NAME */}
                         <input
                             className="form-control bg-light border-0 mb-2"
+                            type="text"
                             name="fullName"
                             placeholder="Full Name"
                             value={formData.fullName}
                             onChange={handleChange}
-                            minLength="2"
-                            maxLength="150"
+                            pattern="[A-Za-z. ]+"
+                            title="Full Name must contain letters, spaces, and periods only."
+                            minLength={2}
+                            maxLength={150}
                             required
                         />
 
-                        {/* Email */}
+                        {/* EMAIL */}
                         <input
                             className="form-control bg-light border-0 mb-2"
                             type="email"
@@ -263,29 +248,26 @@ const HomeownerAuthSimple = () => {
                             placeholder="Email Address"
                             value={formData.email}
                             onChange={handleChange}
+                            pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                            title="Enter a valid email address, such as name@example.com."
                             required
                         />
 
-                        {/* =================================================
-                            PASSWORD WITH EYE BUTTON
-                        ================================================== */}
+                        {/* PASSWORD */}
                         <div className="password-input-wrapper mb-2">
-
                             <input
                                 className="form-control bg-light border-0 password-input"
                                 type={
-                                    showPassword
-                                        ? 'text'
-                                        : 'password'
+                                    showPassword ? 'text' : 'password'
                                 }
                                 name="password"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                minLength="8"
-                                maxLength="128"
-                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,128}"
-                                title="Use at least 8 characters, including uppercase, lowercase, and a number."
+                                minLength={8}
+                                maxLength={128}
+                                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,128}"
+                                title="Password must contain uppercase and lowercase letters, a number, and a special character. Minimum 8 characters."
                                 required
                             />
 
@@ -315,14 +297,10 @@ const HomeownerAuthSimple = () => {
                                         }`}
                                 ></i>
                             </button>
-
                         </div>
 
-                        {/* =================================================
-                            CONFIRM PASSWORD WITH EYE BUTTON
-                        ================================================== */}
+                        {/* CONFIRM PASSWORD */}
                         <div className="password-input-wrapper mb-2">
-
                             <input
                                 className="form-control bg-light border-0 password-input"
                                 type={
@@ -334,8 +312,8 @@ const HomeownerAuthSimple = () => {
                                 placeholder="Confirm Password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                minLength="8"
-                                maxLength="128"
+                                minLength={8}
+                                maxLength={128}
                                 required
                             />
 
@@ -365,39 +343,34 @@ const HomeownerAuthSimple = () => {
                                         }`}
                                 ></i>
                             </button>
-
                         </div>
 
-                        {/* Password Error */}
+                        {/* REGISTRATION PASSWORD ERROR */}
                         {passwordError && (
-                            <div className="text-danger small mb-1">
+                            <div
+                                className="text-danger small mb-1"
+                                role="alert"
+                            >
                                 {passwordError}
                             </div>
                         )}
 
-                        {/* Sign Up Button */}
+                        {/* SIGN UP BUTTON */}
                         <button
                             type="submit"
                             className="btn btn-theme rounded-pill px-5 py-2 fw-bold text-white"
                         >
                             Sign up
                         </button>
-
                     </form>
-
                 </div>
 
-
-                {/* =====================================================
-                    LOGIN FORM
-                ====================================================== */}
+                {/* LOGIN FORM */}
                 <div className="form-container sign-in-container">
-
                     <form
                         onSubmit={handleLoginSubmit}
                         className="d-flex flex-column align-items-center justify-content-center h-100 px-5 text-center"
                     >
-
                         <h1 className="fw-bold mb-3 theme-text">
                             Log in
                         </h1>
@@ -406,23 +379,21 @@ const HomeownerAuthSimple = () => {
                             or use your homeowner account:
                         </span>
 
-                        {/* Email */}
+                        {/* LOGIN EMAIL */}
                         <input
                             className="form-control bg-light border-0 mb-3"
                             type="email"
                             placeholder="Email"
                             value={loginEmail}
-                            onChange={(event) =>
-                                setLoginEmail(event.target.value)
-                            }
+                            onChange={(event) => {
+                                setLoginEmail(event.target.value);
+                                setLoginError('');
+                            }}
                             required
                         />
 
-                        {/* =================================================
-                            LOGIN PASSWORD WITH EYE BUTTON
-                        ================================================== */}
-                        <div className="password-input-wrapper mb-4">
-
+                        {/* LOGIN PASSWORD */}
+                        <div className="password-input-wrapper mb-2">
                             <input
                                 className="form-control bg-light border-0 password-input"
                                 type={
@@ -432,11 +403,10 @@ const HomeownerAuthSimple = () => {
                                 }
                                 placeholder="Password"
                                 value={loginPassword}
-                                onChange={(event) =>
-                                    setLoginPassword(
-                                        event.target.value
-                                    )
-                                }
+                                onChange={(event) => {
+                                    setLoginPassword(event.target.value);
+                                    setLoginError('');
+                                }}
                                 required
                             />
 
@@ -466,32 +436,33 @@ const HomeownerAuthSimple = () => {
                                         }`}
                                 ></i>
                             </button>
-
                         </div>
 
-                        {/* Login Button */}
+                        {/* GENERIC LOGIN ERROR */}
+                        {loginError && (
+                            <div
+                                className="text-danger small mb-3"
+                                role="alert"
+                            >
+                                {loginError}
+                            </div>
+                        )}
+
+                        {/* LOGIN BUTTON */}
                         <button
                             type="submit"
                             className="btn btn-theme rounded-pill px-5 py-2 fw-bold text-white"
                         >
                             Log in
                         </button>
-
                     </form>
-
                 </div>
 
-
-                {/* =====================================================
-                    SIDE OVERLAY
-                ====================================================== */}
+                {/* SIDE OVERLAY */}
                 <div className="overlay-container">
-
                     <div className="overlay">
-
                         {/* LEFT PANEL */}
                         <div className="overlay-panel overlay-left d-flex flex-column align-items-center justify-content-center text-center p-5">
-
                             <h1 className="fw-bold text-white mb-3">
                                 Welcome Back!
                             </h1>
@@ -508,13 +479,10 @@ const HomeownerAuthSimple = () => {
                             >
                                 Log in
                             </button>
-
                         </div>
-
 
                         {/* RIGHT PANEL */}
                         <div className="overlay-panel overlay-right d-flex flex-column align-items-center justify-content-center text-center p-5">
-
                             <h1 className="fw-bold text-white mb-3">
                                 Hello, Friend!
                             </h1>
@@ -531,39 +499,30 @@ const HomeownerAuthSimple = () => {
                             >
                                 SIGN UP
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
 
-
-                {/* =====================================================
-                    REGISTRATION SUCCESS MODAL
-                ====================================================== */}
+                {/* REGISTRATION SUCCESS MODAL */}
                 {showSuccessModal && (
-
                     <div
                         className="registration-success-overlay"
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="registration-success-title"
                     >
-
                         <div className="registration-success-modal">
-
-                            {/* Success Icon */}
+                            {/* SUCCESS ICON */}
                             <div className="registration-success-icon">
                                 <i className="bi bi-check-lg"></i>
                             </div>
 
-                            {/* Title */}
+                            {/* TITLE */}
                             <h3 id="registration-success-title">
                                 Registration Successful!
                             </h3>
 
-                            {/* Message */}
+                            {/* MESSAGE */}
                             <p>
                                 Your homeowner account has been
                                 successfully created.
@@ -572,7 +531,7 @@ const HomeownerAuthSimple = () => {
                                 email and password.
                             </p>
 
-                            {/* OK Button */}
+                            {/* OK BUTTON */}
                             <button
                                 type="button"
                                 className="registration-success-button"
@@ -580,15 +539,10 @@ const HomeownerAuthSimple = () => {
                             >
                                 OK, Go to Log in
                             </button>
-
                         </div>
-
                     </div>
-
                 )}
-
             </div>
-
         </div>
     );
 };
