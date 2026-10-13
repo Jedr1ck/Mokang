@@ -459,3 +459,58 @@
 }
 
 
+
+/* HOMEOWNER SERVICE CAROUSEL */
+.quick-card {
+    min-width: 0;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    font-family: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quick-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09) !important;
+}
+
+.quick-card:focus-visible {
+    outline: 3px solid rgba(25, 135, 84, 0.35);
+    outline-offset: 3px;
+}
+
+.quick-card:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* PROFILE DROPDOWN */
+.homeowner-profile-dropdown {
+    min-width: 190px;
+}
+
+.homeowner-profile-dropdown button {
+    font-size: 0.9rem;
+}
+
+/* DASHBOARD HEADER */
+.main-content header {
+    position: relative;
+    z-index: 10;
+}
+
+/* RESPONSIVE DASHBOARD */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 16px !important;
+    }
+
+    .main-content header {
+        align-items: stretch !important;
+    }
+
+    .main-content header>div {
+        max-width: 100%;
+    }
+}

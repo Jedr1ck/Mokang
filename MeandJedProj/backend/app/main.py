@@ -118,6 +118,7 @@ class User(Base):
     )
 
 
+
 class UserProfile(Base):
     __tablename__ = "user_profiles"
 
@@ -130,7 +131,12 @@ class UserProfile(Base):
     gender = Column(String(30))
     address = Column(String(500))
 
+    # ADD THESE TWO FIELDS
+    birthday = Column(Date, nullable=True)
+    profile_picture = Column(Text, nullable=True)
+
     user = relationship("User", back_populates="profile")
+
 
 
 class Category(Base):
@@ -327,28 +333,32 @@ def current(
 # USER RESPONSE
 # ============================================================
 
+
+
 def user_out(user):
+    profile = user.profile
+
     return {
         "id": user.id,
         "fullName": user.full_name,
         "email": user.email,
-        "mobileNumber": (
-            user.profile.mobile_number
-            if user.profile
+        "mobileNumber": profile.mobile_number if profile else None,
+        "gender": profile.gender if profile else None,
+        "address": profile.address if profile else None,
+        "birthday": (
+            profile.birthday.isoformat()
+            if profile and profile.birthday
             else None
         ),
-        "gender": (
-            user.profile.gender
-            if user.profile
-            else None
-        ),
-        "address": (
-            user.profile.address
-            if user.profile
+        "profilePicture": (
+            profile.profile_picture
+            if profile
             else None
         ),
         "role": user.role,
     }
+
+
 
 
 # ============================================================
@@ -594,6 +604,34 @@ class BookingIn(BaseModel):
             )
 
         return value
+
+    
+class ProfileUpdate(BaseModel):
+    fullName: str = Field(min_length=2, max_length=150)
+    mobileNumber: str = Field(min_length=7, max_length=30)
+    gender: str = Field(min_length=1, max_length=30)
+    address: str = Field(min_length=10, max_length=500)
+    birthday: date
+    profilePicture: str | None = None
+
+    @field_validator(
+        "fullName",
+        "mobileNumber",
+        "gender",
+        "address",
+        mode="before",
+    )
+    @classmethod
+    def required_profile_text(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+
+        if not value:
+            raise ValueError("This field is required")
+
+        return value
+
+
 
 
 class StatusIn(BaseModel):
@@ -1071,6 +1109,13 @@ def login_admin(
 
 @app.get("/auth/me")
 def me(
+    u: User = Depends(current),
+):
+    return user_out(u)
+
+
+@app.get("/profile/me")
+def get_my_profile(
     u: User = Depends(current),
 ):
     return user_out(u)

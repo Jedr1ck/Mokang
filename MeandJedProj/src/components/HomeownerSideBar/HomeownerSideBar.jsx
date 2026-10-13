@@ -1,146 +1,153 @@
+
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './HomeownerSideBar.css';
 
-// Relative path batay sa file tree (3 levels up)
-// 2 levels up para makarating sa src folder:
-// HomeownerSideBar (1) -> components (2) -> src
 import myLogo from '../../assets/images/logo.png';
 
 const HomeownerSideBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const isActive = (path) => location.pathname === path;
 
-    const handleLogout = () => {
-        setShowLogoutModal(true);
-    };
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+    const isActive = (path) => location.pathname === path;
 
     const confirmLogout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('loggedInHomeowner');
+        localStorage.removeItem('access_token');
+
         setShowLogoutModal(false);
         navigate('/');
-    };
-
-    const cancelLogout = () => {
-        setShowLogoutModal(false);
     };
 
     return (
         <aside className="green-wavy-sidebar">
             <div className="sidebar-content">
-
-                {/* Top Brand Logo */}
-                <Link to="/homeowner-dashboard" className="top-brand-icon" title="Go to Dashboard">
-                    <img src={myLogo} alt="Logo" className="brand-logo-img" />
+                {/* LOGO */}
+                <Link
+                    to="/homeowner-dashboard"
+                    className="top-brand-icon"
+                    title="Dashboard"
+                >
+                    <img
+                        src={myLogo}
+                        alt="SmartHome Logo"
+                        className="brand-logo-img"
+                    />
                 </Link>
 
-                {/* Nav Items */}
+                {/* NAVIGATION */}
                 <nav className="nav-items-container">
                     <Link
-                        to="/profile"
-                        className={`sidebar-btn ${isActive('/profile') ? 'active' : ''}`}
+                        to="/homeowner-dashboard"
+                        title="Dashboard"
+                        className={`sidebar-btn ${isActive('/homeowner-dashboard') ? 'active' : ''
+                            }`}
                     >
-                        <i className="bi bi-person"></i>
-                        <span className="link-text">Profile</span>
+                        <i className="bi bi-grid" />
+                        <span className="link-text">Dashboard</span>
+                    </Link>
+
+                    <Link
+                        to="/services"
+                        title="Services"
+                        className={`sidebar-btn ${isActive('/services') ? 'active' : ''
+                            }`}
+                    >
+                        <i className="bi bi-tools" />
+                        <span className="link-text">Services</span>
                     </Link>
 
                     <Link
                         to="/history"
-                        className={`sidebar-btn ${isActive('/history') ? 'active' : ''}`}
+                        title="History"
+                        className={`sidebar-btn ${isActive('/history') ? 'active' : ''
+                            }`}
                     >
-                        <i className="bi bi-clock-history"></i>
-                        <span className="badge-pill"></span>
+                        <i className="bi bi-clock-history" />
                         <span className="link-text">History</span>
                     </Link>
 
                     <Link
-                        to="/notifications"
-                        className={`sidebar-btn ${isActive('/notifications') ? 'active' : ''}`}
-                    >
-                        <i className="bi bi-bell"></i>
-                        <span className="link-text">Notifications</span>
-                    </Link>
-
-                    <Link
                         to="/calendar"
-                        className={`sidebar-btn ${isActive('/calendar') ? 'active' : ''}`}
+                        title="Calendar"
+                        className={`sidebar-btn ${isActive('/calendar') ? 'active' : ''
+                            }`}
                     >
-                        <i className="bi bi-calendar-event"></i>
+                        <i className="bi bi-calendar-event" />
                         <span className="link-text">Calendar</span>
                     </Link>
 
                     <Link
-                        to="/messages"
-                        className={`sidebar-btn ${isActive('/messages') ? 'active' : ''}`}
-                    >
-                        <i className="bi bi-envelope"></i>
-                        <span className="badge-dot-yellow"></span>
-                        <span className="link-text">Messages</span>
-                    </Link>
-
-                    <Link
                         to="/settings"
-                        className={`sidebar-btn ${isActive('/settings') ? 'active' : ''}`}
+                        title="Settings"
+                        className={`sidebar-btn ${isActive('/settings') ? 'active' : ''
+                            }`}
                     >
-                        <i className="bi bi-gear"></i>
+                        <i className="bi bi-gear" />
                         <span className="link-text">Settings</span>
                     </Link>
 
                     <button
                         type="button"
                         className="sidebar-btn homeowner-logout-btn"
-                        onClick={handleLogout}
+                        title="Logout"
+                        onClick={() => setShowLogoutModal(true)}
                     >
-                        <i className="bi bi-box-arrow-right"></i>
-                        <span className="badge-dot-lightgreen"></span>
+                        <i className="bi bi-box-arrow-right" />
                         <span className="link-text">Logout</span>
                     </button>
                 </nav>
-
             </div>
 
-            {showLogoutModal && createPortal(
-                <div
-                    className="homeowner-logout-modal-overlay"
-                    onClick={cancelLogout}
-                >
+            {/* LOGOUT MODAL */}
+            {showLogoutModal &&
+                createPortal(
                     <div
-                        className="homeowner-logout-modal"
-                        onClick={(event) => event.stopPropagation()}
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="homeowner-logout-title"
+                        className="homeowner-logout-modal-overlay"
+                        onClick={() => setShowLogoutModal(false)}
                     >
-                        <div className="homeowner-logout-modal-content">
-                            <h3 id="homeowner-logout-title">Logout</h3>
-                            <p>Are you sure you want to log out?</p>
-                        </div>
+                        <div
+                            className="homeowner-logout-modal"
+                            onClick={(event) => event.stopPropagation()}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="homeowner-logout-title"
+                        >
+                            <div className="homeowner-logout-modal-content">
+                                <h3 id="homeowner-logout-title">
+                                    Logout
+                                </h3>
 
-                        <div className="homeowner-logout-modal-actions">
-                            <button
-                                type="button"
-                                className="homeowner-logout-confirm-btn"
-                                onClick={confirmLogout}
-                            >
-                                OK
-                            </button>
-                            <button
-                                type="button"
-                                className="homeowner-logout-cancel-btn"
-                                onClick={cancelLogout}
-                            >
-                                Cancel
-                            </button>
+                                <p>Are you sure you want to log out?</p>
+                            </div>
+
+                            <div className="homeowner-logout-modal-actions">
+                                <button
+                                    type="button"
+                                    className="homeowner-logout-confirm-btn"
+                                    onClick={confirmLogout}
+                                >
+                                    OK
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="homeowner-logout-cancel-btn"
+                                    onClick={() => setShowLogoutModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>,
-                document.body
-            )}
+                    </div>,
+                    document.body
+                )}
         </aside>
     );
 };
