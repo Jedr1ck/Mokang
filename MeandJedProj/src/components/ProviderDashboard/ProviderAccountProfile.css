@@ -1,0 +1,412 @@
+.provider-profile-page {
+    max-width: 1000px;
+    margin: 24px auto;
+    padding: 32px;
+    color: #183b32;
+}
+
+.provider-profile-page h2 {
+    margin-bottom: 8px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.provider-profile-page>p {
+    color: #64748b;
+    margin-bottom: 28px;
+}
+
+.provider-profile-page form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(15, 60, 45, 0.08);
+    border: 1px solid #e2eee8;
+}
+
+.provider-profile-page form>div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.provider-profile-page label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.provider-profile-page input,
+.provider-profile-page select,
+.provider-profile-page textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d5e2dc;
+    border-radius: 9px;
+    background: #fff;
+    color: #1f2937;
+    font: inherit;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.provider-profile-page input:focus,
+.provider-profile-page select:focus,
+.provider-profile-page textarea:focus {
+    border-color: #00a878;
+    box-shadow: 0 0 0 3px rgba(0, 168, 120, 0.12);
+}
+
+.provider-profile-page textarea {
+    resize: vertical;
+}
+
+.provider-profile-page button[type="submit"] {
+    grid-column: 1 / -1;
+    justify-self: start;
+    padding: 12px 26px;
+    border: none;
+    border-radius: 9px;
+    background: #00a878;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.provider-profile-page button[type="submit"]:hover {
+    background: #008b64;
+}
+
+.provider-profile-page button[type="submit"]:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+    .provider-profile-page {
+        padding: 18px;
+    }
+
+    .provider-profile-page form {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+}
+
+
+/* =========================================
+   PROVIDER APPLICATION - CLEAN LAYOUT
+========================================= */
+
+.provider-profile-page {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 30px 32px 48px;
+    box-sizing: border-box;
+    color: #193b30;
+}
+
+.provider-application-heading {
+    margin-bottom: 24px;
+}
+
+.provider-application-heading>span {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #009f70;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.provider-application-heading h2 {
+    margin: 0 0 8px;
+    color: #183d31;
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.provider-application-heading p {
+    margin: 0;
+    color: #718079;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* STATUS */
+
+.provider-profile-page>.alert {
+    margin-bottom: 22px;
+    padding: 13px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+/* STEP INDICATOR */
+
+.provider-step-progress {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin: 26px 0;
+}
+
+.provider-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    min-width: 0;
+    padding: 14px 6px;
+    border: 1px solid #e5ece8;
+    border-radius: 13px;
+    background: #ffffff;
+    text-align: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.provider-step>span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border: 1px solid #d8e5de;
+    border-radius: 50%;
+    background: #f3f7f5;
+    color: #63766c;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.provider-step small {
+    display: block;
+    max-width: 130px;
+    color: #718079;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.provider-step.active {
+    border-color: #00ad78;
+    background: #eaf8f2;
+}
+
+.provider-step.active>span,
+.provider-step.completed>span {
+    border-color: #00a873;
+    background: #00a873;
+    color: #ffffff;
+}
+
+.provider-step.active small,
+.provider-step.completed small {
+    color: #08794f;
+}
+
+/* FORM CARD */
+
+.provider-application-card {
+    padding: 30px;
+    border: 1px solid #e5ece8;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 8px 30px rgba(25, 59, 48, 0.06);
+}
+
+.provider-application-card>h3 {
+    margin: 0 0 24px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid #edf1ee;
+    color: #183d31;
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+/* FORM FIELDS */
+
+.provider-application-card .form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #294438;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.provider-application-card .form-control,
+.provider-application-card .form-select {
+    width: 100%;
+    min-height: 48px;
+    padding: 11px 13px;
+    border: 1px solid #dce7e1;
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: #20372d;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.provider-application-card textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.provider-application-card .form-control:focus,
+.provider-application-card .form-select:focus {
+    border-color: #00ad78;
+    box-shadow: 0 0 0 3px rgba(0, 173, 120, 0.12);
+}
+
+.provider-application-card .form-control[readonly] {
+    background: #f5f8f6;
+    color: #5e7067;
+}
+
+.provider-application-card .form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.provider-application-card .form-check-input {
+    flex-shrink: 0;
+    margin-top: 4px;
+    accent-color: #00a873;
+}
+
+.provider-application-card .form-check-label {
+    color: #40574b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ACTION BUTTONS */
+
+.provider-application-card>.d-flex {
+    padding-top: 22px;
+    margin-top: 24px;
+    border-top: 1px solid #edf1ee;
+}
+
+.provider-application-card .btn {
+    min-height: 44px;
+    padding: 11px 22px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.provider-application-card .btn-success {
+    border-color: #00a873;
+    background: #00a873;
+    color: #ffffff;
+}
+
+.provider-application-card .btn-success:hover {
+    border-color: #008c60;
+    background: #008c60;
+}
+
+.provider-application-card .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* REVIEW DETAILS */
+
+.provider-application-card>p {
+    color: #52675c;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.provider-application-card hr {
+    margin: 24px 0;
+    border-color: #e8eeea;
+    opacity: 1;
+}
+
+.provider-application-card h5 {
+    margin: 12px 0;
+    color: #183d31;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .provider-profile-page {
+        padding: 24px 20px 36px;
+    }
+
+    .provider-step-progress {
+        gap: 6px;
+    }
+
+    .provider-step {
+        padding: 12px 4px;
+    }
+
+    .provider-step small {
+        font-size: 10px;
+    }
+
+    .provider-application-card {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 600px) {
+    .provider-profile-page {
+        padding: 20px 12px 30px;
+    }
+
+    .provider-step-progress {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin: 20px 0;
+    }
+
+    .provider-step {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 10px 12px;
+        text-align: left;
+    }
+
+    .provider-step small {
+        max-width: none;
+        font-size: 12px;
+    }
+
+    .provider-application-card {
+        padding: 18px 14px;
+        border-radius: 13px;
+    }
+
+    .provider-application-card>h3 {
+        font-size: 19px;
+    }
+
+    .provider-application-card>.d-flex {
+        align-items: stretch;
+    }
+
+    .provider-application-card .btn {
+        padding: 10px 14px;
+    }
+}

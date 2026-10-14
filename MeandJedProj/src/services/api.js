@@ -13,3 +13,64 @@ export async function updateBookingStatus(id, status) { return api(`/bookings/${
 export async function sendMessage(recipientId, body, bookingId) { return api('/messages', { method: 'POST', body: JSON.stringify({ recipient_id: recipientId, body, booking_id: bookingId }) }); }
 export async function getMessages() { return api('/messages'); }
 export const logout = () => { localStorage.removeItem('access_token'); localStorage.removeItem('user'); };
+// PROFILE API
+export async function getMyProfile() {
+    return api('/profile/me');
+}
+
+export async function updateMyProfile(profileData) {
+    const updatedUser = await api('/profile/me', {
+        method: 'PUT',
+        body: JSON.stringify(profileData),
+    });
+
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return updatedUser;
+}
+
+// PROVIDER VERIFICATION API
+
+export async function uploadProviderId(idSide, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers = {};
+
+    if (token()) {
+        headers.Authorization = `Bearer ${token()}`;
+    }
+
+    const response = await fetch(
+        `${API_URL}/provider-verification/upload-id?id_side=${idSide}`,
+        {
+            method: 'POST',
+            headers,
+            body: formData,
+        }
+    );
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.detail || 'Failed to upload ID.');
+    }
+
+    return data;
+}
+
+export async function getProviderVerification() {
+    return api('/provider-verification/me');
+}
+
+export async function submitProviderVerification() {
+    return api('/provider-verification/submit', {
+        method: 'POST',
+    });
+}
+
+export async function updateProviderVerification(formData) {
+    return api('/provider-verification/me', {
+        method: 'PUT',
+        body: JSON.stringify(formData),
+    });
+}

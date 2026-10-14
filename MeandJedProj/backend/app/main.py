@@ -3,11 +3,21 @@ import os
 import uuid
 
 from pathlib import Path
+from typing import Optional
 from datetime import datetime, timedelta, date, time
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import (
+    FastAPI,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy import (
     create_engine,
@@ -86,10 +96,7 @@ pwd = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto",
 )
-
-oauth2 = OAuth2PasswordBearer(
-    tokenUrl="auth/login"
-)
+bearer_scheme = HTTPBearer()
 
 
 # ============================================================
@@ -171,6 +178,36 @@ class ProviderProfile(Base):
         String(50),
         default="Available",
     )
+
+    
+    # Provider verification status
+    is_verified = Column(Boolean, default=False, nullable=False)
+    verification_status = Column(
+        String(30),
+        default="incomplete",
+        nullable=False,
+    )
+    verification_submitted_at = Column(DateTime, nullable=True)
+    verification_reviewed_at = Column(DateTime, nullable=True)
+    verification_reviewed_by = Column(BigInteger, nullable=True)
+    verification_review_notes = Column(Text, nullable=True)
+
+    # Complete address
+    region_name = Column(String(120), nullable=True)
+    province_name = Column(String(120), nullable=True)
+    city_municipality_name = Column(String(120), nullable=True)
+    barangay_name = Column(String(120), nullable=True)
+    street_address = Column(String(255), nullable=True)
+    postal_code = Column(String(10), nullable=True)
+
+    # Verification documents
+    id_type = Column(String(80), nullable=True)
+    id_front_path = Column(String(500), nullable=True)
+    id_back_path = Column(String(500), nullable=True)
+    qualifications = Column(Text, nullable=True)
+    portfolio_paths = Column(Text, nullable=True)
+    service_area = Column(String(255), nullable=True)
+
 
     user = relationship("User")
 
@@ -291,14 +328,17 @@ def db():
         session.close()
 
 
+
 # ============================================================
 # CURRENT USER
 # ============================================================
 
 def current(
-    token: str = Depends(oauth2),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     s: Session = Depends(db),
 ):
+    token = credentials.credentials
+
     try:
         data = jwt.decode(
             token,
@@ -308,11 +348,7 @@ def current(
 
         uid = int(data["sub"])
 
-    except (
-        JWTError,
-        KeyError,
-        ValueError,
-    ):
+    except (JWTError, KeyError, ValueError):
         raise HTTPException(
             status_code=401,
             detail="Invalid token",
@@ -327,6 +363,7 @@ def current(
         )
 
     return user
+
 
 
 # ============================================================
@@ -1103,9 +1140,14 @@ def login_admin(
     }
 
 
+
 # ============================================================
 # CURRENT USER
 # ============================================================
+
+# ==============================
+# AUTH / CURRENT USER PROFILE
+# ==============================
 
 @app.get("/auth/me")
 def me(
@@ -1119,6 +1161,384 @@ def get_my_profile(
     u: User = Depends(current),
 ):
     return user_out(u)
+
+
+# ==============================
+# PROVIDER VERIFICATION SCHEMAS
+# ==============================
+
+class ProviderVerificationUpdate(BaseModel):
+    business_name: str = Field(..., min_length=2, max_length=150)
+    bio: Optional[str] = None
+    experience_years: int = Field(..., ge=0)
+    hourly_rate: float = Field(..., ge=0)
+
+    region_name: str = Field(..., min_length=1, max_length=120)
+    province_name: str = Field(..., min_length=1, max_length=120)
+    city_municipality_name: str = Field(..., min_length=1, max_length=120)
+    barangay_name: str = Field(..., min_length=1, max_length=120)
+    street_address: str = Field(..., min_length=1, max_length=255)
+    postal_code: Optional[str] = Field(None, max_length=10)
+
+    id_type: str = Field(..., min_length=1, max_length=80)
+    service_area: str = Field(..., min_length=1, max_length=255)
+
+
+# ==============================
+# PROVIDER VERIFICATION HELPERS
+# ==============================
+
+def get_current_provider(u: User, s: Session):
+    provider = (
+        s.query(ProviderProfile)
+        .filter(ProviderProfile.user_id == u.id)
+        .first()
+    )
+
+    if not provider:
+        raise HTTPException(
+            status_code=404,
+            detail="Provider profile not found.",
+        )
+
+    return provider
+
+
+# ==============================
+# SECURE PROVIDER ID UPLOAD
+# ==============================
+
+MAX_ID_SIZE = 5 * 1024 * 1024  # 5 MB
+
+ID_UPLOAD_DIR = (
+    Path(__file__).resolve().parent
+    / "private_uploads"
+    / "provider_ids"
+)
+
+
+@app.post("/provider-verification/upload-id")
+async def upload_provider_id(
+    id_side: str,
+    file: UploadFile = File(...),
+    u: User = Depends(current),
+    s: Session = Depends(db),
+):
+    if u.role != "provider":
+        raise HTTPException(
+            status_code=403,
+            detail="Providers only.",
+        )
+
+    if id_side not in ("front", "back"):
+        raise HTTPException(
+            status_code=400,
+            detail="id_side must be 'front' or 'back'.",
+        )
+
+    provider = get_current_provider(u, s)
+
+    if provider.verification_status == "verified":
+        raise HTTPException(
+            status_code=400,
+            detail="Your provider profile is already verified.",
+        )
+
+    if file.content_type not in (
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Only JPG, PNG, and WEBP images are allowed.",
+        )
+
+    content = await file.read(MAX_ID_SIZE + 1)
+    await file.close()
+
+    if not content:
+        raise HTTPException(
+            status_code=400,
+            detail="The uploaded file is empty.",
+        )
+
+    if len(content) > MAX_ID_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="Maximum ID image size is 5 MB.",
+        )
+
+    # Verify the actual image signature, not just its filename.
+    if content.startswith(b"\xff\xd8\xff"):
+        extension = ".jpg"
+    elif content.startswith(b"\x89PNG\r\n\x1a\n"):
+        extension = ".png"
+    elif (
+        len(content) >= 12
+        and content[:4] == b"RIFF"
+        and content[8:12] == b"WEBP"
+    ):
+        extension = ".webp"
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="The file is not a valid supported image.",
+        )
+
+    provider_dir = ID_UPLOAD_DIR / str(u.id)
+    provider_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{id_side}_{uuid.uuid4().hex}{extension}"
+    destination = provider_dir / filename
+
+    old_path_value = (
+        provider.id_front_path
+        if id_side == "front"
+        else provider.id_back_path
+    )
+
+    try:
+        destination.write_bytes(content)
+
+        # Store a relative path; do not expose the ID as a public URL.
+        saved_path = destination.relative_to(
+            Path(__file__).resolve().parent
+        ).as_posix()
+
+        if id_side == "front":
+            provider.id_front_path = saved_path
+        else:
+            provider.id_back_path = saved_path
+
+        # A new document requires a fresh review submission.
+        provider.verification_status = "incomplete"
+        provider.verification_submitted_at = None
+
+        s.commit()
+
+    except Exception:
+        s.rollback()
+
+        if destination.exists():
+            destination.unlink()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to save the ID image.",
+        )
+
+    # Remove the previous file only if it belongs to this
+    # provider's private ID folder.
+    if old_path_value:
+        old_path = (
+            Path(__file__).resolve().parent / old_path_value
+        ).resolve()
+
+        allowed_dir = provider_dir.resolve()
+
+        if (
+            old_path.is_relative_to(allowed_dir)
+            and old_path != destination.resolve()
+            and old_path.is_file()
+        ):
+            old_path.unlink(missing_ok=True)
+
+    return {
+        "message": f"ID {id_side} uploaded successfully.",
+        "id_side": id_side,
+    }
+
+
+# ==============================
+# GET PROVIDER VERIFICATION
+# ==============================
+
+@app.get("/provider-verification/me")
+def get_provider_verification(
+    u: User = Depends(current),
+    s: Session = Depends(db),
+):
+    provider = get_current_provider(u, s)
+
+    return {
+        "id": provider.id,
+        "business_name": provider.business_name,
+        "bio": provider.bio,
+        "experience_years": provider.experience_years,
+        "hourly_rate": provider.hourly_rate,
+        "availability_status": provider.availability_status,
+
+        "verification_status": provider.verification_status,
+        "verification_submitted_at": provider.verification_submitted_at,
+        "verification_reviewed_at": provider.verification_reviewed_at,
+        "verification_review_notes": provider.verification_review_notes,
+
+        "region_name": provider.region_name,
+        "province_name": provider.province_name,
+        "city_municipality_name": provider.city_municipality_name,
+        "barangay_name": provider.barangay_name,
+        "street_address": provider.street_address,
+        "postal_code": provider.postal_code,
+
+        "id_type": provider.id_type,
+        "id_front_path": provider.id_front_path,
+        "id_back_path": provider.id_back_path,
+        "qualifications": provider.qualifications,
+        "portfolio_paths": provider.portfolio_paths,
+        "service_area": provider.service_area,
+    }
+
+
+# ==============================
+# UPDATE PROVIDER VERIFICATION
+# ==============================
+
+@app.put("/provider-verification/me")
+def update_provider_verification(
+    data: ProviderVerificationUpdate,
+    u: User = Depends(current),
+    s: Session = Depends(db),
+):
+    provider = get_current_provider(u, s)
+
+    if provider.verification_status == "verified":
+        raise HTTPException(
+            status_code=400,
+            detail="Your provider profile is already verified.",
+        )
+
+    provider.business_name = data.business_name
+    provider.bio = data.bio
+    provider.experience_years = data.experience_years
+    provider.hourly_rate = data.hourly_rate
+
+    provider.region_name = data.region_name
+    provider.province_name = data.province_name
+    provider.city_municipality_name = data.city_municipality_name
+    provider.barangay_name = data.barangay_name
+    provider.street_address = data.street_address
+    provider.postal_code = data.postal_code
+
+    provider.id_type = data.id_type
+    provider.service_area = data.service_area
+
+    # Save the profile as incomplete until it is submitted for review.
+    provider.verification_status = "incomplete"
+
+    s.commit()
+    s.refresh(provider)
+
+    return {
+        "message": "Provider verification information saved successfully.",
+        "verification_status": provider.verification_status,
+    }
+
+
+# ==============================
+# SUBMIT PROVIDER VERIFICATION
+# ==============================
+
+@app.post("/provider-verification/submit")
+def submit_provider_verification(
+    u: User = Depends(current),
+    s: Session = Depends(db),
+):
+    provider = get_current_provider(u, s)
+
+    if provider.verification_status == "verified":
+        raise HTTPException(
+            status_code=400,
+            detail="Your provider profile is already verified.",
+        )
+
+    required_fields = {
+        "business_name": provider.business_name,
+        "region_name": provider.region_name,
+        "province_name": provider.province_name,
+        "city_municipality_name": provider.city_municipality_name,
+        "barangay_name": provider.barangay_name,
+        "street_address": provider.street_address,
+        "id_type": provider.id_type,
+        "service_area": provider.service_area,
+    }
+
+    missing_fields = [
+        field_name
+        for field_name, value in required_fields.items()
+        if not value or not str(value).strip()
+    ]
+
+    if missing_fields:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": "Please complete all required verification information.",
+                "missing_fields": missing_fields,
+            },
+        )
+
+    # These document paths must be populated through a secure upload
+    # endpoint before submission can succeed.
+    if not provider.id_front_path or not provider.id_back_path:
+        raise HTTPException(
+            status_code=400,
+            detail="Please upload both the front and back of your valid ID first.",
+        )
+
+    provider.verification_status = "pending"
+    provider.verification_submitted_at = datetime.utcnow()
+    provider.verification_reviewed_at = None
+    provider.verification_reviewed_by = None
+    provider.verification_review_notes = None
+
+    s.commit()
+    s.refresh(provider)
+
+    return {
+        "message": "Provider verification submitted successfully.",
+        "verification_status": provider.verification_status,
+        "verification_submitted_at": provider.verification_submitted_at,
+    }
+
+
+# ADD THIS NEW ENDPOINT BELOW
+@app.put("/profile/me")
+def update_my_profile(
+    x: ProfileUpdate,
+    u: User = Depends(current),
+    s: Session = Depends(db),
+):
+    profile = (
+        s.query(UserProfile)
+        .filter_by(user_id=u.id)
+        .first()
+    )
+
+    if profile is None:
+        profile = UserProfile(user_id=u.id)
+        s.add(profile)
+
+    u.full_name = x.fullName.strip()
+
+    profile.mobile_number = x.mobileNumber.strip()
+    profile.gender = x.gender.strip()
+    profile.address = x.address.strip()
+    profile.birthday = x.birthday
+    profile.profile_picture = x.profilePicture
+
+    try:
+        s.commit()
+        s.refresh(u)
+    except Exception:
+        s.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to save profile changes",
+        )
+
+    return user_out(u)
+
 
 
 # ============================================================

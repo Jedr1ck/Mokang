@@ -9,6 +9,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../ProviderDashboard.css';
 import { getMessages, getMyBookings } from '../../services/api';
 import Messages from '../HomeOwnerDashboard/Messages';
+import ProviderNotifications from './ProviderNotifications';
+import ProviderProfile from '../HomeOwnerDashboard/ProviderProfile';
+import ProviderAccountProfile from './ProviderAccountProfile';
+
 
 const ProviderDashboard = () => {
     const navigate = useNavigate();
@@ -140,77 +144,76 @@ const ProviderDashboard = () => {
                 ====================================== */}
 
                 <div className="provider-top-header">
+                    <div className="provider-header-brand">
+                        <div className="provider-brand-icon">
+                            <i className="bi bi-house-heart-fill"></i>
+                        </div>
 
-                    {/* Notification */}
-                    <button
-                        type="button"
-                        className="provider-header-icon position-relative"
-                        onClick={() =>
-                            goToSection(
-                                'notifications',
-                                '/provider-notifications'
-                            )
-                        }
-                        title="Notifications"
-                    >
-                        <i className="bi bi-bell fs-5"></i>
+                        <div className="provider-brand-text">
+                            <h2>SmartHome Services</h2>
+                            <p>
+                                Manage your services, connect with homeowners, and grow your business.
+                            </p>
 
-                        <span className="provider-notification-count">
-                            3
-                        </span>
-                    </button>
+                            <div className="provider-search-box">
+                                <i className="bi bi-search"></i>
+                                <input
+                                    type="search"
+                                    placeholder="Search bookings, services, and more..."
+                                    aria-label="Search dashboard"
+                                />
+                            </div>
+                        </div>
+                    </div>
 
+                    <div className="provider-header-actions">
+                        <button
+                            type="button"
+                            className="provider-header-icon position-relative"
+                            onClick={() =>
+                                goToSection("notifications", "/provider-notifications")
+                            }
+                            title="Notifications"
+                        >
+                            <i className="bi bi-bell fs-5"></i>
+                            <span className="provider-notification-count">3</span>
+                        </button>
 
-                    {/* Messages */}
-                    <button
-                        type="button"
-                        className="provider-header-icon"
-                        onClick={() =>
-                            goToSection(
-                                'messages',
-                                '/provider-messages'
-                            )
-                        }
-                        title="Messages"
-                    >
-                        <i className="bi bi-chat-dots fs-5"></i>
-                    </button>
+                        <button
+                            type="button"
+                            className="provider-header-icon"
+                            onClick={() => goToSection("messages", "/provider-messages")}
+                            title="Messages"
+                        >
+                            <i className="bi bi-chat-dots fs-5"></i>
+                        </button>
 
+                        <button
+                            type="button"
+                            className="provider-profile-header"
+                            onClick={() => goToSection("profile", "/provider-profile")}
+                            title="Open profile"
+                        >
+                            {profileImage ? (
+                                <img
+                                    src={profileImage}
+                                    alt={user.fullName}
+                                    className="provider-header-avatar"
+                                />
+                            ) : (
+                                <span className="provider-header-avatar-placeholder">
+                                    <i className="bi bi-person"></i>
+                                </span>
+                            )}
 
-                    {/* Provider Profile */}
-                    <button
-                        type="button"
-                        className="provider-profile-header"
-                        onClick={() =>
-                            goToSection(
-                                'profile',
-                                '/provider-profile'
-                            )
-                        }
-                    >
-
-                        {profileImage ? (
-                            <img
-                                src={profileImage}
-                                alt={user.fullName}
-                                className="provider-header-avatar"
-                            />
-                        ) : (
-                            <span className="provider-header-avatar-placeholder">
-                                <i className="bi bi-person"></i>
+                            <span className="provider-header-name">
+                                {user.fullName}
                             </span>
-                        )}
 
-                        <span className="provider-header-name">
-                            {user.fullName}
-                        </span>
-
-                        <i className="bi bi-chevron-down"></i>
-
-                    </button>
-
+                            <i className="bi bi-chevron-down"></i>
+                        </button>
+                    </div>
                 </div>
-
 
                 {/* =====================================
                     DASHBOARD
@@ -735,7 +738,7 @@ const ProviderDashboard = () => {
 
 
                 {activeSection === 'messages' && (
-                    <Messages embedded />
+                    <Messages embedded bookings={bookings} />
                 )}
 
 
@@ -761,25 +764,15 @@ const ProviderDashboard = () => {
                 )}
 
 
+
                 {activeSection === 'notifications' && (
-                    <div className="provider-placeholder-page">
-                        <i className="bi bi-bell"></i>
-                        <h2>Notifications</h2>
-                        <p>
-                            View all your provider notifications.
-                        </p>
-                    </div>
+                    <ProviderNotifications bookings={bookings} />
                 )}
 
 
+
                 {activeSection === 'profile' && (
-                    <div className="provider-placeholder-page">
-                        <i className="bi bi-person-circle"></i>
-                        <h2>My Profile</h2>
-                        <p>
-                            Manage your provider profile and account details.
-                        </p>
-                    </div>
+                    <ProviderAccountProfile />
                 )}
 
 

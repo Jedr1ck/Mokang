@@ -3,6 +3,7 @@ import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 import { getMessages, sendMessage } from '../../services/api';
+import ProviderBookingCard from '../ProviderDashboard/ProviderBookingCard';
 
 const Messages = ({ embedded = false }) => {
     const currentUserId = Number(JSON.parse(localStorage.getItem('user') || '{}').id);
@@ -51,22 +52,63 @@ const Messages = ({ embedded = false }) => {
     const [newMessage, setNewMessage] = useState('');
     const [messageError, setMessageError] = useState('');
 
+
     useEffect(() => {
-        getMessages().then((rows) => {
-            const grouped = new Map();
-            rows.forEach((row) => {
-                const otherId = row.senderId === currentUserId ? row.recipientId : row.senderId;
-                const otherName = row.senderId === currentUserId ? row.recipientName : row.senderName;
-                const conversation = grouped.get(otherId) || { id: otherId, recipientId: otherId, name: otherName, avatar: '', lastMessage: '', time: '', unread: false, online: false, messages: [] };
-                conversation.messages.push({ id: row.id, sender: row.senderId === currentUserId ? 'user' : 'provider', text: row.body, time: new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-                conversation.lastMessage = row.body;
-                conversation.time = new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                grouped.set(otherId, conversation);
-            });
-            const loaded = [...grouped.values()];
-            setConversations(loaded);
-            setActiveChatId(loaded[0]?.id || null);
-        }).catch((error) => setMessageError(error.message));
+        getMessages()
+            .then((rows) => {
+                const grouped = new Map();
+
+                rows.forEach((row) => {
+                    const otherId =
+                        Number(row.senderId) === currentUserId
+                            ? row.recipientId
+                            : row.senderId;
+
+                    const otherName =
+                        Number(row.senderId) === currentUserId
+                            ? row.recipientName
+                            : row.senderName;
+
+                    const conversation = grouped.get(otherId) || {
+                        id: otherId,
+                        recipientId: otherId,
+                        name: otherName,
+                        avatar: '',
+                        lastMessage: '',
+                        time: '',
+                        unread: false,
+                        online: false,
+                        messages: []
+                    };
+
+                    conversation.messages.push({
+                        id: row.id,
+                        bookingId: row.bookingId ?? null,
+                        sender:
+                            Number(row.senderId) === currentUserId
+                                ? 'user'
+                                : 'provider',
+                        text: row.body,
+                        time: new Date(row.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })
+                    });
+
+                    conversation.lastMessage = row.body;
+                    conversation.time = new Date(row.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    grouped.set(otherId, conversation);
+                });
+
+                const loaded = [...grouped.values()];
+                setConversations(loaded);
+                setActiveChatId(loaded[0]?.id || null);
+            })
+            .catch((error) => setMessageError(error.message));
     }, [currentUserId]);
 
     const activeChat = conversations.find(c => c.id === activeChatId);
