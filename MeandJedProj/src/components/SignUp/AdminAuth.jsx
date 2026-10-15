@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../services/api";
 
@@ -22,13 +22,13 @@ const AdminAuth = () => {
     // ADMIN LOGIN
     // =========================================
 
-    const handleLogin = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         setFormError("");
 
         if (!username.trim()) {
-            setFormError("Please enter your admin username.");
+            setFormError("Please enter an admin username.");
             return;
         }
 
@@ -73,7 +73,7 @@ const AdminAuth = () => {
                 <div className="admin-form-container admin-login-container">
 
                     <form
-                        onSubmit={handleLogin}
+                        onSubmit={handleSubmit}
                         className="admin-auth-form"
                     >
 
@@ -169,7 +169,6 @@ const AdminAuth = () => {
 
                         </div>
 
-
                         {/* =================================================
                             ERROR MESSAGE
                         ================================================== */}
@@ -201,11 +200,9 @@ const AdminAuth = () => {
 
                             {loading
                                 ? "LOGGING IN..."
-                                : "LOG IN"
-                            }
+                                : "LOG IN"}
 
                         </button>
-
 
                         {/* =================================================
                             SECURITY NOTE

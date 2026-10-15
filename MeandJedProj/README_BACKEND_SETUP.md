@@ -19,11 +19,14 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env   # Windows
 # cp .env.example .env   # macOS/Linux
-uvicorn app.main:app --reload --port 8000
+flask --app app.main:app run --debug --port 8000
 ```
-Edit `backend/.env` with your MariaDB credentials. The default template points to the `meandjed` database created by `database/schema.sql`.
+Edit `backend/.env` with your MariaDB credentials. The default template
+connects to the `Smarthomes` database used by the current backend.
 
-API docs: http://localhost:8000/docs
+The Flask backend is organized into feature blueprints under `backend/app/routes`,
+with shared SQLAlchemy models, request schemas, and database/authentication
+helpers in separate modules. The API is available at http://localhost:8000.
 
 ## 3. Frontend
 ```bash
@@ -36,11 +39,18 @@ Optional `.env` in project root:
 ## Current backend endpoints
 - POST /auth/register
 - POST /auth/login
+- POST /auth/admin/login
 - GET /auth/me
+- GET/PUT /profile/me
+- GET /public/stats
+- GET/POST /messages
 - GET /categories
 - GET /providers
+- POST /provider-verification/upload-id
+- GET/PUT /provider-verification/me
+- POST /provider-verification/submit
 - POST /bookings
 - GET /bookings/my
 - PATCH /bookings/{id}/status
 
-The frontend API helper is in `src/services/api.js`. Booking creation and My Bookings are already connected to the backend. Authentication and the remaining dashboard pages are structured for the next integration pass.
+The frontend API helper is in `src/services/api.js`.
