@@ -30,6 +30,7 @@ const initialProfile = {
 };
 
 const initialVerification = {
+    business_name: '',
     region: '',
     province: '',
     city: '',
@@ -312,10 +313,30 @@ export default function ProviderAccountProfile() {
                     ...Object.fromEntries(
                         Object.keys(initialVerification).map((key) => [
                             key,
-                            verificationData?.[key] ?? previous[key],
+                            verificationData?.[key] ??
+                                ({
+                                    region: verificationData?.region_name,
+                                    province: verificationData?.province_name,
+                                    city:
+                                        verificationData?.city_municipality_name,
+                                    barangay:
+                                        verificationData?.barangay_name,
+                                    street: verificationData?.street_address,
+                                }[key]) ??
+                                previous[key],
                         ])
                     ),
                 }));
+                setExperience(
+                    verificationData?.experience_years == null
+                        ? ''
+                        : String(verificationData.experience_years)
+                );
+                setRate(
+                    verificationData?.hourly_rate == null
+                        ? ''
+                        : String(verificationData.hourly_rate)
+                );
 
                 setStatus(
                     verificationData?.verification_status || 'incomplete'
@@ -893,6 +914,74 @@ export default function ProviderAccountProfile() {
             />
         </div>
     );
+
+    const detail = (label, value) => (
+        <div className="col-md-6 mb-3" key={label}>
+            <span className="form-label d-block mb-1">{label}</span>
+            <strong>{value || '—'}</strong>
+        </div>
+    );
+
+    if (status === 'verified') {
+        return (
+            <section className="provider-profile-page">
+                <div className="provider-application-heading">
+                    <span className="text-success fw-semibold">
+                        VERIFIED PROVIDER
+                    </span>
+                    <h2>Your Provider Information</h2>
+                    <p>
+                        Your provider application has been approved. Your
+                        submitted information is shown below.
+                    </p>
+                </div>
+
+                <div className="alert alert-success" role="status">
+                    Your provider account is verified.
+                </div>
+
+                <div className="provider-application-card">
+                    <h3>Personal Information</h3>
+                    <div className="row mt-3">
+                        {detail('Full Name', profile.fullName)}
+                        {detail('Email', profile.email)}
+                        {detail('Mobile Number', profile.mobileNumber)}
+                        {detail('Gender', profile.gender)}
+                        {detail('Birthday', profile.birthday)}
+                        {detail('Address', profile.address)}
+                    </div>
+
+                    <h3 className="mt-3">Provider Information</h3>
+                    <div className="row mt-3">
+                        {detail('Business Name', verification.business_name)}
+                        {detail(
+                            'Service Location',
+                            [
+                                verification.street,
+                                verification.barangay,
+                                verification.city,
+                                verification.province,
+                                verification.region,
+                                verification.postal_code,
+                            ]
+                                .filter(Boolean)
+                                .join(', ')
+                        )}
+                        {detail('Qualifications', verification.qualifications)}
+                        {detail('Service Area', verification.service_area)}
+                        {detail(
+                            'Experience',
+                            experience ? `${experience} years` : ''
+                        )}
+                        {detail(
+                            'Hourly Rate',
+                            rate ? `₱${rate}` : ''
+                        )}
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="provider-profile-page">

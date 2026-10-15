@@ -49,6 +49,10 @@ Optional `.env` in project root:
 - POST /provider-verification/upload-id
 - GET/PUT /provider-verification/me
 - POST /provider-verification/submit
+- GET /admin/providers (administrator-only provider profiles and verification status)
+- GET /admin/provider-verifications
+- GET /admin/provider-verifications/{provider_id}/documents/{side}
+- POST /admin/provider-verifications/{provider_id}/approve
 - POST /bookings
 - GET /bookings/my
 - PATCH /bookings/{id}/status

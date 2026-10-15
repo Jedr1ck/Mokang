@@ -72,3 +72,36 @@ export async function updateProviderVerification(formData) {
         body: JSON.stringify(formData),
     });
 }
+
+export async function getPendingProviderVerifications() {
+    return api('/admin/provider-verifications');
+}
+
+export async function getAdminProviders() {
+    return api('/admin/providers');
+}
+
+export async function getProviderVerificationDocument(providerId, side) {
+    const response = await fetch(
+        `${API_URL}/admin/provider-verifications/${providerId}/documents/${side}`,
+        {
+            headers: token()
+                ? { Authorization: `Bearer ${token()}` }
+                : {},
+        }
+    );
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.detail || 'Failed to load verification document.');
+    }
+
+    return response.blob();
+}
+
+export async function approveProviderVerification(providerId) {
+    return api(
+        `/admin/provider-verifications/${providerId}/approve`,
+        { method: 'POST' }
+    );
+}

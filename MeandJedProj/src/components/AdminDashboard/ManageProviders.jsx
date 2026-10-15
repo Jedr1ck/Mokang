@@ -1,10 +1,25 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+import { getAdminProviders } from "../../services/api";
 import "./AdminDashboard.css";
+import ProviderVerificationReviews from "./ProviderVerificationReviews";
 
+function mapProviders(data) {
+    return data.map((provider) => ({
+        ...provider,
+        approvalStatus:
+            provider.verificationStatus === "verified"
+                ? "Approved"
+                : provider.verificationStatus === "pending"
+                    ? "Pending"
+                    : provider.verificationStatus === "rejected"
+                        ? "Rejected"
+                        : "Not Submitted",
+    }));
+}
 
 function ManageProviders() {
 
@@ -12,8 +27,9 @@ function ManageProviders() {
        STATE
     ========================================================= */
 
-    // Backend-ready — no dummy/sample providers
     const [providers, setProviders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -32,8 +48,47 @@ function ManageProviders() {
     const [modalType, setModalType] =
         useState(null);
 
+    const [showVerificationReviews, setShowVerificationReviews] =
+        useState(false);
+
     const itemsPerPage = 5;
 
+    const loadProviders = useCallback(async () => {
+        setLoading(true);
+        setLoadError("");
+
+        try {
+            const data = await getAdminProviders();
+            setProviders(mapProviders(data));
+        } catch (error) {
+            setLoadError(error.message || "Unable to load providers.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+
+        getAdminProviders()
+            .then((data) => {
+                if (active) setProviders(mapProviders(data));
+            })
+            .catch((error) => {
+                if (active) {
+                    setLoadError(
+                        error.message || "Unable to load providers."
+                    );
+                }
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, []);
 
     /* =========================================================
        FILTER
@@ -251,86 +306,8 @@ function ManageProviders() {
 
     };
 
-
-    /* =========================================================
-       APPROVE
-    ========================================================= */
-
-    const handleApprove = (provider) => {
-
-        setSelectedProvider(provider);
-
-        setModalType("approve");
-
-    };
-
-
-    const confirmApprove = () => {
-
-        if (!selectedProvider) {
-            return;
-        }
-
-        setProviders(
-            (previousProviders) =>
-                previousProviders.map(
-                    (provider) =>
-                        provider.id ===
-                            selectedProvider.id
-                            ? {
-                                ...provider,
-                                approvalStatus:
-                                    "Approved",
-                                accountStatus:
-                                    "Active",
-                            }
-                            : provider
-                )
-        );
-
-        closeModal();
-
-    };
-
-
-    /* =========================================================
-       REJECT
-    ========================================================= */
-
-    const handleReject = (provider) => {
-
-        setSelectedProvider(provider);
-
-        setModalType("reject");
-
-    };
-
-
-    const confirmReject = () => {
-
-        if (!selectedProvider) {
-            return;
-        }
-
-        setProviders(
-            (previousProviders) =>
-                previousProviders.map(
-                    (provider) =>
-                        provider.id ===
-                            selectedProvider.id
-                            ? {
-                                ...provider,
-                                approvalStatus:
-                                    "Rejected",
-                                accountStatus:
-                                    "Inactive",
-                            }
-                            : provider
-                )
-        );
-
-        closeModal();
-
+    const openVerificationReviews = () => {
+        setShowVerificationReviews(true);
     };
 
 
@@ -430,6 +407,17 @@ function ManageProviders() {
 
     };
 
+    if (showVerificationReviews) {
+        return (
+            <ProviderVerificationReviews
+                onBack={() => {
+                    setShowVerificationReviews(false);
+                    loadProviders();
+                }}
+            />
+        );
+    }
+
 
     /* =========================================================
        RENDER
@@ -463,31 +451,46 @@ function ManageProviders() {
 
                 </div>
 
+                <div className="verification-header-actions">
+                    <button
+                        type="button"
+                        className="verification-open-button"
+                        onClick={() => setShowVerificationReviews(true)}
+                    >
+                        <i className="bi bi-shield-check" aria-hidden="true"></i>
+                        Review verification requests
+                    </button>
 
-                <div className="providers-total-card">
+                    <div className="providers-total-card">
 
-                    <div className="providers-total-icon">
+                        <div className="providers-total-icon">
 
-                        <i className="bi bi-person-badge-fill"></i>
+                            <i className="bi bi-person-badge-fill"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Total Providers
+                            </span>
+
+                            <strong>
+                                {totalProviders}
+                            </strong>
+
+                        </div>
 
                     </div>
-
-                    <div>
-
-                        <span>
-                            Total Providers
-                        </span>
-
-                        <strong>
-                            {totalProviders}
-                        </strong>
-
-                    </div>
-
                 </div>
 
             </div>
 
+            {loadError && (
+                <div className="alert alert-danger" role="alert">
+                    {loadError}
+                </div>
+            )}
 
             {/* =================================================
                 SUMMARY CARDS
@@ -709,6 +712,10 @@ function ManageProviders() {
                                     Rejected
                                 </option>
 
+                                <option value="Not Submitted">
+                                    Not Submitted
+                                </option>
+
                             </select>
 
                         </div>
@@ -853,7 +860,16 @@ function ManageProviders() {
 
                         <tbody>
 
-                            {currentProviders.length > 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td
+                                        colSpan="8"
+                                        className="providers-empty-cell"
+                                    >
+                                        Loading providers...
+                                    </td>
+                                </tr>
+                            ) : currentProviders.length > 0 ? (
 
                                 currentProviders.map(
                                     (provider) => (
@@ -1049,38 +1065,16 @@ function ManageProviders() {
 
                                                     {provider.approvalStatus ===
                                                         "Pending" && (
-                                                            <>
-                                                                <button
-                                                                    type="button"
-                                                                    className="provider-action approve"
-                                                                    onClick={() =>
-                                                                        handleApprove(
-                                                                            provider
-                                                                        )
-                                                                    }
-                                                                    title="Approve"
-                                                                >
-
-                                                                    <i className="bi bi-check-lg"></i>
-
-                                                                </button>
-
-
-                                                                <button
-                                                                    type="button"
-                                                                    className="provider-action reject"
-                                                                    onClick={() =>
-                                                                        handleReject(
-                                                                            provider
-                                                                        )
-                                                                    }
-                                                                    title="Reject"
-                                                                >
-
-                                                                    <i className="bi bi-x-lg"></i>
-
-                                                                </button>
-                                                            </>
+                                                            <button
+                                                                type="button"
+                                                                className="provider-action approve"
+                                                                onClick={
+                                                                    openVerificationReviews
+                                                                }
+                                                                title="Review submitted verification"
+                                                            >
+                                                                <i className="bi bi-shield-check"></i>
+                                                            </button>
                                                         )}
 
 
@@ -1508,6 +1502,80 @@ function ManageProviders() {
 
                                 </div>
 
+                                <div>
+
+                                    <span>
+                                        Gender
+                                    </span>
+
+                                    <strong>
+                                        {selectedProvider.gender || "—"}
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Birthday
+                                    </span>
+
+                                    <strong>
+                                        {selectedProvider.birthday || "—"}
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Personal Address
+                                    </span>
+
+                                    <strong>
+                                        {selectedProvider.address || "—"}
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Business Name
+                                    </span>
+
+                                    <strong>
+                                        {selectedProvider.businessName || "—"}
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Qualifications
+                                    </span>
+
+                                    <strong>
+                                        {selectedProvider.qualifications || "—"}
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Hourly Rate
+                                    </span>
+
+                                    <strong>
+                                        {selectedProvider.hourlyRate == null
+                                            ? "—"
+                                            : `₱${selectedProvider.hourlyRate}`}
+                                    </strong>
+
+                                </div>
+
                             </div>
 
 
@@ -1523,199 +1591,6 @@ function ManageProviders() {
                                     Close
                                 </button>
 
-
-                                {selectedProvider.approvalStatus ===
-                                    "Pending" && (
-                                        <>
-
-                                            <button
-                                                type="button"
-                                                className="providers-danger-button"
-                                                onClick={() =>
-                                                    handleReject(
-                                                        selectedProvider
-                                                    )
-                                                }
-                                            >
-                                                Reject
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="providers-primary-button"
-                                                onClick={() =>
-                                                    handleApprove(
-                                                        selectedProvider
-                                                    )
-                                                }
-                                            >
-
-                                                <i className="bi bi-check-lg"></i>
-
-                                                Approve
-
-                                            </button>
-
-                                        </>
-                                    )}
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                )
-            }
-
-
-            {/* =================================================
-                APPROVE MODAL
-            ================================================= */}
-
-            {modalType === "approve" &&
-                selectedProvider && (
-
-                    <div
-                        className="providers-modal-overlay"
-                        onMouseDown={(event) => {
-
-                            if (
-                                event.target ===
-                                event.currentTarget
-                            ) {
-                                closeModal();
-                            }
-
-                        }}
-                    >
-
-                        <div className="providers-confirm-modal">
-
-                            <div className="providers-confirm-icon success">
-
-                                <i className="bi bi-check-circle"></i>
-
-                            </div>
-
-                            <h3>
-                                Approve Provider?
-                            </h3>
-
-                            <p>
-
-                                Are you sure you want to approve{" "}
-
-                                <strong>
-                                    {
-                                        selectedProvider.fullName ||
-                                        "this provider"
-                                    }
-                                </strong>
-                                ?
-
-                            </p>
-
-                            <div className="providers-confirm-actions">
-
-                                <button
-                                    type="button"
-                                    className="providers-secondary-button"
-                                    onClick={
-                                        closeModal
-                                    }
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="providers-primary-button"
-                                    onClick={
-                                        confirmApprove
-                                    }
-                                >
-                                    Approve Provider
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                )
-            }
-
-
-            {/* =================================================
-                REJECT MODAL
-            ================================================= */}
-
-            {modalType === "reject" &&
-                selectedProvider && (
-
-                    <div
-                        className="providers-modal-overlay"
-                        onMouseDown={(event) => {
-
-                            if (
-                                event.target ===
-                                event.currentTarget
-                            ) {
-                                closeModal();
-                            }
-
-                        }}
-                    >
-
-                        <div className="providers-confirm-modal">
-
-                            <div className="providers-confirm-icon warning">
-
-                                <i className="bi bi-x-circle"></i>
-
-                            </div>
-
-                            <h3>
-                                Reject Provider?
-                            </h3>
-
-                            <p>
-
-                                Are you sure you want to reject{" "}
-
-                                <strong>
-                                    {
-                                        selectedProvider.fullName ||
-                                        "this provider"
-                                    }
-                                </strong>
-                                ?
-
-                            </p>
-
-                            <div className="providers-confirm-actions">
-
-                                <button
-                                    type="button"
-                                    className="providers-secondary-button"
-                                    onClick={
-                                        closeModal
-                                    }
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="providers-danger-button"
-                                    onClick={
-                                        confirmReject
-                                    }
-                                >
-                                    Reject Provider
-                                </button>
 
                             </div>
 
