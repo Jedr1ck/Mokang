@@ -46,6 +46,7 @@ def create_app(test_config=None):
     from app.routes.profiles import profiles_bp
     from app.routes.admin_providers import admin_providers_bp
     from app.routes.admin_verifications import admin_verifications_bp
+    from app.routes.admin_users import admin_users_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(bookings_bp)
@@ -54,6 +55,7 @@ def create_app(test_config=None):
     app.register_blueprint(profiles_bp)
     app.register_blueprint(admin_providers_bp)
     app.register_blueprint(admin_verifications_bp)
+    app.register_blueprint(admin_users_bp)
 
     @app.after_request
     def add_cors_headers(response):

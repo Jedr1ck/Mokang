@@ -81,6 +81,22 @@ export async function getAdminProviders() {
     return api('/admin/providers');
 }
 
+export async function getAdminHomeowners() {
+    return api('/admin/users/homeowners');
+}
+
+export async function createAdminAccount(account) {
+    return api('/admin/users', {
+        method: 'POST',
+        body: JSON.stringify({
+            full_name: account.fullName,
+            email: account.email,
+            password: account.password,
+            role: account.role,
+        }),
+    });
+}
+
 export async function getProviderVerificationDocument(providerId, side) {
     const response = await fetch(
         `${API_URL}/admin/provider-verifications/${providerId}/documents/${side}`,

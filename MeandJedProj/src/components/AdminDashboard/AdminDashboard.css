@@ -11603,3 +11603,297 @@
         transform: translateX(20px);
     }
 }
+
+.admin-create-account-modal {
+    width: min(560px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.admin-create-account-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 25px 28px 22px;
+    border-bottom: 1px solid #edf1f4;
+}
+
+.admin-create-account-heading {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+}
+
+.admin-create-account-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 14px;
+    background: #eaf8ef;
+    color: #168346;
+    font-size: 21px;
+}
+
+.admin-create-account-eyebrow {
+    display: block;
+    margin-bottom: 5px;
+    color: #168346;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.admin-create-account-header h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 21px;
+    font-weight: 750;
+    letter-spacing: -0.45px;
+}
+
+.admin-create-account-header p {
+    margin: 5px 0 0;
+    color: #718096;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.admin-create-account-close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 0;
+    border-radius: 9px;
+    background: #f3f5f7;
+    color: #64748b;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+}
+
+.admin-create-account-close:hover:not(:disabled) {
+    background: #e8edf0;
+    color: #1e293b;
+}
+
+.admin-create-account-close:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.admin-create-account-body {
+    padding: 25px 28px 22px;
+}
+
+.admin-create-account-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 19px 16px;
+}
+
+.admin-create-account-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+    margin: 0;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.admin-create-account-field input {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d8e0e6;
+    border-radius: 9px;
+    outline: none;
+    background: #fff;
+    color: #1e293b;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 400;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.admin-create-account-field input:hover {
+    border-color: #b8c7cf;
+}
+
+.admin-create-account-field input:focus {
+    border-color: #28a05d;
+    background: #fcfffd;
+    box-shadow: 0 0 0 3px rgba(40, 160, 93, 0.13);
+}
+
+.admin-create-account-field input::placeholder {
+    color: #a0acb7;
+}
+
+.admin-create-account-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 22px;
+    padding: 13px 14px;
+    border: 1px solid #dcefe3;
+    border-radius: 10px;
+    background: #f5fbf7;
+    color: #21804a;
+}
+
+.admin-create-account-hint > i {
+    margin-top: 1px;
+    font-size: 14px;
+}
+
+.admin-create-account-hint p {
+    margin: 0;
+    color: #526b5b;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.admin-create-account-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 15px;
+    padding: 11px 13px;
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    background: #fff7f7;
+    color: #b42318;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.admin-create-account-error i {
+    margin-top: 1px;
+}
+
+.admin-create-account-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 17px 28px 21px;
+    border-top: 1px solid #edf1f4;
+    background: #fbfcfd;
+    border-radius: 0 0 18px 18px;
+}
+
+.admin-create-account-cancel,
+.admin-create-account-submit {
+    display: inline-flex;
+    min-height: 41px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 17px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-create-account-cancel {
+    border: 1px solid #d8e0e6;
+    background: #fff;
+    color: #475467;
+}
+
+.admin-create-account-cancel:hover:not(:disabled) {
+    border-color: #bfcbd3;
+    background: #f8fafb;
+}
+
+.admin-create-account-submit {
+    border: 1px solid #168346;
+    background: #168346;
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(22, 131, 70, 0.16);
+}
+
+.admin-create-account-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #116b39;
+    background: #116b39;
+    box-shadow: 0 4px 10px rgba(22, 131, 70, 0.2);
+}
+
+.admin-create-account-cancel:disabled,
+.admin-create-account-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.admin-create-account-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: adminCreateAccountSpin 700ms linear infinite;
+}
+
+@keyframes adminCreateAccountSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-create-account-header {
+        padding: 21px 20px 18px;
+    }
+
+    .admin-create-account-heading {
+        gap: 12px;
+    }
+
+    .admin-create-account-icon {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .admin-create-account-header h3 {
+        font-size: 18px;
+    }
+
+    .admin-create-account-body {
+        padding: 21px 20px;
+    }
+
+    .admin-create-account-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .admin-create-account-footer {
+        padding: 15px 20px 18px;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-create-account-footer {
+        flex-direction: column-reverse;
+    }
+
+    .admin-create-account-cancel,
+    .admin-create-account-submit {
+        width: 100%;
+    }
+}

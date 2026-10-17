@@ -57,6 +57,10 @@ class AdminCredentials(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class AdminAccountCreate(Register):
+    role: str
+
+
 class BookingIn(BaseModel):
     category: str = Field(min_length=2, max_length=100)
     preferred_date: date

@@ -50,6 +50,7 @@ Optional `.env` in project root:
 - GET/PUT /provider-verification/me
 - POST /provider-verification/submit
 - GET /admin/providers (administrator-only provider profiles and verification status)
+- GET /admin/users/homeowners and POST /admin/users (administrator-only account management)
 - GET /admin/provider-verifications
 - GET /admin/provider-verifications/{provider_id}/documents/{side}
 - POST /admin/provider-verifications/{provider_id}/approve

@@ -6,6 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { getAdminProviders } from "../../services/api";
 import "./AdminDashboard.css";
 import ProviderVerificationReviews from "./ProviderVerificationReviews";
+import CreateAccountModal from "./CreateAccountModal";
 
 function mapProviders(data) {
     return data.map((provider) => ({
@@ -50,6 +51,7 @@ function ManageProviders() {
 
     const [showVerificationReviews, setShowVerificationReviews] =
         useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const itemsPerPage = 5;
 
@@ -452,6 +454,14 @@ function ManageProviders() {
                 </div>
 
                 <div className="verification-header-actions">
+                    <button
+                        type="button"
+                        className="btn btn-success"
+                        onClick={() => setShowCreateModal(true)}
+                    >
+                        <i className="bi bi-person-plus-fill me-2" aria-hidden="true"></i>
+                        Add Provider
+                    </button>
                     <button
                         type="button"
                         className="verification-open-button"
@@ -1782,6 +1792,14 @@ function ManageProviders() {
 
                 )
             }
+
+            {showCreateModal && (
+                <CreateAccountModal
+                    role="provider"
+                    onClose={() => setShowCreateModal(false)}
+                    onCreated={loadProviders}
+                />
+            )}
 
         </div>
 

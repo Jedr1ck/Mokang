@@ -1,16 +1,22 @@
-import React, { useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import "./AdminDashboard.css";
+import { getAdminHomeowners } from "../../services/api";
+import CreateAccountModal from "./CreateAccountModal";
+
 function ManageHomeowners() {
     // =====================================================
     // STATE
     // =====================================================
 
     const [homeowners, setHomeowners] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
@@ -28,6 +34,32 @@ function ManageHomeowners() {
 
     const itemsPerPage = 5;
 
+    useEffect(() => {
+        let active = true;
+
+        getAdminHomeowners()
+            .then((data) => {
+                if (active) {
+                    setHomeowners(data.map((homeowner) => ({
+                        ...homeowner,
+                        contact: homeowner.contact || "—",
+                        location: homeowner.location || "—",
+                        status: homeowner.status || "Inactive",
+                    })));
+                }
+            })
+            .catch((error) => {
+                if (active) setLoadError(error.message || "Unable to load homeowners.");
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
     // =====================================================
     // FILTER
     // =====================================================
@@ -36,10 +68,10 @@ function ManageHomeowners() {
         const search = searchTerm.toLowerCase().trim();
 
         const matchesSearch =
-            homeowner.fullName.toLowerCase().includes(search) ||
-            homeowner.email.toLowerCase().includes(search) ||
-            homeowner.contact.toLowerCase().includes(search) ||
-            homeowner.location.toLowerCase().includes(search);
+            String(homeowner.fullName || "").toLowerCase().includes(search) ||
+            String(homeowner.email || "").toLowerCase().includes(search) ||
+            String(homeowner.contact || "").toLowerCase().includes(search) ||
+            String(homeowner.location || "").toLowerCase().includes(search);
 
         const matchesStatus =
             statusFilter === "All" ||
@@ -282,15 +314,26 @@ function ManageHomeowners() {
                     </p>
                 </div>
 
-                <div className="admin-management-total">
+                <div className="d-flex align-items-center gap-3 flex-wrap">
+                    <button
+                        type="button"
+                        className="btn btn-success"
+                        onClick={() => setShowCreateModal(true)}
+                    >
+                        <i className="bi bi-person-plus-fill me-2"></i>
+                        Add Homeowner
+                    </button>
 
-                    <i className="bi bi-people-fill"></i>
+                    <div className="admin-management-total">
 
-                    <div>
-                        <span>Total Homeowners</span>
-                        <strong>{homeowners.length}</strong>
+                        <i className="bi bi-people-fill"></i>
+
+                        <div>
+                            <span>Total Homeowners</span>
+                            <strong>{homeowners.length}</strong>
+                        </div>
+
                     </div>
-
                 </div>
 
             </div>
@@ -395,7 +438,15 @@ function ManageHomeowners() {
 
                         <tbody>
 
-                            {currentHomeowners.length > 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-4">Loading homeowners...</td>
+                                </tr>
+                            ) : loadError ? (
+                                <tr>
+                                    <td colSpan="5" className="text-center text-danger py-4">{loadError}</td>
+                                </tr>
+                            ) : currentHomeowners.length > 0 ? (
 
                                 currentHomeowners.map(
                                     (homeowner) => (
@@ -585,6 +636,23 @@ function ManageHomeowners() {
                             </>
                         ) : (
                             "Showing 0 to 0 of 0"
+                        )}
+
+                        {showCreateModal && (
+                        <CreateAccountModal
+                            role="homeowner"
+                            onClose={() => setShowCreateModal(false)}
+                            onCreated={async () => {
+                                const data = await getAdminHomeowners();
+                                setHomeowners(data.map((homeowner) => ({
+                                    ...homeowner,
+                                    contact: homeowner.contact || "—",
+                                    location: homeowner.location || "—",
+                                    status: homeowner.status || "Inactive",
+                                })));
+                                setLoadError("");
+                            }}
+                        />
                         )}
 
                     </div>
