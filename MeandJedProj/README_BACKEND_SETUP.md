@@ -19,7 +19,7 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env   # Windows
 # cp .env.example .env   # macOS/Linux
-flask --app app.main:app run --debug --port 8000
+python app.py
 ```
 Edit `backend/.env` with your MariaDB credentials. The default template
 connects to the `Smarthomes` database used by the current backend.
