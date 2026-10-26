@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { api } from '../../services/api';
+import { api, getCategories } from '../../services/api';
 
-const BookingModal = ({ show, handleClose, initialCategory = 'Electrical', providerId = null }) => {
+const EMPTY_PROVIDER_SERVICES = [];
+
+const BookingModal = ({
+    show,
+    handleClose,
+    initialCategory = 'Electrical',
+    providerId = null,
+    providerServices = EMPTY_PROVIDER_SERVICES,
+}) => {
     const navigate = useNavigate();
     const [bookingSubmitted, setBookingSubmitted] = useState(false);
     const [formError, setFormError] = useState('');
+    const [serviceOptions, setServiceOptions] = useState([]);
+    const [selectedServiceIndex, setSelectedServiceIndex] = useState('');
     const [formData, setFormData] = useState({
-        category: initialCategory,
+        category: '',
         preferredDate: '',
         preferredTime: '',
         address: '',
@@ -17,15 +27,57 @@ const BookingModal = ({ show, handleClose, initialCategory = 'Electrical', provi
     });
 
     useEffect(() => {
-        if (show) {
-            setFormData((previous) => ({ ...previous, category: initialCategory || '' }));
-            setFormError('');
-        }
-    }, [show, initialCategory]);
+        if (!show) return undefined;
+
+        setFormError('');
+        setServiceOptions([]);
+
+        const loadServices = async () => {
+            try {
+                const options = providerServices.length
+                    ? providerServices
+                    : (await getCategories()).map((category) => ({
+                        name: category.name,
+                        category: category.name,
+                    }));
+                const availableOptions = options.length
+                    ? options
+                    : initialCategory
+                        ? [{ name: initialCategory, category: initialCategory }]
+                        : [];
+                const initialIndex = availableOptions.findIndex(
+                    (option) => option.category === initialCategory || option.name === initialCategory
+                );
+                const selectedIndex = initialIndex >= 0 ? initialIndex : 0;
+                const initialOption = availableOptions[selectedIndex];
+
+                setServiceOptions(availableOptions);
+                setSelectedServiceIndex(availableOptions.length ? String(selectedIndex) : '');
+                setFormData((previous) => ({
+                    ...previous,
+                    category: initialOption?.category || '',
+                }));
+            } catch (error) {
+                setFormError(error.message || 'Unable to load service options.');
+            }
+        };
+
+        loadServices();
+    }, [show, initialCategory, providerServices]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handleServiceChange = (e) => {
+        const { value } = e.target;
+        const selectedService = serviceOptions[Number(value)];
+        setSelectedServiceIndex(value);
+        setFormData((previous) => ({
+            ...previous,
+            category: selectedService?.category || selectedService?.name || '',
+        }));
     };
 
     const handleFileChange = (e) => {
@@ -113,13 +165,26 @@ const BookingModal = ({ show, handleClose, initialCategory = 'Electrical', provi
                                     {/* Service Category */}
                                     <div className="col-12">
                                         <label className="form-label fw-semibold small">Service Category</label>
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 rounded-3"
-                                            name="category"
-                                            value={formData.category}
-                                            readOnly
-                                        />
+                                        <select
+                                            className="form-select bg-light border-0 rounded-3"
+                                            name="serviceIndex"
+                                            value={selectedServiceIndex}
+                                            onChange={handleServiceChange}
+                                            required
+                                            disabled={serviceOptions.length === 0}
+                                        >
+                                            {serviceOptions.length === 0 && (
+                                                <option value="">Loading services...</option>
+                                            )}
+                                            {serviceOptions.map((service, index) => (
+                                                <option
+                                                    key={`${service.category || service.name}-${service.name}-${index}`}
+                                                    value={index}
+                                                >
+                                                    {service.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     {/* Preferred Date */}

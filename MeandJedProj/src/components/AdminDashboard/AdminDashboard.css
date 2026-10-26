@@ -11897,3 +11897,684 @@
         width: 100%;
     }
 }
+
+.homeowner-detail-modal {
+    width: min(640px, 100%);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    border: 1px solid #e6ece8;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+.homeowner-detail-modal .admin-modal-header {
+    align-items: center;
+    padding: 22px 28px;
+}
+
+.homeowner-detail-modal .admin-modal-header span {
+    margin-bottom: 6px;
+    color: #168346;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+
+.homeowner-detail-modal .admin-modal-header h3 {
+    color: #1f2937;
+    font-size: 21px;
+    letter-spacing: -0.35px;
+}
+
+.homeowner-detail-modal .admin-modal-header > button {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+}
+
+.homeowner-detail-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 22px 28px 18px;
+    padding: 19px;
+    border: 1px solid #dcefe3;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #f0faf3, #fbfefc 75%);
+}
+
+.homeowner-detail-avatar {
+    display: grid;
+    width: 56px;
+    height: 56px;
+    flex: 0 0 56px;
+    place-items: center;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #168346, #35ae6a);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(22, 131, 70, 0.18);
+    font-size: 23px;
+}
+
+.homeowner-detail-identity {
+    min-width: 0;
+}
+
+.homeowner-detail-identity h4 {
+    margin: 0 0 7px;
+    color: #1f2937;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.25px;
+    overflow-wrap: anywhere;
+}
+
+.homeowner-detail-identity .admin-account-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    border: 1px solid #ccebd6;
+    border-radius: 999px;
+    background: #fff;
+    color: #168346;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.homeowner-detail-identity .admin-account-status > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.homeowner-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0 28px 24px;
+}
+
+.homeowner-detail-item {
+    display: flex;
+    min-width: 0;
+    min-height: 76px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #e9eeeb;
+    border-radius: 12px;
+    background: #fff;
+    transition: border-color 160ms ease, background 160ms ease;
+}
+
+.homeowner-detail-item:hover {
+    border-color: #ccebd6;
+    background: #fcfefc;
+}
+
+.homeowner-detail-item > i {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    place-items: center;
+    border-radius: 10px;
+    background: #eff8f2;
+    color: #168346;
+    font-size: 15px;
+}
+
+.homeowner-detail-item > div {
+    min-width: 0;
+}
+
+.homeowner-detail-item span {
+    display: block;
+    margin-bottom: 5px;
+    color: #84918a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.55px;
+    text-transform: uppercase;
+}
+
+.homeowner-detail-item strong {
+    display: block;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.homeowner-detail-modal .admin-modal-footer {
+    gap: 10px;
+    padding: 16px 28px 20px;
+    border-top: 1px solid #edf1ee;
+    background: #fbfcfb;
+}
+
+.homeowner-detail-modal .admin-modal-footer button {
+    min-height: 41px;
+    padding: 0 17px;
+    border-radius: 9px;
+    font-size: 12px;
+}
+
+.homeowner-detail-modal .admin-modal-primary-button {
+    border-color: #168346;
+    background: #168346;
+    box-shadow: 0 2px 5px rgba(22, 131, 70, 0.15);
+}
+
+.homeowner-detail-modal .admin-modal-primary-button:hover {
+    border-color: #116b39;
+    background: #116b39;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 560px) {
+    .homeowner-detail-modal .admin-modal-header {
+        padding: 19px 20px;
+    }
+
+    .homeowner-detail-profile {
+        margin: 18px 20px 16px;
+        padding: 15px;
+    }
+
+    .homeowner-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+        padding: 0 20px 20px;
+    }
+
+    .homeowner-detail-item {
+        min-height: 68px;
+    }
+
+    .homeowner-detail-modal .admin-modal-footer {
+        padding: 15px 20px 18px;
+    }
+}
+
+@media (max-width: 420px) {
+    .homeowner-detail-modal .admin-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .homeowner-detail-modal .admin-modal-footer button {
+        width: 100%;
+    }
+}
+
+.booking-insights-page .reports-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.booking-insights-date-note {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border: 1px solid #dcefe3;
+    border-radius: 999px;
+    background: #f5fbf7;
+    color: #21804a;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.booking-insights-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 13px 15px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fff7f7;
+    color: #b42318;
+    font-size: 13px;
+}
+
+.booking-insights-state {
+    display: flex;
+    min-height: 240px;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.booking-insights-state .spinner-border {
+    width: 24px;
+    height: 24px;
+}
+
+.booking-insights-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.booking-insights-kpi {
+    display: flex;
+    min-width: 0;
+    min-height: 104px;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid #e7ece9;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.booking-insights-kpi-icon,
+.booking-insights-panel-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 12px;
+}
+
+.booking-insights-kpi-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 19px;
+}
+
+.booking-insights-kpi-icon.green,
+.booking-insights-panel-icon.green {
+    background: #eff9f2;
+    color: #168346;
+}
+
+.booking-insights-kpi-icon.orange,
+.booking-insights-panel-icon.orange {
+    background: #fff5eb;
+    color: #e87918;
+}
+
+.booking-insights-kpi-icon.blue,
+.booking-insights-panel-icon.blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.booking-insights-kpi > div {
+    min-width: 0;
+}
+
+.booking-insights-kpi > div > span,
+.booking-insights-kpi small {
+    display: block;
+    color: #718096;
+    font-size: 11px;
+}
+
+.booking-insights-kpi strong {
+    display: block;
+    margin-top: 3px;
+    overflow: hidden;
+    color: #1f2937;
+    font-size: 20px;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.booking-insights-kpi small {
+    margin-top: 3px;
+}
+
+.booking-insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.booking-insights-panel {
+    min-width: 0;
+    min-height: 300px;
+    overflow: hidden;
+    border: 1px solid #e7ece9;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.booking-insights-panel-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 20px 21px 17px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.booking-insights-panel-heading h3 {
+    margin: 0;
+    color: #17251d;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.booking-insights-panel-heading p {
+    max-width: 380px;
+    margin: 6px 0 0;
+    color: #7b8790;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.booking-insights-eyebrow {
+    display: block;
+    margin-bottom: 5px;
+    color: #84918a;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.9px;
+}
+
+.booking-insights-panel-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+}
+
+.booking-season-list,
+.booking-preference-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 21px;
+}
+
+.booking-season-row,
+.booking-preference-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.booking-season-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    color: #475467;
+    font-size: 12px;
+}
+
+.booking-season-label span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.booking-season-label strong {
+    flex: 0 0 auto;
+    color: #26352d;
+    font-weight: 700;
+}
+
+.booking-insights-track {
+    width: 100%;
+    height: 9px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #f0f3f1;
+}
+
+.booking-insights-fill {
+    display: block;
+    height: 100%;
+    min-width: 3px;
+    border-radius: inherit;
+    transition: width 180ms ease;
+}
+
+.booking-insights-fill.orange {
+    background: linear-gradient(90deg, #f8a44b, #ed7417);
+}
+
+.booking-insights-fill.green {
+    background: linear-gradient(90deg, #45b978, #168346);
+}
+
+.booking-season-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 4px;
+    padding-top: 15px;
+    border-top: 1px solid #edf1ee;
+    color: #718096;
+    font-size: 11px;
+}
+
+.booking-season-highlights i {
+    margin-right: 5px;
+    color: #168346;
+}
+
+.booking-season-highlights strong {
+    color: #344054;
+}
+
+.booking-preference-list {
+    gap: 13px;
+}
+
+.booking-preference-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.booking-preference-rank {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    place-items: center;
+    border-radius: 9px;
+    background: #f2f7f3;
+    color: #168346;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.booking-preference-row .booking-insights-track {
+    height: 7px;
+}
+
+.booking-forecast-panel {
+    grid-column: 1 / -1;
+}
+
+.booking-forecast-chart {
+    display: grid;
+    height: 225px;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 8px;
+    padding: 19px 22px 0;
+}
+
+.booking-forecast-column {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.booking-forecast-value {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 650;
+}
+
+.booking-forecast-bar-area {
+    display: flex;
+    width: min(100%, 36px);
+    height: 150px;
+    align-items: flex-end;
+    overflow: hidden;
+    border-radius: 7px 7px 2px 2px;
+    background: #f6f8f7;
+}
+
+.booking-forecast-bar {
+    display: block;
+    width: 100%;
+    min-height: 4px;
+    border-radius: 6px 6px 2px 2px;
+}
+
+.booking-forecast-bar.actual {
+    background: linear-gradient(180deg, #49b878, #168346);
+}
+
+.booking-forecast-bar.forecast {
+    background: repeating-linear-gradient(
+        135deg,
+        #72a6f8,
+        #72a6f8 5px,
+        #a9c8fc 5px,
+        #a9c8fc 10px
+    );
+}
+
+.booking-forecast-month {
+    overflow: hidden;
+    width: 100%;
+    color: #718096;
+    font-size: 9px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.booking-forecast-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 11px 16px 16px;
+    color: #64748b;
+    font-size: 10px;
+}
+
+.booking-forecast-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.booking-forecast-legend i {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+}
+
+.booking-forecast-legend i.actual {
+    background: #168346;
+}
+
+.booking-forecast-legend i.forecast {
+    background: #72a6f8;
+}
+
+.booking-insights-empty {
+    display: flex;
+    min-height: 170px;
+    align-items: center;
+    justify-content: center;
+    padding: 26px;
+    color: #87928c;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.booking-forecast-empty {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.booking-forecast-empty > i {
+    color: #e87918;
+    font-size: 23px;
+}
+
+.booking-forecast-empty strong {
+    color: #344054;
+    font-size: 13px;
+}
+
+.booking-forecast-empty span {
+    max-width: 420px;
+}
+
+@media (max-width: 900px) {
+    .booking-insights-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .booking-insights-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-forecast-panel {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 560px) {
+    .booking-insights-page .reports-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .booking-insights-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-insights-kpi {
+        min-height: 88px;
+    }
+
+    .booking-insights-panel-heading {
+        padding: 17px;
+    }
+
+    .booking-season-list,
+    .booking-preference-list {
+        padding: 17px;
+    }
+
+    .booking-forecast-chart {
+        height: 205px;
+        gap: 4px;
+        padding-right: 13px;
+        padding-left: 13px;
+    }
+
+    .booking-forecast-bar-area {
+        height: 130px;
+    }
+
+    .booking-forecast-value,
+    .booking-forecast-month {
+        font-size: 8px;
+    }
+}

@@ -131,6 +131,8 @@ class MessageIn(BaseModel):
 class ProviderVerificationUpdate(BaseModel):
     business_name: str = Field(..., min_length=2, max_length=150)
     bio: Optional[str] = None
+    service_category: Optional[str] = Field(None, min_length=2, max_length=100)
+    service_titles: list[str] = Field(default_factory=list, max_length=20)
     experience_years: int = Field(..., ge=0)
     hourly_rate: float = Field(..., ge=0)
     region_name: str = Field(..., min_length=1, max_length=120)

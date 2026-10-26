@@ -5,6 +5,8 @@ export async function login(email, password) { const d = await api('/auth/login'
 export async function register(data) { return api('/auth/register', { method: 'POST', body: JSON.stringify(data) }) }
 export async function loginAdmin(username, password) { const d = await api('/auth/admin/login', { method: 'POST', body: JSON.stringify({ username, password }) }); localStorage.setItem('access_token', d.access_token); localStorage.setItem('user', JSON.stringify(d.user)); return d; }
 export async function getProviders(params = {}) { const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value && value !== 'All')); return api(`/providers${query.toString() ? `?${query}` : ''}`); }
+export async function getProvider(id) { return api(`/providers/${encodeURIComponent(id)}`); }
+export async function getCategories() { return api('/categories'); }
 export async function getPublicStats() { return api('/public/stats'); }
 export async function getMyBookings() { return api('/bookings/my'); }
 export async function updateBookingStatus(id, status) { return api(`/bookings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); }
@@ -83,6 +85,10 @@ export async function getAdminProviders() {
 
 export async function getAdminHomeowners() {
     return api('/admin/users/homeowners');
+}
+
+export async function getAdminBookingAnalytics() {
+    return api('/admin/analytics');
 }
 
 export async function createAdminAccount(account) {

@@ -732,7 +732,7 @@ function ManageHomeowners() {
                         }}
                     >
 
-                        <div className="admin-modal">
+                        <div className="admin-modal homeowner-detail-modal">
 
                             <div className="admin-modal-header">
 
@@ -756,13 +756,13 @@ function ManageHomeowners() {
 
                             </div>
 
-                            <div className="admin-modal-profile">
+                            <div className="homeowner-detail-profile">
 
-                                <div className="admin-modal-avatar">
+                                <div className="homeowner-detail-avatar">
                                     <i className="bi bi-person-fill"></i>
                                 </div>
 
-                                <div>
+                                <div className="homeowner-detail-identity">
                                     <h4>
                                         {selectedHomeowner.fullName}
                                     </h4>
@@ -778,34 +778,38 @@ function ManageHomeowners() {
 
                             </div>
 
-                            <div className="admin-detail-grid">
+                            <div className="homeowner-detail-grid">
 
-                                <div>
-                                    <span>Full Name</span>
-                                    <strong>
-                                        {selectedHomeowner.fullName}
-                                    </strong>
+                                <div className="homeowner-detail-item">
+                                    <i className="bi bi-person"></i>
+                                    <div>
+                                        <span>Full Name</span>
+                                        <strong>{selectedHomeowner.fullName}</strong>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <span>Email</span>
-                                    <strong>
-                                        {selectedHomeowner.email}
-                                    </strong>
+                                <div className="homeowner-detail-item">
+                                    <i className="bi bi-envelope"></i>
+                                    <div>
+                                        <span>Email address</span>
+                                        <strong>{selectedHomeowner.email}</strong>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <span>Contact</span>
-                                    <strong>
-                                        {selectedHomeowner.contact}
-                                    </strong>
+                                <div className="homeowner-detail-item">
+                                    <i className="bi bi-telephone"></i>
+                                    <div>
+                                        <span>Contact number</span>
+                                        <strong>{selectedHomeowner.contact}</strong>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <span>Location</span>
-                                    <strong>
-                                        {selectedHomeowner.location}
-                                    </strong>
+                                <div className="homeowner-detail-item">
+                                    <i className="bi bi-geo-alt"></i>
+                                    <div>
+                                        <span>Location</span>
+                                        <strong>{selectedHomeowner.location}</strong>
+                                    </div>
                                 </div>
 
                             </div>
@@ -814,7 +818,7 @@ function ManageHomeowners() {
 
                                 <button
                                     type="button"
-                                    className="admin-modal-secondary"
+                                    className="admin-modal-secondary-button"
                                     onClick={closeModal}
                                 >
                                     Close
@@ -822,7 +826,7 @@ function ManageHomeowners() {
 
                                 <button
                                     type="button"
-                                    className="admin-modal-primary"
+                                    className="admin-modal-primary-button"
                                     onClick={() =>
                                         handleEdit(
                                             selectedHomeowner

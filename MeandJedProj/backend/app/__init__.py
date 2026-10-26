@@ -12,16 +12,21 @@ def create_app(test_config=None):
     load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
     app = Flask(__name__)
+    default_cors_origins = (
+        "http://localhost:5173,http://127.0.0.1:5173,"
+        "http://localhost:5174,http://127.0.0.1:5174"
+    )
     app.config.from_mapping(
         SECRET_KEY=os.getenv("SECRET_KEY", "CHANGE_ME"),
         DATABASE_URL=os.getenv(
             "DATABASE_URL",
             "mysql+pymysql://root@localhost:3306/Smarthomes",
         ),
-        CORS_ORIGINS=os.getenv(
-            "CORS_ORIGINS",
-            "http://localhost:5173,http://localhost:5174",
-        ).split(","),
+        CORS_ORIGINS=[
+            origin.strip()
+            for origin in os.getenv("CORS_ORIGINS", default_cors_origins).split(",")
+            if origin.strip()
+        ],
         MAX_CONTENT_LENGTH=6 * 1024 * 1024,
     )
     if test_config:
@@ -47,6 +52,7 @@ def create_app(test_config=None):
     from app.routes.admin_providers import admin_providers_bp
     from app.routes.admin_verifications import admin_verifications_bp
     from app.routes.admin_users import admin_users_bp
+    from app.routes.admin_analytics import admin_analytics_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(bookings_bp)
@@ -56,10 +62,11 @@ def create_app(test_config=None):
     app.register_blueprint(admin_providers_bp)
     app.register_blueprint(admin_verifications_bp)
     app.register_blueprint(admin_users_bp)
+    app.register_blueprint(admin_analytics_bp)
 
     @app.after_request
     def add_cors_headers(response):
-        origin = request.headers.get("Origin")
+        origin = (request.headers.get("Origin") or "").strip()
         allowed_origins = app.config["CORS_ORIGINS"]
         if origin and (origin in allowed_origins or "*" in allowed_origins):
             response.headers["Access-Control-Allow-Origin"] = (

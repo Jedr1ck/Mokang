@@ -22,7 +22,9 @@ copy .env.example .env   # Windows
 python app.py
 ```
 Edit `backend/.env` with your MariaDB credentials. The default template
-connects to the `Smarthomes` database used by the current backend.
+connects to the `Smarthomes` database used by the current backend, and it now
+accepts Vite requests from both `localhost` and `127.0.0.1` on the default
+frontend ports.
 
 The Flask backend is organized into feature blueprints under `backend/app/routes`,
 with shared SQLAlchemy models, request schemas, and database/authentication
@@ -54,6 +56,7 @@ Optional `.env` in project root:
 - GET /admin/provider-verifications
 - GET /admin/provider-verifications/{provider_id}/documents/{side}
 - POST /admin/provider-verifications/{provider_id}/approve
+- GET /admin/analytics (administrator-only booking seasonality, service preferences, and ARIMA(1,1,1) forecast)
 - POST /bookings
 - GET /bookings/my
 - PATCH /bookings/{id}/status

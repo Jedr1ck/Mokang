@@ -15,7 +15,7 @@ from app.common import (
     user_out,
     validated,
 )
-from app.models import UserProfile
+from app.models import Category, ProviderService, UserProfile
 from app.schemas import ProfileUpdate, ProviderVerificationUpdate
 
 profiles_bp = Blueprint("profiles", __name__)
@@ -202,6 +202,34 @@ def update_provider_verification():
             "service_area",
         ):
             setattr(provider, field, getattr(data, field))
+        provider.qualifications = data.bio
+
+        if data.service_category:
+            category = (
+                session.query(Category)
+                .filter(Category.name.ilike(data.service_category))
+                .first()
+            )
+            if not category:
+                category = Category(name=data.service_category)
+                session.add(category)
+                session.flush()
+
+            session.query(ProviderService).filter_by(
+                provider_id=provider.id
+            ).delete(synchronize_session=False)
+            service_title = ", ".join(
+                title.strip()
+                for title in data.service_titles
+                if title.strip()
+            )[:150]
+            session.add(
+                ProviderService(
+                    provider_id=provider.id,
+                    category_id=category.id,
+                    title=service_title or category.name,
+                )
+            )
         provider.verification_status = "incomplete"
         session.commit()
         session.refresh(provider)

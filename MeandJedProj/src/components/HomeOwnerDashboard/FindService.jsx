@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "../../HomeownerDashboard.css";
@@ -43,7 +43,8 @@ const FindService = () => {
     }, []);
 
     const filteredProviders = providers.filter((provider) => {
-        const matchesCategory = selectedCategory === 'All' || provider.category === selectedCategory;
+        const providerCategories = provider.category.split(',').map((category) => category.trim());
+        const matchesCategory = selectedCategory === 'All' || providerCategories.includes(selectedCategory);
         const matchesLocation = provider.location.toLowerCase().includes(searchLocation.toLowerCase().trim());
         const matchesQuery = provider.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
             provider.category.toLowerCase().includes(searchQuery.toLowerCase().trim());
@@ -162,22 +163,43 @@ const FindService = () => {
 
                                     {/* Provider Header Info */}
                                     <div className="d-flex align-items-center gap-3 mb-3">
-                                        <a href={`/provider/${provider.id}`}>
-                                            <img
-                                                src={provider.image}
-                                                alt={provider.name}
-                                                className="rounded-circle object-fit-cover shadow-sm provider-avatar"
-                                                width="60"
-                                                height="60"
-                                            />
-                                        </a>
+                                        <Link to={`/provider/${provider.id}`}>
+                                            {provider.image ? (
+                                                <img
+                                                    src={provider.image}
+                                                    alt={provider.name}
+                                                    className="rounded-circle object-fit-cover shadow-sm provider-avatar"
+                                                    width="60"
+                                                    height="60"
+                                                />
+                                            ) : (
+                                                <span
+                                                    className="rounded-circle bg-success-subtle text-success shadow-sm provider-avatar d-inline-flex align-items-center justify-content-center"
+                                                    style={{ width: 60, height: 60, fontSize: 24 }}
+                                                    aria-label="No profile photo"
+                                                >
+                                                    <i className="bi bi-person-fill"></i>
+                                                </span>
+                                            )}
+                                        </Link>
                                         <div>
-                                            <a href={`/provider/${provider.id}`} className="text-decoration-none text-dark provider-link">
+                                            <Link to={`/provider/${provider.id}`} className="text-decoration-none text-dark provider-link">
                                                 <h6 className="fw-bold mb-1 provider-name-text">{provider.name}</h6>
-                                            </a>
-                                            <span className="badge bg-primary-subtle theme-text rounded-pill me-1">
+                                            </Link>
+                                            <span className="badge bg-primary-subtle theme-text rounded-pill me-1 text-wrap text-start">
                                                 {provider.category}
                                             </span>
+                                            {provider.specificServices?.length > 0 ? (
+                                                <small className="text-muted d-block mt-2">
+                                                    <strong>Specific services:</strong>{' '}
+                                                    {provider.specificServices.join(', ')}
+                                                </small>
+                                            ) : provider.qualifications ? (
+                                                <small className="text-muted d-block mt-2">
+                                                    <strong>Expertise:</strong>{' '}
+                                                    {provider.qualifications}
+                                                </small>
+                                            ) : null}
                                             <small className="text-muted extra-small d-block mt-1">
                                                 <i className="bi bi-geo-alt-fill text-danger"></i> {provider.location}
                                             </small>
@@ -187,8 +209,14 @@ const FindService = () => {
                                     {/* Rating and Experience */}
                                     <div className="d-flex justify-content-between align-items-center bg-light p-2 rounded-3 mb-3 extra-small">
                                         <div>
-                                            <i className="bi bi-star-fill text-warning me-1"></i>
-                                            <span className="fw-bold">{provider.rating}</span> ({provider.reviews} reviews)
+                                            {provider.reviews > 0 ? (
+                                                <>
+                                                    <i className="bi bi-star-fill text-warning me-1"></i>
+                                                    <span className="fw-bold">{provider.rating}</span> ({provider.reviews} reviews)
+                                                </>
+                                            ) : (
+                                                <span className="text-muted">No reviews yet</span>
+                                            )}
                                         </div>
                                         <div className="text-muted fw-semibold">{provider.experience}</div>
                                     </div>
@@ -199,9 +227,9 @@ const FindService = () => {
                                             <small className="text-muted d-block extra-small">Starting Rate</small>
                                             <span className="fw-bold theme-text fs-6">{provider.rate}</span>
                                         </div>
-                                        <a href={`/provider/${provider.id}`} className="btn btn-theme text-white rounded-pill btn-sm px-3 fw-bold">
+                                        <Link to={`/provider/${provider.id}`} className="btn btn-theme text-white rounded-pill btn-sm px-3 fw-bold">
                                             Book Now
-                                        </a>
+                                        </Link>
                                     </div>
 
                                 </div>

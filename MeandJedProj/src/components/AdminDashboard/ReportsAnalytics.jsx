@@ -1,666 +1,282 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { getAdminBookingAnalytics } from "../../services/api";
 import "./AdminDashboard.css";
 
+const EMPTY_ANALYTICS = {
+    totalBookings: 0,
+    peakSeason: { name: "—", bookings: 0 },
+    peakMonth: { name: "—", bookings: 0 },
+    peakQuarter: { name: "—", bookings: 0 },
+    seasons: [],
+    preferences: [],
+    history: [],
+    forecast: [],
+    forecastAvailable: false,
+    forecastMessage: "",
+};
+
+const formatCount = (count) => (
+    Number.isInteger(count) ? count.toLocaleString() : count.toFixed(1)
+);
+
 function ReportsAnalytics() {
-    const [reports] = useState([]);
+    const [analytics, setAnalytics] = useState(EMPTY_ANALYTICS);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const [reportType, setReportType] = useState("All");
-    const [dateRange, setDateRange] = useState("All Time");
-    const [searchTerm, setSearchTerm] = useState("");
+    useEffect(() => {
+        let active = true;
 
-    const [currentPage, setCurrentPage] = useState(1);
+        getAdminBookingAnalytics()
+            .then((data) => {
+                if (active) setAnalytics(data);
+            })
+            .catch((requestError) => {
+                if (active) {
+                    setError(requestError.message || "Unable to load booking analytics.");
+                }
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
 
-    const itemsPerPage = 5;
+        return () => {
+            active = false;
+        };
+    }, []);
 
-    const filteredReports = useMemo(() => {
-        return reports.filter((report) => {
-            const search = searchTerm.toLowerCase();
+    const forecastChart = useMemo(() => {
+        const actual = analytics.history.slice(-9).map((item) => ({
+            ...item,
+            type: "actual",
+        }));
+        return [
+            ...actual,
+            ...analytics.forecast.map((item) => ({
+                ...item,
+                type: "forecast",
+            })),
+        ];
+    }, [analytics.history, analytics.forecast]);
 
-            const matchesSearch =
-                String(report.id || "")
-                    .toLowerCase()
-                    .includes(search) ||
-                String(report.title || "")
-                    .toLowerCase()
-                    .includes(search) ||
-                String(report.type || "")
-                    .toLowerCase()
-                    .includes(search) ||
-                String(report.description || "")
-                    .toLowerCase()
-                    .includes(search);
-
-            const matchesType =
-                reportType === "All" ||
-                report.type === reportType;
-
-            const matchesDate =
-                dateRange === "All Time" ||
-                report.dateRange === dateRange;
-
-            return (
-                matchesSearch &&
-                matchesType &&
-                matchesDate
-            );
-        });
-    }, [
-        reports,
-        searchTerm,
-        reportType,
-        dateRange,
-    ]);
-
-    const totalPages = Math.ceil(
-        filteredReports.length / itemsPerPage
+    const maxForecastCount = Math.max(
+        1,
+        ...forecastChart.map((item) => item.count)
     );
-
-    const paginatedReports = filteredReports.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+    const maxSeasonCount = Math.max(
+        1,
+        ...analytics.seasons.map((item) => item.bookings)
     );
-
-    const totalReports = reports.length;
-
-    const bookingReports = reports.filter(
-        (report) => report.type === "Booking"
-    ).length;
-
-    const providerReports = reports.filter(
-        (report) => report.type === "Provider"
-    ).length;
-
-    const userReports = reports.filter(
-        (report) => report.type === "User"
-    ).length;
-
-    const handleSearch = (value) => {
-        setSearchTerm(value);
-        setCurrentPage(1);
-    };
-
-    const handleReportType = (value) => {
-        setReportType(value);
-        setCurrentPage(1);
-    };
-
-    const handleDateRange = (value) => {
-        setDateRange(value);
-        setCurrentPage(1);
-    };
-
-    const getStatusClass = (status) => {
-        switch (status) {
-            case "Generated":
-                return "status-generated";
-
-            case "Processing":
-                return "status-processing";
-
-            case "Pending":
-                return "status-pending";
-
-            case "Failed":
-                return "status-failed";
-
-            default:
-                return "status-default";
-        }
-    };
-
-    const getReportIcon = (type) => {
-        switch (type) {
-            case "Booking":
-                return "bi-calendar-check-fill";
-
-            case "Provider":
-                return "bi-person-badge-fill";
-
-            case "User":
-                return "bi-people-fill";
-
-            case "Service":
-                return "bi-grid-fill";
-
-            case "Financial":
-                return "bi-cash-stack";
-
-            default:
-                return "bi-bar-chart-fill";
-        }
-    };
-
-    const getShowingText = () => {
-        if (filteredReports.length === 0) {
-            return "Showing 0 to 0 of 0";
-        }
-
-        const start =
-            (currentPage - 1) * itemsPerPage + 1;
-
-        const end = Math.min(
-            currentPage * itemsPerPage,
-            filteredReports.length
-        );
-
-        return `Showing ${start} to ${end} of ${filteredReports.length}`;
-    };
+    const maxPreferenceCount = Math.max(
+        1,
+        ...analytics.preferences.map((item) => item.bookings)
+    );
+    const preferences = analytics.preferences.slice(0, 6);
 
     return (
-        <div className="reports-analytics-page">
-
-            {/* PAGE HEADER */}
-            <div className="reports-page-header">
-
+        <div className="reports-analytics-page booking-insights-page">
+            <header className="reports-page-header">
                 <div>
-                    <span className="reports-section-label">
-                        SYSTEM MONITORING
-                    </span>
-
-                    <h2>Reports and Analytics</h2>
-
+                    <span className="reports-section-label">BOOKING INSIGHTS</span>
+                    <h2>Peak Season &amp; Preferences</h2>
                     <p>
-                        Monitor system activity and review
-                        platform reports and analytics.
+                        Discover when homeowners schedule services, what they request,
+                        and how booking demand may trend.
                     </p>
                 </div>
+                <span className="booking-insights-date-note">
+                    Based on preferred service dates
+                </span>
+            </header>
 
-            </div>
-
-            {/* SUMMARY CARDS */}
-            <div className="reports-summary-grid">
-
-                <div className="reports-summary-card">
-                    <div className="reports-summary-icon green">
-                        <i className="bi bi-bar-chart-fill"></i>
-                    </div>
-
-                    <div>
-                        <span>Total Reports</span>
-                        <strong>{totalReports}</strong>
-                    </div>
+            {error && (
+                <div className="booking-insights-error" role="alert">
+                    <i className="bi bi-exclamation-circle"></i>
+                    <span>{error}</span>
                 </div>
+            )}
 
-                <div className="reports-summary-card">
-                    <div className="reports-summary-icon orange">
-                        <i className="bi bi-calendar-check-fill"></i>
-                    </div>
-
-                    <div>
-                        <span>Booking Reports</span>
-                        <strong>{bookingReports}</strong>
-                    </div>
+            {loading ? (
+                <div className="booking-insights-state" role="status">
+                    <span className="spinner-border text-success" aria-hidden="true"></span>
+                    <span>Loading booking analytics...</span>
                 </div>
-
-                <div className="reports-summary-card">
-                    <div className="reports-summary-icon green">
-                        <i className="bi bi-person-badge-fill"></i>
-                    </div>
-
-                    <div>
-                        <span>Provider Reports</span>
-                        <strong>{providerReports}</strong>
-                    </div>
-                </div>
-
-                <div className="reports-summary-card">
-                    <div className="reports-summary-icon orange">
-                        <i className="bi bi-people-fill"></i>
-                    </div>
-
-                    <div>
-                        <span>User Reports</span>
-                        <strong>{userReports}</strong>
-                    </div>
-                </div>
-
-            </div>
-
-            {/* ANALYTICS OVERVIEW */}
-            <div className="reports-analytics-grid">
-
-                <section className="reports-analytics-card">
-
-                    <div className="reports-analytics-card-header">
-
-                        <div>
-                            <span className="analytics-label">
-                                ACTIVITY
+            ) : !error ? (
+                <>
+                    <section className="booking-insights-summary">
+                        <article className="booking-insights-kpi">
+                            <span className="booking-insights-kpi-icon green">
+                                <i className="bi bi-calendar2-check"></i>
                             </span>
-
-                            <h3>Booking Analytics</h3>
-
-                            <p>
-                                Overview of booking activity.
-                            </p>
-                        </div>
-
-                        <div className="reports-analytics-header-icon green">
-                            <i className="bi bi-calendar-check-fill"></i>
-                        </div>
-
-                    </div>
-
-                    <div className="reports-analytics-empty">
-
-                        <div className="reports-chart-icon">
-                            <i className="bi bi-bar-chart-line"></i>
-                        </div>
-
-                        <strong>
-                            No booking data available
-                        </strong>
-
-                        <span>
-                            Booking analytics will be displayed
-                            when booking data is connected.
-                        </span>
-
-                    </div>
-
-                </section>
-
-                <section className="reports-analytics-card">
-
-                    <div className="reports-analytics-card-header">
-
-                        <div>
-                            <span className="analytics-label">
-                                PROVIDER ACTIVITY
+                            <div>
+                                <span>Total booking requests</span>
+                                <strong>{analytics.totalBookings.toLocaleString()}</strong>
+                            </div>
+                        </article>
+                        <article className="booking-insights-kpi">
+                            <span className="booking-insights-kpi-icon orange">
+                                <i className="bi bi-sun"></i>
                             </span>
-
-                            <h3>Service Provider Analytics</h3>
-
-                            <p>
-                                Overview of provider activity.
-                            </p>
-                        </div>
-
-                        <div className="reports-analytics-header-icon orange">
-                            <i className="bi bi-person-badge-fill"></i>
-                        </div>
-
-                    </div>
-
-                    <div className="reports-analytics-empty">
-
-                        <div className="reports-chart-icon">
-                            <i className="bi bi-pie-chart"></i>
-                        </div>
-
-                        <strong>
-                            No provider data available
-                        </strong>
-
-                        <span>
-                            Provider analytics will be displayed
-                            when provider data is connected.
-                        </span>
-
-                    </div>
-
-                </section>
-
-            </div>
-
-            {/* REPORT FILTERS */}
-            <div className="reports-filter-card">
-
-                <div className="reports-search-box">
-
-                    <i className="bi bi-search"></i>
-
-                    <input
-                        type="text"
-                        placeholder="Search reports..."
-                        value={searchTerm}
-                        onChange={(event) =>
-                            handleSearch(
-                                event.target.value
-                            )
-                        }
-                    />
-
-                </div>
-
-                <div className="reports-filter-box">
-
-                    <label htmlFor="report-type-filter">
-                        Report Type
-                    </label>
-
-                    <select
-                        id="report-type-filter"
-                        value={reportType}
-                        onChange={(event) =>
-                            handleReportType(
-                                event.target.value
-                            )
-                        }
-                    >
-                        <option value="All">
-                            All Reports
-                        </option>
-
-                        <option value="Booking">
-                            Booking
-                        </option>
-
-                        <option value="Provider">
-                            Provider
-                        </option>
-
-                        <option value="User">
-                            User
-                        </option>
-
-                        <option value="Service">
-                            Service
-                        </option>
-
-                        <option value="Financial">
-                            Financial
-                        </option>
-                    </select>
-
-                </div>
-
-                <div className="reports-filter-box">
-
-                    <label htmlFor="report-date-filter">
-                        Date Range
-                    </label>
-
-                    <select
-                        id="report-date-filter"
-                        value={dateRange}
-                        onChange={(event) =>
-                            handleDateRange(
-                                event.target.value
-                            )
-                        }
-                    >
-                        <option value="All Time">
-                            All Time
-                        </option>
-
-                        <option value="Today">
-                            Today
-                        </option>
-
-                        <option value="This Week">
-                            This Week
-                        </option>
-
-                        <option value="This Month">
-                            This Month
-                        </option>
-
-                        <option value="This Year">
-                            This Year
-                        </option>
-                    </select>
-
-                </div>
-
-            </div>
-
-            {/* REPORT TABLE */}
-            <div className="reports-table-card">
-
-                <div className="reports-table-header">
-
-                    <div>
-                        <h3>Generated Reports</h3>
-
-                        <p>
-                            System reports and analytics
-                            records.
-                        </p>
-                    </div>
-
-                    <div className="reports-table-count">
-                        {filteredReports.length}{" "}
-                        {filteredReports.length === 1
-                            ? "report"
-                            : "reports"}
-                    </div>
-
-                </div>
-
-                <div className="reports-table-wrapper">
-
-                    <table className="reports-table">
-
-                        <thead>
-                            <tr>
-                                <th>Report ID</th>
-                                <th>Report</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            {paginatedReports.length > 0 ? (
-
-                                paginatedReports.map(
-                                    (report) => (
-                                        <tr key={report.id}>
-
-                                            <td>
-                                                <strong className="report-id">
-                                                    {report.id}
-                                                </strong>
-                                            </td>
-
-                                            <td>
-                                                <div className="report-name">
-
-                                                    <div className="report-icon">
-                                                        <i
-                                                            className={`bi ${getReportIcon(
-                                                                report.type
-                                                            )}`}
-                                                        ></i>
-                                                    </div>
-
-                                                    <div>
-                                                        <strong>
-                                                            {report.title ||
-                                                                "—"}
-                                                        </strong>
-
-                                                        <small>
-                                                            {report.description ||
-                                                                "No description"}
-                                                        </small>
-                                                    </div>
-
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <span className="report-type">
-                                                    {report.type ||
-                                                        "—"}
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <span className="report-date">
-                                                    {report.date ||
-                                                        "—"}
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <span
-                                                    className={`report-status ${getStatusClass(
-                                                        report.status
-                                                    )}`}
-                                                >
-                                                    <span className="report-status-dot"></span>
-
-                                                    {report.status ||
-                                                        "Pending"}
-                                                </span>
-                                            </td>
-
-                                            <td>
-
-                                                <div className="reports-action-buttons">
-
-                                                    <button
-                                                        type="button"
-                                                        className="reports-action-button view"
-                                                        title="View Report"
-                                                        disabled
-                                                    >
-                                                        <i className="bi bi-eye"></i>
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        className="reports-action-button download"
-                                                        title="Download Report"
-                                                        disabled
-                                                    >
-                                                        <i className="bi bi-download"></i>
-                                                    </button>
-
-                                                </div>
-
-                                            </td>
-
-                                        </tr>
-                                    )
-                                )
-
-                            ) : (
-
-                                <tr>
-
-                                    <td
-                                        colSpan="6"
-                                        className="reports-table-empty"
-                                    >
-
-                                        <div className="reports-empty-state">
-
-                                            <div className="reports-empty-icon">
-                                                <i className="bi bi-bar-chart"></i>
+                            <div>
+                                <span>Peak season</span>
+                                <strong>{analytics.peakSeason.name}</strong>
+                                <small>{analytics.peakSeason.bookings.toLocaleString()} bookings</small>
+                            </div>
+                        </article>
+                        <article className="booking-insights-kpi">
+                            <span className="booking-insights-kpi-icon blue">
+                                <i className="bi bi-grid"></i>
+                            </span>
+                            <div>
+                                <span>Most requested service</span>
+                                <strong>{preferences[0]?.name || "No data yet"}</strong>
+                                {preferences[0] && (
+                                    <small>{preferences[0].bookings.toLocaleString()} bookings</small>
+                                )}
+                            </div>
+                        </article>
+                    </section>
+
+                    <section className="booking-insights-grid">
+                        <article className="booking-insights-panel">
+                            <div className="booking-insights-panel-heading">
+                                <div>
+                                    <span className="booking-insights-eyebrow">SEASONAL DEMAND</span>
+                                    <h3>Peak Season</h3>
+                                    <p>
+                                        Bookings grouped by the month homeowners prefer service.
+                                    </p>
+                                </div>
+                                <span className="booking-insights-panel-icon orange">
+                                    <i className="bi bi-sun"></i>
+                                </span>
+                            </div>
+                            {analytics.totalBookings ? (
+                                <div className="booking-season-list">
+                                    {analytics.seasons.map((season) => (
+                                        <div className="booking-season-row" key={season.name}>
+                                            <div className="booking-season-label">
+                                                <span>{season.name}</span>
+                                                <strong>{season.bookings.toLocaleString()}</strong>
                                             </div>
-
-                                            <h4>
-                                                No reports available
-                                            </h4>
-
-                                            <p>
-                                                Reports and analytics
-                                                will appear here once
-                                                data is available.
-                                            </p>
-
+                                            <div
+                                                className="booking-insights-track"
+                                                role="img"
+                                                aria-label={`${season.name}: ${season.bookings} bookings`}
+                                            >
+                                                <span
+                                                    className="booking-insights-fill orange"
+                                                    style={{ width: `${(season.bookings / maxSeasonCount) * 100}%` }}
+                                                ></span>
+                                            </div>
                                         </div>
-
-                                    </td>
-
-                                </tr>
-
+                                    ))}
+                                    <div className="booking-season-highlights">
+                                        <span><i className="bi bi-calendar3"></i> Busiest month: <strong>{analytics.peakMonth.name}</strong></span>
+                                        <span><i className="bi bi-bar-chart"></i> Busiest quarter: <strong>{analytics.peakQuarter.name}</strong></span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="booking-insights-empty">
+                                    Booking season insights will appear when bookings have preferred dates.
+                                </div>
                             )}
+                        </article>
 
-                        </tbody>
+                        <article className="booking-insights-panel">
+                            <div className="booking-insights-panel-heading">
+                                <div>
+                                    <span className="booking-insights-eyebrow">HOMEOWNER DEMAND</span>
+                                    <h3>Service Preferences</h3>
+                                    <p>Most requested service categories across booking requests.</p>
+                                </div>
+                                <span className="booking-insights-panel-icon green">
+                                    <i className="bi bi-heart"></i>
+                                </span>
+                            </div>
+                            {preferences.length ? (
+                                <div className="booking-preference-list">
+                                    {preferences.map((preference, index) => (
+                                        <div className="booking-preference-row" key={preference.name}>
+                                            <span className="booking-preference-rank">
+                                                {String(index + 1).padStart(2, "0")}
+                                            </span>
+                                            <div className="booking-preference-main">
+                                                <div className="booking-season-label">
+                                                    <span>{preference.name}</span>
+                                                    <strong>{preference.bookings.toLocaleString()}</strong>
+                                                </div>
+                                                <div
+                                                    className="booking-insights-track"
+                                                    role="img"
+                                                    aria-label={`${preference.name}: ${preference.bookings} bookings`}
+                                                >
+                                                    <span
+                                                        className="booking-insights-fill green"
+                                                        style={{ width: `${(preference.bookings / maxPreferenceCount) * 100}%` }}
+                                                    ></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="booking-insights-empty">
+                                    Service preferences will appear when bookings are recorded.
+                                </div>
+                            )}
+                        </article>
 
-                    </table>
-
-                </div>
-
-                {/* PAGINATION */}
-                <div className="reports-pagination">
-
-                    <span>
-                        {getShowingText()}
-                    </span>
-
-                    <div className="reports-pagination-buttons">
-
-                        <button
-                            type="button"
-                            disabled={
-                                currentPage === 1
-                            }
-                            onClick={() =>
-                                setCurrentPage(
-                                    (page) =>
-                                        Math.max(
-                                            page - 1,
-                                            1
-                                        )
-                                )
-                            }
-                        >
-                            <i className="bi bi-chevron-left"></i>
-                        </button>
-
-                        {totalPages > 0 &&
-                            Array.from(
-                                {
-                                    length: totalPages,
-                                },
-                                (_, index) =>
-                                    index + 1
-                            ).map((page) => (
-                                <button
-                                    type="button"
-                                    key={page}
-                                    className={
-                                        currentPage ===
-                                            page
-                                            ? "active"
-                                            : ""
-                                    }
-                                    onClick={() =>
-                                        setCurrentPage(
-                                            page
-                                        )
-                                    }
-                                >
-                                    {page}
-                                </button>
-                            ))}
-
-                        <button
-                            type="button"
-                            disabled={
-                                totalPages === 0 ||
-                                currentPage ===
-                                totalPages
-                            }
-                            onClick={() =>
-                                setCurrentPage(
-                                    (page) =>
-                                        Math.min(
-                                            page + 1,
-                                            totalPages
-                                        )
-                                )
-                            }
-                        >
-                            <i className="bi bi-chevron-right"></i>
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+                        <article className="booking-insights-panel booking-forecast-panel">
+                            <div className="booking-insights-panel-heading">
+                                <div>
+                                    <span className="booking-insights-eyebrow">DEMAND FORECAST</span>
+                                    <h3>ARIMA Booking Trend</h3>
+                                    <p>Monthly bookings with a three-month ARIMA(1,1,1) projection.</p>
+                                </div>
+                                <span className="booking-insights-panel-icon blue">
+                                    <i className="bi bi-graph-up-arrow"></i>
+                                </span>
+                            </div>
+                            {analytics.forecastAvailable ? (
+                                <>
+                                    <div className="booking-forecast-chart">
+                                        {forecastChart.map((item) => (
+                                            <div className="booking-forecast-column" key={`${item.type}-${item.year}-${item.month}`}>
+                                                <span className="booking-forecast-value">
+                                                    {formatCount(item.count)}
+                                                </span>
+                                                <div className="booking-forecast-bar-area">
+                                                    <span
+                                                        className={`booking-forecast-bar ${item.type}`}
+                                                        style={{
+                                                            height: `${Math.max((item.count / maxForecastCount) * 100, 4)}%`,
+                                                        }}
+                                                        title={`${item.label}: ${formatCount(item.count)} ${item.type === "forecast" ? "forecast bookings" : "bookings"}`}
+                                                    ></span>
+                                                </div>
+                                                <span className="booking-forecast-month">{item.label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="booking-forecast-legend">
+                                        <span><i className="actual"></i> Historical</span>
+                                        <span><i className="forecast"></i> ARIMA forecast</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="booking-insights-empty booking-forecast-empty">
+                                    <i className="bi bi-hourglass-split"></i>
+                                    <strong>Forecast not available yet</strong>
+                                    <span>{analytics.forecastMessage}</span>
+                                </div>
+                            )}
+                        </article>
+                    </section>
+                </>
+            ) : null}
         </div>
     );
 }

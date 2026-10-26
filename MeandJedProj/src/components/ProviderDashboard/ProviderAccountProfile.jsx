@@ -690,6 +690,8 @@ export default function ProviderAccountProfile() {
         await updateProviderVerification({
             business_name: profile.fullName,
             bio: verification.qualifications || '',
+            service_category: selectedCategory,
+            service_titles: selectedServices,
             experience_years: experienceYears,
             hourly_rate: hourlyRate,
             region_name: verification.region,
