@@ -2,7 +2,15 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import func
 
 from app.common import get_session
-from app.models import Booking, Category, ProviderProfile, ProviderService, User
+from app.models import (
+    Booking,
+    Category,
+    ProviderProfile,
+    ProviderService,
+    Review,
+    User,
+    UserProfile,
+)
 
 catalog_bp = Blueprint("catalog", __name__)
 
@@ -11,6 +19,7 @@ def verified_provider_query(session):
     return (
         session.query(ProviderProfile)
         .join(User)
+        .join(UserProfile, UserProfile.user_id == User.id)
         .filter(
             User.role == "provider",
             User.is_active.is_(True),
@@ -28,6 +37,16 @@ def verified_provider_query(session):
             func.trim(ProviderProfile.id_front_path) != "",
             func.trim(ProviderProfile.id_back_path) != "",
             func.trim(ProviderProfile.service_area) != "",
+            func.trim(UserProfile.mobile_number) != "",
+            func.trim(UserProfile.gender) != "",
+            func.trim(UserProfile.address) != "",
+            UserProfile.birthday.isnot(None),
+            ProviderProfile.id.in_(
+                session.query(ProviderService.provider_id).filter(
+                    ProviderService.title.isnot(None),
+                    func.trim(ProviderService.title) != "",
+                )
+            ),
         )
     )
 
@@ -73,8 +92,23 @@ def providers():
     query_text = request.args.get("q")
     location = request.args.get("location")
     category_filter = request.args.get("category")
+    service_filter = request.args.get("service")
     with get_session() as session:
         rows = verified_provider_query(session).all()
+        review_summaries = {
+            provider_id: {"rating": float(average_rating), "reviews": review_count}
+            for provider_id, average_rating, review_count in (
+                session.query(
+                    Booking.provider_id,
+                    func.avg(Review.rating),
+                    func.count(Review.id),
+                )
+                .join(Review, Review.booking_id == Booking.id)
+                .filter(Booking.provider_id.isnot(None))
+                .group_by(Booking.provider_id)
+                .all()
+            )
+        }
         output = []
         for provider in rows:
             services = (
@@ -104,6 +138,19 @@ def providers():
                     }
                 )
             )
+            capability_names = specific_services or [
+                service.category.name
+                for service in services
+                if service.category and service.category.name
+            ]
+            service_prices = [
+                float(service.rate)
+                for service in services
+                if service.rate is not None
+            ]
+            review_summary = review_summaries.get(
+                provider.id, {"rating": 0.0, "reviews": 0}
+            )
             category_name = ", ".join(category_names) or "Service Provider"
             location_name = provider_location(provider)
             searchable = " ".join(
@@ -123,6 +170,11 @@ def providers():
                 continue
             if category_filter and category_filter.lower() not in category_name.lower():
                 continue
+            if service_filter and not any(
+                service_filter.strip().casefold() in capability.casefold()
+                for capability in capability_names
+            ):
+                continue
 
             output.append(
                 {
@@ -136,14 +188,20 @@ def providers():
                         or category_name
                     ),
                     "specificServices": specific_services,
+                    "capabilities": capability_names,
                     "qualifications": provider.qualifications or "",
                     "location": location_name,
-                    "rate": float(provider.hourly_rate or 0),
+                    "rate": min(service_prices) if service_prices else None,
+                    "servicePrices": {
+                        service.title: float(service.rate)
+                        for service in services
+                        if service.title and service.rate is not None
+                    },
                     "experience": f"{provider.experience_years or 0} years exp",
                     "availability": provider.availability_status or "Available",
                     "availabilityType": "today",
-                    "rating": 0,
-                    "reviews": 0,
+                    "rating": round(review_summary["rating"], 1),
+                    "reviews": review_summary["reviews"],
                     "image": (
                         provider.user.profile.profile_picture
                         if provider.user.profile
@@ -167,6 +225,20 @@ def provider_details(provider_id):
             session.query(ProviderService)
             .filter_by(provider_id=provider.id)
             .all()
+        )
+        reviews = (
+            session.query(Review)
+            .join(Booking, Review.booking_id == Booking.id)
+            .filter(Booking.provider_id == provider.id)
+            .order_by(Review.created_at.desc())
+            .limit(10)
+            .all()
+        )
+        average_rating, review_count = (
+            session.query(func.avg(Review.rating), func.count(Review.id))
+            .join(Booking, Review.booking_id == Booking.id)
+            .filter(Booking.provider_id == provider.id)
+            .one()
         )
         completed_jobs = (
             session.query(func.count(Booking.id))
@@ -192,8 +264,12 @@ def provider_details(provider_id):
                 "location": provider_location(provider),
                 "serviceArea": provider.service_area,
                 "rate": (
-                    float(provider.hourly_rate)
-                    if provider.hourly_rate is not None
+                    min(
+                        float(service.rate)
+                        for service in services
+                        if service.rate is not None
+                    )
+                    if any(service.rate is not None for service in services)
                     else None
                 ),
                 "experienceYears": provider.experience_years or 0,
@@ -207,6 +283,26 @@ def provider_details(provider_id):
                 ),
                 "completedJobs": completed_jobs,
                 "isVerified": provider.is_verified,
+                "rating": round(float(average_rating), 1) if average_rating else 0,
+                "reviews": review_count,
+                "reviewDetails": [
+                    {
+                        "id": review.id,
+                        "rating": review.rating,
+                        "comment": review.comment or "",
+                        "createdAt": (
+                            review.created_at.isoformat()
+                            if review.created_at
+                            else None
+                        ),
+                        "service": (
+                            review.booking.category.name
+                            if review.booking and review.booking.category
+                            else "Home service"
+                        ),
+                    }
+                    for review in reviews
+                ],
                 "services": [
                     {
                         "name": service.title

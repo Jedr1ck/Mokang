@@ -112,23 +112,31 @@
 
 /* ACTIVE STATE (Kapag na-click na): Puti na Background at Inset Curved Notch */
 .sidebar-btn.active {
-    width: 160px;
+    width: 40px;
     background-color: #f8f9fa;
-    /* Match sa background color ng Dashboard */
     color: #00b176;
-    border-top-left-radius: 21px;
-    border-bottom-left-radius: 21px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 21px;
     font-weight: bold;
     z-index: 5;
     box-shadow: none;
 }
 
 .sidebar-btn.active .link-text {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.sidebar-btn.active:hover {
+    width: 150px;
+    background-color: #e6f7f2;
+    color: #005b3c;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-btn.active:hover .link-text {
     opacity: 1;
     transform: translateX(0);
-    color: #00b176;
+    color: #005b3c;
 }
 
 .sidebar-btn.active .badge-pill,
@@ -139,29 +147,11 @@
 
 /* Curved Notch Cutouts para sa Active State */
 .sidebar-btn.active::before {
-    content: '';
-    position: absolute;
-    top: -16px;
-    right: 0;
-    width: 16px;
-    height: 16px;
-    background-color: transparent;
-    border-bottom-right-radius: 16px;
-    box-shadow: 5px 5px 0 5px #f8f9fa;
-    pointer-events: none;
+    display: none;
 }
 
 .sidebar-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -16px;
-    right: 0;
-    width: 16px;
-    height: 16px;
-    background-color: transparent;
-    border-top-right-radius: 16px;
-    box-shadow: 5px -5px 0 5px #f8f9fa;
-    pointer-events: none;
+    display: none;
 }
 
 /* Indicators / Badges */

@@ -9,6 +9,14 @@ In PowerShell, use:
 ```powershell
 Get-Content database/schema.sql | mysql -u root -p
 ```
+For an existing database, apply the complaints table migration separately:
+```powershell
+Get-Content database/migrations/20260603_create_complaints.sql | mysql -u root -p Smarthomes
+```
+To allow providers to offer multiple priced services in one category, apply:
+```powershell
+Get-Content database/migrations/20261027_allow_multiple_provider_services_per_category.sql | mysql -u root -p Smarthomes
+```
 
 ## 2. Backend
 ```bash
@@ -50,6 +58,7 @@ Optional `.env` in project root:
 - GET /providers
 - POST /provider-verification/upload-id
 - GET/PUT /provider-verification/me
+- PUT /provider-verification/services (verified providers can manage their service list)
 - POST /provider-verification/submit
 - GET /admin/providers (administrator-only provider profiles and verification status)
 - GET /admin/users/homeowners and POST /admin/users (administrator-only account management)
@@ -60,5 +69,10 @@ Optional `.env` in project root:
 - POST /bookings
 - GET /bookings/my
 - PATCH /bookings/{id}/status
+- POST /bookings/{id}/reviews (completed bookings only)
+- POST /bookings/{id}/complaints
+- GET /admin/bookings and PATCH /admin/bookings/{id}/status (administrator-only)
+- GET /admin/feedback and PATCH /admin/feedback/complaints/{id}/status (administrator-only)
+- DELETE /admin/feedback/{reviews|complaints}/{id} (administrator-only)
 
 The frontend API helper is in `src/services/api.js`.

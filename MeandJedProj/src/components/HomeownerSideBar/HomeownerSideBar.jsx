@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -71,6 +71,16 @@ const HomeownerSideBar = () => {
                     >
                         <i className="bi bi-clock-history" />
                         <span className="link-text">History</span>
+                    </Link>
+
+                    <Link
+                        to="/messages"
+                        title="Messages"
+                        className={`sidebar-btn ${isActive('/messages') ? 'active' : ''
+                            }`}
+                    >
+                        <i className="bi bi-chat-dots" />
+                        <span className="link-text">Messages</span>
                     </Link>
 
                     <Link

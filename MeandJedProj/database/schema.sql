@@ -106,6 +106,17 @@ CREATE TABLE `reviews` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Complaint reports are separate from reviews so admins can track resolution.
+CREATE TABLE `complaints` (
+  `id` bigint(20) NOT NULL,
+  `booking_id` bigint(20) NOT NULL,
+  `homeowner_id` bigint(20) NOT NULL,
+  `subject` varchar(150) NOT NULL,
+  `message` text NOT NULL,
+  `status` varchar(30) NOT NULL DEFAULT 'Pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Source: smarthomes_table_service_categories.sql
 CREATE TABLE `service_categories` (
   `id` bigint(20) NOT NULL,
@@ -187,7 +198,7 @@ ALTER TABLE `provider_profiles`
 --
 ALTER TABLE `provider_services`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `provider_id` (`provider_id`,`category_id`),
+  ADD KEY `idx_provider_services_provider` (`provider_id`),
   ADD KEY `category_id` (`category_id`);
 
 --
@@ -196,6 +207,15 @@ ALTER TABLE `provider_services`
 ALTER TABLE `reviews`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `booking_id` (`booking_id`);
+
+--
+-- Indexes for table `complaints`
+--
+ALTER TABLE `complaints`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `booking_id` (`booking_id`),
+  ADD KEY `homeowner_id` (`homeowner_id`),
+  ADD KEY `status` (`status`);
 
 --
 -- Indexes for table `service_categories`
@@ -231,6 +251,12 @@ ALTER TABLE `bookings`
 -- AUTO_INCREMENT for table `booking_status_history`
 --
 ALTER TABLE `booking_status_history`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `complaints`
+--
+ALTER TABLE `complaints`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
@@ -293,6 +319,13 @@ ALTER TABLE `bookings`
 ALTER TABLE `booking_status_history`
   ADD CONSTRAINT `booking_status_history_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `booking_status_history_ibfk_2` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `complaints`
+--
+ALTER TABLE `complaints`
+  ADD CONSTRAINT `complaints_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `complaints_ibfk_2` FOREIGN KEY (`homeowner_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `messages`

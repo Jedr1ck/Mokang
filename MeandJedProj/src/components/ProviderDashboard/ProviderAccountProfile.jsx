@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+
+import { useEffect, useState } from 'react';
 import {
     getMyProfile,
     updateMyProfile,
@@ -6,6 +7,7 @@ import {
     updateProviderVerification,
     uploadProviderId,
     submitProviderVerification,
+    updateVerifiedProviderServices,
 } from '../../services/api';
 import './ProviderAccountProfile.css';
 
@@ -18,6 +20,29 @@ const steps = [
     'Identity Verification',
     'Review & Submit',
 ];
+
+function calculateAge(birthday) {
+    if (!birthday) return null;
+    const birthDate = new Date(`${birthday}T00:00:00`);
+    if (Number.isNaN(birthDate.getTime())) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const birthdayHasPassed =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() &&
+            today.getDate() >= birthDate.getDate());
+    if (!birthdayHasPassed) age -= 1;
+    return age >= 0 ? age : null;
+}
+
+function todayDateInputValue() {
+    const today = new Date();
+    const localDate = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60_000
+    );
+    return localDate.toISOString().slice(0, 10);
+}
 
 const initialProfile = {
     fullName: '',
@@ -52,180 +77,178 @@ const idTypes = [
     'Other',
 ];
 
-
 const serviceCategories = [
     {
-        name: "Electrician",
+        name: 'Electrician',
         tasks: [
-            "Wiring Installation",
-            "Outlet and Switch Repair",
-            "Lighting Installation",
-            "Circuit Breaker Repair",
-            "Electrical Troubleshooting",
+            'Wiring Installation',
+            'Outlet and Switch Repair',
+            'Lighting Installation',
+            'Circuit Breaker Repair',
+            'Electrical Troubleshooting',
         ],
     },
     {
-        name: "Plumber",
+        name: 'Plumber',
         tasks: [
-            "Leak Repair",
-            "Clogged Drain Clearing",
-            "Faucet Installation",
-            "Pipe Replacement",
-            "Toilet Repair",
+            'Leak Repair',
+            'Clogged Drain Clearing',
+            'Faucet Installation',
+            'Pipe Replacement',
+            'Toilet Repair',
         ],
     },
     {
-        name: "Aircon Technician",
+        name: 'Aircon Technician',
         tasks: [
-            "Aircon Cleaning",
-            "Preventive Maintenance",
-            "Aircon Installation",
-            "Cooling Problem Diagnosis",
-            "Aircon Repair",
+            'Aircon Cleaning',
+            'Preventive Maintenance',
+            'Aircon Installation',
+            'Cooling Problem Diagnosis',
+            'Aircon Repair',
         ],
     },
     {
-        name: "Carpenter",
+        name: 'Carpenter',
         tasks: [
-            "Furniture Assembly",
-            "Door and Cabinet Repair",
-            "Shelf Installation",
-            "Woodwork",
-            "Custom Furniture Repair",
+            'Furniture Assembly',
+            'Door and Cabinet Repair',
+            'Shelf Installation',
+            'Woodwork',
+            'Custom Furniture Repair',
         ],
     },
     {
-        name: "Pest Control Technician",
+        name: 'Pest Control Technician',
         tasks: [
-            "Cockroach Control",
-            "Ant Control",
-            "Termite Treatment",
-            "Rodent Control",
-            "General Pest Inspection",
+            'Cockroach Control',
+            'Ant Control',
+            'Termite Treatment',
+            'Rodent Control',
+            'General Pest Inspection',
         ],
     },
     {
-        name: "Painter",
+        name: 'Painter',
         tasks: [
-            "Interior Painting",
-            "Exterior Painting",
-            "Wall Repainting",
-            "Surface Preparation",
-            "Minor Wall Touch-ups",
+            'Interior Painting',
+            'Exterior Painting',
+            'Wall Repainting',
+            'Surface Preparation',
+            'Minor Wall Touch-ups',
         ],
     },
     {
-        name: "Appliance Repair Technician",
+        name: 'Appliance Repair Technician',
         tasks: [
-            "Washing Machine Repair",
-            "Refrigerator Repair",
-            "Electric Fan Repair",
-            "Microwave Repair",
-            "Appliance Troubleshooting",
+            'Washing Machine Repair',
+            'Refrigerator Repair',
+            'Electric Fan Repair',
+            'Microwave Repair',
+            'Appliance Troubleshooting',
         ],
     },
     {
-        name: "Locksmith",
+        name: 'Locksmith',
         tasks: [
-            "Door Lock Repair",
-            "Lock Replacement",
-            "Key Duplication",
-            "Door Lock Installation",
-            "Lockout Assistance",
+            'Door Lock Repair',
+            'Lock Replacement',
+            'Key Duplication',
+            'Door Lock Installation',
+            'Lockout Assistance',
         ],
     },
     {
-        name: "Deep Cleaner",
+        name: 'Deep Cleaner',
         tasks: [
-            "Deep House Cleaning",
-            "Kitchen Cleaning",
-            "Bathroom Cleaning",
-            "Move-in / Move-out Cleaning",
-            "Upholstery Cleaning",
+            'Deep House Cleaning',
+            'Kitchen Cleaning',
+            'Bathroom Cleaning',
+            'Move-in / Move-out Cleaning',
+            'Upholstery Cleaning',
         ],
     },
     {
-        name: "Massage Therapist",
+        name: 'Massage Therapist',
         tasks: [
-            "Relaxation Massage",
-            "Swedish Massage",
-            "Traditional Massage",
-            "Full-body Massage",
-            "Targeted Muscle Relaxation",
+            'Relaxation Massage',
+            'Swedish Massage',
+            'Traditional Massage',
+            'Full-body Massage',
+            'Targeted Muscle Relaxation',
         ],
     },
     {
-        name: "Hair Stylist / Barber",
+        name: 'Hair Stylist / Barber',
         tasks: [
-            "Haircut",
-            "Hair Styling",
-            "Hair Coloring",
-            "Blow-dry",
-            "Beard Trimming",
+            'Haircut',
+            'Hair Styling',
+            'Hair Coloring',
+            'Blow-dry',
+            'Beard Trimming',
         ],
     },
     {
-        name: "Nail Technician (Manicurist/Pedicurist)",
+        name: 'Nail Technician (Manicurist/Pedicurist)',
         tasks: [
-            "Manicure",
-            "Pedicure",
-            "Nail Cleaning",
-            "Nail Polish Application",
-            "Basic Nail Art",
+            'Manicure',
+            'Pedicure',
+            'Nail Cleaning',
+            'Nail Polish Application',
+            'Basic Nail Art',
         ],
     },
     {
-        name: "Makeup Artist",
+        name: 'Makeup Artist',
         tasks: [
-            "Everyday Makeup",
-            "Event Makeup",
-            "Debut Makeup",
-            "Bridal Makeup",
-            "Photoshoot Makeup",
+            'Everyday Makeup',
+            'Event Makeup',
+            'Debut Makeup',
+            'Bridal Makeup',
+            'Photoshoot Makeup',
         ],
     },
     {
-        name: "Private Nurse / Caregiver",
+        name: 'Private Nurse / Caregiver',
         tasks: [
-            "Elderly Assistance",
-            "Personal Care Assistance",
-            "Companionship",
-            "Daily Living Support",
-            "Basic Patient Assistance",
+            'Elderly Assistance',
+            'Personal Care Assistance',
+            'Companionship',
+            'Daily Living Support',
+            'Basic Patient Assistance',
         ],
     },
     {
-        name: "Physical Therapist",
+        name: 'Physical Therapist',
         tasks: [
-            "Mobility Exercises",
-            "Rehabilitation Sessions",
-            "Movement Assessment",
-            "Therapeutic Exercise",
-            "Recovery Support",
+            'Mobility Exercises',
+            'Rehabilitation Sessions',
+            'Movement Assessment',
+            'Therapeutic Exercise',
+            'Recovery Support',
         ],
     },
     {
-        name: "Computer / CCTV Technician",
+        name: 'Computer / CCTV Technician',
         tasks: [
-            "Computer Troubleshooting",
-            "Software Installation",
-            "Computer Setup",
-            "CCTV Installation",
-            "CCTV Troubleshooting",
+            'Computer Troubleshooting',
+            'Software Installation',
+            'Computer Setup',
+            'CCTV Installation',
+            'CCTV Troubleshooting',
         ],
     },
     {
-        name: "Private Tutor / Personal Fitness Trainer",
+        name: 'Private Tutor / Personal Fitness Trainer',
         tasks: [
-            "Academic Tutoring",
-            "Subject Review",
-            "Homework Assistance",
-            "Personal Fitness Training",
-            "Workout Guidance",
+            'Academic Tutoring',
+            'Subject Review',
+            'Homework Assistance',
+            'Personal Fitness Training',
+            'Workout Guidance',
         ],
     },
 ];
-
 
 async function fetchLocations(path, signal) {
     const response = await fetch(`${PSGC_API}/${path}`, { signal });
@@ -254,15 +277,15 @@ function getLocationCode(item) {
     return item?.code ?? item?.psgcCode ?? item?.psgc_code ?? '';
 }
 
-export default function ProviderAccountProfile() {
+export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [step, setStep] = useState(0);
     const [profile, setProfile] = useState(initialProfile);
     const [verification, setVerification] = useState(initialVerification);
 
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [selectedServices, setSelectedServices] = useState([]);
+    const [selectedServicesByCategory, setSelectedServicesByCategory] = useState({});
+    const selectedCategories = Object.keys(selectedServicesByCategory);
     const [experience, setExperience] = useState('');
-    const [rate, setRate] = useState('');
+    const [serviceRatesByCategory, setServiceRatesByCategory] = useState({});
     const [workSamples, setWorkSamples] = useState([]);
 
     const [frontFile, setFrontFile] = useState(null);
@@ -277,9 +300,21 @@ export default function ProviderAccountProfile() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [addressError, setAddressError] = useState('');
     const [declaration, setDeclaration] = useState(false);
 
-    // Philippine location states
+    // Approved provider profile UI.
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [isEditingServices, setIsEditingServices] = useState(false);
+    const [serviceEditSnapshot, setServiceEditSnapshot] = useState(null);
+    const [customServiceInputs, setCustomServiceInputs] = useState({});
+    const [savingServices, setSavingServices] = useState(false);
+    const [serviceSaveError, setServiceSaveError] = useState('');
+    const [serviceSaveMessage, setServiceSaveMessage] = useState('');
+    const [photoPreview, setPhotoPreview] = useState('');
+    const [photoFileName, setPhotoFileName] = useState('');
+    const [savingProfile, setSavingProfile] = useState(false);
+
     const [regions, setRegions] = useState([]);
     const [provinces, setProvinces] = useState([]);
     const [cities, setCities] = useState([]);
@@ -287,7 +322,6 @@ export default function ProviderAccountProfile() {
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationError, setLocationError] = useState('');
 
-    // Load the user's existing profile and provider verification data.
     useEffect(() => {
         let active = true;
 
@@ -314,29 +348,67 @@ export default function ProviderAccountProfile() {
                         Object.keys(initialVerification).map((key) => [
                             key,
                             verificationData?.[key] ??
-                                ({
-                                    region: verificationData?.region_name,
-                                    province: verificationData?.province_name,
-                                    city:
-                                        verificationData?.city_municipality_name,
-                                    barangay:
-                                        verificationData?.barangay_name,
-                                    street: verificationData?.street_address,
-                                }[key]) ??
-                                previous[key],
+                            ({
+                                region: verificationData?.region_name,
+                                province: verificationData?.province_name,
+                                city: verificationData?.city_municipality_name,
+                                barangay: verificationData?.barangay_name,
+                                street: verificationData?.street_address,
+                            }[key]) ??
+                            previous[key],
                         ])
                     ),
                 }));
+
                 setExperience(
                     verificationData?.experience_years == null
                         ? ''
                         : String(verificationData.experience_years)
                 );
-                setRate(
-                    verificationData?.hourly_rate == null
-                        ? ''
-                        : String(verificationData.hourly_rate)
-                );
+
+                const savedServices = verificationData?.services || [];
+                if (savedServices.length) {
+                    setSelectedServicesByCategory(
+                        Object.fromEntries(
+                            savedServices.map((service) => [
+                                service.category,
+                                service.capabilities || [],
+                            ])
+                        )
+                    );
+                    setServiceRatesByCategory(
+                        Object.fromEntries(
+                            savedServices.map((service) => [
+                                service.category,
+                                Object.fromEntries(
+                                    (service.capabilities || []).map((title) => [
+                                        title,
+                                        service.service_rates?.[title] ??
+                                            service.rate ??
+                                            verificationData?.hourly_rate ??
+                                            '',
+                                    ])
+                                ),
+                            ])
+                        )
+                    );
+                } else if (verificationData?.service_category) {
+                    setSelectedServicesByCategory({
+                        [verificationData.service_category]:
+                            verificationData.service_titles || [],
+                    });
+                    setServiceRatesByCategory({
+                        [verificationData.service_category]: Object.fromEntries(
+                            (verificationData.service_titles || []).map((title) => [
+                                title,
+                                verificationData.hourly_rate ?? '',
+                            ])
+                        ),
+                    });
+                } else {
+                    setSelectedServicesByCategory({});
+                    setServiceRatesByCategory({});
+                }
 
                 setStatus(
                     verificationData?.verification_status || 'incomplete'
@@ -359,7 +431,6 @@ export default function ProviderAccountProfile() {
         };
     }, []);
 
-    // Load all Philippine regions.
     useEffect(() => {
         const controller = new AbortController();
 
@@ -390,7 +461,6 @@ export default function ProviderAccountProfile() {
         return () => controller.abort();
     }, []);
 
-    // Load provinces when a region is selected.
     useEffect(() => {
         const region = findLocationByName(regions, verification.region);
 
@@ -414,8 +484,6 @@ export default function ProviderAccountProfile() {
                     controller.signal
                 );
 
-                // NCR has no regular provinces.
-                // Use Metro Manila as a grouping in the Province field.
                 if (
                     data.length === 0 &&
                     /national capital region|\bncr\b/i.test(region.name)
@@ -446,7 +514,6 @@ export default function ProviderAccountProfile() {
         return () => controller.abort();
     }, [regions, verification.region]);
 
-    // Load cities and municipalities for the selected province.
     useEffect(() => {
         const region = findLocationByName(regions, verification.region);
         const province = findLocationByName(
@@ -501,7 +568,6 @@ export default function ProviderAccountProfile() {
         verification.province,
     ]);
 
-    // Load barangays for the selected city or municipality.
     useEffect(() => {
         const city = findLocationByName(cities, verification.city);
 
@@ -540,80 +606,275 @@ export default function ProviderAccountProfile() {
         return () => controller.abort();
     }, [cities, verification.city]);
 
-    // Clean up temporary ID image previews.
     useEffect(() => {
         return () => {
             if (frontPreview) URL.revokeObjectURL(frontPreview);
             if (backPreview) URL.revokeObjectURL(backPreview);
+            if (photoPreview) URL.revokeObjectURL(photoPreview);
         };
-    }, [frontPreview, backPreview]);
+    }, [frontPreview, backPreview, photoPreview]);
+
 
     const changeProfile = (event) => {
         const { name, value } = event.target;
 
         setProfile((previous) => ({
             ...previous,
-            [name]: value,
+            [name]: name === 'mobileNumber'
+                ? value.replace(/\D/g, '').slice(0, 11)
+                : value,
         }));
     };
 
     const changeVerification = (event) => {
         const { name, value } = event.target;
 
+        setAddressError('');
         setVerification((previous) => ({
             ...previous,
-            [name]: value,
+            [name]: name === 'postal_code' ? value.replace(/\D/g, '').slice(0, 4) : value,
         }));
     };
-    const toggleService = (service) => {
-        setSelectedServices((previous) =>
-            previous.includes(service)
-                ? previous.filter((item) => item !== service)
-                : [...previous, service]
-        );
-    };
 
-    const selectedCategoryData = serviceCategories.find(
-        (category) => category.name === selectedCategory
-    );
 
-    const chooseIdFile = (event, side) => {
+    const handleProfilePhotoChange = (event) => {
         const file = event.target.files?.[0];
-
         if (!file) return;
 
         if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-            setError('Choose a JPG, PNG, or WEBP image.');
+            setError('Choose a JPG, PNG, or WEBP profile photo.');
+            event.target.value = '';
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            setError('Profile photo must be 2 MB or smaller.');
+            event.target.value = '';
+            return;
+        }
+
+        setError('');
+        setMessage('');
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const imageData = reader.result;
+
+            setPhotoPreview(imageData);
+            setPhotoFileName(file.name);
+            setIsEditingProfile(true);
+
+            setProfile((previous) => ({
+                ...previous,
+                profilePicture: imageData,
+            }));
+        };
+
+        reader.onerror = () => {
+            setError('Unable to read the selected profile photo.');
+        };
+
+        reader.readAsDataURL(file);
+    };
+
+
+
+    const handleSaveProfile = async () => {
+        setSavingProfile(true);
+        setError('');
+        setMessage('');
+
+        try {
+            const updatedProfile = await updateMyProfile({
+                fullName: profile.fullName,
+                mobileNumber: profile.mobileNumber,
+                gender: profile.gender,
+                birthday: profile.birthday,
+                address: profile.address,
+                profilePicture: profile.profilePicture || null,
+            });
+
+            setProfile((previous) => ({
+                ...previous,
+                ...updatedProfile,
+                birthday: updatedProfile.birthday
+                    ? String(updatedProfile.birthday).slice(0, 10)
+                    : '',
+            }));
+            onProfileUpdated?.(updatedProfile);
+
+            setPhotoPreview('');
+            setPhotoFileName('');
+            setIsEditingProfile(false);
+            setMessage('Your profile and profile picture have been updated.');
+        } catch (err) {
+            setError(err.message || 'Unable to update your profile.');
+        } finally {
+            setSavingProfile(false);
+        }
+    };
+
+
+    const toggleCategory = (categoryName) => {
+        if (Object.hasOwn(selectedServicesByCategory, categoryName)) {
+            setSelectedServicesByCategory((previous) => {
+                const next = { ...previous };
+                delete next[categoryName];
+                return next;
+            });
+            setServiceRatesByCategory((previous) => {
+                const next = { ...previous };
+                delete next[categoryName];
+                return next;
+            });
+            return;
+        }
+        setSelectedServicesByCategory((previous) => ({
+            ...previous,
+            [categoryName]: [],
+        }));
+    };
+
+    const toggleService = (categoryName, service) => {
+        const selectedServices = selectedServicesByCategory[categoryName] || [];
+        const isSelected = selectedServices.includes(service);
+        setSelectedServicesByCategory((previous) => ({
+            ...previous,
+            [categoryName]: isSelected
+                ? selectedServices.filter((item) => item !== service)
+                : [...selectedServices, service],
+        }));
+        if (isSelected) {
+            setServiceRatesByCategory((previous) => {
+                const categoryRates = { ...(previous[categoryName] || {}) };
+                delete categoryRates[service];
+                return { ...previous, [categoryName]: categoryRates };
+            });
+        }
+    };
+
+    const changeServiceRate = (categoryName, service, value) => {
+        setServiceRatesByCategory((previous) => ({
+            ...previous,
+            [categoryName]: {
+                ...(previous[categoryName] || {}),
+                [service]: value.replace(/[^\d.]/g, ''),
+            },
+        }));
+    };
+
+    const handleNextStep = () => {
+        setError('');
+        setMessage('');
+
+        if (step === 0) {
+            if (!/^09\d{9}$/.test(profile.mobileNumber || '')) {
+                setError('Enter an 11-digit mobile number starting with 09.');
+                return;
+            }
+            if (!profile.gender || !profile.birthday) {
+                setError('Please select your gender and birthday before continuing.');
+                return;
+            }
+        }
+
+        if (step === 1) {
+            const requiredAddressFields = [
+                verification.region,
+                verification.province,
+                verification.city,
+                verification.barangay,
+            ];
+            if (requiredAddressFields.some((value) => !value?.trim())) {
+                setAddressError('Complete the region, province, city / municipality, and barangay fields.');
+                return;
+            }
+            if (verification.postal_code && !/^\d{4}$/.test(verification.postal_code)) {
+                setAddressError('Enter a valid 4-digit postal code.');
+                return;
+            }
+            setAddressError('');
+        }
+
+        if (step === 2) {
+            if (
+                !verification.business_name.trim() ||
+                experience === '' ||
+                !verification.service_area.trim()
+            ) {
+                setError('Enter your business name, years of experience, and service area.');
+                return;
+            }
+
+            const selectedTasks = selectedCategories.flatMap((category) =>
+                selectedServicesByCategory[category] || []
+            );
+            if (!selectedTasks.length) {
+                setError('Select at least one specific service you can provide.');
+                return;
+            }
+
+            const missingPrice = selectedCategories.some((category) =>
+                (selectedServicesByCategory[category] || []).some((service) => {
+                    const value = serviceRatesByCategory[category]?.[service];
+                    return value === undefined || value === '' || !Number.isFinite(Number(value));
+                })
+            );
+            if (missingPrice) {
+                setError('Enter a price for every specific service you selected.');
+                return;
+            }
+        }
+
+        if (step === 3 && !verification.id_type) {
+            setError('Select the type of valid ID you will submit.');
+            return;
+        }
+
+        setStep((current) => Math.min(steps.length - 1, current + 1));
+    };
+
+    const handleFileChange = (event, side) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setError('Please choose an image file.');
             event.target.value = '';
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            setError('Each ID image must be 5 MB or smaller.');
+            setError('Image files must be 5 MB or smaller.');
             event.target.value = '';
             return;
         }
 
         setError('');
 
-        const preview = URL.createObjectURL(file);
-
         if (side === 'front') {
             setFrontFile(file);
-            setFrontPreview(preview);
+            setFrontPreview((previous) => {
+                if (previous) URL.revokeObjectURL(previous);
+                return URL.createObjectURL(file);
+            });
             setFrontUploaded(false);
         } else {
             setBackFile(file);
-            setBackPreview(preview);
+            setBackPreview((previous) => {
+                if (previous) URL.revokeObjectURL(previous);
+                return URL.createObjectURL(file);
+            });
             setBackUploaded(false);
         }
     };
 
-    const uploadId = async (side) => {
+    const uploadIdSide = async (side) => {
         const file = side === 'front' ? frontFile : backFile;
 
         if (!file) {
-            setError(`Choose the ${side} ID image first.`);
+            setError(`Please select the ${side} side of your ID first.`);
             return;
         }
 
@@ -630,1125 +891,1238 @@ export default function ProviderAccountProfile() {
                 setBackUploaded(true);
             }
 
-            setMessage(
-                `${side === 'front' ? 'Front' : 'Back'} ID uploaded.`
-            );
+            setMessage(`${side === 'front' ? 'Front' : 'Back'} ID uploaded successfully.`);
         } catch (err) {
-            setError(err.message || 'ID upload failed.');
+            setError(err.message || 'Unable to upload your ID.');
         } finally {
             setBusy(false);
         }
     };
 
-    // Build the complete address before saving the personal profile.
-    const savePersonalInformation = async () => {
-        const fullAddress = [
+    const startServiceEdit = () => {
+        setServiceEditSnapshot({
+            services: Object.fromEntries(
+                Object.entries(selectedServicesByCategory).map(([category, titles]) => [
+                    category,
+                    [...titles],
+                ])
+            ),
+            rates: Object.fromEntries(
+                Object.entries(serviceRatesByCategory).map(([category, rates]) => [
+                    category,
+                    { ...rates },
+                ])
+            ),
+        });
+        setCustomServiceInputs({});
+        setIsEditingServices(true);
+        setServiceSaveError('');
+        setServiceSaveMessage('');
+        setError('');
+        setMessage('');
+    };
+
+    const cancelServiceEdit = () => {
+        if (serviceEditSnapshot) {
+            setSelectedServicesByCategory(serviceEditSnapshot.services);
+            setServiceRatesByCategory(serviceEditSnapshot.rates);
+        }
+        setCustomServiceInputs({});
+        setServiceEditSnapshot(null);
+        setIsEditingServices(false);
+        setServiceSaveError('');
+        setServiceSaveMessage('');
+        setError('');
+        setMessage('');
+    };
+
+    const saveServices = async () => {
+        const services = selectedCategories
+            .map((category) => ({
+                category,
+                service_titles: selectedServicesByCategory[category] || [],
+                service_rates: Object.fromEntries(
+                    (selectedServicesByCategory[category] || []).map((title) => [
+                        title,
+                        serviceRatesByCategory[category]?.[title],
+                    ])
+                ),
+            }))
+            .filter((selection) => selection.service_titles.length);
+
+        if (!services.length) {
+            setServiceSaveError('Keep at least one service on your profile.');
+            return;
+        }
+
+        const missingPrice = services.some((selection) =>
+            selection.service_titles.some((title) => {
+                const price = selection.service_rates[title];
+                return price === '' || price === undefined || !Number.isFinite(Number(price)) || Number(price) < 0;
+            })
+        );
+        if (missingPrice) {
+            setServiceSaveError('Enter a valid price for every service you offer.');
+            return;
+        }
+
+        const savedServices = services.map((selection) => ({
+            ...selection,
+            service_rates: Object.fromEntries(
+                Object.entries(selection.service_rates).map(([title, price]) => [
+                    title,
+                    Number(price),
+                ])
+            ),
+        }));
+
+        setSavingServices(true);
+        setServiceSaveError('');
+        setServiceSaveMessage('');
+        setError('');
+        setMessage('');
+        try {
+            const result = await updateVerifiedProviderServices(savedServices);
+            const persistedServices = result.services || savedServices.map((selection) => ({
+                category: selection.category,
+                capabilities: selection.service_titles,
+                service_rates: selection.service_rates,
+            }));
+            setSelectedServicesByCategory(Object.fromEntries(
+                persistedServices.map((selection) => [
+                    selection.category,
+                    selection.capabilities || [],
+                ])
+            ));
+            setServiceRatesByCategory(Object.fromEntries(
+                persistedServices.map((selection) => [
+                    selection.category,
+                    selection.service_rates || {},
+                ])
+            ));
+            setIsEditingServices(false);
+            setServiceEditSnapshot(null);
+            setServiceSaveMessage(result.message || 'Your services have been updated successfully.');
+            onProfileUpdated?.({
+                services: persistedServices.map((selection) => ({
+                    category: selection.category,
+                    capabilities: selection.capabilities || [],
+                    service_rates: selection.service_rates,
+                })),
+            });
+        } catch (err) {
+            setServiceSaveError(err.message || 'Unable to update your services.');
+        } finally {
+            setSavingServices(false);
+        }
+    };
+
+    const addCustomService = (category) => {
+        const title = (customServiceInputs[category] || '').trim();
+        if (!title) return;
+
+        if ((selectedServicesByCategory[category] || []).some(
+            (service) => service.toLowerCase() === title.toLowerCase()
+        )) {
+            setError('That service is already in your list.');
+            return;
+        }
+
+        toggleService(category, title);
+        setCustomServiceInputs((previous) => ({ ...previous, [category]: '' }));
+        setError('');
+    };
+
+    const saveApplication = async () => {
+        setBusy(true);
+        setError('');
+        setMessage('');
+
+        try {
+            const serviceSelections = selectedCategories
+                .map((category) => ({
+                    category,
+                    service_titles: selectedServicesByCategory[category] || [],
+                    service_rates: Object.fromEntries(
+                        Object.entries(serviceRatesByCategory[category] || {})
+                            .filter(([, value]) => value !== '')
+                            .map(([title, value]) => [title, Number(value)])
+                    ),
+                }))
+                .filter((selection) => selection.service_titles.length);
+
+            const address = [
+                verification.street,
+                verification.barangay,
+                verification.city,
+                verification.province,
+                verification.region,
+                verification.postal_code,
+            ].filter(Boolean).join(', ');
+
+            await updateMyProfile({
+                fullName: profile.fullName,
+                mobileNumber: profile.mobileNumber,
+                gender: profile.gender,
+                birthday: profile.birthday,
+                address: address || profile.address,
+                profilePicture: profile.profilePicture || null,
+            });
+
+            await updateProviderVerification({
+                ...verification,
+
+                // Address fields expected by the backend
+                region_name: verification.region,
+                province_name: verification.province,
+                city_municipality_name: verification.city,
+                barangay_name: verification.barangay,
+                street_address: verification.street,
+
+                service_category: serviceSelections[0]?.category || null,
+                service_categories: selectedCategories,
+                service_titles: serviceSelections[0]?.service_titles || [],
+                services: serviceSelections,
+                experience_years: experience ? Number(experience) : null,
+                work_samples: workSamples,
+            });
+
+            onProfileUpdated?.({
+                fullName: profile.fullName,
+                profilePicture: profile.profilePicture,
+                services: serviceSelections.map((selection) => ({
+                    category: selection.category,
+                    capabilities: selection.service_titles,
+                    service_rates: selection.service_rates,
+                })),
+            });
+
+            await submitProviderVerification();
+            setStatus('pending');
+            setMessage(
+                'Your provider application has been submitted for review.'
+            );
+        } catch (err) {
+            setError(err.message || 'Unable to save your application.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const detail = (label, value) => (
+        <div className="profile-detail-item" key={label}>
+            <span>{label}</span>
+            <strong>{value || 'Not provided'}</strong>
+        </div>
+    );
+    const editableServiceCategories = [
+        ...serviceCategories,
+        ...selectedCategories
+            .filter((category) => !serviceCategories.some((item) => item.name === category))
+            .map((name) => ({ name, tasks: [] })),
+    ];
+
+    if (loading) {
+        return (
+            <section className="provider-profile-page">
+                <div className="provider-application-card">
+                    <p>Loading your provider profile...</p>
+                </div>
+            </section>
+        );
+    }
+
+
+    if (status === 'verified') {
+        const serviceLocation = [
             verification.street,
             verification.barangay,
             verification.city,
             verification.province,
             verification.region,
             verification.postal_code,
-        ]
-            .filter(Boolean)
-            .join(', ');
+        ].filter(Boolean).join(', ');
 
-        await updateMyProfile({
-            fullName: profile.fullName,
-            mobileNumber: profile.mobileNumber,
-            gender: profile.gender,
-            birthday: profile.birthday,
-            address: fullAddress,
-            profilePicture: profile.profilePicture || null,
-        });
-    };
+        const profilePhoto = photoPreview || profile.profilePicture || '';
 
-    const saveVerificationDetails = async () => {
-        const experienceYears = Number(experience);
-        const hourlyRate = Number(rate);
-
-        if (
-            experience.trim() === '' ||
-            !Number.isInteger(experienceYears) ||
-            experienceYears < 0
-        ) {
-            throw new Error(
-                'Enter your experience as a whole number, such as 3.'
-            );
-        }
-
-        if (
-            rate.trim() === '' ||
-            !Number.isFinite(hourlyRate) ||
-            hourlyRate < 0
-        ) {
-            throw new Error(
-                'Enter your service rate as a number, such as 350.'
-            );
-        }
-
-        await updateProviderVerification({
-            business_name: profile.fullName,
-            bio: verification.qualifications || '',
-            service_category: selectedCategory,
-            service_titles: selectedServices,
-            experience_years: experienceYears,
-            hourly_rate: hourlyRate,
-            region_name: verification.region,
-            province_name: verification.province,
-            city_municipality_name: verification.city,
-            barangay_name: verification.barangay,
-            street_address: verification.street,
-            postal_code: verification.postal_code || null,
-            id_type: verification.id_type || 'Not selected',
-            service_area: verification.service_area || 'Not specified',
-        });
-    };
-
-    const nextStep = async () => {
-        setError('');
-        setMessage('');
-
-        try {
-            if (step === 0) {
-                if (
-                    !profile.fullName?.trim() ||
-                    !profile.email?.trim() ||
-                    !profile.mobileNumber?.trim() ||
-                    !profile.gender ||
-                    !profile.birthday
-                ) {
-                    setError(
-                        'Complete all required personal information.'
-                    );
-                    return;
-                }
-
-                // Do not call the complete-profile endpoint yet.
-                // The full address will be saved after Step 2.
-            }
-
-            if (step === 1) {
-                const required = [
-                    'region',
-                    'province',
-                    'city',
-                    'barangay',
-                    'street',
-                ];
-
-                if (
-                    required.some(
-                        (key) => !verification[key]?.trim()
-                    )
-                ) {
-                    setError('Complete all required address fields.');
-                    return;
-                }
-
-                const validRegion = findLocationByName(
-                    regions,
-                    verification.region
-                );
-                const validProvince = findLocationByName(
-                    provinces,
-                    verification.province
-                );
-                const validCity = findLocationByName(
-                    cities,
-                    verification.city
-                );
-                const validBarangay = findLocationByName(
-                    barangays,
-                    verification.barangay
-                );
-
-                if (
-                    !validRegion ||
-                    !validProvince ||
-                    !validCity ||
-                    !validBarangay
-                ) {
-                    setError(
-                        'Select a valid Region, Province, City/Municipality, and Barangay from the suggestions.'
-                    );
-                    return;
-                }
-
-                setBusy(true);
-            }
-
-            if (step === 2) {
-                if (
-                    selectedServices.length === 0 ||
-                    !verification.qualifications.trim() ||
-                    !experience.trim() ||
-                    !rate.trim() ||
-                    !verification.service_area.trim()
-                ) {
-                    setError(
-                        'Select a service and complete qualifications, experience, rate, and service area.'
-                    );
-                    return;
-                }
-
-                setBusy(true);
-                await saveVerificationDetails();
-            }
-
-            if (step === 3) {
-                if (!verification.id_type) {
-                    setError('Select your valid ID type.');
-                    return;
-                }
-
-                if (!frontUploaded || !backUploaded) {
-                    setError(
-                        'Upload both the front and back of your ID before continuing.'
-                    );
-                    return;
-                }
-            }
-
-            setStep((current) =>
-                Math.min(current + 1, steps.length - 1)
-            );
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth',
-            });
-        } catch (err) {
-            setError(err.message || 'Unable to save your information.');
-        } finally {
-            setBusy(false);
-        }
-    };
-
-    const previousStep = () => {
-        setError('');
-        setMessage('');
-
-        setStep((current) => Math.max(current - 1, 0));
-    };
-
-    const handleSubmit = async () => {
-        if (!declaration) {
-            setError(
-                'Please confirm that your information is accurate.'
-            );
-            return;
-        }
-
-        if (status === 'pending') {
-            setError(
-                'Your application is already pending admin review.'
-            );
-            return;
-        }
-
-        if (status === 'verified') {
-            setError('Your provider account is already verified.');
-            return;
-        }
-
-        setBusy(true);
-        setError('');
-        setMessage('');
-
-        try {
-            // Save complete personal information and address.
-            await savePersonalInformation();
-
-            // Save verification details.
-            await saveVerificationDetails();
-
-            // Submit to the backend for admin review.
-            const result = await submitProviderVerification();
-
-            setStatus(result.verification_status || 'pending');
-
-            setMessage(
-                result.message ||
-                'Application submitted. Please wait for admin review.'
-            );
-        } catch (err) {
-            setError(
-                err.message || 'Unable to submit your application.'
-            );
-        } finally {
-            setBusy(false);
-        }
-    };
-
-    if (loading) {
         return (
-            <section className="provider-profile-page">
-                Loading application...
+            <section className="provider-profile-page verified-profile-page">
+                {error && <div className="alert alert-danger" role="alert">{error}</div>}
+                {message && <div className="alert alert-success" role="status">{message}</div>}
+
+                <header className="provider-profile-title-row">
+                    <div>
+                        <h1>My Profile</h1>
+                        <p>Manage your personal information, service details, and account settings.</p>
+                    </div>
+                    <div className="provider-profile-breadcrumb">
+                        <span>Home</span><span>›</span><strong>Profile</strong>
+                    </div>
+                </header>
+
+                <section className="provider-profile-hero">
+                    <div className="provider-profile-hero-avatar">
+                        {profilePhoto
+                            ? <img src={profilePhoto} alt="Provider profile" />
+                            : <span>{profile.fullName?.charAt(0)?.toUpperCase() || 'P'}</span>}
+
+                        <label className="provider-avatar-camera" title="Change profile photo">
+                            <i className="bi bi-camera-fill" />
+                            <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={handleProfilePhotoChange}
+                                aria-label="Change profile photo"
+                            />
+                        </label>
+                    </div>
+
+                    <div className="provider-profile-hero-details">
+                        <div className="provider-profile-name-row">
+                            <h2>{profile.fullName || 'Service Provider'}</h2>
+                            <span className="provider-role-pill">Provider</span>
+                        </div>
+
+                        <p className="provider-profile-tagline">
+                            Reliable home service provider ready to help you.
+                        </p>
+
+                        <div className="provider-profile-contact-row">
+                            {profile.mobileNumber && (
+                                <span><i className="bi bi-telephone-fill" /> {profile.mobileNumber}</span>
+                            )}
+                            {profile.email && (
+                                <span><i className="bi bi-envelope-fill" /> {profile.email}</span>
+                            )}
+                            {(profile.address || serviceLocation) && (
+                                <span><i className="bi bi-geo-alt-fill" /> {profile.address || serviceLocation}</span>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="provider-profile-hero-status">
+                        <span><i className="bi bi-patch-check-fill" /> Verified Provider</span>
+                        <small>Your account has been verified.</small>
+                    </div>
+                </section>
+
+                <nav className="provider-profile-tabs" aria-label="Profile sections">
+                    <button
+                        type="button"
+                        className="active"
+                        onClick={() => document.getElementById('provider-personal-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    >
+                        <i className="bi bi-person-fill" /> Personal Information
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => document.getElementById('provider-service-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    >
+                        <i className="bi bi-briefcase-fill" /> Service Information
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => document.getElementById('provider-security-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    >
+                        <i className="bi bi-lock-fill" /> Account Security
+                    </button>
+                </nav>
+
+                <div className="provider-profile-content-grid">
+                    <div className="provider-profile-main-column">
+                        <section id="provider-personal-panel" className="provider-profile-panel">
+                            <div className="provider-panel-heading">
+                                <i className="bi bi-person provider-heading-icon" />
+                                <div>
+                                    <h3>Personal Information</h3>
+                                    <p>Update your personal details and contact information.</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="provider-edit-details-button"
+                                    onClick={() => {
+                                        setIsEditingProfile(current => !current);
+                                        setError('');
+                                        setMessage('');
+                                    }}
+                                >
+                                    <i className={`bi ${isEditingProfile ? 'bi-x-lg' : 'bi-pencil-fill'}`} />
+                                    {isEditingProfile ? 'Cancel Edit' : 'Edit Details'}
+                                </button>
+                            </div>
+
+                            {isEditingProfile ? (
+                                <div className="provider-profile-form-grid">
+                                    <div>
+                                        <label className="form-label" htmlFor="approved-fullName">Full Name <b>*</b></label>
+                                        <input id="approved-fullName" className="form-control" value={profile.fullName || ''} readOnly />
+                                    </div>
+                                    <div>
+                                        <label className="form-label" htmlFor="approved-email">Email Address <b>*</b></label>
+                                        <input id="approved-email" className="form-control" value={profile.email || ''} readOnly />
+                                    </div>
+                                    <div>
+                                        <label className="form-label" htmlFor="approved-mobile">Phone Number <b>*</b></label>
+                                        <input
+                                            id="approved-mobile"
+                                            className="form-control"
+                                            type="tel"
+                                            inputMode="numeric"
+                                            maxLength={11}
+                                            pattern="09[0-9]{9}"
+                                            placeholder="09XXXXXXXXX"
+                                            name="mobileNumber"
+                                            value={profile.mobileNumber || ''}
+                                            onChange={changeProfile}
+                                        />
+                                        <small className="provider-field-hint">Exactly 11 digits, starting with 09.</small>
+                                    </div>
+                                    <div>
+                                        <label className="form-label" htmlFor="approved-birthday">Date of Birth</label>
+                                        <input
+                                            id="approved-birthday"
+                                            type="date"
+                                            className="form-control"
+                                            name="birthday"
+                                            max={todayDateInputValue()}
+                                            value={profile.birthday || ''}
+                                            onChange={changeProfile}
+                                        />
+                                        <small className="provider-field-hint">
+                                            {calculateAge(profile.birthday) === null
+                                                ? 'Age will appear after selecting your birthday.'
+                                                : `Age: ${calculateAge(profile.birthday)} years old`}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <label className="form-label" htmlFor="approved-gender">Gender</label>
+                                        <select
+                                            id="approved-gender"
+                                            className="form-select"
+                                            name="gender"
+                                            value={profile.gender || ''}
+                                            onChange={changeProfile}
+                                        >
+                                            <option value="">Select gender</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="form-label" htmlFor="approved-address">Address <b>*</b></label>
+                                        <input
+                                            id="approved-address"
+                                            className="form-control"
+                                            name="address"
+                                            value={profile.address || ''}
+                                            onChange={changeProfile}
+                                        />
+                                    </div>
+                                    <div className="provider-profile-form-actions">
+                                        <button
+                                            type="button"
+                                            className="provider-profile-save-button"
+                                            onClick={handleSaveProfile}
+                                            disabled={savingProfile}
+                                        >
+                                            <i className="bi bi-floppy" />
+                                            {savingProfile ? 'Saving...' : 'Save Changes'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="provider-profile-cancel-button"
+                                            onClick={() => setIsEditingProfile(false)}
+                                            disabled={savingProfile}
+                                        >
+                                            <i className="bi bi-x-lg" /> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="provider-profile-read-grid">
+                                    <div><span>Full Name <b>*</b></span><strong>{profile.fullName || 'Not provided'}</strong></div>
+                                    <div><span>Email Address <b>*</b></span><strong>{profile.email || 'Not provided'}</strong></div>
+                                    <div><span>Phone Number <b>*</b></span><strong>{profile.mobileNumber || 'Not provided'}</strong></div>
+                                    <div><span>Date of Birth / Age</span><strong>{profile.birthday ? `${profile.birthday} · ${calculateAge(profile.birthday)} years old` : 'Not provided'}</strong></div>
+                                    <div><span>Gender</span><strong>{profile.gender || 'Not provided'}</strong></div>
+                                    <div><span>Address <b>*</b></span><strong>{profile.address || serviceLocation || 'Not provided'}</strong></div>
+                                </div>
+                            )}
+                        </section>
+
+                        <section id="provider-service-panel" className="provider-profile-panel">
+                            <div className="provider-panel-heading">
+                                <i className="bi bi-briefcase provider-heading-icon" />
+                                <div>
+                                    <h3>Service Information</h3>
+                                    <p>Your business details, experience, and service area.</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="provider-edit-details-button"
+                                    onClick={isEditingServices ? cancelServiceEdit : startServiceEdit}
+                                    disabled={savingServices}
+                                >
+                                    <i className={`bi ${isEditingServices ? 'bi-x-lg' : 'bi-pencil-fill'}`} />
+                                    {isEditingServices ? 'Cancel Edit' : 'Edit Services'}
+                                </button>
+                            </div>
+                            {serviceSaveError && (
+                                <div className="alert alert-danger" role="alert">
+                                    {serviceSaveError}
+                                </div>
+                            )}
+                            {serviceSaveMessage && (
+                                <div className="alert alert-success" role="status">
+                                    {serviceSaveMessage}
+                                </div>
+                            )}
+                            {isEditingServices ? (
+                                <div className="provider-service-editor">
+                                    <p className="provider-service-editor-hint">
+                                        Select the services you offer, set each price, or add a custom service.
+                                    </p>
+                                    <div className="provider-service-category-options">
+                                        {editableServiceCategories.map((category) => (
+                                            <label className="provider-service-category-option" key={category.name}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={Object.hasOwn(selectedServicesByCategory, category.name)}
+                                                    onChange={() => toggleCategory(category.name)}
+                                                    disabled={savingServices}
+                                                />
+                                                <span>{category.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {selectedCategories.map((categoryName) => {
+                                        const category = editableServiceCategories.find(
+                                            (item) => item.name === categoryName
+                                        );
+                                        const services = [
+                                            ...(category?.tasks || []),
+                                            ...(selectedServicesByCategory[categoryName] || [])
+                                                .filter((title) => !(category?.tasks || []).includes(title)),
+                                        ];
+
+                                        return (
+                                            <div className="provider-service-task-selection" key={categoryName}>
+                                                <strong className="provider-service-editor-category">
+                                                    {categoryName} — services offered
+                                                </strong>
+                                                <div className="provider-service-task-grid">
+                                                    {services.map((service, index) => {
+                                                        const inputId = `profile-service-${categoryName}-${index}`.replace(/[^a-zA-Z0-9-]/g, '-');
+                                                        const isSelected = selectedServicesByCategory[categoryName]?.includes(service) || false;
+                                                        return (
+                                                            <div className={`provider-service-task-option${isSelected ? ' selected' : ''}`} key={service}>
+                                                                <label htmlFor={inputId}>
+                                                                    <input
+                                                                        id={inputId}
+                                                                        type="checkbox"
+                                                                        checked={isSelected}
+                                                                        onChange={() => toggleService(categoryName, service)}
+                                                                        disabled={savingServices}
+                                                                    />
+                                                                    <span>{service}</span>
+                                                                </label>
+                                                                {isSelected && (
+                                                                    <div className="provider-service-price">
+                                                                        <span>₱</span>
+                                                                        <input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            step="1"
+                                                                            inputMode="decimal"
+                                                                            placeholder="Price"
+                                                                            aria-label={`Price for ${service}`}
+                                                                            value={serviceRatesByCategory[categoryName]?.[service] ?? ''}
+                                                                            onChange={(event) => changeServiceRate(categoryName, service, event.target.value)}
+                                                                            disabled={savingServices}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <div className="provider-add-service-row">
+                                                    <input
+                                                        className="form-control"
+                                                        maxLength={150}
+                                                        placeholder="Enter another service"
+                                                        aria-label={`Add a service to ${categoryName}`}
+                                                        value={customServiceInputs[categoryName] || ''}
+                                                        disabled={savingServices}
+                                                        onChange={(event) => setCustomServiceInputs((previous) => ({
+                                                            ...previous,
+                                                            [categoryName]: event.target.value,
+                                                        }))}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="provider-add-service-button"
+                                                        onClick={() => addCustomService(categoryName)}
+                                                        disabled={savingServices}
+                                                    >
+                                                        Add Service
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                    <div className="provider-service-edit-actions">
+                                        <button
+                                            type="button"
+                                            className="provider-profile-cancel-button"
+                                            onClick={cancelServiceEdit}
+                                            disabled={savingServices}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="provider-profile-save-button"
+                                            onClick={saveServices}
+                                            disabled={savingServices}
+                                        >
+                                            {savingServices ? 'Saving...' : 'Save Services'}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="provider-profile-read-grid">
+                                    <div><span>Business Name</span><strong>{verification.business_name || profile.fullName || 'Not provided'}</strong></div>
+                                    <div><span>Service Categories</span><strong>{selectedCategories.join(', ') || 'Not provided'}</strong></div>
+                                    <div><span>Experience</span><strong>{experience ? `${experience} years` : 'Not provided'}</strong></div>
+                                    <div className="provider-profile-wide-field">
+                                        <span>Prices per Specific Service</span>
+                                        <strong>
+                                            {selectedCategories.flatMap((category) =>
+                                                (selectedServicesByCategory[category] || []).map((service) => {
+                                                    const price = serviceRatesByCategory[category]?.[service];
+                                                    return `${service}: ${price === undefined || price === '' ? 'Not provided' : `₱${price}`}`;
+                                                })
+                                            ).join(' · ') || 'Not provided'}
+                                        </strong>
+                                    </div>
+                                    <div><span>Service Location</span><strong>{serviceLocation || 'Not provided'}</strong></div>
+                                    <div><span>Service Area</span><strong>{verification.service_area || 'Not provided'}</strong></div>
+                                    <div className="provider-profile-wide-field">
+                                        <span>Qualifications / Certifications</span>
+                                        <strong>{verification.qualifications || 'Not provided'}</strong>
+                                    </div>
+                                </div>
+                            )}
+                        </section>
+
+                        <section id="provider-security-panel" className="provider-profile-panel">
+                            <div className="provider-panel-heading">
+                                <i className="bi bi-shield-lock provider-heading-icon" />
+                                <div>
+                                    <h3>Account Security</h3>
+                                    <p>Your provider account verification status.</p>
+                                </div>
+                            </div>
+                            <div className="provider-security-status-box">
+                                <i className="bi bi-check-circle-fill" />
+                                <div>
+                                    <strong>Verified Provider</strong>
+                                    <span>Your account has been verified.</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <aside className="provider-profile-side-column">
+                        <section className="provider-profile-side-card">
+                            <h3><i className="bi bi-image" /> Profile Picture</h3>
+
+                            <div className="provider-profile-photo-preview">
+                                {profilePhoto
+                                    ? <img src={profilePhoto} alt="Profile preview" />
+                                    : <span>{profile.fullName?.charAt(0)?.toUpperCase() || 'P'}</span>}
+                                <span className="provider-photo-camera-small"><i className="bi bi-camera-fill" /></span>
+                            </div>
+
+                            <p>Upload a clear profile picture<br />(Recommended: 1:1 ratio, max 5MB)</p>
+
+                            <div className="provider-profile-photo-actions">
+                                <label className="provider-upload-photo-button">
+                                    <i className="bi bi-upload" /> Upload Photo
+                                    <input
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        onChange={handleProfilePhotoChange}
+                                    />
+                                </label>
+                                <button
+                                    type="button"
+                                    className="provider-remove-photo-button"
+                                    onClick={() => {
+                                        setPhotoPreview('');
+                                        setPhotoFileName('');
+                                        setProfile(previous => ({ ...previous, profilePicture: '' }));
+                                    }}
+                                    disabled={!photoPreview && !profile.profilePicture}
+                                >
+                                    <i className="bi bi-trash3" /> Remove
+                                </button>
+                            </div>
+                            <small className="provider-photo-disclaimer">
+                                Photo changes are preview-only unless the existing API supports profile photo uploads.
+                            </small>
+                        </section>
+
+                        <section className="provider-profile-side-card">
+                            <h3><i className="bi bi-shield-fill-check" /> Account Status</h3>
+                            <div className="provider-account-status-content">
+                                <i className="bi bi-check-circle-fill" />
+                                <div>
+                                    <strong>Verified Provider</strong>
+                                    <span>Your account has been verified.</span>
+                                </div>
+                            </div>
+                        </section>
+                    </aside>
+                </div>
             </section>
         );
     }
 
-    const field = (label, name, options = {}) => (
-        <div className="mb-3" key={name}>
-            <label className="form-label" htmlFor={name}>
-                {label}
-                {options.required ? ' *' : ''}
-            </label>
 
-            <input
-                id={name}
-                name={name}
-                className="form-control"
-                type={options.type || 'text'}
-                value={
-                    options.profile
-                        ? profile[name] || ''
-                        : verification[name] || ''
-                }
-                onChange={
-                    options.profile
-                        ? changeProfile
-                        : changeVerification
-                }
-                required={Boolean(options.required)}
-                readOnly={Boolean(options.readOnly)}
-            />
-        </div>
-    );
-
-    const detail = (label, value) => (
-        <div className="col-md-6 mb-3" key={label}>
-            <span className="form-label d-block mb-1">{label}</span>
-            <strong>{value || '—'}</strong>
-        </div>
-    );
-
-    if (status === 'verified') {
-        return (
-            <section className="provider-profile-page">
-                <div className="provider-application-heading">
-                    <span className="text-success fw-semibold">
-                        VERIFIED PROVIDER
-                    </span>
-                    <h2>Your Provider Information</h2>
-                    <p>
-                        Your provider application has been approved. Your
-                        submitted information is shown below.
-                    </p>
-                </div>
-
-                <div className="alert alert-success" role="status">
-                    Your provider account is verified.
-                </div>
-
-                <div className="provider-application-card">
-                    <h3>Personal Information</h3>
-                    <div className="row mt-3">
-                        {detail('Full Name', profile.fullName)}
-                        {detail('Email', profile.email)}
-                        {detail('Mobile Number', profile.mobileNumber)}
-                        {detail('Gender', profile.gender)}
-                        {detail('Birthday', profile.birthday)}
-                        {detail('Address', profile.address)}
-                    </div>
-
-                    <h3 className="mt-3">Provider Information</h3>
-                    <div className="row mt-3">
-                        {detail('Business Name', verification.business_name)}
-                        {detail(
-                            'Service Location',
-                            [
-                                verification.street,
-                                verification.barangay,
-                                verification.city,
-                                verification.province,
-                                verification.region,
-                                verification.postal_code,
-                            ]
-                                .filter(Boolean)
-                                .join(', ')
-                        )}
-                        {detail('Qualifications', verification.qualifications)}
-                        {detail('Service Area', verification.service_area)}
-                        {detail(
-                            'Experience',
-                            experience ? `${experience} years` : ''
-                        )}
-                        {detail(
-                            'Hourly Rate',
-                            rate ? `₱${rate}` : ''
-                        )}
-                    </div>
-                </div>
-            </section>
-        );
-    }
 
     return (
         <section className="provider-profile-page">
             <div className="provider-application-heading">
-                <span className="text-success fw-semibold">
-                    PROVIDER APPLICATION
-                </span>
-
-                <h2>My Provider Profile & Verification</h2>
-
-                <p>
-                    Complete your details to apply for provider verification.
-                </p>
+                <span>SMART HOME SERVICES</span>
+                <h2>Provider Verification</h2>
+                <p>Complete your information to become a verified service provider.</p>
             </div>
 
-            <div className="alert alert-info">
-                Verification status: <strong>{status}</strong>
-            </div>
+            {error && <div className="alert alert-danger" role="alert">{error}</div>}
+            {message && <div className="alert alert-success" role="status">{message}</div>}
 
-            {message && (
-                <div className="alert alert-success" role="status">
-                    {message}
+            {status === 'pending' ? (
+                <div className="provider-application-card">
+                    <h3>Application Under Review</h3>
+                    <p>Your provider application has been submitted and is awaiting review.</p>
+                    <p>You will be able to manage your provider profile after approval.</p>
                 </div>
-            )}
-
-            {error && (
-                <div className="alert alert-danger" role="alert">
-                    {error}
+            ) : status === 'rejected' ? (
+                <div className="provider-application-card">
+                    <h3>Application Needs Attention</h3>
+                    <p>Your application was not approved. Please review your information and resubmit if the system allows it.</p>
                 </div>
-            )}
-
-            <div className="provider-step-progress">
-                {steps.map((label, index) => (
-                    <div
-                        className={`provider-step ${index === step ? 'active' : ''
-                            } ${index < step ? 'completed' : ''}`}
-                        key={label}
-                    >
-                        <span>{index + 1}</span>
-                        <small>{label}</small>
-                    </div>
-                ))}
-            </div>
-
-            <div className="provider-application-card">
-                <h3>{steps[step]}</h3>
-
-                {/* STEP 1: PERSONAL INFORMATION */}
-                {step === 0 && (
-                    <div className="row">
-                        <div className="col-md-6">
-                            {field('Full Name', 'fullName', {
-                                profile: true,
-                                required: true,
-                                readOnly: true,
-                            })}
-                        </div>
-
-                        <div className="col-md-6">
-                            {field('Email', 'email', {
-                                profile: true,
-                                required: true,
-                                readOnly: true,
-                            })}
-                        </div>
-
-                        <div className="col-md-6">
-                            {field('Mobile Number', 'mobileNumber', {
-                                profile: true,
-                                required: true,
-                                type: 'tel',
-                            })}
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="gender"
-                            >
-                                Gender *
-                            </label>
-
-                            <select
-                                id="gender"
-                                name="gender"
-                                className="form-select"
-                                value={profile.gender || ''}
-                                onChange={changeProfile}
-                                required
-                            >
-                                <option value="">Select gender</option>
-                                <option value="Female">Female</option>
-                                <option value="Male">Male</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        <div className="col-md-6">
-                            {field('Birthday', 'birthday', {
-                                profile: true,
-                                required: true,
-                                type: 'date',
-                            })}
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="profilePicture"
-                            >
-                                Profile Picture URL
-                            </label>
-
-                            <input
-                                id="profilePicture"
-                                className="form-control"
-                                value={profile.profilePicture || ''}
-                                readOnly
-                                placeholder="Profile picture upload will be connected separately"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {/* STEP 2: COMPLETE ADDRESS */}
-                {step === 1 && (
-                    <div className="row">
-                        <p className="text-muted">
-                            Search and select your actual Philippine
-                            location. Each list depends on your previous
-                            selection.
-                        </p>
-
-                        {locationLoading && (
-                            <p className="text-muted" role="status">
-                                Loading Philippine locations...
-                            </p>
-                        )}
-
-                        {locationError && (
+            ) : (
+                <>
+                    <div className="provider-step-progress">
+                        {steps.map((label, index) => (
                             <div
-                                className="alert alert-warning"
-                                role="alert"
+                                key={label}
+                                className={`provider-step ${step === index
+                                    ? 'active'
+                                    : step > index
+                                        ? 'completed'
+                                        : ''
+                                    }`}
                             >
-                                {locationError}
+                                <span>{step > index ? '✓' : index + 1}</span>
+                                <small>{label}</small>
                             </div>
-                        )}
-
-                        <div className="col-md-6 mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="region"
-                            >
-                                Region *
-                            </label>
-
-                            <input
-                                id="region"
-                                name="region"
-                                className="form-control"
-                                list="provider-regions"
-                                autoComplete="off"
-                                placeholder="Type to search region"
-                                value={verification.region}
-                                onChange={(event) =>
-                                    setVerification((previous) => ({
-                                        ...previous,
-                                        region: event.target.value,
-                                        province: '',
-                                        city: '',
-                                        barangay: '',
-                                    }))
-                                }
-                                required
-                            />
-
-                            <datalist id="provider-regions">
-                                {regions.map((item) => (
-                                    <option
-                                        key={getLocationCode(item)}
-                                        value={item.name}
-                                    />
-                                ))}
-                            </datalist>
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="province"
-                            >
-                                Province *
-                            </label>
-
-                            <input
-                                id="province"
-                                name="province"
-                                className="form-control"
-                                list="provider-provinces"
-                                autoComplete="off"
-                                placeholder="Select a region first"
-                                value={verification.province}
-                                disabled={
-                                    !findLocationByName(
-                                        regions,
-                                        verification.region
-                                    )
-                                }
-                                onChange={(event) =>
-                                    setVerification((previous) => ({
-                                        ...previous,
-                                        province: event.target.value,
-                                        city: '',
-                                        barangay: '',
-                                    }))
-                                }
-                                required
-                            />
-
-                            <datalist id="provider-provinces">
-                                {provinces.map((item) => (
-                                    <option
-                                        key={getLocationCode(item)}
-                                        value={item.name}
-                                    />
-                                ))}
-                            </datalist>
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="city"
-                            >
-                                City / Municipality *
-                            </label>
-
-                            <input
-                                id="city"
-                                name="city"
-                                className="form-control"
-                                list="provider-cities"
-                                autoComplete="off"
-                                placeholder="Select a province first"
-                                value={verification.city}
-                                disabled={
-                                    !findLocationByName(
-                                        provinces,
-                                        verification.province
-                                    )
-                                }
-                                onChange={(event) =>
-                                    setVerification((previous) => ({
-                                        ...previous,
-                                        city: event.target.value,
-                                        barangay: '',
-                                    }))
-                                }
-                                required
-                            />
-
-                            <datalist id="provider-cities">
-                                {cities.map((item) => (
-                                    <option
-                                        key={getLocationCode(item)}
-                                        value={item.name}
-                                    />
-                                ))}
-                            </datalist>
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="barangay"
-                            >
-                                Barangay *
-                            </label>
-
-                            <input
-                                id="barangay"
-                                name="barangay"
-                                className="form-control"
-                                list="provider-barangays"
-                                autoComplete="off"
-                                placeholder="Select a city/municipality first"
-                                value={verification.barangay}
-                                disabled={
-                                    !findLocationByName(
-                                        cities,
-                                        verification.city
-                                    )
-                                }
-                                onChange={(event) =>
-                                    setVerification((previous) => ({
-                                        ...previous,
-                                        barangay: event.target.value,
-                                    }))
-                                }
-                                required
-                            />
-
-                            <datalist id="provider-barangays">
-                                {barangays.map((item) => (
-                                    <option
-                                        key={getLocationCode(item)}
-                                        value={item.name}
-                                    />
-                                ))}
-                            </datalist>
-                        </div>
-
-                        <div className="col-md-8">
-                            {field(
-                                'House No. / Street / Subdivision',
-                                'street',
-                                { required: true }
-                            )}
-                        </div>
-
-                        <div className="col-md-4">
-                            {field('Postal Code', 'postal_code')}
-                        </div>
+                        ))}
                     </div>
-                )}
 
-                {/* STEP 3: SERVICES AND EXPERIENCE */}
-                {step === 2 && (
-                    <>
-                        <p className="text-muted">
-                            Select the services you offer and provide your
-                            experience and rates.
-                        </p>
+                    <div className="provider-application-card">
+                        {step === 0 && (
+                            <>
+                                <h3>Personal Information</h3>
 
-
-                        <label className="form-label">
-                            Service Categories *
-                        </label>
-
-                        <div className="mb-3">
-                            <select
-                                className="form-select"
-                                value={selectedCategory}
-                                onChange={(event) =>
-                                    setSelectedCategory(event.target.value)
-                                }
-                            >
-                                <option value="">Choose a service category</option>
-
-                                {serviceCategories.map((category) => (
-                                    <option key={category.name} value={category.name}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {selectedCategoryData && (
-                            <div className="row mb-3">
-                                <h6>Specific Services</h6>
-
-                                {selectedCategoryData.tasks.map((service) => (
-                                    <div
-                                        className="col-md-6 mb-2"
-                                        key={service}
-                                    >
-                                        <label className="form-check border rounded p-3">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                checked={selectedServices.includes(service)}
-                                                onChange={() => toggleService(service)}
-                                            />
-
-                                            <span className="form-check-label">
-                                                {service}
-                                            </span>
-                                        </label>
+                                <div className="row">
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Full Name</label>
+                                        <input className="form-control" value={profile.fullName || ''} readOnly />
                                     </div>
-                                ))}
-                            </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Email</label>
+                                        <input className="form-control" value={profile.email || ''} readOnly />
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Mobile Number</label>
+                                        <input
+                                            className="form-control"
+                                            type="tel"
+                                            inputMode="numeric"
+                                            maxLength={11}
+                                            pattern="09[0-9]{9}"
+                                            placeholder="09XXXXXXXXX"
+                                            name="mobileNumber"
+                                            value={profile.mobileNumber || ''}
+                                            onChange={changeProfile}
+                                        />
+                                        <small className="provider-field-hint">Enter exactly 11 digits, starting with 09.</small>
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Gender</label>
+                                        <select
+                                            className="form-select"
+                                            name="gender"
+                                            value={profile.gender || ''}
+                                            onChange={changeProfile}
+                                        >
+                                            <option value="">Select gender</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Birthday</label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            name="birthday"
+                                            max={todayDateInputValue()}
+                                            value={profile.birthday || ''}
+                                            onChange={changeProfile}
+                                        />
+                                        <small className="provider-field-hint">
+                                            {calculateAge(profile.birthday) === null
+                                                ? 'Your age will appear here after you select your birthday.'
+                                                : `Age: ${calculateAge(profile.birthday)} years old`}
+                                        </small>
+                                    </div>
+                                </div>
+                            </>
                         )}
 
+                        {step === 1 && (
+                            <>
+                                <h3>Complete Address</h3>
 
-                        <div className="mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="qualifications"
-                            >
-                                Skills, Qualifications & Experience *
-                            </label>
+                                {locationError && (
+                                    <div className="alert alert-warning">{locationError}</div>
+                                )}
 
-                            <textarea
-                                id="qualifications"
-                                name="qualifications"
-                                className="form-control"
-                                rows="3"
-                                value={verification.qualifications}
-                                onChange={changeVerification}
-                                placeholder="Describe your skills, certificates, and experience"
-                                required
-                            />
-                        </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Region</label>
+                                    <select
+                                        className="form-select"
+                                        name="region"
+                                        value={verification.region}
+                                        onChange={(event) => {
+                                            changeVerification(event);
+                                            setAddressError('');
+                                            setVerification((previous) => ({
+                                                ...previous,
+                                                region: event.target.value,
+                                                province: '',
+                                                city: '',
+                                                barangay: '',
+                                                postal_code: '',
+                                            }));
+                                        }}
+                                    >
+                                        <option value="">Select region</option>
+                                        {regions.map((item) => (
+                                            <option key={getLocationCode(item)} value={item.name}>
+                                                {item.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                        <div className="mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="experience"
-                            >
-                                Years of Experience *
-                            </label>
+                                <div className="mb-3">
+                                    <label className="form-label">Province</label>
+                                    <select
+                                        className="form-select"
+                                        name="province"
+                                        value={verification.province}
+                                        onChange={(event) => {
+                                            const value = event.target.value;
+                                            setAddressError('');
+                                            setVerification((previous) => ({
+                                                ...previous,
+                                                province: value,
+                                                city: '',
+                                                barangay: '',
+                                                postal_code: '',
+                                            }));
+                                        }}
+                                        disabled={!verification.region || locationLoading}
+                                    >
+                                        <option value="">Select province</option>
+                                        {provinces.map((item) => (
+                                            <option key={getLocationCode(item)} value={item.name}>
+                                                {item.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <input
-                                id="experience"
-                                className="form-control"
-                                value={experience}
-                                onChange={(event) =>
-                                    setExperience(event.target.value)
-                                }
-                                placeholder="e.g. 3 years"
-                                required
-                            />
-                        </div>
+                                <div className="mb-3">
+                                    <label className="form-label">City / Municipality</label>
+                                    <select
+                                        className="form-select"
+                                        name="city"
+                                        value={verification.city}
+                                        onChange={(event) => {
+                                            const value = event.target.value;
+                                            setAddressError('');
+                                            setVerification((previous) => ({
+                                                ...previous,
+                                                city: value,
+                                                barangay: '',
+                                                postal_code: '',
+                                            }));
+                                        }}
+                                        disabled={!verification.province || locationLoading}
+                                    >
+                                        <option value="">Select city / municipality</option>
+                                        {cities.map((item) => (
+                                            <option key={getLocationCode(item)} value={item.name}>
+                                                {item.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                        <div className="mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="rate"
-                            >
-                                Service Rate *
-                            </label>
+                                <div className="mb-3">
+                                    <label className="form-label">Barangay</label>
+                                    <select
+                                        className="form-select"
+                                        name="barangay"
+                                        value={verification.barangay}
+                                        onChange={changeVerification}
+                                        disabled={!verification.city || locationLoading}
+                                    >
+                                        <option value="">Select barangay</option>
+                                        {barangays.map((item) => (
+                                            <option key={getLocationCode(item)} value={item.name}>
+                                                {item.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <input
-                                id="rate"
-                                className="form-control"
-                                value={rate}
-                                onChange={(event) =>
-                                    setRate(event.target.value)
-                                }
-                                placeholder="e.g. ₱350 per hour"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="service_area"
-                            >
-                                Service Area *
-                            </label>
-
-                            <input
-                                id="service_area"
-                                name="service_area"
-                                className="form-control"
-                                value={verification.service_area}
-                                onChange={changeVerification}
-                                placeholder="Cities or barangays you serve"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="workSamples"
-                            >
-                                Work Samples
-                            </label>
-
-                            <input
-                                id="workSamples"
-                                type="file"
-                                className="form-control"
-                                accept="image/jpeg,image/png,image/webp"
-                                multiple
-                                onChange={(event) =>
-                                    setWorkSamples(
-                                        Array.from(
-                                            event.target.files || []
-                                        )
-                                    )
-                                }
-                            />
-
-                            <small className="text-muted">
-                                Selected: {workSamples.length} file(s).
-                                Work-sample upload is not yet connected to
-                                the backend.
-                            </small>
-                        </div>
-                    </>
-                )}
-
-                {/* STEP 4: IDENTITY VERIFICATION */}
-                {step === 3 && (
-                    <>
-                        <div className="mb-3">
-                            <label
-                                className="form-label"
-                                htmlFor="id_type"
-                            >
-                                Valid ID Type *
-                            </label>
-
-                            <select
-                                id="id_type"
-                                name="id_type"
-                                className="form-select"
-                                value={verification.id_type}
-                                onChange={(event) => {
-                                    changeVerification(event);
-                                    setFrontUploaded(false);
-                                    setBackUploaded(false);
-                                }}
-                                required
-                            >
-                                <option value="">Select ID type</option>
-
-                                {idTypes.map((idType) => (
-                                    <option value={idType} key={idType}>
-                                        {idType}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <p className="text-muted">
-                            Use clear images of your own ID. JPG, PNG, or
-                            WEBP; maximum 5 MB per image.
-                        </p>
-
-                        <div className="row">
-                            {[
-                                {
-                                    side: 'front',
-                                    title: 'Front of ID',
-                                    file: frontFile,
-                                    preview: frontPreview,
-                                    uploaded: frontUploaded,
-                                },
-                                {
-                                    side: 'back',
-                                    title: 'Back of ID',
-                                    file: backFile,
-                                    preview: backPreview,
-                                    uploaded: backUploaded,
-                                },
-                            ].map((item) => (
-                                <div
-                                    className="col-md-6 mb-4"
-                                    key={item.side}
-                                >
-                                    <h5>{item.title}</h5>
-
+                                <div className="mb-3">
+                                    <label className="form-label">Street / House Number (optional)</label>
                                     <input
                                         className="form-control"
-                                        type="file"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        onChange={(event) =>
-                                            chooseIdFile(
-                                                event,
-                                                item.side
-                                            )
-                                        }
+                                        name="street"
+                                        value={verification.street}
+                                        onChange={changeVerification}
                                     />
-
-                                    {item.preview && (
-                                        <img
-                                            className="img-thumbnail mt-3"
-                                            src={item.preview}
-                                            alt={`${item.side} ID preview`}
-                                            style={{
-                                                maxHeight: 220,
-                                                width: '100%',
-                                                objectFit: 'contain',
-                                            }}
-                                        />
-                                    )}
-
-                                    <button
-                                        type="button"
-                                        className="btn btn-outline-success mt-3"
-                                        disabled={
-                                            busy ||
-                                            !item.file ||
-                                            item.uploaded
-                                        }
-                                        onClick={() =>
-                                            uploadId(item.side)
-                                        }
-                                    >
-                                        {item.uploaded
-                                            ? 'Uploaded ✓'
-                                            : `Upload ${item.side} ID`}
-                                    </button>
-
-                                    {item.uploaded && (
-                                        <p className="text-success mt-2">
-                                            Upload complete
-                                        </p>
+                                    {addressError && (
+                                        <div className="invalid-feedback d-block" role="alert">
+                                            {addressError}
+                                        </div>
                                     )}
                                 </div>
-                            ))}
+
+                                <div className="mb-3">
+                                    <label className="form-label">Postal Code</label>
+                                    <input
+                                        className="form-control"
+                                        name="postal_code"
+                                        inputMode="numeric"
+                                        maxLength={4}
+                                        value={verification.postal_code}
+                                        onChange={changeVerification}
+                                    />
+                                    <small className="provider-field-hint">
+                                        Enter the correct 4-digit postal code for your address.
+                                    </small>
+                                </div>
+                            </>
+                        )}
+
+                        {step === 2 && (
+                            <>
+                                <h3>Services &amp; Experience</h3>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Business Name</label>
+                                    <input
+                                        className="form-control"
+                                        name="business_name"
+                                        value={verification.business_name}
+                                        onChange={changeVerification}
+                                    />
+                                </div>
+
+                                <div className="mb-3 provider-service-selection">
+                                    <label className="form-label">Service Categories</label>
+                                    <p>Select every type of work you can provide.</p>
+                                    <div className="provider-service-category-options">
+                                        {serviceCategories.map((category) => (
+                                            <label className="provider-service-category-option" key={category.name}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={Object.hasOwn(selectedServicesByCategory, category.name)}
+                                                    onChange={() => toggleCategory(category.name)}
+                                                />
+                                                <span>{category.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {selectedCategories.map((categoryName) => {
+                                    const category = serviceCategories.find(
+                                        (item) => item.name === categoryName
+                                    );
+                                    if (!category) return null;
+
+                                    return (
+                                        <div className="mb-3 provider-service-task-selection" key={categoryName}>
+                                            <label className="form-label">{categoryName} — specific services</label>
+                                            <div className="provider-service-task-grid">
+                                                {category.tasks.map((service, index) => {
+                                                    const inputId = `service-${categoryName}-${index}`.replace(/[^a-zA-Z0-9-]/g, '-');
+                                                    const isSelected = selectedServicesByCategory[categoryName].includes(service);
+                                                    return (
+                                                        <div className={`provider-service-task-option${isSelected ? ' selected' : ''}`} key={service}>
+                                                            <label htmlFor={inputId}>
+                                                                <input
+                                                                    id={inputId}
+                                                                    type="checkbox"
+                                                                    checked={isSelected}
+                                                                    onChange={() => toggleService(categoryName, service)}
+                                                                />
+                                                                <span>{service}</span>
+                                                            </label>
+                                                            {isSelected && (
+                                                                <div className="provider-service-price">
+                                                                    <span>₱</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        step="1"
+                                                                        inputMode="decimal"
+                                                                        placeholder="Price"
+                                                                        aria-label={`Price for ${service}`}
+                                                                        value={serviceRatesByCategory[categoryName]?.[service] ?? ''}
+                                                                        onChange={(event) => changeServiceRate(categoryName, service, event.target.value)}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                <div className="mb-3">
+                                    <label className="form-label">Years of Experience</label>
+                                    <input
+                                        className="form-control"
+                                        type="number"
+                                        min="0"
+                                        value={experience}
+                                        onChange={(event) => setExperience(event.target.value)}
+                                    />
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Service Area</label>
+                                    <textarea
+                                        className="form-control"
+                                        name="service_area"
+                                        rows="3"
+                                        value={verification.service_area}
+                                        onChange={changeVerification}
+                                    />
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Qualifications / Certifications</label>
+                                    <textarea
+                                        className="form-control"
+                                        name="qualifications"
+                                        rows="3"
+                                        value={verification.qualifications}
+                                        onChange={changeVerification}
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {step === 3 && (
+                            <>
+                                <h3>Identity Verification</h3>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Valid ID Type</label>
+                                    <select
+                                        className="form-select"
+                                        name="id_type"
+                                        value={verification.id_type}
+                                        onChange={changeVerification}
+                                    >
+                                        <option value="">Select ID type</option>
+                                        {idTypes.map((idType) => (
+                                            <option key={idType} value={idType}>{idType}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="row">
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Front of ID</label>
+                                        <input
+                                            className="form-control"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(event) => handleFileChange(event, 'front')}
+                                        />
+
+                                        {frontPreview && (
+                                            <div className="id-preview mt-3">
+                                                <img src={frontPreview} alt="Front of ID preview" />
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-success mt-3"
+                                            onClick={() => uploadIdSide('front')}
+                                            disabled={busy || !frontFile || frontUploaded}
+                                        >
+                                            {frontUploaded ? 'Front ID Uploaded' : 'Upload Front ID'}
+                                        </button>
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label">Back of ID</label>
+                                        <input
+                                            className="form-control"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(event) => handleFileChange(event, 'back')}
+                                        />
+
+                                        {backPreview && (
+                                            <div className="id-preview mt-3">
+                                                <img src={backPreview} alt="Back of ID preview" />
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-success mt-3"
+                                            onClick={() => uploadIdSide('back')}
+                                            disabled={busy || !backFile || backUploaded}
+                                        >
+                                            {backUploaded ? 'Back ID Uploaded' : 'Upload Back ID'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {step === 4 && (
+                            <>
+                                <h3>Review &amp; Submit</h3>
+                                <p>Review your information before submitting your provider application.</p>
+
+                                <hr />
+
+                                <h5>Personal Information</h5>
+                                <p><strong>Name:</strong> {profile.fullName || 'Not provided'}</p>
+                                <p><strong>Email:</strong> {profile.email || 'Not provided'}</p>
+                                <p><strong>Mobile:</strong> {profile.mobileNumber || 'Not provided'}</p>
+
+                                <hr />
+
+                                <h5>Business Information</h5>
+                                <p><strong>Business:</strong> {verification.business_name || 'Not provided'}</p>
+                                <p><strong>Categories:</strong> {selectedCategories.join(', ') || 'Not selected'}</p>
+                                <div className="provider-review-services">
+                                    <strong>Specific services and prices:</strong>
+                                    {selectedCategories.flatMap((category) =>
+                                        (selectedServicesByCategory[category] || []).map((service) => (
+                                            <span key={`${category}-${service}`}>
+                                                {category} · {service} · ₱{serviceRatesByCategory[category]?.[service] ?? ''}
+                                            </span>
+                                        ))
+                                    )}
+                                    {!selectedCategories.some((category) =>
+                                        (selectedServicesByCategory[category] || []).length
+                                    ) && <span>Not selected</span>}
+                                </div>
+                                <p><strong>Experience:</strong> {experience ? `${experience} years` : 'Not provided'}</p>
+                                <p><strong>Address:</strong> {[
+                                    verification.street,
+                                    verification.barangay,
+                                    verification.city,
+                                    verification.province,
+                                    verification.region,
+                                    verification.postal_code,
+                                ].filter(Boolean).join(', ') || 'Not provided'}</p>
+
+                                <div className="provider-declaration">
+                                    <input
+                                        id="provider-declaration"
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        checked={declaration}
+                                        onChange={(event) => setDeclaration(event.target.checked)}
+                                    />
+                                    <label htmlFor="provider-declaration">
+                                        <strong>Declaration and Agreement</strong>
+                                        <span>
+                                            I confirm that the information and documents I provided
+                                            are accurate and authentic.
+                                        </span>
+                                    </label>
+                                </div>
+                            </>
+                        )}
+
+                        <div className="d-flex justify-content-between flex-wrap gap-2">
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={() => setStep((current) => Math.max(0, current - 1))}
+                                disabled={step === 0 || busy}
+                            >
+                                Previous
+                            </button>
+
+                            {step < steps.length - 1 ? (
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={handleNextStep}
+                                    disabled={busy}
+                                >
+                                    Next Step
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={saveApplication}
+                                    disabled={busy || !declaration}
+                                >
+                                    {busy ? 'Submitting...' : 'Submit Application'}
+                                </button>
+                            )}
+
                         </div>
-                    </>
-                )}
-
-                {/* STEP 5: REVIEW AND SUBMIT */}
-                {step === 4 && (
-                    <>
-                        <h5>Personal Information</h5>
-
-                        <p>
-                            <strong>Name:</strong> {profile.fullName}
-                        </p>
-                        <p>
-                            <strong>Email:</strong> {profile.email}
-                        </p>
-                        <p>
-                            <strong>Mobile:</strong> {profile.mobileNumber}
-                        </p>
-                        <p>
-                            <strong>Gender:</strong> {profile.gender}
-                        </p>
-                        <p>
-                            <strong>Birthday:</strong> {profile.birthday}
-                        </p>
-
-                        <hr />
-
-                        <h5>Address</h5>
-
-                        <p>
-                            {[
-                                verification.street,
-                                verification.barangay,
-                                verification.city,
-                                verification.province,
-                                verification.region,
-                                verification.postal_code,
-                            ]
-                                .filter(Boolean)
-                                .join(', ')}
-                        </p>
-
-                        <hr />
-
-                        <h5>Services & Experience</h5>
-
-                        <p>
-                            <strong>Services:</strong>{' '}
-                            {selectedServices.join(', ') || 'None selected'}
-                        </p>
-
-                        <p>
-                            <strong>Qualifications:</strong>{' '}
-                            {verification.qualifications || 'Not provided'}
-                        </p>
-
-                        <p>
-                            <strong>Experience:</strong>{' '}
-                            {experience || 'Not provided'}
-                        </p>
-
-                        <p>
-                            <strong>Rate:</strong> {rate || 'Not provided'}
-                        </p>
-
-                        <p>
-                            <strong>Service Area:</strong>{' '}
-                            {verification.service_area || 'Not provided'}
-                        </p>
-
-                        <hr />
-
-                        <h5>Identity Verification</h5>
-
-                        <p>
-                            <strong>ID type:</strong>{' '}
-                            {verification.id_type || 'Not selected'}
-                        </p>
-
-                        <p>
-                            <strong>Front image:</strong>{' '}
-                            {frontUploaded ? 'Uploaded' : 'Not uploaded'}
-                        </p>
-
-                        <p>
-                            <strong>Back image:</strong>{' '}
-                            {backUploaded ? 'Uploaded' : 'Not uploaded'}
-                        </p>
-
-
-                        <div className="provider-declaration">
-                            <input
-                                id="providerDeclaration"
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={declaration}
-                                onChange={(event) =>
-                                    setDeclaration(event.target.checked)
-                                }
-                            />
-
-                            <label htmlFor="providerDeclaration">
-                                <strong>Confirmation of Information</strong>
-                                <span>
-                                    I confirm that the information I provided is accurate
-                                    and that I am authorized to submit these details
-                                    for verification.
-                                </span>
-                            </label>
-                        </div>
-
-
-                        <div className="alert alert-warning mt-3">
-                            Submitting your application does not
-                            automatically verify your account. An admin
-                            must review and approve it.
-                        </div>
-                    </>
-                )}
-
-                {/* NAVIGATION BUTTONS */}
-                <div className="d-flex flex-wrap justify-content-between gap-2 mt-4">
-                    <button
-                        type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={previousStep}
-                        disabled={step === 0 || busy}
-                    >
-                        Back
-                    </button>
-
-                    {step < steps.length - 1 ? (
-                        <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={nextStep}
-                            disabled={busy}
-                        >
-                            {busy ? 'Saving...' : 'Next'}
-                        </button>
-                    ) : (
-                        <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={handleSubmit}
-                            disabled={
-                                busy ||
-                                status === 'verified' ||
-                                status === 'pending'
-                            }
-                        >
-                            {busy
-                                ? 'Submitting...'
-                                : status === 'pending'
-                                    ? 'Awaiting Admin Review'
-                                    : 'Submit for Admin Review'}
-                        </button>
-                    )}
-                </div>
-            </div>
+                    </div>
+                </>
+            )}
         </section>
     );
 }

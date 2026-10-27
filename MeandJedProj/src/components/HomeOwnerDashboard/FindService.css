@@ -1,0 +1,164 @@
+.find-services-page {
+    min-height: 100vh;
+    background: #f5f7f7;
+    color: #17272d;
+}
+
+.find-services-topbar {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    padding: 7px 22px;
+    border-bottom: 1px solid #edf0f1;
+    background: #fff;
+}
+.find-services-brand { width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; padding: 4px; border: 1px solid #e8efeb; border-radius: 12px; background: #fff; }
+.find-services-brand img { width: 100%; height: 100%; object-fit: contain; }
+.find-services-brand:hover { border-color: #9acbb7; box-shadow: 0 3px 10px #0a654f12; }
+.find-services-global-search { width: min(100%, 620px); height: 40px; display: flex; align-items: center; gap: 9px; padding: 0 14px; border-radius: 10px; background: #f3f5f6; color: #43606a; }
+.find-services-global-search input { width: 100%; border: 0; outline: 0; background: transparent; color: #263940; font-size: 13px; }
+.find-services-global-search input::placeholder { color: #8c9aa1; }
+.find-services-account { display: flex; align-items: center; gap: 15px; margin-left: auto; }
+.find-services-bell { position: relative; width: 35px; height: 35px; border: 0; background: transparent; color: #344c55; font-size: 17px; }
+.find-services-bell span { position: absolute; top: 6px; right: 5px; width: 8px; height: 8px; border: 1px solid white; border-radius: 50%; background: #ff790e; }
+.find-services-user { display: flex; align-items: center; gap: 9px; padding: 0 0 0 13px; border: 0; border-left: 1px solid #e7ebed; background: transparent; text-align: left; }
+.find-services-user img, .find-services-user-fallback { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 50%; object-fit: cover; background: #dcefe8; color: #087453; font-weight: 750; }
+.find-services-user strong, .find-services-user small { display: block; }
+.find-services-user strong { max-width: 130px; overflow: hidden; color: #20333a; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.find-services-user small { margin-top: 1px; color: #78868d; font-size: 10px; }
+.find-services-user > i { margin-left: 8px; color: #5b6b72; font-size: 10px; }
+
+.find-services-content { padding: 10px 12px 22px; }
+.find-services-hero { position: relative; min-height: 155px; display: flex; align-items: center; overflow: hidden; border-radius: 9px; background-color: #093c32; background-position: center 48%; background-size: cover; color: #fff; }
+.find-services-hero::before { position: absolute; inset: 0; content: ''; background: linear-gradient(90deg, #063c32e8 0%, #063c32c9 33%, #063c3270 58%, #063c321a 100%); z-index: 1; }
+.find-services-hero-copy { position: relative; z-index: 2; padding: 22px 30px; }
+.find-services-hero h1 { max-width: 520px; margin: 0; font-size: clamp(26px, 3.5vw, 38px); font-weight: 800; line-height: 1.1; letter-spacing: -.6px; }
+.find-services-hero h1 em { color: #ff891f; font-style: normal; }
+
+.find-services-category-bar { display: flex; align-items: center; gap: 8px; margin: 13px 0; }
+.find-services-categories { min-width: 0; display: flex; flex: 1; gap: 11px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
+.find-services-categories::-webkit-scrollbar { display: none; }
+.find-services-categories > button { min-width: 112px; height: 90px; display: flex; flex: 0 0 112px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid #edf0f1; border-radius: 12px; background: #fff; color: #26383f; box-shadow: 0 2px 8px #18372d08; transition: background .16s, border-color .16s, transform .16s; }
+.find-services-categories > button:hover { transform: translateY(-2px); border-color: #b6dfcf; }
+.find-services-categories > button.selected { border-color: #9bd5bf; background: #e6f5ef; }
+.find-services-category-arrow { width: 34px; height: 34px; flex: 0 0 34px; border: 1px solid #e5ebea; border-radius: 50%; background: #fff; color: #315d50; box-shadow: 0 2px 8px #18372d0b; }
+.find-services-category-arrow:hover { border-color: #9bd5bf; background: #e6f5ef; }
+.category-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; font-size: 19px; }
+.category-icon.mint { background: #dff3eb; color: #087c5a; }
+.category-icon.blue { background: #e5f1fb; color: #157ab4; }
+.category-icon.orange { background: #fff0df; color: #e7780b; }
+.category-icon.neutral { background: #f1f3f4; color: #52636b; }
+.find-services-categories small { max-width: 100px; overflow: hidden; color: #394a51; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+
+.find-services-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 10px; align-items: stretch; }
+.find-services-results, .find-service-details { min-width: 0; border: 1px solid #edf0f1; border-radius: 9px; background: #fff; box-shadow: 0 3px 12px #14372b08; }
+.find-services-results { padding: 15px; }
+.find-services-results-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.find-services-results-heading h2 { margin: 0; font-size: 19px; font-weight: 800; }
+.find-services-results-heading p { margin: 4px 0 0; color: #718087; font-size: 12px; }
+.find-services-tools { display: flex; align-items: center; gap: 8px; }
+.find-services-sort, .find-services-inline-search { height: 30px; display: flex; align-items: center; gap: 5px; padding: 0 8px; border: 1px solid #e7ebed; border-radius: 6px; color: #52636b; font-size: 9px; }
+.find-services-sort select, .find-services-inline-search input { min-width: 0; border: 0; outline: 0; background: transparent; color: #34474f; font-size: 9px; }
+.find-services-inline-search { width: 150px; }
+.find-services-inline-search input { width: 100%; }
+.find-services-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+.find-service-card { min-width: 0; overflow: hidden; border: 1px solid #edf0f1; border-radius: 8px; background: #fff; transition: border-color .16s, box-shadow .16s, transform .16s; }
+.find-service-card:hover, .find-service-card.active { border-color: #8bcbb2; box-shadow: 0 4px 14px #0a654f16; transform: translateY(-1px); }
+.find-service-card-image { position: relative; width: 100%; height: 100px; display: block; border: 0; background-position: center; background-size: cover; }
+.find-service-verified { position: absolute; top: 5px; left: 5px; padding: 3px 5px; border-radius: 4px; background: #ffffffeb; color: #087453; font-size: 7px; font-weight: 750; }
+.find-service-card-body { padding: 11px; }
+.find-service-card-title { min-height: 40px; display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
+.find-service-card-title h3 { overflow: hidden; margin: 0; color: #1e2d34; font-size: 13px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.find-service-card-title p { overflow: hidden; margin: 3px 0 0; color: #697880; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.find-service-open { width: 20px; height: 20px; flex: 0 0 20px; border: 1px solid #e5eaeb; border-radius: 5px; background: #fff; color: #45616a; font-size: 10px; }
+.find-service-card-meta { display: flex; justify-content: space-between; gap: 4px; margin-top: 7px; color: #364850; font-size: 10px; font-weight: 700; }
+.find-service-card-meta > span:first-child { overflow: hidden; color: #687980; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.find-service-card-meta i, .find-service-detail-rating i { color: #f28a16; }
+.find-service-location { min-height: 24px; overflow: hidden; margin: 7px 0 9px; color: #738087; font-size: 10px; line-height: 1.4; text-overflow: ellipsis; }
+.find-service-location i { margin-right: 3px; }
+.find-service-book, .find-service-detail-book { width: 100%; min-height: 34px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 6px; background: #ff780d; color: #fff; font-size: 11px; font-weight: 750; }
+.find-service-book:hover, .find-service-detail-book:hover { background: #e96b08; }
+
+.find-service-details { overflow: hidden; }
+.find-service-detail-image { position: relative; height: 78px; background-position: center; background-size: cover; }
+.find-service-detail-image > button { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border: 0; border-radius: 50%; background: #ffffffed; color: #3e5158; font-size: 10px; }
+.find-service-detail-body { padding: 13px; }
+.find-service-provider-heading { display: flex; align-items: center; gap: 10px; }
+.find-service-provider-avatar { width: 48px; height: 48px; flex: 0 0 48px; border: 2px solid #e4f2eb; border-radius: 50%; object-fit: cover; }
+.find-service-provider-avatar-fallback { display: grid; place-items: center; background: #e4f2eb; color: #087453; font-size: 22px; }
+.find-service-detail-category { color: #75848a; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; }
+.find-service-detail-body h2 { margin: 3px 0; color: #1c2d33; font-size: 16px; font-weight: 800; }
+.find-service-detail-rating { margin: 9px 0 8px; color: #687980; font-size: 10px; }
+.find-service-detail-tabs { display: flex; gap: 10px; border-bottom: 1px solid #e7ecee; }
+.find-service-detail-tabs button { min-width: 70px; padding: 8px 4px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #687980; font-size: 10px; }
+.find-service-detail-tabs button.active { border-bottom-color: #087453; color: #087453; font-weight: 750; }
+.find-service-detail-list { display: grid; gap: 10px; margin: 11px 0 14px; }
+.find-service-detail-list div { min-width: 0; }
+.find-service-detail-list dt { display: flex; align-items: center; gap: 6px; color: #25383f; font-size: 10px; font-weight: 750; }
+.find-service-detail-list dt i { width: 12px; color: #526a73; font-size: 11px; }
+.find-service-detail-list dd { margin: 3px 0 0 18px; color: #718087; font-size: 9px; line-height: 1.5; }
+.find-service-detail-book { min-height: 38px; font-size: 11px; }
+.find-service-offerings { max-height: 240px; overflow-y: auto; }
+.find-service-reviews { max-height: 280px; display: grid; gap: 9px; overflow-y: auto; padding: 10px 0 12px; }
+.find-service-review { padding: 10px; border: 1px solid #edf0f1; border-radius: 8px; background: #fbfcfc; }
+.find-service-review-heading { display: flex; align-items: center; justify-content: space-between; gap: 6px; color: #30464d; font-size: 9px; }
+.find-service-review-heading i { margin-right: 4px; color: #087453; }
+.find-service-review-heading > span { color: #89969b; font-size: 8px; }
+.find-service-review-rating { margin: 5px 0; color: #f28a16; font-size: 12px; letter-spacing: 1px; }
+.find-service-review-rating small { color: #728087; font-size: 8px; letter-spacing: 0; }
+.find-service-review-comment { margin: 0; color: #465a61; font-size: 9px; line-height: 1.5; overflow-wrap: anywhere; }
+.find-service-review-service { display: block; margin-top: 6px; color: #7a898e; font-size: 8px; }
+.find-service-no-reviews { margin: 12px 0; color: #74838a; font-size: 10px; text-align: center; }
+.find-service-detail-empty, .find-services-state { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #74838a; text-align: center; }
+.find-service-detail-empty > i, .find-services-state > i { color: #0b7657; font-size: 25px; }
+.find-service-detail-empty h3, .find-services-state h3 { margin: 8px 0 3px; color: #283b42; font-size: 13px; }
+.find-service-detail-empty p, .find-services-state p { margin: 4px 0 0; font-size: 10px; }
+
+@media (min-width: 1500px) {
+    .find-services-content { padding: 12px 18px 25px; }
+    .find-services-workspace { grid-template-columns: minmax(0, 1fr) 300px; }
+    .find-services-hero { min-height: 185px; }
+    .find-services-grid { gap: 12px; }
+    .find-service-card-image { height: 120px; }
+}
+@media (max-width: 1050px) {
+    .find-services-workspace { grid-template-columns: minmax(0, 1fr) 230px; }
+    .find-services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 780px) {
+    .find-services-workspace { grid-template-columns: 1fr; }
+    .find-service-details { display: grid; grid-template-columns: 180px minmax(0, 1fr); }
+    .find-service-detail-image { height: 100%; min-height: 190px; }
+    .find-service-detail-body { padding: 13px; }
+    .find-service-detail-list { grid-template-columns: 1fr 1fr; }
+    .find-services-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+    .find-services-topbar { min-height: 48px; gap: 8px; padding: 7px 10px; }
+    .find-services-brand { width: 36px; height: 36px; flex-basis: 36px; }
+    .find-services-global-search { width: auto; flex: 1; }
+    .find-services-global-search input { font-size: 11px; }
+    .find-services-account { gap: 3px; }
+    .find-services-user { gap: 5px; padding-left: 7px; }
+    .find-services-user > span:nth-child(2), .find-services-user > i { display: none; }
+    .find-services-content { padding: 8px; }
+    .find-services-hero { min-height: 180px; }
+    .find-services-hero { min-height: 160px; background-position: 58% center; }
+    .find-services-hero-copy { padding: 18px; }
+    .find-services-hero h1 { max-width: 290px; font-size: 26px; }
+    .find-services-category-bar { gap: 5px; }
+    .find-services-category-arrow { width: 29px; height: 29px; flex-basis: 29px; }
+    .find-services-categories { gap: 8px; }
+    .find-services-categories > button { min-width: 92px; height: 78px; flex-basis: 92px; }
+    .category-icon { width: 36px; height: 36px; font-size: 16px; }
+    .find-services-categories small { font-size: 10px; }
+    .find-services-results-heading { align-items: flex-start; flex-direction: column; }
+    .find-services-tools { width: 100%; }
+    .find-services-sort { flex: 1; justify-content: space-between; }
+    .find-services-inline-search { width: 48%; }
+    .find-services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .find-service-details { display: block; }
+    .find-service-detail-image { height: 115px; min-height: 0; }
+}

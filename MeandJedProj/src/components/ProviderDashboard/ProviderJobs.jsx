@@ -1,883 +1,254 @@
-import React, { useEffect, useState } from "react";
-import ProviderSideBar from "../ProviderSideBar/ProviderSideBar";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "./ProviderJobs.css";
-import { getMyBookings, sendMessage, updateBookingStatus } from "../../services/api";
-
-const ProviderJobs = () => {
-    const [selectedJob, setSelectedJob] = useState(null);
-    const [showDetails, setShowDetails] = useState(false);
-    const [showMessage, setShowMessage] = useState(false);
-    const [message, setMessage] = useState("");
-
-    const [jobs, setJobs] = useState([]);
-
-    useEffect(() => {
-        getMyBookings().then((bookings) => setJobs(bookings
-            .filter((booking) => booking.status !== "Pending" && booking.status !== "Cancelled")
-            .map((booking) => ({
-                id: booking.id,
-                recipientId: booking.homeownerId,
-                requestNo: booking.bookingCode,
-                customerName: booking.customerName || "Homeowner",
-                service: booking.category || "Service request",
-                location: booking.address,
-                contact: booking.customerPhone || "Not provided",
-                date: new Date(`${booking.preferredDate}T00:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-                time: booking.preferredTime,
-                status: booking.status,
-                amount: "Not specified",
-                description: booking.description,
-                photo: ""
-            })))).catch((error) => alert(error.message));
-    }, []);
-
-    const openDetails = (job) => {
-        setSelectedJob(job);
-        setShowDetails(true);
-    };
-
-    const closeDetails = () => {
-        setSelectedJob(null);
-        setShowDetails(false);
-    };
-
-    const updateStatus = (newStatus) => {
-        if (!selectedJob) return;
-
-        const updatedJob = {
-            ...selectedJob,
-            status: newStatus
-        };
-
-        updateBookingStatus(selectedJob.id, newStatus)
-            .then(() => {
-                setJobs((previousJobs) => previousJobs.map((job) => job.id === selectedJob.id ? updatedJob : job));
-                setSelectedJob(updatedJob);
-            })
-            .catch((error) => alert(error.message));
-    };
-
-    const openMessage = (job) => {
-        setSelectedJob(job);
-        setShowMessage(true);
-    };
-
-    const handleSendMessage = async () => {
-        if (!message.trim() || message.trim().length > 1000) {
-            alert("Enter a message between 1 and 1,000 characters.");
-            return;
-        }
-
-        try {
-            await sendMessage(selectedJob.recipientId, message.trim(), selectedJob.id);
-            alert(`Message sent to ${selectedJob.customerName}!`);
-            setMessage("");
-            setShowMessage(false);
-        } catch (error) { alert(error.message); }
-    };
-
-    const getStatusClass = (status) => {
-        if (status === "Accepted") {
-            return "status-accepted";
-        }
-
-        if (status === "On the Way") {
-            return "status-onway";
-        }
-
-        if (status === "In Progress") {
-            return "status-progress";
-        }
-
-        if (status === "Completed") {
-            return "status-completed";
-        }
-
-        return "";
-    };
-
-    const getNextStatus = (status) => {
-        if (status === "Accepted") {
-            return "On the Way";
-        }
-
-        if (status === "On the Way") {
-            return "In Progress";
-        }
-
-        if (status === "In Progress") {
-            return "Completed";
-        }
-
-        return null;
-    };
-
-    const getNextButtonText = (status) => {
-        if (status === "Accepted") {
-            return "Mark as On the Way";
-        }
-
-        if (status === "On the Way") {
-            return "Start Job";
-        }
-
-        if (status === "In Progress") {
-            return "Mark as Completed";
-        }
-
-        return "Job Completed";
-    };
-
-    return (
-        <div className="provider-jobs-page">
-
-            {/* SIDEBAR */}
-            <ProviderSideBar />
-
-            {/* MAIN CONTENT */}
-            <main className="provider-jobs-main">
-
-                {/* HEADER */}
-                <div className="jobs-page-header">
-
-                    <div>
-                        <span className="jobs-overline">
-                            PROVIDER PORTAL
-                        </span>
-
-                        <h1>
-                            My Jobs
-                        </h1>
-
-                        <p>
-                            Manage your accepted bookings and monitor your
-                            service jobs.
-                        </p>
-                    </div>
-
-                    <div className="provider-profile-mini">
-
-                        <div className="provider-mini-avatar">
-                            P
-                        </div>
-
-                        <div>
-                            <small>Logged in as</small>
-                            <strong>Service Provider</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {/* SUMMARY CARDS */}
-                <div className="row g-3 mb-4">
-
-                    <div className="col-lg-3 col-md-6">
-
-                        <div className="job-summary-card">
-
-                            <div className="summary-icon">
-                                <i className="bi bi-briefcase"></i>
-                            </div>
-
-                            <div>
-                                <span>Total Jobs</span>
-                                <h3>{jobs.length}</h3>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="col-lg-3 col-md-6">
-
-                        <div className="job-summary-card">
-
-                            <div className="summary-icon accepted-icon">
-                                <i className="bi bi-check-circle"></i>
-                            </div>
-
-                            <div>
-                                <span>Accepted</span>
-
-                                <h3>
-                                    {
-                                        jobs.filter(
-                                            (job) =>
-                                                job.status === "Accepted"
-                                        ).length
-                                    }
-                                </h3>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="col-lg-3 col-md-6">
-
-                        <div className="job-summary-card">
-
-                            <div className="summary-icon onway-icon">
-                                <i className="bi bi-truck"></i>
-                            </div>
-
-                            <div>
-                                <span>On the Way</span>
-
-                                <h3>
-                                    {
-                                        jobs.filter(
-                                            (job) =>
-                                                job.status === "On the Way"
-                                        ).length
-                                    }
-                                </h3>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="col-lg-3 col-md-6">
-
-                        <div className="job-summary-card">
-
-                            <div className="summary-icon completed-icon">
-                                <i className="bi bi-check2-all"></i>
-                            </div>
-
-                            <div>
-                                <span>Completed</span>
-
-                                <h3>
-                                    {
-                                        jobs.filter(
-                                            (job) =>
-                                                job.status === "Completed"
-                                        ).length
-                                    }
-                                </h3>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {/* JOB LIST */}
-                <div className="jobs-card">
-
-                    <div className="jobs-card-header">
-
-                        <div>
-                            <h4>My Service Jobs</h4>
-                            <p>
-                                View and manage your accepted customer
-                                bookings.
-                            </p>
-                        </div>
-
-                        <button className="btn btn-outline-success rounded-pill px-4">
-                            <i className="bi bi-funnel me-2"></i>
-                            Filter
-                        </button>
-
-                    </div>
-
-                    {/* JOB LIST */}
-                    <div className="job-list">
-
-                        {jobs.map((job) => (
-
-                            <div
-                                className="job-item"
-                                key={job.id}
-                            >
-
-                                {/* CUSTOMER */}
-                                <div className="job-customer">
-
-                                    <div className="customer-avatar">
-                                        {job.customerName
-                                            .charAt(0)
-                                            .toUpperCase()}
-                                    </div>
-
-                                    <div>
-                                        <h6>
-                                            {job.customerName}
-                                        </h6>
-
-                                        <small>
-                                            {job.requestNo}
-                                        </small>
-                                    </div>
-
-                                </div>
-
-                                {/* SERVICE */}
-                                <div className="job-service">
-
-                                    <span>
-                                        SERVICE
-                                    </span>
-
-                                    <strong>
-                                        {job.service}
-                                    </strong>
-
-                                </div>
-
-                                {/* LOCATION */}
-                                <div className="job-location">
-
-                                    <span>
-                                        LOCATION
-                                    </span>
-
-                                    <strong>
-                                        <i className="bi bi-geo-alt me-1"></i>
-                                        {job.location}
-                                    </strong>
-
-                                </div>
-
-                                {/* DATE */}
-                                <div className="job-date">
-
-                                    <span>
-                                        SCHEDULE
-                                    </span>
-
-                                    <strong>
-                                        {job.date}
-                                    </strong>
-
-                                    <small>
-                                        {job.time}
-                                    </small>
-
-                                </div>
-
-                                {/* STATUS */}
-                                <div>
-
-                                    <span
-                                        className={`job-status ${getStatusClass(
-                                            job.status
-                                        )}`}
-                                    >
-                                        {job.status}
-                                    </span>
-
-                                </div>
-
-                                {/* ACTIONS */}
-                                <div className="job-actions">
-
-                                    <button
-                                        className="btn btn-success btn-sm rounded-pill"
-                                        onClick={() =>
-                                            openDetails(job)
-                                        }
-                                    >
-                                        <i className="bi bi-eye me-1"></i>
-                                        View
-                                    </button>
-
-                                    <button
-                                        className="btn btn-outline-primary btn-sm rounded-pill"
-                                        onClick={() =>
-                                            openMessage(job)
-                                        }
-                                    >
-                                        <i className="bi bi-chat-dots me-1"></i>
-                                        Message
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
-                </div>
-
-            </main>
-
-            {/* ======================================
-                JOB DETAILS MODAL
-            ====================================== */}
-
-            {showDetails && selectedJob && (
-
-                <div className="job-modal-overlay">
-
-                    <div className="job-details-modal">
-
-                        {/* MODAL HEADER */}
-                        <div className="job-modal-header">
-
-                            <div>
-
-                                <span>
-                                    REQUEST NUMBER
-                                </span>
-
-                                <h3>
-                                    {selectedJob.requestNo}
-                                </h3>
-
-                            </div>
-
-                            <button
-                                className="modal-close"
-                                onClick={closeDetails}
-                            >
-                                ×
-                            </button>
-
-                        </div>
-
-                        {/* MODAL BODY */}
-                        <div className="job-modal-body">
-
-                            {/* STATUS */}
-                            <div className="details-top">
-
-                                <div>
-
-                                    <small>
-                                        CURRENT STATUS
-                                    </small>
-
-                                    <div>
-                                        <span
-                                            className={`job-status ${getStatusClass(
-                                                selectedJob.status
-                                            )}`}
-                                        >
-                                            {selectedJob.status}
-                                        </span>
-                                    </div>
-
-                                </div>
-
-                                <div className="details-price">
-
-                                    <small>
-                                        SERVICE AMOUNT
-                                    </small>
-
-                                    <strong>
-                                        {selectedJob.amount}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                            {/* CUSTOMER INFO */}
-                            <div className="details-section">
-
-                                <h5>
-                                    <i className="bi bi-person-circle"></i>
-                                    Customer Information
-                                </h5>
-
-                                <div className="details-grid">
-
-                                    <div>
-                                        <small>
-                                            Customer Name
-                                        </small>
-
-                                        <strong>
-                                            {selectedJob.customerName}
-                                        </strong>
-                                    </div>
-
-                                    <div>
-                                        <small>
-                                            Contact Number
-                                        </small>
-
-                                        <strong>
-                                            {selectedJob.contact}
-                                        </strong>
-                                    </div>
-
-                                    <div className="full-detail">
-
-                                        <small>
-                                            Location
-                                        </small>
-
-                                        <strong>
-                                            <i className="bi bi-geo-alt me-1"></i>
-                                            {selectedJob.location}
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            {/* SERVICE INFO */}
-                            <div className="details-section">
-
-                                <h5>
-                                    <i className="bi bi-tools"></i>
-                                    Service Information
-                                </h5>
-
-                                <div className="details-grid">
-
-                                    <div>
-                                        <small>
-                                            Service
-                                        </small>
-
-                                        <strong>
-                                            {selectedJob.service}
-                                        </strong>
-                                    </div>
-
-                                    <div>
-                                        <small>
-                                            Request No.
-                                        </small>
-
-                                        <strong>
-                                            {selectedJob.requestNo}
-                                        </strong>
-                                    </div>
-
-                                    <div>
-                                        <small>
-                                            Date
-                                        </small>
-
-                                        <strong>
-                                            {selectedJob.date}
-                                        </strong>
-                                    </div>
-
-                                    <div>
-                                        <small>
-                                            Time
-                                        </small>
-
-                                        <strong>
-                                            {selectedJob.time}
-                                        </strong>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            {/* JOB INFORMATION */}
-                            <div className="details-section">
-
-                                <h5>
-                                    <i className="bi bi-file-text"></i>
-                                    Job Information
-                                </h5>
-
-                                <div className="job-description">
-
-                                    {selectedJob.description}
-
-                                </div>
-
-                            </div>
-
-                            {/* PHOTO */}
-                            <div className="details-section">
-
-                                <h5>
-                                    <i className="bi bi-image"></i>
-                                    Homeowner Uploaded Photo
-                                </h5>
-
-                                <div className="uploaded-photo-wrapper">
-
-                                    <img
-                                        src={selectedJob.photo}
-                                        alt="Homeowner uploaded"
-                                        className="uploaded-job-photo"
-                                    />
-
-                                </div>
-
-                            </div>
-
-                            {/* STATUS TIMELINE */}
-                            <div className="details-section">
-
-                                <h5>
-                                    <i className="bi bi-activity"></i>
-                                    Job Progress
-                                </h5>
-
-                                <div className="job-progress">
-
-                                    <div
-                                        className={
-                                            selectedJob.status ===
-                                                "Accepted" ||
-                                                selectedJob.status ===
-                                                "On the Way" ||
-                                                selectedJob.status ===
-                                                "In Progress" ||
-                                                selectedJob.status ===
-                                                "Completed"
-                                                ? "progress-step active"
-                                                : "progress-step"
-                                        }
-                                    >
-                                        <div className="progress-circle">
-                                            <i className="bi bi-check"></i>
-                                        </div>
-
-                                        <span>
-                                            Accepted
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        className={
-                                            selectedJob.status ===
-                                                "On the Way" ||
-                                                selectedJob.status ===
-                                                "In Progress" ||
-                                                selectedJob.status ===
-                                                "Completed"
-                                                ? "progress-step active"
-                                                : "progress-step"
-                                        }
-                                    >
-                                        <div className="progress-circle">
-                                            <i className="bi bi-truck"></i>
-                                        </div>
-
-                                        <span>
-                                            On the Way
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        className={
-                                            selectedJob.status ===
-                                                "In Progress" ||
-                                                selectedJob.status ===
-                                                "Completed"
-                                                ? "progress-step active"
-                                                : "progress-step"
-                                        }
-                                    >
-                                        <div className="progress-circle">
-                                            <i className="bi bi-tools"></i>
-                                        </div>
-
-                                        <span>
-                                            In Progress
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        className={
-                                            selectedJob.status ===
-                                                "Completed"
-                                                ? "progress-step active"
-                                                : "progress-step"
-                                        }
-                                    >
-                                        <div className="progress-circle">
-                                            <i className="bi bi-check2-all"></i>
-                                        </div>
-
-                                        <span>
-                                            Completed
-                                        </span>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* MODAL FOOTER */}
-                        <div className="job-modal-footer">
-
-                            <button
-                                className="btn btn-outline-primary rounded-pill px-4"
-                                onClick={() =>
-                                    openMessage(selectedJob)
-                                }
-                            >
-                                <i className="bi bi-chat-dots me-2"></i>
-                                Message Customer
-                            </button>
-
-                            {getNextStatus(
-                                selectedJob.status
-                            ) && (
-
-                                    <button
-                                        className="btn btn-success rounded-pill px-4"
-                                        onClick={() =>
-                                            updateStatus(
-                                                getNextStatus(
-                                                    selectedJob.status
-                                                )
-                                            )
-                                        }
-                                    >
-                                        <i className="bi bi-arrow-right-circle me-2"></i>
-
-                                        {getNextButtonText(
-                                            selectedJob.status
-                                        )}
-
-                                    </button>
-
-                                )}
-
-                            {selectedJob.status ===
-                                "Completed" && (
-
-                                    <button
-                                        className="btn btn-secondary rounded-pill px-4"
-                                        disabled
-                                    >
-                                        <i className="bi bi-check-circle me-2"></i>
-                                        Completed
-                                    </button>
-
-                                )}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            )}
-
-            {/* ======================================
-                MESSAGE MODAL
-            ====================================== */}
-
-            {showMessage && selectedJob && (
-
-                <div className="job-modal-overlay">
-
-                    <div className="message-modal">
-
-                        <div className="message-modal-header">
-
-                            <div>
-
-                                <small>
-                                    MESSAGE CUSTOMER
-                                </small>
-
-                                <h4>
-                                    {selectedJob.customerName}
-                                </h4>
-
-                            </div>
-
-                            <button
-                                className="modal-close"
-                                onClick={() =>
-                                    setShowMessage(false)
-                                }
-                            >
-                                ×
-                            </button>
-
-                        </div>
-
-                        <div className="message-modal-body">
-
-                            <div className="message-person">
-
-                                <div className="customer-avatar large">
-                                    {selectedJob.customerName
-                                        .charAt(0)
-                                        .toUpperCase()}
-                                </div>
-
-                                <div>
-
-                                    <strong>
-                                        {selectedJob.customerName}
-                                    </strong>
-
-                                    <small>
-                                        {selectedJob.service}
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-                            <textarea
-                                className="form-control"
-                                rows="6"
-                                placeholder="Type your message..."
-                                value={message}
-                                onChange={(e) =>
-                                    setMessage(e.target.value)
-                                }
-                                minLength="1"
-                                maxLength="1000"
-                                required
-                            ></textarea>
-
-                        </div>
-
-                        <div className="message-modal-footer">
-
-                            <button
-                                className="btn btn-light rounded-pill px-4"
-                                onClick={() =>
-                                    setShowMessage(false)
-                                }
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                className="btn btn-success rounded-pill px-4"
-                                onClick={handleSendMessage}
-                            >
-                                <i className="bi bi-send me-2"></i>
-                                Send Message
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            )}
-
-        </div>
-    );
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getMyBookings, sendMessage, updateBookingStatus } from '../../services/api';
+import myLogo from '../../assets/images/logo.png';
+import airconImage from '../../assets/services/aircon.jpg';
+import applianceRepairImage from '../../assets/services/appliance-repair.jpg';
+import deepCleanerImage from '../../assets/services/deep-cleaner.jpg';
+import electricianImage from '../../assets/services/electrician.jpg';
+import plumberImage from '../../assets/services/plumber.jpg';
+import './ProviderJobs.css';
+
+const PAGE_SIZE = 5;
+const TABS = ['All Jobs', 'Pending', 'Upcoming', 'In Progress', 'Completed', 'Cancelled'];
+const SERVICE_IMAGES = [
+    { keywords: ['clean'], image: deepCleanerImage },
+    { keywords: ['aircon', 'air con', 'air conditioning'], image: airconImage },
+    { keywords: ['electric', 'electrical'], image: electricianImage },
+    { keywords: ['plumb'], image: plumberImage },
+    { keywords: ['appliance'], image: applianceRepairImage },
+];
+const toDate = (date) => date ? new Date(`${date}T00:00:00`) : null;
+const displayDate = (date) => toDate(date)?.toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+}) || 'Date not set';
+const displayTime = (time) => time ? new Date(`1970-01-01T${time}`).toLocaleTimeString('en-US', {
+    hour: 'numeric', minute: '2-digit',
+}) : 'Time not set';
+const serviceImage = (service) => {
+    const normalizedService = service.toLowerCase();
+    return SERVICE_IMAGES.find(({ keywords }) => keywords.some((keyword) => normalizedService.includes(keyword)))?.image;
+};
+const statusGroup = (status) => {
+    if (status === 'Pending') return 'Pending';
+    if (status === 'In Progress' || status === 'On the Way') return 'In Progress';
+    if (status === 'Completed') return 'Completed';
+    if (status === 'Cancelled' || status === 'Rejected') return 'Cancelled';
+    return 'Upcoming';
 };
 
-export default ProviderJobs;
+export default function ProviderJobs() {
+    const navigate = useNavigate();
+    const [profile] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('user') || '{}');
+        } catch (profileError) {
+            console.error('Unable to read provider account:', profileError);
+            return {};
+        }
+    });
+    const [jobs, setJobs] = useState([]);
+    const [activeTab, setActiveTab] = useState('All Jobs');
+    const [search, setSearch] = useState('');
+    const [serviceFilter, setServiceFilter] = useState('All Service Types');
+    const [statusFilter, setStatusFilter] = useState('All Status');
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
+    const [page, setPage] = useState(1);
+    const [expandedJobId, setExpandedJobId] = useState(null);
+    const [selectedJob, setSelectedJob] = useState(null);
+    const [message, setMessage] = useState('');
+    const [showMessage, setShowMessage] = useState(false);
+    const [error, setError] = useState('');
+    const [busyId, setBusyId] = useState(null);
+
+    const loadJobs = () => getMyBookings().then((bookings) => setJobs(bookings.map((booking) => ({
+        id: booking.id,
+        recipientId: booking.homeownerId,
+        requestNo: booking.bookingCode || `#${booking.id}`,
+        customerName: booking.customerName || 'Homeowner',
+        customerPhoto: booking.customerProfilePicture,
+        service: booking.category || 'Service request',
+        location: booking.address || 'Location not provided',
+        contact: booking.customerPhone || 'Not provided',
+        dateValue: booking.preferredDate || '',
+        date: displayDate(booking.preferredDate),
+        time: displayTime(booking.preferredTime),
+        status: booking.status || 'Pending',
+        description: booking.description || '',
+    })))).catch((loadError) => setError(loadError.message || 'Unable to load jobs.'));
+
+    useEffect(() => { loadJobs(); }, []);
+
+    const counts = useMemo(() => ({
+        upcoming: jobs.filter((job) => statusGroup(job.status) === 'Upcoming').length,
+        pending: jobs.filter((job) => job.status === 'Pending').length,
+        progress: jobs.filter((job) => statusGroup(job.status) === 'In Progress').length,
+        completed: jobs.filter((job) => job.status === 'Completed').length,
+        cancelled: jobs.filter((job) => statusGroup(job.status) === 'Cancelled').length,
+    }), [jobs]);
+
+    const services = useMemo(() => [...new Set(jobs.map((job) => job.service))].sort(), [jobs]);
+    const filteredJobs = useMemo(() => jobs.filter((job) => {
+        const term = search.trim().toLowerCase();
+        const matchesSearch = !term || [job.requestNo, job.customerName, job.service, job.location]
+            .some((value) => value.toLowerCase().includes(term));
+        const matchesTab = activeTab === 'All Jobs' || statusGroup(job.status) === activeTab;
+        const matchesService = serviceFilter === 'All Service Types' || job.service === serviceFilter;
+        const matchesStatus = statusFilter === 'All Status' || job.status === statusFilter;
+        const matchesStart = !dateFrom || job.dateValue >= dateFrom;
+        const matchesEnd = !dateTo || job.dateValue <= dateTo;
+        return matchesSearch && matchesTab && matchesService && matchesStatus && matchesStart && matchesEnd;
+    }).sort((a, b) => `${a.dateValue} ${a.time}`.localeCompare(`${b.dateValue} ${b.time}`)),
+    [jobs, search, activeTab, serviceFilter, statusFilter, dateFrom, dateTo]);
+
+    useEffect(() => setPage(1), [search, activeTab, serviceFilter, statusFilter, dateFrom, dateTo]);
+    const totalPages = Math.max(1, Math.ceil(filteredJobs.length / PAGE_SIZE));
+    const visibleJobs = filteredJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const updateStatus = async (job, status) => {
+        setBusyId(job.id);
+        setError('');
+        try {
+            const updated = await updateBookingStatus(job.id, status);
+            setJobs((current) => current.map((item) => item.id === job.id ? { ...item, status: updated.status || status } : item));
+            setSelectedJob((current) => current?.id === job.id ? { ...current, status: updated.status || status } : current);
+        } catch (statusError) {
+            setError(statusError.message || 'Unable to update this job.');
+        } finally {
+            setBusyId(null);
+        }
+    };
+
+    const submitMessage = async () => {
+        if (!selectedJob || !message.trim()) return;
+        try {
+            await sendMessage(selectedJob.recipientId, message.trim(), selectedJob.id);
+            setMessage('');
+            setShowMessage(false);
+        } catch (sendError) {
+            setError(sendError.message || 'Unable to send your message.');
+        }
+    };
+
+    const statusClass = (status) => `job-pill job-pill-${status.toLowerCase().replaceAll(' ', '-')}`;
+    const showDetails = (job) => setSelectedJob(job);
+
+    return (
+        <section className="provider-my-jobs">
+            <header className="my-jobs-topbar">
+                <button type="button" className="my-jobs-brand" aria-label="Go to Provider Dashboard" onClick={() => navigate('/provider-dashboard')}>
+                    <img src={myLogo} alt="" />
+                </button>
+                <label className="my-jobs-topbar-search">
+                    <i className="bi bi-search" />
+                    <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search jobs, customers, or service type..." aria-label="Search jobs, customers, or service type" />
+                </label>
+                <button type="button" className="my-jobs-notifications" aria-label="Notifications" onClick={() => navigate('/provider-notifications')}>
+                    <i className="bi bi-bell" /><span />
+                </button>
+                <button type="button" className="my-jobs-profile" onClick={() => navigate('/provider-profile')}>
+                    {profile.profilePicture || profile.profileImage || profile.profilePhoto || profile.photo || profile.image
+                        ? <img src={profile.profilePicture || profile.profileImage || profile.profilePhoto || profile.photo || profile.image} alt="" />
+                        : <span className="my-jobs-profile-placeholder"><i className="bi bi-person" /></span>}
+                    <span><strong>{profile.fullName || profile.name || 'Provider'}</strong><small>Service Provider</small></span>
+                    <i className="bi bi-chevron-down" />
+                </button>
+            </header>
+
+            <header className="my-jobs-heading">
+                <div>
+                    <h1>My Jobs</h1>
+                    <p>View and manage all your service jobs in one place.</p>
+                </div>
+                <button type="button" className="my-jobs-availability" onClick={() => navigate('/provider-availability')}>
+                    <i className="bi bi-calendar2-week" /> Set Availability <i className="bi bi-arrow-right" />
+                </button>
+            </header>
+
+            <div className="my-jobs-stats">
+                <Summary icon="calendar2-check" value={counts.upcoming} label="Upcoming Jobs" tone="green" />
+                <Summary icon="hourglass-split" value={counts.pending} label="Pending Requests" tone="orange" />
+                <Summary icon="play-circle-fill" value={counts.progress} label="In Progress" tone="blue" />
+                <Summary icon="check-circle-fill" value={counts.completed} label="Completed" tone="green" />
+                <Summary icon="x-circle-fill" value={counts.cancelled} label="Cancelled" tone="red" />
+            </div>
+
+            <nav className="my-jobs-tabs" aria-label="Filter jobs by status">
+                {TABS.map((tab) => <button type="button" key={tab} className={activeTab === tab ? 'active' : ''} onClick={() => setActiveTab(tab)}>
+                    {tab}{tab === 'Pending' ? ` (${counts.pending})` : tab === 'Upcoming' ? ` (${counts.upcoming})` : tab === 'In Progress' ? ` (${counts.progress})` : tab === 'Completed' ? ` (${counts.completed})` : tab === 'Cancelled' ? ` (${counts.cancelled})` : ''}
+                </button>)}
+            </nav>
+
+            <div className="my-jobs-filters">
+                <label className="my-jobs-search"><i className="bi bi-search" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search jobs..." /></label>
+                <select aria-label="Filter by service type" value={serviceFilter} onChange={(event) => setServiceFilter(event.target.value)}>
+                    <option>All Service Types</option>{services.map((service) => <option key={service}>{service}</option>)}
+                </select>
+                <select aria-label="Filter by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                    <option>All Status</option>{[...new Set(jobs.map((job) => job.status))].sort().map((status) => <option key={status}>{status}</option>)}
+                </select>
+                <div className="my-jobs-date-filter"><i className="bi bi-calendar-event" /><input aria-label="Start date" type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} /><span>to</span><input aria-label="End date" type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} /></div>
+            </div>
+
+            {error && <div className="my-jobs-error" role="alert">{error}</div>}
+            <div className="my-jobs-table-wrap">
+                <table className="my-jobs-table">
+                    <thead><tr><th>#</th><th>Service Details</th><th>Customer</th><th>Date &amp; Time</th></tr></thead>
+                    <tbody>{visibleJobs.map((job) => <Fragment key={job.id}><tr
+                        className={`job-row-clickable${expandedJobId === job.id ? ' job-row-selected' : ''}`}
+                        tabIndex={0}
+                        aria-expanded={expandedJobId === job.id}
+                        aria-controls={`job-expanded-${job.id}`}
+                        aria-label={`Show location, status, and actions for ${job.service} booking ${job.requestNo}`}
+                        onClick={() => setExpandedJobId((current) => current === job.id ? null : job.id)}
+                        onKeyDown={(event) => {
+                            if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                                event.preventDefault();
+                                setExpandedJobId((current) => current === job.id ? null : job.id);
+                            }
+                        }}
+                    >
+                        <td className="job-code">{job.requestNo}</td>
+                        <td><div className="job-service-cell">{serviceImage(job.service) ? <img className="job-service-image" src={serviceImage(job.service)} alt="" /> : <span className="job-service-icon"><i className="bi bi-tools" /></span>}<div><strong>{job.service}</strong><small>{job.service}</small></div></div></td>
+                        <td><div className="job-customer-cell">{job.customerPhoto ? <img src={job.customerPhoto} alt="" /> : <span className="job-customer-initial">{job.customerName.charAt(0).toUpperCase()}</span>}<div><strong>{job.customerName}</strong><small>{job.contact}</small></div></div></td>
+                        <td><div className="job-datetime"><span><i className="bi bi-calendar3" />{job.date}</span><span><i className="bi bi-clock" />{job.time}</span></div></td>
+                    </tr>
+                    {expandedJobId === job.id && <tr className="job-expanded-row" id={`job-expanded-${job.id}`}>
+                        <td colSpan="4">
+                            <div className="job-expanded-details">
+                                <div className="job-expanded-location"><small>Location</small><span className="job-location-cell"><i className="bi bi-geo-alt" />{job.location}</span></div>
+                                <div className="job-expanded-status"><small>Status</small><span className={statusClass(job.status)}>{job.status === 'Accepted' || job.status === 'Matched' ? 'Upcoming' : job.status}</span></div>
+                                <div className="job-expanded-actions"><small>Actions</small><div className="job-row-actions">
+                                    {job.status === 'Pending' && <button type="button" className="job-accept-button" disabled={busyId === job.id} onClick={() => updateStatus(job, 'Accepted')}>Accept</button>}
+                                    <button type="button" className="job-view-button" onClick={() => showDetails(job)}>View Details</button>
+                                </div></div>
+                            </div>
+                        </td>
+                    </tr>}
+                    </Fragment>)}</tbody>
+                </table>
+                {visibleJobs.length === 0 && <div className="my-jobs-empty">No jobs match these filters.</div>}
+                <footer className="my-jobs-pagination"><span>Showing {filteredJobs.length ? (page - 1) * PAGE_SIZE + 1 : 0} to {Math.min(page * PAGE_SIZE, filteredJobs.length)} of {filteredJobs.length} jobs</span><div><button type="button" aria-label="Previous page" disabled={page <= 1} onClick={() => setPage((current) => current - 1)}><i className="bi bi-chevron-left" /></button><strong>{page}</strong><button type="button" aria-label="Next page" disabled={page >= totalPages} onClick={() => setPage((current) => current + 1)}><i className="bi bi-chevron-right" /></button></div></footer>
+            </div>
+
+            {selectedJob && <div className="job-modal-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedJob(null); }}>
+                <section className="job-details-modal" role="dialog" aria-modal="true" aria-labelledby="job-details-title">
+                    <header className="job-modal-header"><div><span>BOOKING</span><h2 id="job-details-title">{selectedJob.requestNo}</h2></div><button type="button" className="modal-close" aria-label="Close" onClick={() => setSelectedJob(null)}>×</button></header>
+                    <div className="job-modal-body"><span className={statusClass(selectedJob.status)}>{selectedJob.status}</span>
+                        <h3>{selectedJob.service}</h3><p>{selectedJob.description || 'No additional job details provided.'}</p>
+                        <dl className="job-details-list"><div><dt>Customer</dt><dd>{selectedJob.customerName}</dd></div><div><dt>Contact</dt><dd>{selectedJob.contact}</dd></div><div><dt>Date and time</dt><dd>{selectedJob.date} · {selectedJob.time}</dd></div><div><dt>Location</dt><dd>{selectedJob.location}</dd></div></dl>
+                    </div>
+                    <footer className="job-modal-footer"><button type="button" className="btn btn-outline-success" onClick={() => setShowMessage(true)}>Message Customer</button>{selectedJob.status === 'Pending' ? <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, 'Accepted')}>Accept Request</button> : ['Accepted', 'On the Way', 'In Progress'].includes(selectedJob.status) && <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, selectedJob.status === 'Accepted' ? 'On the Way' : selectedJob.status === 'On the Way' ? 'In Progress' : 'Completed')}>{selectedJob.status === 'Accepted' ? 'Mark On the Way' : selectedJob.status === 'On the Way' ? 'Start Job' : 'Mark Completed'}</button>}</footer>
+                </section>
+            </div>}
+
+            {showMessage && selectedJob && <div className="job-modal-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowMessage(false); }}>
+                <section className="message-modal" role="dialog" aria-modal="true" aria-labelledby="job-message-title"><header className="message-modal-header"><h2 id="job-message-title">Message {selectedJob.customerName}</h2><button type="button" className="modal-close" aria-label="Close" onClick={() => setShowMessage(false)}>×</button></header><div className="message-modal-body"><textarea className="form-control" rows="5" maxLength="1000" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Type your message..." /></div><footer className="message-modal-footer"><button type="button" className="btn btn-light" onClick={() => setShowMessage(false)}>Cancel</button><button type="button" className="btn btn-success" disabled={!message.trim()} onClick={submitMessage}>Send Message</button></footer></section>
+            </div>}
+        </section>
+    );
+}
+
+function Summary({ icon, value, label, tone }) {
+    return <article className={`my-jobs-stat my-jobs-stat-${tone}`}><span className="my-jobs-stat-icon"><i className={`bi bi-${icon}`} /></span><div><strong>{value}</strong><small>{label}</small></div><i className="bi bi-chevron-right my-jobs-stat-arrow" /></article>;
+}

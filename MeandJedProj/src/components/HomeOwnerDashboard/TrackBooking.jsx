@@ -1,20 +1,35 @@
-import React from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { api } from '../../services/api';
 
 const TrackBooking = () => {
     const location = useLocation();
+    const [bookingData, setBookingData] = useState(location.state?.booking || null);
+    const [loading, setLoading] = useState(!location.state?.booking);
+    const [loadError, setLoadError] = useState('');
 
-    // Kunin ang booking data mula sa state kung mayroon, kung wala gagamit ng fallback
-    const bookingData = location.state?.booking || {
-        id: "REQ-2026-0831",
-        category: "Electrician",
-        providerName: "Juan Dela Cruz",
-        preferredDate: "2026-08-31",
-        preferredTime: "14:30",
-        status: "Pending" // Default status
-    };
+    useEffect(() => {
+        if (location.state?.booking) return undefined;
+        let active = true;
+        api('/bookings/my')
+            .then((bookings) => {
+                if (active) {
+                    if (bookings.length) setBookingData(bookings[0]);
+                    else setLoadError('No bookings are available to track yet.');
+                }
+            })
+            .catch((error) => {
+                if (active) setLoadError(error.message || 'Unable to load booking status.');
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [location.state]);
 
     // Listahan ng lahat ng steps
     const steps = [
@@ -27,13 +42,13 @@ const TrackBooking = () => {
     ];
 
     // Hanapin ang index base sa status ng booking (Halimbawa: "Pending" = Index 0)
-    const currentStep = steps.findIndex(
-        (step) => step.label.toLowerCase() === (bookingData.status || 'pending').toLowerCase()
-    );
+    const status = (bookingData?.status || 'pending').toLowerCase();
+    const currentStep = steps.findIndex((step) => step.label.toLowerCase() === status);
 
     // Siguraduhing valid ang step index (0 kung di mahanap)
     const activeIndex = currentStep !== -1 ? currentStep : 0;
-    const isCompleted = activeIndex === 5;
+    const isCompleted = status === 'completed';
+    const isClosed = ['cancelled', 'rejected'].includes(status);
 
     const getStatusText = (stepIndex) => {
         switch (stepIndex) {
@@ -53,6 +68,22 @@ const TrackBooking = () => {
                 return { title: "", desc: "" };
         }
     };
+
+    if (loading) {
+        return <div className="container py-5 text-center"><div className="spinner-border text-warning" role="status"><span className="visually-hidden">Loading booking...</span></div></div>;
+    }
+
+    if (loadError || !bookingData) {
+        return (
+            <div className="container py-5">
+                <Link to="/homeowner-dashboard" className="text-decoration-none text-dark fw-bold">
+                    <i className="bi bi-arrow-left me-2"></i>Back to Dashboard
+                </Link>
+                <div className="alert alert-info mt-4" role="status">{loadError || 'No booking selected.'}</div>
+                <Link to="/history" className="btn btn-warning text-white">View Service History</Link>
+            </div>
+        );
+    }
 
     return (
         <div className="container py-4 px-lg-5" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -76,16 +107,21 @@ const TrackBooking = () => {
                 <div className="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
                     <div>
                         <small className="text-muted d-block fw-semibold text-uppercase">REQUEST NUMBER</small>
-                        <span className="fw-bold fs-4 text-primary">{bookingData.id}</span>
+                        <span className="fw-bold fs-4 text-primary">{bookingData.bookingCode || bookingData.id}</span>
                     </div>
                     {/* Badge Color base sa Status */}
-                    <span className={`badge ${isCompleted ? 'bg-warning text-white' : 'bg-secondary-subtle text-dark'} px-3 py-2 rounded-pill fw-bold fs-6`}>
-                        {steps[activeIndex].label}
+                    <span className={`badge ${isCompleted ? 'bg-warning text-white' : isClosed ? 'bg-danger' : 'bg-secondary-subtle text-dark'} px-3 py-2 rounded-pill fw-bold fs-6`}>
+                        {isClosed ? bookingData.status : steps[activeIndex].label}
                     </span>
                 </div>
 
+                <p className="text-muted">
+                    {bookingData.category || 'Service booking'} · {bookingData.preferredDate} at {bookingData.preferredTime}
+                    {bookingData.providerName ? ` · ${bookingData.providerName}` : ''}
+                </p>
+
                 {/* Stepper Bar */}
-                <div className="d-flex align-items-start justify-content-between my-4 px-2">
+                {!isClosed && <div className="d-flex align-items-start justify-content-between my-4 px-2">
                     {steps.map((step, index) => {
                         const isPassed = index < activeIndex;
                         const isCurrent = index === activeIndex;
@@ -104,7 +140,7 @@ const TrackBooking = () => {
                         }
 
                         return (
-                            <React.Fragment key={index}>
+                            <Fragment key={index}>
                                 <div className="text-center position-relative" style={{ minWidth: '60px' }}>
                                     <div
                                         className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 tracker-step-icon"
@@ -134,15 +170,19 @@ const TrackBooking = () => {
                                         }}
                                     ></div>
                                 )}
-                            </React.Fragment>
+                            </Fragment>
                         );
                     })}
-                </div>
+                </div>}
 
                 {/* Status Message */}
                 <div className="bg-light rounded-4 p-4 mt-4 text-center">
-                    <h6 className="fw-bold mb-1 text-dark fs-5">{getStatusText(activeIndex).title}</h6>
-                    <p className="text-muted small m-0">{getStatusText(activeIndex).desc}</p>
+                    <h6 className="fw-bold mb-1 text-dark fs-5">
+                        {isClosed ? `Booking ${bookingData.status.toLowerCase()}` : getStatusText(activeIndex).title}
+                    </h6>
+                    <p className="text-muted small m-0">
+                        {isClosed ? 'This booking is no longer active.' : getStatusText(activeIndex).desc}
+                    </p>
                 </div>
             </div>
 

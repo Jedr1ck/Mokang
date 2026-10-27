@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./AdminDashboard.css";
+import { api } from "../../services/api";
 
 function ReviewsComplaints() {
     const [feedback, setFeedback] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
+    const [actionError, setActionError] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
     const [typeFilter, setTypeFilter] = useState("All");
@@ -22,6 +26,23 @@ function ReviewsComplaints() {
     const [feedbackToDelete, setFeedbackToDelete] = useState(null);
 
     const itemsPerPage = 5;
+
+    useEffect(() => {
+        let active = true;
+        api("/admin/feedback")
+            .then((items) => {
+                if (active) setFeedback(items);
+            })
+            .catch((error) => {
+                if (active) setLoadError(error.message || "Unable to load feedback.");
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const filteredFeedback = useMemo(() => {
         return feedback.filter((item) => {
@@ -86,10 +107,6 @@ function ReviewsComplaints() {
         (item) => item.status === "Pending"
     ).length;
 
-    const resolvedCount = feedback.filter(
-        (item) => item.status === "Resolved"
-    ).length;
-
     const handleSearch = (value) => {
         setSearchTerm(value);
         setCurrentPage(1);
@@ -127,23 +144,29 @@ function ReviewsComplaints() {
         setNewStatus("");
     };
 
-    const handleStatusUpdate = () => {
+    const handleStatusUpdate = async () => {
         if (!feedbackForStatus || !newStatus) {
             return;
         }
 
-        setFeedback((previousFeedback) =>
-            previousFeedback.map((item) =>
-                item.id === feedbackForStatus.id
-                    ? {
-                        ...item,
-                        status: newStatus,
-                    }
-                    : item
-            )
-        );
-
-        closeStatusModal();
+        setActionError("");
+        try {
+            const updated = await api(
+                `/admin/feedback/complaints/${feedbackForStatus.recordId}/status`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({ status: newStatus }),
+                }
+            );
+            setFeedback((previousFeedback) =>
+                previousFeedback.map((item) =>
+                    item.id === updated.id ? { ...item, status: updated.status } : item
+                )
+            );
+            closeStatusModal();
+        } catch (error) {
+            setActionError(error.message || "Unable to update complaint status.");
+        }
     };
 
     const openDeleteModal = (item) => {
@@ -156,16 +179,24 @@ function ReviewsComplaints() {
         setShowDeleteModal(false);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!feedbackToDelete) {
             return;
         }
 
-        setFeedback((previousFeedback) =>
-            previousFeedback.filter(
-                (item) => item.id !== feedbackToDelete.id
-            )
-        );
+        setActionError("");
+        try {
+            const feedbackType = feedbackToDelete.type === "Review" ? "reviews" : "complaints";
+            await api(`/admin/feedback/${feedbackType}/${feedbackToDelete.recordId}`, {
+                method: "DELETE",
+            });
+            setFeedback((previousFeedback) =>
+                previousFeedback.filter((item) => item.id !== feedbackToDelete.id)
+            );
+        } catch (error) {
+            setActionError(error.message || "Unable to delete feedback.");
+            return;
+        }
 
         closeDeleteModal();
 
@@ -262,6 +293,8 @@ function ReviewsComplaints() {
                         Monitor homeowner feedback, reviews,
                         and service-related complaints.
                     </p>
+                    {loadError && <div className="alert alert-danger" role="alert">{loadError}</div>}
+                    {actionError && <div className="alert alert-danger" role="alert">{actionError}</div>}
                 </div>
             </div>
 
@@ -435,7 +468,9 @@ function ReviewsComplaints() {
 
                         <tbody>
 
-                            {paginatedFeedback.length > 0 ? (
+                            {loading ? (
+                                <tr><td colSpan="9" className="reviews-table-empty">Loading feedback...</td></tr>
+                            ) : paginatedFeedback.length > 0 ? (
                                 paginatedFeedback.map((item) => (
                                     <tr key={item.id}>
 
@@ -521,7 +556,7 @@ function ReviewsComplaints() {
                                                     <i className="bi bi-eye"></i>
                                                 </button>
 
-                                                <button
+                                                {item.type === "Complaint" && <button
                                                     type="button"
                                                     className="reviews-action-button edit"
                                                     title="Update Status"
@@ -532,7 +567,7 @@ function ReviewsComplaints() {
                                                     }
                                                 >
                                                     <i className="bi bi-pencil"></i>
-                                                </button>
+                                                </button>}
 
                                                 <button
                                                     type="button"

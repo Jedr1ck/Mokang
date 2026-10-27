@@ -65,13 +65,16 @@ def list_pending_verifications():
                     "businessName": provider.business_name,
                     "bio": provider.bio,
                     "services": service_names,
+                    "servicePrices": [
+                        {
+                            "name": item.title,
+                            "price": float(item.rate),
+                        }
+                        for item in services
+                        if item.title and item.rate is not None
+                    ],
                     "qualifications": provider.qualifications,
                     "experienceYears": provider.experience_years or 0,
-                    "hourlyRate": (
-                        float(provider.hourly_rate)
-                        if provider.hourly_rate is not None
-                        else None
-                    ),
                     "serviceArea": provider.service_area,
                     "region": provider.region_name,
                     "province": provider.province_name,

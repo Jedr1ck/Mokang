@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -15,7 +15,8 @@ const ProviderSideBar = () => {
 
     // ACTIVE LINK
     const isActive = (path) => {
-        return location.pathname === path;
+        return location.pathname === path ||
+            (path === "/provider-schedule" && location.pathname === "/provider-availability");
     };
 
     // LOGOUT
@@ -102,18 +103,33 @@ const ProviderSideBar = () => {
                         </span>
                     </Link>
 
-                    {/* SCHEDULE */}
+                    {/* CALENDAR & SCHEDULE */}
                     <Link
                         to="/provider-schedule"
                         className={`provider-sidebar-btn ${isActive("/provider-schedule")
                                 ? "active"
                                 : ""
                             }`}
-                        title="Schedule"
+                        title="Calendar & Schedule"
                     >
                         <i className="bi bi-calendar-event"></i>
                         <span className="provider-link-text">
-                            Schedule
+                            Calendar & Schedule
+                        </span>
+                    </Link>
+
+                    {/* MESSAGES */}
+                    <Link
+                        to="/provider-messages"
+                        className={`provider-sidebar-btn ${isActive("/provider-messages")
+                                ? "active"
+                                : ""
+                            }`}
+                        title="Messages"
+                    >
+                        <i className="bi bi-chat-dots"></i>
+                        <span className="provider-link-text">
+                            Messages
                         </span>
                     </Link>
 
@@ -129,36 +145,6 @@ const ProviderSideBar = () => {
                         <i className="bi bi-star"></i>
                         <span className="provider-link-text">
                             Ratings & Reviews
-                        </span>
-                    </Link>
-
-                    {/* EARNINGS */}
-                    <Link
-                        to="/provider-earnings"
-                        className={`provider-sidebar-btn ${isActive("/provider-earnings")
-                                ? "active"
-                                : ""
-                            }`}
-                        title="Earnings"
-                    >
-                        <i className="bi bi-wallet2"></i>
-                        <span className="provider-link-text">
-                            Earnings
-                        </span>
-                    </Link>
-
-                    {/* AVAILABILITY */}
-                    <Link
-                        to="/provider-availability"
-                        className={`provider-sidebar-btn ${isActive("/provider-availability")
-                                ? "active"
-                                : ""
-                            }`}
-                        title="Availability"
-                    >
-                        <i className="bi bi-clock"></i>
-                        <span className="provider-link-text">
-                            Availability
                         </span>
                     </Link>
 

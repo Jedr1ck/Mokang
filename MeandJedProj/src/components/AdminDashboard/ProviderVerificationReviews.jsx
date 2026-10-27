@@ -210,7 +210,16 @@ function ProviderVerificationReviews({ onBack }) {
                                         <p><b>Services</b>{request.services?.filter(Boolean).join(", ") || "Not provided"}</p>
                                         <p><b>Qualifications</b>{request.qualifications || "Not provided"}</p>
                                         <p><b>Experience</b>{request.experienceYears} years</p>
-                                        <p><b>Rate</b>{request.hourlyRate == null ? "Not provided" : `₱${request.hourlyRate}`}</p>
+                                        <div className="verification-service-prices">
+                                            <b>Specific service prices</b>
+                                            {request.servicePrices?.length
+                                                ? request.servicePrices.map((service) => (
+                                                    <span key={service.name}>
+                                                        {service.name}: ₱{Number(service.price).toLocaleString()}
+                                                    </span>
+                                                ))
+                                                : <span>Not provided</span>}
+                                        </div>
                                         <p><b>Service area</b>{request.serviceArea || "Not provided"}</p>
                                         <p><b>Location</b>{[
                                             request.streetAddress,

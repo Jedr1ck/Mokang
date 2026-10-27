@@ -5,5 +5,11 @@
         "dev": "npm --prefix MeandJedProj run dev",
         "build": "npm --prefix MeandJedProj run build",
         "lint": "npm --prefix MeandJedProj run lint"
+    },
+    "dependencies": {
+        "@googlemaps/js-api-loader": "^2.1.3",
+        "leaflet": "^1.9.4",
+        "lucide-react": "^1.61.0",
+        "react-leaflet": "^5.0.0"
     }
 }

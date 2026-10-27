@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 
 from app.common import ApiError, current_user, get_session, require_auth, validated
-from app.models import Booking, Message, User
+from app.models import Booking, Message, Notification, User
 from app.schemas import MessageIn
 
 messages_bp = Blueprint("messages", __name__)
@@ -42,6 +42,14 @@ def send_message():
             body=data.body,
         )
         session.add(message)
+        session.add(
+            Notification(
+                user_id=recipient.id,
+                title="New message",
+                body=f"{user.full_name} sent you a message.",
+                type="message",
+            )
+        )
         session.commit()
         session.refresh(message)
         return jsonify(
@@ -91,10 +99,22 @@ def get_messages():
                         if row.sender_id in users
                         else "User"
                     ),
+                    "senderProfilePicture": (
+                        users[row.sender_id].profile.profile_picture
+                        if row.sender_id in users
+                        and users[row.sender_id].profile
+                        else None
+                    ),
                     "recipientName": (
                         users[row.recipient_id].full_name
                         if row.recipient_id in users
                         else "User"
+                    ),
+                    "recipientProfilePicture": (
+                        users[row.recipient_id].profile.profile_picture
+                        if row.recipient_id in users
+                        and users[row.recipient_id].profile
+                        else None
                     ),
                 }
                 for row in rows

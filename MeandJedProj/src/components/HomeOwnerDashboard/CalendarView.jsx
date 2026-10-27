@@ -1,42 +1,37 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
+import { api } from '../../services/api';
 
 const CalendarView = () => {
-    const [currentDate, setCurrentDate] = useState(new Date(2026, 8, 1)); // September 2026
-    const [selectedDate, setSelectedDate] = useState('2026-09-15');
+    const today = new Date();
+    const toDateString = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+    const [selectedDate, setSelectedDate] = useState(toDateString(today));
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
-    // Sample Scheduled Events & Bookings
-    const [events] = useState([
-        {
-            id: 1,
-            date: '2026-09-10',
-            time: '09:00 AM - 11:00 AM',
-            title: 'Plumbing Service',
-            provider: 'Mario Plumbing Services',
-            type: 'Service Request',
-            status: 'Confirmed'
-        },
-        {
-            id: 2,
-            date: '2026-09-15',
-            time: '02:00 PM - 04:00 PM',
-            title: 'AC Cleaning & Maintenance',
-            provider: 'Cool Breeze Tech',
-            type: 'Service Request',
-            status: 'Pending'
-        },
-        {
-            id: 3,
-            date: '2026-09-20',
-            time: '10:00 AM',
-            title: 'Monthly Subscription Renewal',
-            provider: 'Homeowner Membership',
-            type: 'Billing',
-            status: 'Upcoming'
-        }
-    ]);
+    useEffect(() => {
+        api('/bookings/my')
+            .then((bookings) => setEvents(bookings.map((booking) => ({
+                id: booking.id,
+                date: booking.preferredDate,
+                time: booking.preferredTime,
+                title: booking.category || 'Service Request',
+                provider: booking.providerName || 'Provider not assigned',
+                type: 'Service Booking',
+                status: booking.status
+            }))))
+            .catch((error) => setLoadError(error.message || 'Unable to load scheduled bookings.'))
+            .finally(() => setLoading(false));
+    }, []);
 
     // Helpers for Calendar calculation
     const year = currentDate.getFullYear();
@@ -59,9 +54,7 @@ const CalendarView = () => {
     };
 
     const formatDateString = (dayNum) => {
-        const formattedMonth = String(month + 1).padStart(2, '0');
-        const formattedDay = String(dayNum).padStart(2, '0');
-        return `${year}-${formattedMonth}-${formattedDay}`;
+        return toDateString(new Date(year, month, dayNum));
     };
 
     // Filter events for currently selected date
@@ -169,7 +162,9 @@ const CalendarView = () => {
                         ) : (
                             <div style={{ textAlign: 'center', color: '#9ca3af', padding: '30px 0' }}>
                                 <i className="bi bi-calendar-x" style={{ fontSize: '2rem' }}></i>
-                                <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>No scheduled bookings for this date.</p>
+                                <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>
+                                    {loading ? 'Loading bookings...' : loadError || 'No scheduled bookings for this date.'}
+                                </p>
                             </div>
                         )}
                     </section>

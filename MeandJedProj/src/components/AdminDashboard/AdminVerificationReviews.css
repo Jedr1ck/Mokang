@@ -129,6 +129,23 @@
     color: #475569;
 }
 
+.verification-service-prices {
+    display: grid;
+    grid-template-columns: minmax(100px, 140px) minmax(0, 1fr);
+    gap: 8px 10px;
+    margin-bottom: 9px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.verification-service-prices > b {
+    color: #475569;
+}
+
+.verification-service-prices > span {
+    grid-column: 2;
+}
+
 .verification-documents {
     border-top: 1px solid #e8edf2;
     padding-top: 18px;

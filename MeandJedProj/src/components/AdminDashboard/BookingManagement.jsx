@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./AdminDashboard.css";
+import { api } from "../../services/api";
 
 
 function BookingManagement() {
@@ -14,6 +15,9 @@ function BookingManagement() {
     ========================================================= */
 
     const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
+    const [actionError, setActionError] = useState("");
 
 
     /* =========================================================
@@ -56,6 +60,37 @@ function BookingManagement() {
 
 
     const itemsPerPage = 5;
+
+    const normalizeBooking = (booking) => ({
+        bookingId: booking.bookingCode || `REQ-${booking.id}`,
+        id: booking.id,
+        homeownerName: booking.customerName,
+        homeownerContact: booking.customerPhone,
+        providerName: booking.providerName,
+        service: booking.category,
+        date: booking.preferredDate,
+        time: booking.preferredTime,
+        location: booking.address,
+        notes: booking.description,
+        status: booking.status,
+    });
+
+    useEffect(() => {
+        let active = true;
+        api("/admin/bookings")
+            .then((items) => {
+                if (active) setBookings(items.map(normalizeBooking));
+            })
+            .catch((error) => {
+                if (active) setLoadError(error.message || "Unable to load bookings.");
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
 
 
     /* =========================================================
@@ -138,7 +173,7 @@ function BookingManagement() {
     const confirmedBookings =
         bookings.filter(
             (booking) =>
-                booking.status === "Confirmed"
+                ["Accepted", "Matched"].includes(booking.status)
         ).length;
 
     const completedBookings =
@@ -256,7 +291,7 @@ function BookingManagement() {
        UPDATE STATUS
     ========================================================= */
 
-    const handleStatusUpdate = () => {
+    const handleStatusUpdate = async () => {
 
         if (
             !bookingForStatusChange ||
@@ -265,6 +300,13 @@ function BookingManagement() {
             return;
         }
 
+        setActionError("");
+        try {
+            const updated = await api(`/admin/bookings/${bookingForStatusChange.id}/status`, {
+                method: "PATCH",
+                body: JSON.stringify({ status: newStatus }),
+            });
+            const normalized = normalizeBooking(updated);
 
         setBookings(
             (previousBookings) =>
@@ -272,13 +314,10 @@ function BookingManagement() {
                 previousBookings.map(
                     (booking) =>
 
-                        booking.bookingId ===
-                            bookingForStatusChange.bookingId
+                        booking.id ===
+                            bookingForStatusChange.id
 
-                            ? {
-                                ...booking,
-                                status: newStatus,
-                            }
+                            ? normalized
 
                             : booking
                 )
@@ -290,15 +329,14 @@ function BookingManagement() {
 
                 if (
                     !previous ||
-                    previous.bookingId !==
-                    bookingForStatusChange.bookingId
+                    previous.id !==
+                    bookingForStatusChange.id
                 ) {
                     return previous;
                 }
 
                 return {
-                    ...previous,
-                    status: newStatus,
+                    ...normalized,
                 };
 
             }
@@ -306,6 +344,9 @@ function BookingManagement() {
 
 
         closeStatusModal();
+        } catch (error) {
+            setActionError(error.message || "Unable to update booking status.");
+        }
 
     };
 
@@ -322,6 +363,8 @@ function BookingManagement() {
                 return "booking-status-pending";
 
             case "Confirmed":
+            case "Accepted":
+            case "Matched":
                 return "booking-status-confirmed";
 
             case "In Progress":
@@ -495,7 +538,7 @@ function BookingManagement() {
                     <div className="booking-summary-info">
 
                         <span>
-                            Confirmed
+                            Accepted / Matched
                         </span>
 
                         <strong>
@@ -641,9 +684,11 @@ function BookingManagement() {
                                     Pending
                                 </option>
 
-                                <option value="Confirmed">
-                                    Confirmed
+                                <option value="Accepted">
+                                    Accepted
                                 </option>
+                                <option value="Matched">Matched</option>
+                                <option value="On the Way">On the Way</option>
 
                                 <option value="In Progress">
                                     In Progress
@@ -720,6 +765,9 @@ function BookingManagement() {
 
                 {/* TABLE */}
 
+                {loadError && <div className="alert alert-danger" role="alert">{loadError}</div>}
+                {actionError && <div className="alert alert-danger" role="alert">{actionError}</div>}
+
                 <div className="booking-table-wrapper">
 
                     <table className="booking-table">
@@ -763,7 +811,9 @@ function BookingManagement() {
 
                         <tbody>
 
-                            {paginatedBookings.length > 0 ? (
+                            {loading ? (
+                                <tr><td colSpan="7">Loading bookings...</td></tr>
+                            ) : paginatedBookings.length > 0 ? (
 
                                 paginatedBookings.map(
                                     (booking) => (
@@ -1448,9 +1498,11 @@ function BookingManagement() {
                                                 Pending
                                             </option>
 
-                                            <option value="Confirmed">
-                                                Confirmed
+                                            <option value="Accepted">
+                                                Accepted
                                             </option>
+                                            <option value="Matched">Matched</option>
+                                            <option value="On the Way">On the Way</option>
 
                                             <option value="In Progress">
                                                 In Progress

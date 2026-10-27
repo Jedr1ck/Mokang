@@ -1,120 +1,133 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
-import { getMessages, sendMessage } from '../../services/api';
-import ProviderBookingCard from '../ProviderDashboard/ProviderBookingCard';
+import { getMessages, getMyBookings, sendMessage } from '../../services/api';
 
-const Messages = ({ embedded = false }) => {
-    const currentUserId = Number(JSON.parse(localStorage.getItem('user') || '{}').id);
-    const [conversations, setConversations] = useState([]); /*
-        {
-            id: 1,
-            name: 'Mario Plumbing Services',
-            avatar: 'https://via.placeholder.com/40',
-            lastMessage: 'Hi! I will arrive around 2:00 PM for the sink repair.',
-            time: '10:30 AM',
-            unread: true,
-            online: true,
-            messages: [
-                { id: 101, sender: 'provider', text: 'Hello! Confirmed na po ang schedule.', time: '10:00 AM' },
-                { id: 102, sender: 'user', text: 'Salamat po! Anong oras po kayo darating?', time: '10:15 AM' },
-                { id: 103, sender: 'provider', text: 'Hi! I will arrive around 2:00 PM for the sink repair.', time: '10:30 AM' }
-            ]
-        },
-        {
-            id: 2,
-            name: 'Cool Breeze Tech',
-            avatar: 'https://via.placeholder.com/40',
-            lastMessage: 'Thank you for choosing our AC cleaning service.',
-            time: 'Yesterday',
-            unread: false,
-            online: false,
-            messages: [
-                { id: 201, sender: 'provider', text: 'Thank you for choosing our AC cleaning service.', time: 'Yesterday' }
-            ]
-        },
-        {
-            id: 3,
-            name: 'Sparky Electricians',
-            avatar: 'https://via.placeholder.com/40',
-            lastMessage: 'All main breakers are checked and secure.',
-            time: 'Aug 25',
-            unread: false,
-            online: false,
-            messages: [
-                { id: 301, sender: 'provider', text: 'All main breakers are checked and secure.', time: 'Aug 25' }
-            ]
-        }
-    ]); */
-
-    const [activeChatId, setActiveChatId] = useState(1);
+const Messages = ({ embedded = false, bookings }) => {
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentUserId = Number(currentUser.id);
+    const currentUserRole = currentUser.role;
+    const [loadedBookings, setLoadedBookings] = useState([]);
+    const bookingRows = bookings ?? loadedBookings;
+    const [messageRows, setMessageRows] = useState([]);
+    const [activeChatId, setActiveChatId] = useState(null);
     const [newMessage, setNewMessage] = useState('');
     const [messageError, setMessageError] = useState('');
 
-
     useEffect(() => {
-        getMessages()
-            .then((rows) => {
-                const grouped = new Map();
-
-                rows.forEach((row) => {
-                    const otherId =
-                        Number(row.senderId) === currentUserId
-                            ? row.recipientId
-                            : row.senderId;
-
-                    const otherName =
-                        Number(row.senderId) === currentUserId
-                            ? row.recipientName
-                            : row.senderName;
-
-                    const conversation = grouped.get(otherId) || {
-                        id: otherId,
-                        recipientId: otherId,
-                        name: otherName,
-                        avatar: '',
-                        lastMessage: '',
-                        time: '',
-                        unread: false,
-                        online: false,
-                        messages: []
-                    };
-
-                    conversation.messages.push({
-                        id: row.id,
-                        bookingId: row.bookingId ?? null,
-                        sender:
-                            Number(row.senderId) === currentUserId
-                                ? 'user'
-                                : 'provider',
-                        text: row.body,
-                        time: new Date(row.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })
-                    });
-
-                    conversation.lastMessage = row.body;
-                    conversation.time = new Date(row.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    grouped.set(otherId, conversation);
+        let isCurrent = true;
+        const loadMessages = () => {
+            getMessages()
+                .then((rows) => {
+                    if (isCurrent) setMessageRows(rows);
+                })
+                .catch((error) => {
+                    if (isCurrent) setMessageError(error.message);
                 });
+        };
 
-                const loaded = [...grouped.values()];
-                setConversations(loaded);
-                setActiveChatId(loaded[0]?.id || null);
-            })
-            .catch((error) => setMessageError(error.message));
+        loadMessages();
+        const intervalId = window.setInterval(loadMessages, 5000);
+        return () => {
+            isCurrent = false;
+            window.clearInterval(intervalId);
+        };
     }, [currentUserId]);
 
-    const activeChat = conversations.find(c => c.id === activeChatId);
+    useEffect(() => {
+        if (bookings !== undefined) return;
+
+        getMyBookings()
+            .then(setLoadedBookings)
+            .catch((error) => setMessageError(error.message));
+    }, [bookings]);
+
+    const conversations = useMemo(() => {
+        const grouped = new Map();
+        const isHomeowner = currentUserRole === 'homeowner';
+        const conversationFor = (recipientId, name, profilePicture, bookingId) => {
+            const id = Number(recipientId);
+            if (!id) return null;
+
+            const conversation = grouped.get(id) || {
+                id,
+                recipientId: id,
+                name: name || 'User',
+                profilePicture: profilePicture || '',
+                bookingId: bookingId ?? null,
+                lastMessage: 'No messages yet — start the conversation.',
+                time: '',
+                messages: []
+            };
+            if (!conversation.profilePicture && profilePicture) {
+                conversation.profilePicture = profilePicture;
+            }
+            if (!conversation.bookingId && bookingId) {
+                conversation.bookingId = bookingId;
+            }
+            grouped.set(id, conversation);
+            return conversation;
+        };
+
+        bookingRows.forEach((booking) => {
+            if (isHomeowner) {
+                if (booking.providerUserId) {
+                    conversationFor(
+                        booking.providerUserId,
+                        booking.providerName,
+                        booking.providerProfilePicture,
+                        booking.id
+                    );
+                }
+            } else if (Number(booking.providerUserId) === currentUserId) {
+                conversationFor(
+                    booking.homeownerId,
+                    booking.customerName,
+                    booking.customerProfilePicture,
+                    booking.id
+                );
+            }
+        });
+
+        messageRows.forEach((row) => {
+            const isSender = Number(row.senderId) === currentUserId;
+            const conversation = conversationFor(
+                isSender ? row.recipientId : row.senderId,
+                isSender ? row.recipientName : row.senderName,
+                isSender
+                    ? row.recipientProfilePicture
+                    : row.senderProfilePicture,
+                row.bookingId
+            );
+            if (!conversation) return;
+
+            const time = new Date(row.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            conversation.messages.push({
+                id: row.id,
+                senderId: Number(row.senderId),
+                text: row.body,
+                time
+            });
+            conversation.lastMessage = row.body;
+            conversation.time = time;
+        });
+
+        return [...grouped.values()];
+    }, [bookingRows, currentUserRole, currentUserId, messageRows]);
+
+    const activeChat =
+        conversations.find((conversation) => conversation.id === activeChatId) ||
+        conversations[0] ||
+        null;
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
+        if (!activeChat) return;
+
         const cleanMessage = newMessage.trim();
         if (!cleanMessage || cleanMessage.length > 1000) {
             setMessageError('Enter a message between 1 and 1,000 characters.');
@@ -123,9 +136,24 @@ const Messages = ({ embedded = false }) => {
         setMessageError('');
 
         try {
-            const result = await sendMessage(activeChat.recipientId, cleanMessage);
-            const updatedConversations = conversations.map((conversation) => conversation.id === activeChatId ? { ...conversation, messages: [...conversation.messages, { id: result.id, sender: 'user', text: cleanMessage, time: 'Just now' }], lastMessage: cleanMessage, time: 'Just now' } : conversation);
-            setConversations(updatedConversations);
+            const result = await sendMessage(
+                activeChat.recipientId,
+                cleanMessage,
+                activeChat.bookingId
+            );
+            setMessageRows((previousRows) => [
+                ...previousRows,
+                {
+                    id: result.id,
+                    senderId: currentUserId,
+                    recipientId: activeChat.recipientId,
+                    bookingId: result.bookingId,
+                    body: cleanMessage,
+                    createdAt: result.createdAt,
+                    senderName: currentUser.fullName,
+                    recipientName: activeChat.name
+                }
+            ]);
             setNewMessage('');
         } catch (error) { setMessageError(error.message); }
     };
@@ -160,13 +188,21 @@ const Messages = ({ embedded = false }) => {
                                     onClick={() => setActiveChatId(item.id)}
                                     style={{
                                         ...contactItemStyle,
-                                        backgroundColor: item.id === activeChatId ? '#f0fdf4' : '#fff'
+                                        backgroundColor: item.id === activeChat?.id ? '#f0fdf4' : '#fff'
                                     }}
                                 >
                                     <div style={{ position: 'relative' }}>
+                                    {item.profilePicture ? (
+                                        <img
+                                            src={item.profilePicture}
+                                            alt={`${item.name} profile`}
+                                            style={{ ...avatarStyle, objectFit: 'cover' }}
+                                        />
+                                    ) : (
                                         <div style={avatarStyle}>{item.name.charAt(0)}</div>
-                                        {item.online && <span style={onlineDotStyle} />}
-                                    </div>
+                                    )}
+                                    {item.online && <span style={onlineDotStyle} />}
+                                </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <h5 style={{ margin: 0, fontSize: '0.9rem', color: '#111827', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -180,17 +216,37 @@ const Messages = ({ embedded = false }) => {
                                     </div>
                                 </div>
                             ))}
+                            {conversations.length === 0 && (
+                                <p style={{ padding: '16px', color: '#6b7280', fontSize: '0.85rem' }}>
+                                    {currentUserRole === 'provider'
+                                        ? 'Homeowner conversations will appear here for your assigned bookings.'
+                                        : 'Provider conversations will appear here after a provider is assigned to a booking.'}
+                                </p>
+                            )}
                         </div>
                     </div>
 
                     {/* Right Panel: Chat Area */}
                     <div style={chatAreaStyle}>
+                        {messageError && (
+                            <p role="alert" style={{ margin: 0, padding: '8px 16px', color: '#dc2626', backgroundColor: '#fef2f2' }}>
+                                {messageError}
+                            </p>
+                        )}
                         {activeChat ? (
                             <>
                                 {/* Chat Header */}
                                 <div style={chatHeaderStyle}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={avatarStyle}>{activeChat.name.charAt(0)}</div>
+                                        {activeChat.profilePicture ? (
+                                            <img
+                                                src={activeChat.profilePicture}
+                                                alt={`${activeChat.name} profile`}
+                                                style={{ ...avatarStyle, objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <div style={avatarStyle}>{activeChat.name.charAt(0)}</div>
+                                        )}
                                         <div>
                                             <h4 style={{ margin: 0, fontSize: '1rem', color: '#111827' }}>{activeChat.name}</h4>
                                             <span style={{ fontSize: '0.75rem', color: activeChat.online ? '#10b981' : '#9ca3af' }}>
@@ -202,18 +258,23 @@ const Messages = ({ embedded = false }) => {
 
                                 {/* Chat Body / Message History */}
                                 <div style={chatBodyStyle}>
+                                    {activeChat.messages.length === 0 && (
+                                        <p style={{ margin: 'auto', color: '#6b7280', textAlign: 'center' }}>
+                                            No messages yet. Send a message to start talking about this booking.
+                                        </p>
+                                    )}
                                     {activeChat.messages.map((msg) => (
                                         <div
                                             key={msg.id}
                                             style={{
                                                 ...messageWrapperStyle,
-                                                justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start'
+                                                justifyContent: msg.senderId === currentUserId ? 'flex-end' : 'flex-start'
                                             }}
                                         >
                                             <div style={{
                                                 ...messageBubbleStyle,
-                                                backgroundColor: msg.sender === 'user' ? '#10b981' : '#f3f4f6',
-                                                color: msg.sender === 'user' ? '#fff' : '#1f2937'
+                                                backgroundColor: msg.senderId === currentUserId ? '#10b981' : '#f3f4f6',
+                                                color: msg.senderId === currentUserId ? '#fff' : '#1f2937'
                                             }}>
                                                 <p style={{ margin: 0, fontSize: '0.9rem' }}>{msg.text}</p>
                                                 <span style={{
@@ -221,7 +282,7 @@ const Messages = ({ embedded = false }) => {
                                                     display: 'block',
                                                     textAlign: 'right',
                                                     marginTop: '4px',
-                                                    color: msg.sender === 'user' ? '#d1fae5' : '#9ca3af'
+                                                    color: msg.senderId === currentUserId ? '#d1fae5' : '#9ca3af'
                                                 }}>
                                                     {msg.time}
                                                 </span>
@@ -241,15 +302,18 @@ const Messages = ({ embedded = false }) => {
                                         required
                                         style={messageInputStyle}
                                     />
-                                    <button type="submit" style={sendBtnStyle}>
+                                    <button type="submit" style={sendBtnStyle} aria-label="Send message">
                                         <i className="bi bi-send-fill"></i>
                                     </button>
-                                    {messageError && <span style={{ color: '#dc2626', fontSize: '0.75rem' }}>{messageError}</span>}
                                 </form>
                             </>
                         ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#9ca3af' }}>
-                                Select a conversation to start messaging.
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '24px', color: '#6b7280', textAlign: 'center' }}>
+                                {messageError
+                                    ? 'Unable to load messages. Please try again later.'
+                                    : currentUserRole === 'provider'
+                                        ? 'No homeowner conversations yet. Assigned booking contacts will appear here.'
+                                        : 'No provider conversations yet. Once a provider is assigned to your booking, you can message them here.'}
                             </div>
                         )}
                     </div>

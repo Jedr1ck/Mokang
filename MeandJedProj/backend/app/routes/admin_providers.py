@@ -32,6 +32,7 @@ def list_providers():
         )
 
         services_by_provider = {}
+        service_prices_by_provider = {}
         services = (
             session.query(ProviderService)
             .filter(
@@ -51,6 +52,16 @@ def list_providers():
                     else None
                 )
             )
+            if service.title and service.rate is not None:
+                service_prices_by_provider.setdefault(
+                    service.provider_id,
+                    [],
+                ).append(
+                    {
+                        "name": service.title,
+                        "price": float(service.rate),
+                    }
+                )
 
         result = []
         for provider in providers:
@@ -94,11 +105,7 @@ def list_providers():
                     ),
                     "location": location,
                     "experience": provider.experience_years or 0,
-                    "hourlyRate": (
-                        float(provider.hourly_rate)
-                        if provider.hourly_rate is not None
-                        else None
-                    ),
+                    "servicePrices": service_prices_by_provider.get(provider.id, []),
                     "qualifications": provider.qualifications,
                     "serviceArea": provider.service_area,
                     "verificationStatus": provider.verification_status,

@@ -63,34 +63,17 @@ function ManageProviders() {
             const data = await getAdminProviders();
             setProviders(mapProviders(data));
         } catch (error) {
-            setLoadError(error.message || "Unable to load providers.");
+            setLoadError(
+                error?.message || "Unable to load providers."
+            );
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        let active = true;
-
-        getAdminProviders()
-            .then((data) => {
-                if (active) setProviders(mapProviders(data));
-            })
-            .catch((error) => {
-                if (active) {
-                    setLoadError(
-                        error.message || "Unable to load providers."
-                    );
-                }
-            })
-            .finally(() => {
-                if (active) setLoading(false);
-            });
-
-        return () => {
-            active = false;
-        };
-    }, []);
+        loadProviders();
+    }, [loadProviders]);
 
     /* =========================================================
        FILTER
@@ -1574,14 +1557,13 @@ function ManageProviders() {
 
                                 <div>
 
-                                    <span>
-                                        Hourly Rate
-                                    </span>
-
+                                    <span>Specific service prices</span>
                                     <strong>
-                                        {selectedProvider.hourlyRate == null
-                                            ? "—"
-                                            : `₱${selectedProvider.hourlyRate}`}
+                                        {selectedProvider.servicePrices?.length
+                                            ? selectedProvider.servicePrices
+                                                .map((service) => `${service.name}: ₱${Number(service.price).toLocaleString()}`)
+                                                .join(" · ")
+                                            : "Not provided"}
                                     </strong>
 
                                 </div>

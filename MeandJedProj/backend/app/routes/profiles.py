@@ -16,9 +16,61 @@ from app.common import (
     validated,
 )
 from app.models import Category, ProviderService, UserProfile
-from app.schemas import ProfileUpdate, ProviderVerificationUpdate
+from app.schemas import (
+    ProfileUpdate,
+    ProviderServiceSelection,
+    ProviderServicesUpdate,
+    ProviderVerificationUpdate,
+)
 
 profiles_bp = Blueprint("profiles", __name__)
+
+
+def replace_provider_services(session, provider_id, service_selections, hourly_rate=None):
+    missing_prices = [
+        title.strip()
+        for selection in service_selections
+        for title in selection.service_titles
+        if title.strip()
+        and title not in selection.service_rates
+        and hourly_rate is None
+    ]
+    if missing_prices:
+        raise ApiError(
+            {
+                "message": "A price is required for every selected service.",
+                "missing_prices": missing_prices,
+            },
+            422,
+        )
+
+    session.query(ProviderService).filter_by(
+        provider_id=provider_id
+    ).delete(synchronize_session=False)
+
+    for selection in service_selections:
+        category = (
+            session.query(Category)
+            .filter(Category.name.ilike(selection.category))
+            .first()
+        )
+        if not category:
+            category = Category(name=selection.category)
+            session.add(category)
+            session.flush()
+
+        for title in selection.service_titles:
+            service_title = title.strip()[:150]
+            if not service_title:
+                continue
+            session.add(
+                ProviderService(
+                    provider_id=provider_id,
+                    category_id=category.id,
+                    title=service_title,
+                    rate=selection.service_rates.get(title, hourly_rate),
+                )
+            )
 
 
 @profiles_bp.get("/profile/me")
@@ -39,12 +91,18 @@ def update_my_profile():
             profile = UserProfile(user_id=user.id)
             session.add(profile)
 
-        user.full_name = data.fullName.strip()
-        profile.mobile_number = data.mobileNumber.strip()
-        profile.gender = data.gender.strip()
-        profile.address = data.address.strip()
-        profile.birthday = data.birthday
-        profile.profile_picture = data.profilePicture
+        if data.fullName is not None:
+            user.full_name = data.fullName.strip()
+        if data.mobileNumber is not None:
+            profile.mobile_number = data.mobileNumber.strip()
+        if data.gender is not None:
+            profile.gender = data.gender.strip()
+        if data.address is not None:
+            profile.address = data.address.strip()
+        if data.birthday is not None:
+            profile.birthday = data.birthday
+        if "profilePicture" in data.model_fields_set:
+            profile.profile_picture = data.profilePicture
 
         try:
             session.commit()
@@ -138,6 +196,46 @@ def upload_provider_id():
 def get_provider_verification():
     with get_session() as session:
         provider = get_current_provider(current_user(session), session)
+        provider_services = (
+            session.query(ProviderService)
+            .filter_by(provider_id=provider.id)
+            .all()
+        )
+        grouped_services = {}
+        for service in provider_services:
+            category_name = service.category.name if service.category else "Service"
+            category_services = grouped_services.setdefault(
+                category_name,
+                {"capabilities": [], "service_rates": {}},
+            )
+            for title in (service.title or "").split(","):
+                capability = title.strip()
+                if (
+                    not capability
+                    or capability.casefold() == category_name.casefold()
+                ):
+                    continue
+                if capability not in category_services["capabilities"]:
+                    category_services["capabilities"].append(capability)
+                if service.rate is not None:
+                    category_services["service_rates"][capability] = float(
+                        service.rate
+                    )
+
+        services = [
+            {
+                "category": category_name,
+                "title": ", ".join(service_data["capabilities"]),
+                "capabilities": service_data["capabilities"],
+                "service_rates": service_data["service_rates"],
+                "rate": (
+                    next(iter(service_data["service_rates"].values()))
+                    if len(service_data["service_rates"]) == 1
+                    else None
+                ),
+            }
+            for category_name, service_data in grouped_services.items()
+        ]
         return jsonify(
             {
                 "id": provider.id,
@@ -174,6 +272,13 @@ def get_provider_verification():
                 "qualifications": provider.qualifications,
                 "portfolio_paths": provider.portfolio_paths,
                 "service_area": provider.service_area,
+                "services": services,
+                "service_category": services[0]["category"] if services else "",
+                "service_titles": [
+                    capability
+                    for service in services
+                    for capability in service["capabilities"]
+                ],
             }
         )
 
@@ -191,7 +296,6 @@ def update_provider_verification():
             "business_name",
             "bio",
             "experience_years",
-            "hourly_rate",
             "region_name",
             "province_name",
             "city_municipality_name",
@@ -202,40 +306,72 @@ def update_provider_verification():
             "service_area",
         ):
             setattr(provider, field, getattr(data, field))
+        provider.hourly_rate = None
         provider.qualifications = data.bio
 
-        if data.service_category:
-            category = (
-                session.query(Category)
-                .filter(Category.name.ilike(data.service_category))
-                .first()
-            )
-            if not category:
-                category = Category(name=data.service_category)
-                session.add(category)
-                session.flush()
-
-            session.query(ProviderService).filter_by(
-                provider_id=provider.id
-            ).delete(synchronize_session=False)
-            service_title = ", ".join(
-                title.strip()
-                for title in data.service_titles
-                if title.strip()
-            )[:150]
-            session.add(
-                ProviderService(
-                    provider_id=provider.id,
-                    category_id=category.id,
-                    title=service_title or category.name,
+        service_selections = data.services or (
+            [
+                ProviderServiceSelection(
+                    category=data.service_category,
+                    service_titles=data.service_titles,
+                    service_rates={
+                        title: data.hourly_rate
+                        for title in data.service_titles
+                    }
+                    if data.hourly_rate is not None
+                    else {},
                 )
-            )
+            ]
+            if data.service_category
+            else []
+        )
+        replace_provider_services(
+            session,
+            provider.id,
+            service_selections,
+            data.hourly_rate,
+        )
         provider.verification_status = "incomplete"
         session.commit()
         session.refresh(provider)
         return jsonify(
             message="Provider verification information saved successfully.",
             verification_status=provider.verification_status,
+        )
+
+
+@profiles_bp.put("/provider-verification/services")
+@require_auth
+def update_verified_provider_services():
+    data = validated(ProviderServicesUpdate)
+    if not data.services:
+        raise ApiError("Keep at least one service on your profile.", 422)
+
+    with get_session() as session:
+        provider = get_current_provider(current_user(session), session)
+        if provider.verification_status != "verified":
+            raise ApiError("Only verified providers can edit services here.", 400)
+
+        replace_provider_services(session, provider.id, data.services)
+        session.commit()
+        return jsonify(
+            message="Your services have been updated successfully.",
+            services=[
+                {
+                    "category": selection.category,
+                    "capabilities": [
+                        title.strip()[:150]
+                        for title in selection.service_titles
+                        if title.strip()
+                    ],
+                    "service_rates": {
+                        title.strip()[:150]: selection.service_rates[title]
+                        for title in selection.service_titles
+                        if title.strip()
+                    },
+                }
+                for selection in data.services
+            ],
         )
 
 

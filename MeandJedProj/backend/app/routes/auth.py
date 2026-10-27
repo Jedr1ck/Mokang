@@ -51,10 +51,25 @@ def register():
 
 @auth_bp.post("/auth/login")
 def login():
+    return login_user(required_role=None)
+
+
+@auth_bp.post("/auth/login/<required_role>")
+def login_with_role(required_role):
+    if required_role not in ("homeowner", "provider"):
+        raise ApiError("Invalid account type", 400)
+    return login_user(required_role=required_role)
+
+
+def login_user(required_role):
     data = validated(Login)
     with get_session() as session:
         user = session.query(User).filter(User.email == data.email).first()
-        if not user or not pwd.verify(data.password, user.password_hash):
+        if (
+            not user
+            or not pwd.verify(data.password, user.password_hash)
+            or (required_role and user.role != required_role)
+        ):
             raise ApiError("Invalid email or password", 401)
         return jsonify(
             access_token=create_token(user),

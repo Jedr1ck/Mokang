@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../index.css';
 
-import { login, register } from '../../services/api';
+import { loginWithRole, register } from '../../services/api';
 
 const ProviderAuth = () => {
     const navigate = useNavigate();
@@ -140,14 +140,15 @@ const ProviderAuth = () => {
         setLoginError('');
 
         try {
-            const response = await login(
+            const response = await loginWithRole(
                 loginData.email.trim(),
-                loginData.password
+                loginData.password,
+                'provider'
             );
 
             const account = {
                 ...response.user,
-                role: response.user.role || 'provider'
+                role: response.user.role
             };
 
             // SAVE AUTHENTICATED ACCOUNT
@@ -157,18 +158,13 @@ const ProviderAuth = () => {
             );
 
             localStorage.setItem(
-                'access_token',
-                response.access_token
-            );
-
-            localStorage.setItem(
                 'loggedInProvider',
                 JSON.stringify(account)
             );
 
             // OPEN PROVIDER DASHBOARD
             navigate('/provider-dashboard');
-        } catch (error) {
+        } catch {
             // USE THE SAME GENERIC MESSAGE FOR ALL LOGIN FAILURES
             setLoginError('Invalid email or password.');
         }

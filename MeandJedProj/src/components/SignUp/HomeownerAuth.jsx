@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "../../index.css";
-import { login, register } from '../../services/api';
+import { loginWithRole, register } from '../../services/api';
 
 const HomeownerAuth = () => {
     const navigate = useNavigate();
@@ -145,7 +145,7 @@ const HomeownerAuth = () => {
         }
 
         try {
-            const response = await login(loginEmail.trim(), loginPassword);
+            const response = await loginWithRole(loginEmail.trim(), loginPassword, 'homeowner');
             localStorage.setItem('user', JSON.stringify({ ...response.user, role: response.user.role || 'homeowner' }));
             navigate('/homeowner-dashboard');
         } catch (error) {

@@ -168,7 +168,7 @@ const ProviderProfile = () => {
                     <div className="card border-0 shadow-sm rounded-4 p-3 bg-white text-center h-100">
                         <i className="bi bi-cash-stack fs-3 text-warning mb-1"></i>
                         <h6 className="fw-bold mb-0">{formatPrice(provider.rate)}</h6>
-                        <small className="text-muted extra-small">Starting hourly rate</small>
+                        <small className="text-muted extra-small">Starting service price</small>
                     </div>
                 </div>
             </div>

@@ -145,3 +145,40 @@ class Message(Base):
     body = Column(Text)
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(ID_TYPE, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey("users.id"))
+    title = Column(String(150), nullable=False)
+    body = Column(Text, nullable=False)
+    type = Column(String(50))
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(ID_TYPE, primary_key=True)
+    booking_id = Column(BigInteger, ForeignKey("bookings.id"), unique=True)
+    rating = Column(Integer, nullable=False)
+    comment = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    booking = relationship("Booking")
+
+
+class Complaint(Base):
+    __tablename__ = "complaints"
+
+    id = Column(ID_TYPE, primary_key=True)
+    booking_id = Column(BigInteger, ForeignKey("bookings.id"), nullable=False)
+    homeowner_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    subject = Column(String(150), nullable=False)
+    message = Column(Text, nullable=False)
+    status = Column(String(30), nullable=False, default="Pending")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    booking = relationship("Booking")
+    homeowner = relationship("User")

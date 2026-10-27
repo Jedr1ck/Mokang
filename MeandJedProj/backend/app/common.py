@@ -101,6 +101,7 @@ def create_token(user):
 
 def user_out(user):
     profile = user.profile
+    missing_profile_fields = profile_missing_fields(user)
     return {
         "id": user.id,
         "fullName": user.full_name,
@@ -115,7 +116,25 @@ def user_out(user):
         ),
         "profilePicture": profile.profile_picture if profile else None,
         "role": user.role,
+        "profileComplete": not missing_profile_fields,
+        "missingProfileFields": missing_profile_fields,
     }
+
+
+def profile_missing_fields(user):
+    profile = user.profile
+    fields = {
+        "fullName": user.full_name,
+        "mobileNumber": profile.mobile_number if profile else None,
+        "gender": profile.gender if profile else None,
+        "address": profile.address if profile else None,
+        "birthday": profile.birthday if profile else None,
+    }
+    return [
+        name
+        for name, value in fields.items()
+        if not value or (isinstance(value, str) and not value.strip())
+    ]
 
 
 def get_current_provider(user, session):
@@ -142,8 +161,22 @@ def booking_out(booking):
         "description": booking.description,
         "status": booking.status,
         "providerId": booking.provider_id,
+        "providerUserId": booking.provider.user_id if booking.provider else None,
+        "providerName": (
+            booking.provider.business_name or booking.provider.user.full_name
+            if booking.provider
+            else None
+        ),
+        "providerProfilePicture": (
+            booking.provider.user.profile.profile_picture
+            if booking.provider and booking.provider.user.profile
+            else None
+        ),
         "homeownerId": booking.homeowner_id,
         "customerName": homeowner.full_name if homeowner else None,
+        "customerProfilePicture": (
+            profile.profile_picture if profile else None
+        ),
         "customerPhone": profile.mobile_number if profile else None,
         "customerEmail": homeowner.email if homeowner else None,
     }
@@ -186,8 +219,13 @@ def provider_booking_query(query, user, session):
             .filter_by(user_id=user.id)
             .first()
         )
-        if not provider:
-            return None
+        if (
+            not provider
+            or not provider.is_verified
+            or provider.verification_status != "verified"
+            or profile_missing_fields(user)
+        ):
+            return query.filter(Booking.id == -1)
         category_ids = [
             row.category_id
             for row in session.query(ProviderService.category_id)
@@ -204,10 +242,5 @@ def provider_booking_query(query, user, session):
                     ),
                 )
             )
-        return query.filter(
-            or_(
-                Booking.provider_id == provider.id,
-                Booking.provider_id.is_(None),
-            )
-        )
+        return query.filter(Booking.provider_id == provider.id)
     return query

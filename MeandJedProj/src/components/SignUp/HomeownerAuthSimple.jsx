@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../index.css';
 import background from '../../assets/images/hero-background.png';
-import { login, register } from '../../services/api';
+import { loginWithRole, register } from '../../services/api';
 
 const HomeownerAuthSimple = () => {
     const navigate = useNavigate();
@@ -125,25 +125,21 @@ const HomeownerAuthSimple = () => {
         setLoginError('');
 
         try {
-            const response = await login(
+            const response = await loginWithRole(
                 loginEmail.trim(),
-                loginPassword
+                loginPassword,
+                'homeowner'
             );
 
             const account = {
                 ...response.user,
-                role: response.user.role || 'homeowner'
+                role: response.user.role
             };
 
             // Save authenticated user only after successful login.
             localStorage.setItem(
                 'user',
                 JSON.stringify(account)
-            );
-
-            localStorage.setItem(
-                'access_token',
-                response.access_token
             );
 
             // Update saved accounts.
@@ -176,7 +172,7 @@ const HomeownerAuthSimple = () => {
 
             // Navigate only after successful login.
             navigate('/homeowner-dashboard');
-        } catch (error) {
+        } catch {
             // Same message regardless of which credential is incorrect.
             setLoginError('Invalid email or password.');
         }
