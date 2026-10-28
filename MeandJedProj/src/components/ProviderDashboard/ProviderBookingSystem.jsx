@@ -5,6 +5,7 @@ import {
     rescheduleBooking,
     updateBookingStatus,
 } from '../../services/api';
+import ConfirmDialog from '../ConfirmDialog';
 import myLogo from '../../assets/images/logo.png';
 import './ProviderBookingSystem.css';
 
@@ -44,6 +45,7 @@ export default function ProviderBookingSystem() {
     const [error, setError] = useState('');
     const [actionError, setActionError] = useState('');
     const [busy, setBusy] = useState(false);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showReschedule, setShowReschedule] = useState(false);
     const [rescheduleDate, setRescheduleDate] = useState('');
     const [rescheduleTime, setRescheduleTime] = useState('');
@@ -93,6 +95,7 @@ export default function ProviderBookingSystem() {
             const matchesSearch = !query || [
                 booking.bookingCode,
                 booking.customerName,
+                booking.serviceName,
                 booking.category,
                 booking.address,
             ].some((value) => String(value || '').toLowerCase().includes(query));
@@ -115,14 +118,16 @@ export default function ProviderBookingSystem() {
     };
 
     const changeStatus = async (status) => {
-        if (!selectedBooking || busy) return;
+        if (!selectedBooking || busy) return false;
         setBusy(true);
         setActionError('');
         try {
             const updated = await updateBookingStatus(selectedBooking.id, status);
             applyBookingUpdate(updated);
+            return true;
         } catch (actionFailure) {
             setActionError(actionFailure.message || 'Unable to update this booking.');
+            return false;
         } finally {
             setBusy(false);
         }
@@ -275,7 +280,7 @@ export default function ProviderBookingSystem() {
                                     ? <img className="pbs-customer-image" src={booking.customerProfilePicture} alt="" />
                                     : <span className="pbs-customer-image pbs-avatar-fallback">{getInitials(booking.customerName)}</span>}
                                 <span className="pbs-card-copy">
-                                    <strong>{booking.category || 'Service request'}</strong>
+                                    <strong>{booking.serviceName || booking.category || 'Service request'}</strong>
                                     <span>{booking.customerName || 'Homeowner'}</span>
                                     <small><i className="bi bi-calendar-event" />{formatDate(booking.preferredDate)} <b>·</b> {booking.preferredTime || 'Time not set'}</small>
                                     <small><i className="bi bi-geo-alt" />{booking.address || 'Address not provided'}</small>
@@ -337,7 +342,7 @@ export default function ProviderBookingSystem() {
                                 </div>
                                 <dl className="pbs-service-details">
                                     <dt>Service Type</dt>
-                                    <dd>{selectedBooking.category || 'Home service'}</dd>
+                                    <dd>{selectedBooking.serviceName || selectedBooking.category || 'Home service'}</dd>
                                     <dt>Description</dt>
                                     <dd>{selectedBooking.description || 'No description provided.'}</dd>
                                 </dl>
@@ -391,11 +396,7 @@ export default function ProviderBookingSystem() {
                                                 <button
                                                     type="button"
                                                     className="danger"
-                                                    onClick={() => {
-                                                        if (window.confirm('Cancel this booking? The homeowner will be notified.')) {
-                                                            changeStatus('Cancelled');
-                                                        }
-                                                    }}
+                                                    onClick={() => setShowCancelConfirm(true)}
                                                     disabled={busy}
                                                 >
                                                     <i className="bi bi-x-lg" /> Cancel Booking
@@ -434,6 +435,19 @@ export default function ProviderBookingSystem() {
                     </form>
                 </div>
             )}
+            <ConfirmDialog
+                open={showCancelConfirm}
+                title="Cancel this booking?"
+                message={`The homeowner will be notified that the ${selectedBooking?.category || 'service'} booking was cancelled.`}
+                confirmLabel="Cancel booking"
+                tone="danger"
+                icon="bi-calendar-x"
+                busy={busy}
+                onConfirm={async () => {
+                    if (await changeStatus('Cancelled')) setShowCancelConfirm(false);
+                }}
+                onCancel={() => setShowCancelConfirm(false)}
+            />
         </main>
     );
 }

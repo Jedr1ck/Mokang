@@ -1,0 +1,220 @@
+.tracking-page {
+    width: min(100% - 32px, 940px);
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 28px 0;
+    color: #17231e;
+}
+
+.tracking-loading {
+    display: grid;
+    place-items: center;
+}
+
+.tracking-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.tracking-header h1 {
+    margin: 0;
+    color: #123d30;
+    font-size: clamp(1.25rem, 3vw, 1.65rem);
+    font-weight: 750;
+}
+
+.tracking-card {
+    padding: clamp(18px, 4vw, 30px);
+    border: 1px solid #e8eeeb;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 12px 34px rgb(22 46 36 / 7%);
+}
+
+.tracking-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #edf1ef;
+}
+
+.tracking-card-heading > div {
+    display: grid;
+    gap: 5px;
+}
+
+.tracking-card-heading small {
+    color: #718078;
+    font-size: 0.68rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+}
+
+.tracking-card-heading strong {
+    color: #153f31;
+    font-size: clamp(1.05rem, 3vw, 1.4rem);
+}
+
+.tracking-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.tracking-status-pending {
+    background: #fff4d6;
+    color: #9a5c00;
+}
+
+.tracking-status-confirmed {
+    background: #e4efff;
+    color: #2457a6;
+}
+
+.tracking-status-in-progress {
+    background: #efe9ff;
+    color: #6436a5;
+}
+
+.tracking-status-completed {
+    background: #e2f5e9;
+    color: #167044;
+}
+
+.tracking-status-closed {
+    background: #ffebe8;
+    color: #b83b2d;
+}
+
+.tracking-booking-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 18px;
+    padding: 17px 0 4px;
+    color: #66736d;
+    font-size: 0.86rem;
+}
+
+.tracking-booking-summary strong {
+    width: 100%;
+    color: #23332c;
+    font-size: 1rem;
+}
+
+.tracking-stepper-scroll {
+    overflow-x: auto;
+    margin: 12px -4px 0;
+    padding: 14px 4px 8px;
+    scrollbar-width: thin;
+}
+
+.tracking-stepper {
+    display: flex;
+    min-width: 610px;
+    align-items: flex-start;
+}
+
+.tracking-step {
+    display: flex;
+    min-width: 72px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tracking-step-icon {
+    display: grid;
+    flex: none;
+    margin-bottom: 8px;
+    place-items: center;
+    border-radius: 50%;
+    transition: background-color 200ms ease, color 200ms ease;
+}
+
+.tracking-step small {
+    color: #89948e;
+    font-size: 0.68rem;
+    font-weight: 650;
+}
+
+.tracking-step small.active {
+    color: #14724e;
+    font-weight: 750;
+}
+
+.tracking-step-line {
+    height: 4px;
+    flex: 1;
+    margin: 18px 5px 0;
+    border-radius: 999px;
+}
+
+.tracking-status-message {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.tracking-status-message h2 {
+    margin: 0 0 5px;
+    color: #20342b;
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+.tracking-status-message p {
+    margin: 0;
+    color: #65736c;
+    font-size: 0.85rem;
+}
+
+.tracking-status-message-pending { background: #fffaf0; }
+.tracking-status-message-confirmed { background: #f3f7ff; }
+.tracking-status-message-in-progress { background: #f7f4ff; }
+.tracking-status-message-completed { background: #f0faf3; }
+.tracking-status-message-closed { background: #fff4f2; }
+
+.tracking-refresh-note {
+    margin: 12px 0 0;
+    color: #8a9690;
+    font-size: 0.74rem;
+    text-align: right;
+}
+
+@media (max-width: 560px) {
+    .tracking-page {
+        width: min(100% - 24px, 940px);
+        padding: 18px 0;
+    }
+
+    .tracking-header {
+        align-items: flex-start;
+        flex-direction: column-reverse;
+    }
+
+    .tracking-card-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tracking-refresh-note {
+        text-align: left;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tracking-step-icon {
+        transition: none;
+    }
+}

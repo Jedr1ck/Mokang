@@ -1,12 +1,12 @@
 
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './HomeownerSideBar.css';
 
 import myLogo from '../../assets/images/logo.png';
+import ConfirmDialog from '../ConfirmDialog';
 
 const HomeownerSideBar = () => {
     const location = useLocation();
@@ -115,49 +115,16 @@ const HomeownerSideBar = () => {
                 </nav>
             </div>
 
-            {/* LOGOUT MODAL */}
-            {showLogoutModal &&
-                createPortal(
-                    <div
-                        className="homeowner-logout-modal-overlay"
-                        onClick={() => setShowLogoutModal(false)}
-                    >
-                        <div
-                            className="homeowner-logout-modal"
-                            onClick={(event) => event.stopPropagation()}
-                            role="dialog"
-                            aria-modal="true"
-                            aria-labelledby="homeowner-logout-title"
-                        >
-                            <div className="homeowner-logout-modal-content">
-                                <h3 id="homeowner-logout-title">
-                                    Logout
-                                </h3>
-
-                                <p>Are you sure you want to log out?</p>
-                            </div>
-
-                            <div className="homeowner-logout-modal-actions">
-                                <button
-                                    type="button"
-                                    className="homeowner-logout-confirm-btn"
-                                    onClick={confirmLogout}
-                                >
-                                    OK
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="homeowner-logout-cancel-btn"
-                                    onClick={() => setShowLogoutModal(false)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>,
-                    document.body
-                )}
+            <ConfirmDialog
+                open={showLogoutModal}
+                title="Log out?"
+                message="Are you sure you want to end your session?"
+                confirmLabel="Log out"
+                icon="bi-box-arrow-right"
+                tone="danger"
+                onConfirm={confirmLogout}
+                onCancel={() => setShowLogoutModal(false)}
+            />
         </aside>
     );
 };

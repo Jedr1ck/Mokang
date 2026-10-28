@@ -15,6 +15,7 @@ from app.common import (
 from app.models import (
     Booking,
     Category,
+    Message,
     Notification,
     ProviderProfile,
     ProviderService,
@@ -81,12 +82,38 @@ def create_booking():
                     "Selected provider does not offer this service category.",
                     400,
                 )
+            if data.service_name:
+                matching_services = (
+                    session.query(ProviderService.title)
+                    .filter_by(
+                        provider_id=provider.id,
+                        category_id=category.id if category else None,
+                    )
+                    .all()
+                )
+                offered_names = {
+                    name.strip().casefold()
+                    for (title,) in matching_services
+                    for name in (title or "").split(",")
+                    if name.strip()
+                }
+                if data.service_name.casefold() not in offered_names:
+                    raise ApiError(
+                        "Selected provider does not offer this specific service.",
+                        400,
+                    )
+        else:
+            provider = None
 
+        service_label = data.service_name or (
+            category.name if category else "home service"
+        )
         booking = Booking(
             booking_code="REQ-" + uuid.uuid4().hex[:8].upper(),
             homeowner_id=user.id,
             provider_id=data.provider_id,
             category_id=category.id if category else None,
+            service_name=data.service_name,
             preferred_date=data.preferred_date,
             preferred_time=data.preferred_time,
             address=data.address,
@@ -98,10 +125,36 @@ def create_booking():
             Notification(
                 user_id=user.id,
                 title="Booking request submitted",
-                body=f"Your {category.name if category else 'home service'} booking request has been submitted.",
+                body=(
+                    f"Your {service_label} "
+                    "booking request has been submitted."
+                ),
                 type="booking",
             )
         )
+        session.flush()
+        if provider:
+            request_details = (
+                f"I submitted a booking request for {service_label} "
+                f"on {data.preferred_date.isoformat()} at "
+                f"{data.preferred_time.strftime('%I:%M %p')}."
+            )
+            session.add(
+                Message(
+                    sender_id=user.id,
+                    recipient_id=provider.user_id,
+                    booking_id=booking.id,
+                    body=request_details,
+                )
+            )
+            session.add(
+                Notification(
+                    user_id=provider.user_id,
+                    title="New booking request",
+                    body=f"A homeowner submitted a {service_label} booking request.",
+                    type="booking",
+                )
+            )
         session.commit()
         session.refresh(booking)
         return jsonify(booking_out(booking))
@@ -117,6 +170,47 @@ def my_bookings():
             return jsonify([])
         rows = query.order_by(Booking.created_at.desc()).all()
         return jsonify([booking_out(booking) for booking in rows])
+
+
+@bookings_bp.patch("/bookings/<int:booking_id>/cancel")
+@require_auth
+def cancel_homeowner_booking(booking_id):
+    with get_session() as session:
+        user = current_user(session)
+        if user.role != "homeowner":
+            raise ApiError("Homeowners only", 403)
+
+        booking = session.get(Booking, booking_id)
+        if not booking:
+            raise ApiError("Booking not found", 404)
+        if booking.homeowner_id != user.id:
+            raise ApiError("Not your booking", 403)
+        if booking.status not in {"Pending", "Matched"}:
+            raise ApiError("This booking can only be cancelled before the provider accepts it.", 400)
+
+        booking.status = "Cancelled"
+        category_name = booking.category.name if booking.category else "service"
+        session.add(
+            Notification(
+                user_id=user.id,
+                title="Booking cancelled",
+                body=f"Your {category_name} booking request was cancelled.",
+                type="booking",
+            )
+        )
+        if booking.provider_id:
+            provider = session.get(ProviderProfile, booking.provider_id)
+            if provider:
+                session.add(
+                    Notification(
+                        user_id=provider.user_id,
+                        title="Booking cancelled",
+                        body=f"A homeowner cancelled their {category_name} booking request.",
+                        type="booking",
+                    )
+                )
+        session.commit()
+        return jsonify(booking_out(booking))
 
 
 @bookings_bp.get("/admin/bookings")

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { getMyProfile, logout, token } from "./services/api";
+import { getMyProfile, logout, token, updatePresence } from "./services/api";
 
 import LandingPage from "./pages/LandingPage";
 
@@ -100,9 +100,49 @@ function RoleProtectedRoute({ role, children }) {
   return <Navigate to={role === 'provider' ? '/auth/provider' : role === 'admin' ? '/admin-login' : '/auth/homeowner'} replace />;
 }
 
+function PresenceHeartbeat() {
+  useEffect(() => {
+    let lastActivityAt = Date.now();
+    const markActive = () => {
+      if (document.visibilityState === "visible") lastActivityAt = Date.now();
+    };
+    const heartbeat = () => {
+      if (
+        token() &&
+        document.visibilityState === "visible" &&
+        Date.now() - lastActivityAt < 30000
+      ) {
+        updatePresence().catch((error) => {
+          console.error("Unable to update online status:", error);
+        });
+      }
+    };
+    const activityEvents = ["pointerdown", "pointermove", "keydown", "touchstart"];
+    activityEvents.forEach((eventName) =>
+      window.addEventListener(eventName, markActive, { passive: true })
+    );
+    window.addEventListener("focus", markActive);
+    document.addEventListener("visibilitychange", markActive);
+    heartbeat();
+    const intervalId = window.setInterval(heartbeat, 10000);
+
+    return () => {
+      activityEvents.forEach((eventName) =>
+        window.removeEventListener(eventName, markActive)
+      );
+      window.removeEventListener("focus", markActive);
+      document.removeEventListener("visibilitychange", markActive);
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
+      <PresenceHeartbeat />
       <Routes>
 
         {/* =================================================

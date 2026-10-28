@@ -32,7 +32,7 @@ const statusOf = (booking) =>
     booking.status || booking.booking_status || booking.bookingStatus || 'Pending';
 
 const titleOf = (booking) =>
-    booking.category || booking.service_name || booking.serviceName || 'Service Request';
+    booking.serviceName || booking.service_name || booking.category || 'Service Request';
 
 const dateOf = (booking) =>
     booking.preferred_date || booking.preferredDate || booking.booking_date || '';

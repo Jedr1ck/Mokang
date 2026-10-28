@@ -197,6 +197,34 @@ def providers():
                         for service in services
                         if service.title and service.rate is not None
                     },
+                    "services": [
+                        {
+                            "name": title.strip(),
+                            "category": (
+                                service.category.name
+                                if service.category
+                                else title.strip()
+                            ),
+                            "price": (
+                                float(service.rate)
+                                if service.rate is not None
+                                else None
+                            ),
+                        }
+                        for service in services
+                        for title in (
+                            service.title.split(",")
+                            if service.title
+                            else []
+                        )
+                        if title.strip()
+                        and title.strip().casefold()
+                        not in {
+                            service.category.name.casefold()
+                            if service.category and service.category.name
+                            else ""
+                        }
+                    ],
                     "experience": f"{provider.experience_years or 0} years exp",
                     "availability": provider.availability_status or "Available",
                     "availabilityType": "today",
@@ -305,16 +333,11 @@ def provider_details(provider_id):
                 ],
                 "services": [
                     {
-                        "name": service.title
-                        or (
-                            service.category.name
-                            if service.category
-                            else "Service"
-                        ),
+                        "name": title.strip(),
                         "category": (
                             service.category.name
                             if service.category
-                            else service.title or "Service"
+                            else title.strip()
                         ),
                         "price": (
                             float(service.rate)
@@ -323,6 +346,18 @@ def provider_details(provider_id):
                         ),
                     }
                     for service in services
+                    for title in (
+                        service.title.split(",")
+                        if service.title
+                        else []
+                    )
+                    if title.strip()
+                    and title.strip().casefold()
+                    not in {
+                        service.category.name.casefold()
+                        if service.category and service.category.name
+                        else ""
+                    }
                 ],
             }
         )

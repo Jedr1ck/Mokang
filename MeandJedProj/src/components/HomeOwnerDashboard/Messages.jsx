@@ -1,16 +1,26 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
-import { getMessages, getMyBookings, sendMessage } from '../../services/api';
+import {
+    getMessages,
+    getMyBookings,
+    getPresence,
+    sendMessage
+} from '../../services/api';
 
 const Messages = ({ embedded = false, bookings }) => {
+    const navigate = useNavigate();
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     const currentUserId = Number(currentUser.id);
     const currentUserRole = currentUser.role;
     const [loadedBookings, setLoadedBookings] = useState([]);
     const bookingRows = bookings ?? loadedBookings;
     const [messageRows, setMessageRows] = useState([]);
+    const [presenceByUserId, setPresenceByUserId] = useState({});
+    const [presenceLoaded, setPresenceLoaded] = useState(false);
+    const [presenceError, setPresenceError] = useState('');
     const [activeChatId, setActiveChatId] = useState(null);
     const [newMessage, setNewMessage] = useState('');
     const [messageError, setMessageError] = useState('');
@@ -24,6 +34,24 @@ const Messages = ({ embedded = false, bookings }) => {
                 })
                 .catch((error) => {
                     if (isCurrent) setMessageError(error.message);
+                });
+            getPresence()
+                .then((rows) => {
+                    if (isCurrent) {
+                        setPresenceByUserId(
+                            Object.fromEntries(
+                                rows.map((row) => [Number(row.userId), row.online === true])
+                            )
+                        );
+                        setPresenceLoaded(true);
+                        setPresenceError('');
+                    }
+                })
+                .catch((error) => {
+                    if (isCurrent) {
+                        setPresenceLoaded(false);
+                        setPresenceError(error.message || 'Unable to check online status.');
+                    }
                 });
         };
 
@@ -55,6 +83,7 @@ const Messages = ({ embedded = false, bookings }) => {
                 recipientId: id,
                 name: name || 'User',
                 profilePicture: profilePicture || '',
+                online: presenceByUserId[id] === true,
                 bookingId: bookingId ?? null,
                 lastMessage: 'No messages yet — start the conversation.',
                 time: '',
@@ -117,12 +146,17 @@ const Messages = ({ embedded = false, bookings }) => {
         });
 
         return [...grouped.values()];
-    }, [bookingRows, currentUserRole, currentUserId, messageRows]);
+    }, [bookingRows, currentUserRole, currentUserId, messageRows, presenceByUserId]);
 
     const activeChat =
         conversations.find((conversation) => conversation.id === activeChatId) ||
         conversations[0] ||
         null;
+    const activeBooking = activeChat?.bookingId
+        ? bookingRows.find(
+            (booking) => Number(booking.id) === Number(activeChat.bookingId)
+        )
+        : null;
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -250,10 +284,29 @@ const Messages = ({ embedded = false, bookings }) => {
                                         <div>
                                             <h4 style={{ margin: 0, fontSize: '1rem', color: '#111827' }}>{activeChat.name}</h4>
                                             <span style={{ fontSize: '0.75rem', color: activeChat.online ? '#10b981' : '#9ca3af' }}>
-                                                {activeChat.online ? '● Online' : 'Offline'}
+                                                {presenceError
+                                                    ? 'Status unavailable'
+                                                    : !presenceLoaded
+                                                        ? 'Checking status...'
+                                                        : activeChat.online
+                                                            ? '● Online'
+                                                            : 'Offline'}
                                             </span>
                                         </div>
                                     </div>
+                                    {currentUserRole === 'homeowner' && activeBooking && (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                navigate('/track-booking', {
+                                                    state: { booking: activeBooking }
+                                                })
+                                            }
+                                            style={trackingButtonStyle}
+                                        >
+                                            Track booking
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Chat Body / Message History */}
@@ -395,7 +448,21 @@ const chatHeaderStyle = {
     padding: '12px 20px',
     borderBottom: '1px solid #e5e7eb',
     backgroundColor: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     flexShrink: 0
+};
+
+const trackingButtonStyle = {
+    border: '1px solid #10b981',
+    borderRadius: '6px',
+    padding: '7px 12px',
+    backgroundColor: '#fff',
+    color: '#047857',
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    cursor: 'pointer'
 };
 
 const chatBodyStyle = {

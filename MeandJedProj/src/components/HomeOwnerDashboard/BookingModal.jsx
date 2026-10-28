@@ -30,6 +30,7 @@ const BookingModal = ({
     const [profileCheckError, setProfileCheckError] = useState('');
     const [serviceOptions, setServiceOptions] = useState([]);
     const [selectedServiceIndex, setSelectedServiceIndex] = useState('');
+    const selectedService = serviceOptions[Number(selectedServiceIndex)] || null;
 
     // Address autocomplete states
     const [addressSuggestions, setAddressSuggestions] = useState([]);
@@ -305,6 +306,7 @@ const BookingModal = ({
                     preferred_time: formData.preferredTime,
                     address: formData.address,
                     description: formData.description,
+                    service_name: selectedService?.name || null,
                 }),
             });
             setCreatedBooking(booking);
@@ -388,7 +390,7 @@ const BookingModal = ({
                                     {/* Service Category */}
                                     <div className="col-12">
                                         <label className="form-label fw-semibold small">
-                                            Service Category
+                                            Specific Service
                                         </label>
 
                                         <select
@@ -412,9 +414,15 @@ const BookingModal = ({
                                                     value={index}
                                                 >
                                                     {service.name}
+                                                    {service.price != null
+                                                        ? ` — ₱${Number(service.price).toLocaleString()}`
+                                                        : ''}
                                                 </option>
                                             ))}
                                         </select>
+                                        <small className="form-text text-muted">
+                                            Choose the exact service you need from this provider.
+                                        </small>
                                         {fieldErrors.category && <div className="invalid-feedback">{fieldErrors.category}</div>}
                                     </div>
 

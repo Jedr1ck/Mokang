@@ -66,17 +66,22 @@ class AdminAccountCreate(Register):
 
 class BookingIn(BaseModel):
     category: str = Field(min_length=2, max_length=100)
+    service_name: str | None = Field(default=None, max_length=150)
     preferred_date: date
     preferred_time: time
     address: str = Field(min_length=10, max_length=500)
     description: str = Field(min_length=10, max_length=2000)
     provider_id: int | None = Field(default=None, gt=0)
 
-    @field_validator("category", "address", "description", mode="before")
+    @field_validator(
+        "category", "address", "description", "service_name", mode="before"
+    )
     @classmethod
     def required_text(cls, value):
+        if value is None:
+            return value
         value = value.strip() if isinstance(value, str) else value
-        if not value:
+        if not value and value is not None:
             raise ValueError("This field cannot be blank")
         return value
 

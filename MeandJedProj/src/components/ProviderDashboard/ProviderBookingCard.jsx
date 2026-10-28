@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import "./ProviderBookings.css";
 
 const ProviderBookingCard = ({ booking, homeownerName = 'Homeowner' }) => {
@@ -8,7 +8,7 @@ const ProviderBookingCard = ({ booking, homeownerName = 'Homeowner' }) => {
     if (!booking) return null;
 
     const category =
-        booking.category || booking.serviceCategory || 'Home Service';
+        booking.serviceName || booking.service_name || booking.category || booking.serviceCategory || 'Home Service';
 
     const address =
         booking.address || booking.location || 'Address not provided';

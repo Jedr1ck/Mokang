@@ -2,34 +2,46 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { api } from '../../services/api';
+import { getMyBookings } from '../../services/api';
+import './TrackBooking.css';
 
 const TrackBooking = () => {
     const location = useLocation();
+    const selectedBookingId = location.state?.booking?.id;
     const [bookingData, setBookingData] = useState(location.state?.booking || null);
     const [loading, setLoading] = useState(!location.state?.booking);
     const [loadError, setLoadError] = useState('');
 
     useEffect(() => {
-        if (location.state?.booking) return undefined;
         let active = true;
-        api('/bookings/my')
-            .then((bookings) => {
-                if (active) {
-                    if (bookings.length) setBookingData(bookings[0]);
-                    else setLoadError('No bookings are available to track yet.');
-                }
-            })
-            .catch((error) => {
-                if (active) setLoadError(error.message || 'Unable to load booking status.');
-            })
-            .finally(() => {
-                if (active) setLoading(false);
-            });
+        const loadBooking = () => {
+            getMyBookings()
+                .then((bookings) => {
+                    if (!active) return;
+                    const latestBooking = selectedBookingId
+                        ? bookings.find((booking) => String(booking.id) === String(selectedBookingId))
+                        : bookings[0];
+                    if (latestBooking) {
+                        setBookingData(latestBooking);
+                        setLoadError('');
+                    } else {
+                        setLoadError('This booking is no longer available.');
+                    }
+                })
+                .catch((error) => {
+                    if (active) setLoadError(error.message || 'Unable to load booking status.');
+                })
+                .finally(() => {
+                    if (active) setLoading(false);
+                });
+        };
+        loadBooking();
+        const intervalId = window.setInterval(loadBooking, 15000);
         return () => {
             active = false;
+            window.clearInterval(intervalId);
         };
-    }, [location.state]);
+    }, [selectedBookingId]);
 
     // Listahan ng lahat ng steps
     const steps = [
@@ -49,6 +61,15 @@ const TrackBooking = () => {
     const activeIndex = currentStep !== -1 ? currentStep : 0;
     const isCompleted = status === 'completed';
     const isClosed = ['cancelled', 'rejected'].includes(status);
+    const statusTone = isClosed
+        ? 'closed'
+        : isCompleted
+            ? 'completed'
+            : ['on the way', 'in progress'].includes(status)
+                ? 'in-progress'
+                : ['matched', 'accepted'].includes(status)
+                    ? 'confirmed'
+                    : 'pending';
 
     const getStatusText = (stepIndex) => {
         switch (stepIndex) {
@@ -70,80 +91,72 @@ const TrackBooking = () => {
     };
 
     if (loading) {
-        return <div className="container py-5 text-center"><div className="spinner-border text-warning" role="status"><span className="visually-hidden">Loading booking...</span></div></div>;
+        return <div className="tracking-page tracking-loading"><div className="spinner-border text-success" role="status"><span className="visually-hidden">Loading booking...</span></div></div>;
     }
 
     if (loadError || !bookingData) {
         return (
-            <div className="container py-5">
+            <div className="tracking-page">
                 <Link to="/homeowner-dashboard" className="text-decoration-none text-dark fw-bold">
                     <i className="bi bi-arrow-left me-2"></i>Back to Dashboard
                 </Link>
                 <div className="alert alert-info mt-4" role="status">{loadError || 'No booking selected.'}</div>
-                <Link to="/history" className="btn btn-warning text-white">View Service History</Link>
+                <Link to="/bookings" className="btn btn-success rounded-pill">View My Bookings</Link>
             </div>
         );
     }
 
     return (
-        <div className="container py-4 px-lg-5" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-
-            <style>{`
-                .tracker-step-icon { transition: all 0.25s ease-in-out; }
-                .text-orange { color: #fd7e14 !important; }
-            `}</style>
-
+        <main className="tracking-page">
             {/* Header */}
-            <div className="d-flex align-items-center justify-content-between mb-4">
+            <div className="tracking-header">
                 <Link to="/homeowner-dashboard" className="text-decoration-none text-dark fw-bold d-flex align-items-center gap-2">
                     <i className="bi bi-arrow-left fs-5"></i> Back to Dashboard
                 </Link>
-                <h3 className="fw-bold m-0" style={{ color: '#0f3a2e' }}>Track Booking Status</h3>
+                <h1>Track Booking</h1>
             </div>
 
             {/* Main Card */}
-            <div className="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <section className="tracking-card">
 
-                <div className="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <div className="tracking-card-heading">
                     <div>
-                        <small className="text-muted d-block fw-semibold text-uppercase">REQUEST NUMBER</small>
-                        <span className="fw-bold fs-4 text-primary">{bookingData.bookingCode || bookingData.id}</span>
+                        <small>REQUEST NUMBER</small>
+                        <strong>{bookingData.bookingCode || bookingData.id}</strong>
                     </div>
-                    {/* Badge Color base sa Status */}
-                    <span className={`badge ${isCompleted ? 'bg-warning text-white' : isClosed ? 'bg-danger' : 'bg-secondary-subtle text-dark'} px-3 py-2 rounded-pill fw-bold fs-6`}>
+                    <span className={`tracking-status tracking-status-${statusTone}`}>
                         {isClosed ? bookingData.status : steps[activeIndex].label}
                     </span>
                 </div>
 
-                <p className="text-muted">
-                    {bookingData.category || 'Service booking'} · {bookingData.preferredDate} at {bookingData.preferredTime}
-                    {bookingData.providerName ? ` · ${bookingData.providerName}` : ''}
-                </p>
+                <div className="tracking-booking-summary">
+                    <strong>{bookingData.serviceName || bookingData.category || 'Service booking'}</strong>
+                    <span>{bookingData.preferredDate || 'Date to be confirmed'}{bookingData.preferredTime ? ` at ${bookingData.preferredTime}` : ''}</span>
+                    {bookingData.providerName && <span>Provider: {bookingData.providerName}</span>}
+                </div>
 
                 {/* Stepper Bar */}
-                {!isClosed && <div className="d-flex align-items-start justify-content-between my-4 px-2">
+                {!isClosed && <div className="tracking-stepper-scroll"><div className="tracking-stepper">
                     {steps.map((step, index) => {
                         const isPassed = index < activeIndex;
                         const isCurrent = index === activeIndex;
                         const hasLine = index < steps.length - 1;
-
-                        // Dynamic Colors Base sa Status
                         let bgColor = '#e9ecef';
                         let textColor = '#adb5bd';
 
                         if (isCurrent && index === 5) {
-                            bgColor = '#fd7e14'; // Orange kapag totoong Completed
+                            bgColor = '#15803d';
                             textColor = '#ffffff';
                         } else if (isCurrent || isPassed) {
-                            bgColor = '#198754'; // Green kapag Active o Tapos na ang nakaraang step
+                            bgColor = '#198754';
                             textColor = '#ffffff';
                         }
 
                         return (
                             <Fragment key={index}>
-                                <div className="text-center position-relative" style={{ minWidth: '60px' }}>
+                                <div className="tracking-step">
                                     <div
-                                        className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 tracker-step-icon"
+                                        className="tracking-step-icon"
                                         style={{
                                             width: isCurrent ? '48px' : '40px',
                                             height: isCurrent ? '48px' : '40px',
@@ -152,41 +165,39 @@ const TrackBooking = () => {
                                             fontSize: isCurrent ? '1.2rem' : '1rem'
                                         }}
                                     >
-                                        <i className={`bi ${isPassed ? 'bi-check-lg' : step.icon}`}></i>
+                                        <i className={`bi ${isPassed ? 'bi-check-lg' : step.icon}`} />
                                     </div>
-                                    <small className={`fw-bold extra-small d-block ${isCurrent ? (index === 5 ? 'text-orange' : 'text-success') : isPassed ? 'text-dark' : 'text-muted'
-                                        }`}>
+                                    <small className={isCurrent || isPassed ? 'active' : ''}>
                                         {step.label}
                                     </small>
                                 </div>
 
                                 {hasLine && (
                                     <div
-                                        className="flex-grow-1 align-self-center mx-1"
+                                        className="tracking-step-line"
                                         style={{
-                                            height: '4px',
                                             backgroundColor: (index < activeIndex) ? '#198754' : '#e9ecef',
-                                            marginTop: '-18px'
                                         }}
-                                    ></div>
+                                    />
                                 )}
                             </Fragment>
                         );
                     })}
-                </div>}
+                </div></div>}
 
                 {/* Status Message */}
-                <div className="bg-light rounded-4 p-4 mt-4 text-center">
-                    <h6 className="fw-bold mb-1 text-dark fs-5">
+                <div className={`tracking-status-message tracking-status-message-${statusTone}`}>
+                    <h2>
                         {isClosed ? `Booking ${bookingData.status.toLowerCase()}` : getStatusText(activeIndex).title}
-                    </h6>
-                    <p className="text-muted small m-0">
+                    </h2>
+                    <p>
                         {isClosed ? 'This booking is no longer active.' : getStatusText(activeIndex).desc}
                     </p>
                 </div>
-            </div>
-
-        </div>
+                {loadError && <p className="tracking-refresh-note" role="status">Live status refresh unavailable: {loadError}</p>}
+                <p className="tracking-refresh-note">Booking status refreshes automatically.</p>
+            </section>
+        </main>
     );
 };
 

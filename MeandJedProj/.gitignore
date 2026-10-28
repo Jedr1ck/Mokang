@@ -12,10 +12,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-node_modules
+node_modules/
 dist
 dist-ssr
 *.local
+/backend/app/private_uploads/provider_ids/
 
 # Editor directories and files
 .vscode/*

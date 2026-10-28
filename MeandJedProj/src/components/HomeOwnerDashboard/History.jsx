@@ -22,7 +22,7 @@ const History = () => {
                 id: booking.bookingCode || `REQ-${booking.id}`,
                 bookingId: booking.id,
                 type: 'Service Request',
-                title: booking.category || 'Service Request',
+                title: booking.serviceName || booking.category || 'Service Request',
                 detail: booking.description || 'No description provided',
                 date: booking.preferredDate,
                 time: booking.preferredTime,

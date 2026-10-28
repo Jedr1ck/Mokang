@@ -1,10 +1,88 @@
+from datetime import datetime, timedelta
+
 from flask import Blueprint, jsonify
 
 from app.common import ApiError, current_user, get_session, require_auth, validated
-from app.models import Booking, Message, Notification, User
+from app.models import Booking, Message, Notification, ProviderProfile, User
 from app.schemas import MessageIn
 
 messages_bp = Blueprint("messages", __name__)
+PRESENCE_TIMEOUT = timedelta(seconds=30)
+
+
+@messages_bp.post("/messages/presence")
+@require_auth
+def update_presence():
+    with get_session() as session:
+        user = current_user(session)
+        user.last_seen_at = datetime.utcnow()
+        session.commit()
+        return jsonify({"online": True})
+
+
+@messages_bp.get("/messages/presence")
+@require_auth
+def get_presence():
+    with get_session() as session:
+        user = current_user(session)
+        if user.role == "homeowner":
+            contact_ids = {
+                row[0]
+                for row in session.query(ProviderProfile.user_id)
+                .join(Booking, Booking.provider_id == ProviderProfile.id)
+                .filter(Booking.homeowner_id == user.id)
+                .all()
+            }
+        elif user.role == "provider":
+            provider = (
+                session.query(ProviderProfile)
+                .filter(ProviderProfile.user_id == user.id)
+                .first()
+            )
+            contact_ids = (
+                {
+                    row[0]
+                    for row in session.query(Booking.homeowner_id)
+                    .filter(Booking.provider_id == provider.id)
+                    .all()
+                }
+                if provider
+                else set()
+            )
+        else:
+            contact_ids = set()
+
+        message_contacts = (
+            session.query(Message.sender_id, Message.recipient_id)
+            .filter(
+                (Message.sender_id == user.id)
+                | (Message.recipient_id == user.id)
+            )
+            .all()
+        )
+        contact_ids.update(
+            participant_id
+            for row in message_contacts
+            for participant_id in row
+            if participant_id != user.id
+        )
+
+        active_after = datetime.utcnow() - PRESENCE_TIMEOUT
+        online_ids = {
+            row[0]
+            for row in session.query(User.id)
+            .filter(
+                User.id.in_(contact_ids),
+                User.last_seen_at >= active_after,
+            )
+            .all()
+        } if contact_ids else set()
+        return jsonify(
+            [
+                {"userId": contact_id, "online": contact_id in online_ids}
+                for contact_id in contact_ids
+            ]
+        )
 
 
 @messages_bp.post("/messages")

@@ -68,7 +68,7 @@ export default function ProviderJobs() {
         requestNo: booking.bookingCode || `#${booking.id}`,
         customerName: booking.customerName || 'Homeowner',
         customerPhoto: booking.customerProfilePicture,
-        service: booking.category || 'Service request',
+        service: booking.serviceName || booking.category || 'Service request',
         location: booking.address || 'Location not provided',
         contact: booking.customerPhone || 'Not provided',
         dateValue: booking.preferredDate || '',

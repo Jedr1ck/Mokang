@@ -155,6 +155,7 @@ def booking_out(booking):
         "id": booking.id,
         "bookingCode": booking.booking_code,
         "category": booking.category.name if booking.category else None,
+        "serviceName": booking.service_name,
         "preferredDate": str(booking.preferred_date),
         "preferredTime": str(booking.preferred_time),
         "address": booking.address,

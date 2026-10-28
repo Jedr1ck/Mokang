@@ -4,6 +4,7 @@ import {
     getPendingProviderVerifications,
     getProviderVerificationDocument,
 } from "../../services/api";
+import ConfirmDialog from "../ConfirmDialog";
 import "./AdminVerificationReviews.css";
 
 function ProviderVerificationReviews({ onBack }) {
@@ -14,6 +15,7 @@ function ProviderVerificationReviews({ onBack }) {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [approvingId, setApprovingId] = useState(null);
+    const [requestToApprove, setRequestToApprove] = useState(null);
 
     const loadRequests = useCallback(async () => {
         setLoading(true);
@@ -85,27 +87,24 @@ function ProviderVerificationReviews({ onBack }) {
         };
     }, [requests]);
 
-    const handleApprove = async (request) => {
-        const confirmed = window.confirm(
-            `Approve identity verification for ${request.fullName}?`
-        );
-        if (!confirmed) {
-            return;
-        }
+    const handleApprove = (request) => setRequestToApprove(request);
 
-        setApprovingId(request.providerId);
+    const confirmApprove = async () => {
+        if (!requestToApprove) return;
+        setApprovingId(requestToApprove.providerId);
         setError("");
         setSuccess("");
         try {
-            await approveProviderVerification(request.providerId);
+            await approveProviderVerification(requestToApprove.providerId);
             setRequests((current) =>
                 current.filter(
-                    (item) => item.providerId !== request.providerId
+                    (item) => item.providerId !== requestToApprove.providerId
                 )
             );
             setSuccess(
-                `${request.fullName}'s provider verification was approved.`
+                `${requestToApprove.fullName}'s provider verification was approved.`
             );
+            setRequestToApprove(null);
         } catch (approvalError) {
             setError(
                 approvalError?.message ||
@@ -149,6 +148,16 @@ function ProviderVerificationReviews({ onBack }) {
                     {success}
                 </div>
             )}
+            <ConfirmDialog
+                open={Boolean(requestToApprove)}
+                title="Approve provider?"
+                message={`Approve identity verification for ${requestToApprove?.fullName}?`}
+                confirmLabel="Approve"
+                icon="bi-shield-check"
+                busy={Boolean(approvingId)}
+                onConfirm={confirmApprove}
+                onCancel={() => setRequestToApprove(null)}
+            />
 
             {loading ? (
                 <div className="verification-empty">Loading review requests...</div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../../ProviderDashboard.css';
 
 const ProviderNotifications = ({ bookings = [] }) => {
@@ -50,7 +50,7 @@ const ProviderNotifications = ({ bookings = [] }) => {
             message: `${booking.customerName || 'A homeowner'} ${booking.status === 'Pending'
                 ? 'sent a booking request'
                 : 'has a booking with you'
-                } for ${booking.category || 'a service'}.`,
+                } for ${booking.serviceName || booking.category || 'a service'}.`,
             date: booking.preferredDate || '',
             status: booking.status || 'Pending',
             icon: 'bi-calendar-check',

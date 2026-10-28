@@ -378,7 +378,7 @@ const ProviderDashboard = () => {
                                             </div>
                                             <div className="provider-schedule-line"></div>
                                             <div className="provider-schedule-details">
-                                                <h4>{booking.category || 'Service request'}</h4>
+                                                <h4>{booking.serviceName || booking.category || 'Service request'}</h4>
                                                 <p><i className="bi bi-person"></i>{booking.customerName || 'Homeowner'}</p>
                                                 <p><i className="bi bi-geo-alt"></i>{booking.address || 'Address not provided'}</p>
                                             </div>
@@ -428,7 +428,7 @@ const ProviderDashboard = () => {
                                             <div className="provider-time"><strong>{booking.preferredTime}</strong></div>
                                             <div className="provider-schedule-line"></div>
                                             <div className="provider-schedule-details">
-                                                <h4>{booking.category || 'Service request'}</h4>
+                                                <h4>{booking.serviceName || booking.category || 'Service request'}</h4>
                                                 <p><i className="bi bi-person"></i>{booking.customerName || 'Homeowner'}</p>
                                             </div>
                                             <span className="provider-status confirmed">{booking.status}</span>
@@ -675,7 +675,7 @@ const ProviderDashboard = () => {
                                             </span>
                                         </div>
                                         <div className="provider-calendar-details">
-                                            <h2>{booking.category || 'Service appointment'}</h2>
+                                            <h2>{booking.serviceName || booking.category || 'Service appointment'}</h2>
                                             <p><i className="bi bi-clock"></i>{booking.preferredTime || 'Time not set'}</p>
                                             <p><i className="bi bi-person"></i>{booking.customerName || 'Homeowner'}</p>
                                             <p><i className="bi bi-geo-alt"></i>{booking.address || 'Address not provided'}</p>

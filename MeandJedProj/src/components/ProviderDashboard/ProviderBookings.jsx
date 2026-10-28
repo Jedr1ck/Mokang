@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProviderSideBar from "../ProviderSideBar/ProviderSideBar";
 
@@ -7,6 +7,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./ProviderBookings.css";
 import { getMyBookings, updateBookingStatus } from "../../services/api";
+import ConfirmDialog from "../ConfirmDialog";
 
 
 const ProviderBookings = () => {
@@ -18,7 +19,7 @@ const ProviderBookings = () => {
     // PROVIDER INFORMATION
     // =====================================================
 
-    const [provider, setProvider] = useState(() => {
+    const [provider] = useState(() => {
 
         try {
 
@@ -287,7 +288,7 @@ const ProviderBookings = () => {
                     customerName: booking.customerName || 'Homeowner',
                     phone: booking.customerPhone || 'Not provided',
                     email: booking.customerEmail || 'Not provided',
-                    service: booking.category || 'Service request',
+                    service: booking.serviceName || booking.category || 'Service request',
                     category: booking.category || 'Uncategorized',
                     location: booking.address,
                     fullAddress: booking.address,
@@ -321,6 +322,10 @@ const ProviderBookings = () => {
 
     const [showDetails, setShowDetails] =
         useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
+    const [actionBusy, setActionBusy] = useState(false);
+    const [actionError, setActionError] = useState("");
+    const [actionSuccess, setActionSuccess] = useState("");
 
 
     // =====================================================
@@ -486,32 +491,8 @@ const ProviderBookings = () => {
     // =====================================================
 
     const handleAccept = (id) => {
-
-        const booking =
-            bookings.find(
-                item => item.id === id
-            );
-
-
-        if (!booking) return;
-
-
-        const confirmAction =
-            window.confirm(
-                `Accept ${booking.requestNo} from ${booking.customerName}?`
-            );
-
-
-        if (!confirmAction) return;
-
-
-        updateBookingStatus(id, 'Accepted').then(() => {
-            const updatedBooking = { ...booking, status: 'Accepted' };
-            setBookings(prev => prev.map(item => item.id === id ? updatedBooking : item));
-            setSelectedBooking(updatedBooking);
-            alert(`${booking.requestNo} has been accepted.`);
-        }).catch((error) => alert(error.message));
-
+        const booking = bookings.find((item) => item.id === id);
+        if (booking) setConfirmAction({ booking, status: 'Accepted' });
     };
 
 
@@ -520,32 +501,28 @@ const ProviderBookings = () => {
     // =====================================================
 
     const handleDecline = (id) => {
+        const booking = bookings.find((item) => item.id === id);
+        if (booking) setConfirmAction({ booking, status: 'Cancelled' });
+    };
 
-        const booking =
-            bookings.find(
-                item => item.id === id
-            );
-
-
-        if (!booking) return;
-
-
-        const confirmAction =
-            window.confirm(
-                `Decline ${booking.requestNo} from ${booking.customerName}?`
-            );
-
-
-        if (!confirmAction) return;
-
-
-        updateBookingStatus(id, 'Cancelled').then(() => {
-            const updatedBooking = { ...booking, status: 'Cancelled' };
-            setBookings(prev => prev.map(item => item.id === id ? updatedBooking : item));
+    const applyConfirmedAction = async () => {
+        if (!confirmAction || actionBusy) return;
+        const { booking, status } = confirmAction;
+        setActionBusy(true);
+        setActionError("");
+        setActionSuccess("");
+        try {
+            await updateBookingStatus(booking.id, status);
+            const updatedBooking = { ...booking, status: status === 'Cancelled' ? 'Cancelled' : status };
+            setBookings((previous) => previous.map((item) => item.id === booking.id ? updatedBooking : item));
             setSelectedBooking(updatedBooking);
-            alert(`${booking.requestNo} has been declined.`);
-        }).catch((error) => alert(error.message));
-
+            setActionSuccess(`${booking.requestNo} has been ${status === 'Accepted' ? 'accepted' : 'declined'}.`);
+            setConfirmAction(null);
+        } catch (error) {
+            setActionError(error.message || 'Unable to update this booking.');
+        } finally {
+            setActionBusy(false);
+        }
     };
 
 
@@ -658,6 +635,8 @@ const ProviderBookings = () => {
 
                 </div>
 
+                {actionError && <p className="alert alert-danger mt-3" role="alert">{actionError}</p>}
+                {actionSuccess && <p className="alert alert-success mt-3" role="status">{actionSuccess}</p>}
 
                 {/* =========================================
                     SUMMARY
@@ -1037,7 +1016,7 @@ const ProviderBookings = () => {
                                             </strong>
 
                                             <span>
-                                                {booking.category}
+                                                {booking.serviceName || booking.category}
                                             </span>
 
                                         </div>
@@ -1143,6 +1122,20 @@ const ProviderBookings = () => {
                             )
 
                         )}
+
+                        <ConfirmDialog
+                        open={Boolean(confirmAction)}
+                        title={confirmAction?.status === 'Accepted' ? 'Accept booking?' : 'Decline booking?'}
+                        message={confirmAction
+                            ? `${confirmAction.booking.requestNo} from ${confirmAction.booking.customerName}?`
+                            : ''}
+                        confirmLabel={confirmAction?.status === 'Accepted' ? 'Accept booking' : 'Decline booking'}
+                        tone={confirmAction?.status === 'Accepted' ? 'primary' : 'danger'}
+                        icon={confirmAction?.status === 'Accepted' ? 'bi-calendar-check' : 'bi-calendar-x'}
+                        busy={actionBusy}
+                        onConfirm={applyConfirmedAction}
+                        onCancel={() => setConfirmAction(null)}
+                        />
 
                     </div>
 

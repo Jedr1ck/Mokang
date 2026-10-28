@@ -22,6 +22,8 @@ export async function rescheduleBooking(id, preferredDate, preferredTime) {
 }
 export async function sendMessage(recipientId, body, bookingId) { return api('/messages', { method: 'POST', body: JSON.stringify({ recipient_id: recipientId, body, booking_id: bookingId }) }); }
 export async function getMessages() { return api('/messages'); }
+export async function updatePresence() { return api('/messages/presence', { method: 'POST' }); }
+export async function getPresence() { return api('/messages/presence'); }
 export async function getNotifications() { return api('/notifications'); }
 export async function markNotificationRead(id) { return api(`/notifications/${id}/read`, { method: 'PATCH' }); }
 export async function markAllNotificationsRead() { return api('/notifications/read', { method: 'PATCH' }); }

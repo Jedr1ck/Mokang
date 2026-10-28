@@ -17,6 +17,14 @@ To allow providers to offer multiple priced services in one category, apply:
 ```powershell
 Get-Content database/migrations/20261027_allow_multiple_provider_services_per_category.sql | mysql -u root -p Smarthomes
 ```
+To enable online/offline presence for messaging on an existing database, apply:
+```powershell
+Get-Content database/migrations/20261028_add_user_presence.sql | mysql -u root -p Smarthomes
+```
+To store the selected provider service on bookings in an existing database, apply:
+```powershell
+Get-Content database/migrations/20261028_add_booking_service_name.sql | mysql -u root -p Smarthomes
+```
 
 ## 2. Backend
 ```bash
@@ -54,6 +62,7 @@ Optional `.env` in project root:
 - GET/PUT /profile/me
 - GET /public/stats
 - GET/POST /messages
+- GET/POST /messages/presence (authenticated online status)
 - GET /categories
 - GET /providers
 - POST /provider-verification/upload-id
@@ -68,6 +77,7 @@ Optional `.env` in project root:
 - GET /admin/analytics (administrator-only booking seasonality, service preferences, and ARIMA(1,1,1) forecast)
 - POST /bookings
 - GET /bookings/my
+- PATCH /bookings/{id}/cancel (homeowner cancellation before provider acceptance)
 - PATCH /bookings/{id}/status
 - POST /bookings/{id}/reviews (completed bookings only)
 - POST /bookings/{id}/complaints

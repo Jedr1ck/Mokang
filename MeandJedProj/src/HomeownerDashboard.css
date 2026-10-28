@@ -1327,6 +1327,10 @@
     margin-bottom: 12px;
 }
 
+.homeowner-dashboard-top-grid {
+    margin-top: 12px;
+}
+
 .homeowner-dashboard-panel {
     min-width: 0;
     padding: 14px;

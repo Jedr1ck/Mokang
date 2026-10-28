@@ -5,7 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 
-import BookingModal from './BookingModal';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import {
     getMyBookings,
@@ -79,7 +78,6 @@ const HomeownerDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
-    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const handleProfileUpdated = (event) => {
@@ -176,7 +174,7 @@ const HomeownerDashboard = () => {
             label: 'Book a Service',
             detail: 'Schedule now',
             icon: 'bi-calendar-plus',
-            onClick: () => setShowModal(true)
+            onClick: () => navigate('/services')
         },
         {
             label: 'My Bookings',
@@ -264,6 +262,20 @@ const HomeownerDashboard = () => {
                 </form>
 
                 <div className="homeowner-dashboard-header-actions">
+                    <button
+                        type="button"
+                        className="homeowner-dashboard-icon-button"
+                        aria-label={`My Bookings${activeBookings.length ? `, ${activeBookings.length} active` : ''}`}
+                        title="My Bookings"
+                        onClick={() => navigate('/bookings')}
+                    >
+                        <i className="bi bi-truck" />
+                        {activeBookings.length > 0 && (
+                            <span className="homeowner-dashboard-notification-badge">
+                                {activeBookings.length > 9 ? '9+' : activeBookings.length}
+                            </span>
+                        )}
+                    </button>
                     <div className="homeowner-dashboard-notification-wrap">
                         <button
                             type="button"
@@ -397,58 +409,12 @@ const HomeownerDashboard = () => {
                 <button
                     type="button"
                     className="homeowner-dashboard-hero-button"
-                    onClick={() => setShowModal(true)}
+                    onClick={() => navigate('/services')}
                 >
                     <i className="bi bi-calendar-plus" />
                     Book a Service
                     <i className="bi bi-chevron-right" />
                 </button>
-            </section>
-
-            <section
-                className="homeowner-dashboard-stats"
-                aria-label="Booking overview"
-            >
-                <article className="homeowner-dashboard-stat">
-                    <span className="homeowner-dashboard-stat-icon green">
-                        <i className="bi bi-calendar2-check" />
-                    </span>
-                    <span className="homeowner-dashboard-stat-copy">
-                        <strong>{activeBookings.length}</strong>
-                        <small>Upcoming Bookings</small>
-                    </span>
-                    <i className="bi bi-chevron-right homeowner-dashboard-stat-arrow" />
-                </article>
-                <article className="homeowner-dashboard-stat orange">
-                    <span className="homeowner-dashboard-stat-icon amber">
-                        <i className="bi bi-check-circle-fill" />
-                    </span>
-                    <span className="homeowner-dashboard-stat-copy">
-                        <strong>{completedBookings.length}</strong>
-                        <small>Completed Services</small>
-                    </span>
-                    <i className="bi bi-chevron-right homeowner-dashboard-stat-arrow" />
-                </article>
-                <article className="homeowner-dashboard-stat">
-                    <span className="homeowner-dashboard-stat-icon green">
-                        <i className="bi bi-tools" />
-                    </span>
-                    <span className="homeowner-dashboard-stat-copy">
-                        <strong>{bookings.length}</strong>
-                        <small>Total Bookings</small>
-                    </span>
-                    <i className="bi bi-chevron-right homeowner-dashboard-stat-arrow" />
-                </article>
-                <article className="homeowner-dashboard-stat orange">
-                    <span className="homeowner-dashboard-stat-icon amber">
-                        <i className="bi bi-patch-check-fill" />
-                    </span>
-                    <span className="homeowner-dashboard-stat-copy">
-                        <strong>{providers.length}</strong>
-                        <small>Verified Providers</small>
-                    </span>
-                    <i className="bi bi-chevron-right homeowner-dashboard-stat-arrow" />
-                </article>
             </section>
 
             <section className="homeowner-dashboard-top-grid">
@@ -483,7 +449,7 @@ const HomeownerDashboard = () => {
                                         <i className="bi bi-tools" />
                                     </span>
                                     <span className="homeowner-dashboard-booking-copy">
-                                        <strong>{booking.category || 'Home Service'}</strong>
+                                        <strong>{booking.serviceName || booking.category || 'Home Service'}</strong>
                                         <small>{booking.description || 'Service booking'}</small>
                                         <small className="homeowner-dashboard-booking-date">
                                             <i className="bi bi-calendar3" />
@@ -504,7 +470,7 @@ const HomeownerDashboard = () => {
                         <div className="homeowner-dashboard-empty">
                             <i className="bi bi-calendar-x" />
                             <span>No upcoming bookings yet.</span>
-                            <button type="button" onClick={() => setShowModal(true)}>
+                            <button type="button" onClick={() => navigate('/services')}>
                                 Book a service
                             </button>
                         </div>
@@ -565,7 +531,7 @@ const HomeownerDashboard = () => {
                                     <span className="homeowner-dashboard-activity-dot" />
                                     <span>
                                         <strong>
-                                            {booking.category || 'Service'} booking · {booking.status || 'Pending'}
+                                            {booking.serviceName || booking.category || 'Service'} booking · {booking.status || 'Pending'}
                                         </strong>
                                         <small>
                                             {formatBookingDate(booking.preferredDate)}
@@ -641,11 +607,6 @@ const HomeownerDashboard = () => {
                 </article>
             </section>
 
-            <BookingModal
-                show={showModal}
-                handleClose={() => setShowModal(false)}
-                initialCategory="General Service"
-            />
             </main>
         </div>
     );

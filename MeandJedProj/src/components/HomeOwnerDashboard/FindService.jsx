@@ -46,6 +46,20 @@ const SERVICE_CATEGORIES = CATEGORY_VISUALS.filter((item) => item.name);
 const visualFor = (label = '') => CATEGORY_VISUALS.find((item) => item.matches.some((word) => label.toLowerCase().includes(word))) || CATEGORY_VISUALS[0];
 const formatPrice = (price) => price == null ? 'Ask for price' : `₱${Number(price).toLocaleString()}`;
 const formatReviewDate = (date) => date ? new Date(date).toLocaleDateString() : '';
+const servicesForProvider = (provider) => {
+    if (provider.services?.length) return provider.services;
+    const names = provider.specificServices || provider.capabilities || [];
+    if (names.length) {
+        return names.map((name) => ({
+            name,
+            category: provider.category?.split(',')[0]?.trim() || name,
+            price: provider.servicePrices?.[name] ?? provider.rate ?? null,
+        }));
+    }
+    return provider.category
+        ? [{ name: provider.category, category: provider.category, price: provider.rate ?? null }]
+        : [];
+};
 const categoryMatchesProvider = (category, provider) => {
     const searchable = [
         provider.name,
@@ -65,9 +79,9 @@ export default function FindService() {
     const [sort, setSort] = useState('recommended');
     const [selectedProviderId, setSelectedProviderId] = useState(null);
     const [providerDetails, setProviderDetails] = useState(null);
+    const [providerDetailsError, setProviderDetailsError] = useState(null);
     const [user, setUser] = useState({ fullName: 'Homeowner', profilePicture: '' });
     const [loading, setLoading] = useState(true);
-    const [detailsLoading, setDetailsLoading] = useState(false);
     const [error, setError] = useState('');
     const [showBooking, setShowBooking] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -97,17 +111,6 @@ export default function FindService() {
         return () => { active = false; };
     }, []);
 
-    useEffect(() => {
-        if (!selectedProviderId) { setProviderDetails(null); return undefined; }
-        let active = true;
-        setDetailsLoading(true);
-        getProvider(selectedProviderId)
-            .then((provider) => { if (active) setProviderDetails(provider); })
-            .catch(() => { if (active) setProviderDetails(providers.find((item) => item.id === selectedProviderId) || null); })
-            .finally(() => { if (active) setDetailsLoading(false); });
-        return () => { active = false; };
-    }, [selectedProviderId, providers]);
-
     const filteredProviders = useMemo(() => {
         const term = query.trim().toLowerCase();
         const rows = providers.filter((provider) => {
@@ -127,15 +130,41 @@ export default function FindService() {
         return rows;
     }, [providers, selectedCategory, query, sort]);
 
-    useEffect(() => {
-        if (selectedProviderId && !filteredProviders.some((provider) => provider.id === selectedProviderId)) {
-            setSelectedProviderId(filteredProviders[0]?.id ?? null);
-        }
-    }, [filteredProviders, selectedProviderId]);
+    const filteredSelection = filteredProviders.find((provider) => provider.id === selectedProviderId);
+    const effectiveProviderId = selectedProviderId === null
+        ? null
+        : filteredSelection?.id ?? filteredProviders[0]?.id ?? null;
+    const detailsLoading = Boolean(
+        effectiveProviderId && providerDetails?.id !== effectiveProviderId
+    );
 
-    const bookingServices = providerDetails?.services?.length
-        ? providerDetails.services
-        : providerDetails ? [{ name: providerDetails.category || 'Home service', category: providerDetails.category || 'Home service' }] : [];
+    useEffect(() => {
+        if (!effectiveProviderId) return undefined;
+        let active = true;
+        getProvider(effectiveProviderId)
+            .then((provider) => {
+                if (active) {
+                    setProviderDetails(provider);
+                    setProviderDetailsError(null);
+                }
+            })
+            .catch((loadError) => {
+                if (active) {
+                    setProviderDetails(providers.find((item) => item.id === effectiveProviderId) || null);
+                    setProviderDetailsError({
+                        id: effectiveProviderId,
+                        message: loadError.message || 'Unable to load provider details.',
+                    });
+                }
+            })
+        return () => { active = false; };
+    }, [effectiveProviderId, providers]);
+
+    const activeProviderDetails = providerDetails?.id === effectiveProviderId ? providerDetails : null;
+    const activeProviderDetailsError = providerDetailsError?.id === effectiveProviderId
+        ? providerDetailsError.message
+        : '';
+    const bookingServices = activeProviderDetails ? servicesForProvider(activeProviderDetails) : [];
 
     return (
         <main className="find-services-page">
@@ -180,15 +209,16 @@ export default function FindService() {
 
                         {loading ? <div className="find-services-state"><span className="spinner-border text-success" /><p>Loading verified providers...</p></div> : error ? <div className="find-services-state"><i className="bi bi-exclamation-circle" /><p>{error}</p></div> : filteredProviders.length ? <div className="find-services-grid">
                             {filteredProviders.map((provider) => {
-                                const visual = visualFor(provider.category);
-                                const serviceName = provider.specificServices?.[0] || provider.capabilities?.[0] || provider.category || 'Home service';
+                                const providerServices = servicesForProvider(provider);
+                                const serviceName = providerServices[0]?.name || provider.category || 'Home service';
+                                const visual = visualFor(serviceName);
                                 const selectProvider = () => { setSelectedProviderId(provider.id); setDetailTab('Details'); };
-                                return <article key={provider.id} className={`find-service-card ${selectedProviderId === provider.id ? 'active' : ''}`} onClick={selectProvider}>
+                                return <article key={provider.id} className={`find-service-card ${effectiveProviderId === provider.id ? 'active' : ''}`} onClick={selectProvider}>
                                     <button type="button" className="find-service-card-image" aria-label={`View ${provider.name}`} style={{ backgroundImage: `url("${visual.image}")` }} onClick={selectProvider}><span className="find-service-verified"><i className="bi bi-patch-check-fill" /> Verified</span></button>
                                     <div className="find-service-card-body"><div className="find-service-card-title"><div><h3>{serviceName}</h3><p>{provider.name}</p></div><button type="button" className="find-service-open" aria-label={`View ${provider.name} details`} onClick={() => setSelectedProviderId(provider.id)}><i className="bi bi-arrow-up-right" /></button></div>
                                         <div className="find-service-card-meta"><span><i className="bi bi-star-fill" /> {provider.reviews > 0 ? `${provider.rating} (${provider.reviews} reviews)` : 'No reviews yet'}</span><span>{formatPrice(provider.rate)}</span></div>
                                         <p className="find-service-location"><i className="bi bi-geo-alt" /> {provider.location || 'Location not provided'}</p>
-                                        <button type="button" className="find-service-book" onClick={(event) => { event.stopPropagation(); selectProvider(); setProviderDetails(provider); setShowBooking(true); }}>Book Now <i className="bi bi-arrow-right" /></button>
+                                        <button type="button" className="find-service-book" onClick={(event) => { event.stopPropagation(); selectProvider(); setShowBooking(true); }}>Book Now <i className="bi bi-arrow-right" /></button>
                                     </div>
                                 </article>;
                             })}
@@ -196,18 +226,18 @@ export default function FindService() {
                     </section>
 
                     <aside className="find-service-details">
-                        {detailsLoading ? <div className="find-services-state"><span className="spinner-border spinner-border-sm text-success" /></div> : providerDetails ? <>
-                            <div className="find-service-detail-image" style={{ backgroundImage: `url("${visualFor(providerDetails.category).image}")` }}><button type="button" aria-label="Close service details" onClick={() => setSelectedProviderId(null)}><i className="bi bi-x-lg" /></button></div>
+                        {detailsLoading ? <div className="find-services-state"><span className="spinner-border spinner-border-sm text-success" /></div> : activeProviderDetails ? <>
+                            <div className="find-service-detail-image" style={{ backgroundImage: `url("${visualFor(bookingServices[0]?.name || activeProviderDetails.category).image}")` }}><button type="button" aria-label="Close service details" onClick={() => setSelectedProviderId(null)}><i className="bi bi-x-lg" /></button></div>
                             <div className="find-service-detail-body">
                                 <div className="find-service-provider-heading">
-                                    {providerDetails.image
-                                        ? <img className="find-service-provider-avatar" src={providerDetails.image} alt={`${providerDetails.fullName || providerDetails.name} profile`} />
+                                    {activeProviderDetails.image
+                                        ? <img className="find-service-provider-avatar" src={activeProviderDetails.image} alt={`${activeProviderDetails.fullName || activeProviderDetails.name} profile`} />
                                         : <span className="find-service-provider-avatar find-service-provider-avatar-fallback"><i className="bi bi-person-fill" /></span>}
-                                    <div><span className="find-service-detail-category">{providerDetails.category || 'Home Service'}</span><h2>{providerDetails.name}</h2></div>
+                                    <div><span className="find-service-detail-category">{activeProviderDetails.category || 'Home Service'}</span><h2>{activeProviderDetails.name}</h2></div>
                                 </div>
-                                <p className="find-service-detail-rating"><i className="bi bi-star-fill" /> {providerDetails.rating > 0 ? Number(providerDetails.rating).toFixed(1) : 'No reviews yet'} {providerDetails.reviews > 0 && `(${providerDetails.reviews} reviews)`}</p>
-                                <div className="find-service-detail-tabs">{['Details', 'Services', 'Reviews'].map((tab) => <button type="button" key={tab} className={detailTab === tab ? 'active' : ''} onClick={() => setDetailTab(tab)}>{tab}{tab === 'Reviews' && providerDetails.reviews > 0 ? ` (${providerDetails.reviews})` : ''}</button>)}</div>
-                                {detailTab === 'Details' ? <dl className="find-service-detail-list"><div><dt><i className="bi bi-person-badge" /> Provider</dt><dd>{providerDetails.fullName || providerDetails.name}</dd></div><div><dt><i className="bi bi-card-text" /> About</dt><dd>{providerDetails.bio || providerDetails.qualifications || 'Verified service provider.'}</dd></div><div><dt><i className="bi bi-geo-alt" /> Service Area</dt><dd>{providerDetails.serviceArea || providerDetails.location || 'Not provided'}</dd></div><div><dt><i className="bi bi-cash-coin" /> Starting Price</dt><dd>{formatPrice(providerDetails.rate)}</dd></div></dl> : detailTab === 'Services' ? <div className="find-service-detail-list find-service-offerings">{bookingServices.length ? bookingServices.map((service, index) => <div key={`${service.name}-${index}`}><dt><i className="bi bi-check-circle" /> {service.name}</dt><dd>{formatPrice(service.price)}</dd></div>) : <p>Contact provider for service details.</p>}</div> : <div className="find-service-reviews">{providerDetails.reviewDetails?.length ? providerDetails.reviewDetails.map((review) => <article className="find-service-review" key={review.id}><div className="find-service-review-heading"><strong><i className="bi bi-person-circle" /> Homeowner</strong><span>{formatReviewDate(review.createdAt)}</span></div><p className="find-service-review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} <small>{review.rating}/5</small></p><p className="find-service-review-comment">{review.comment || 'No comment provided.'}</p>{review.service && <small className="find-service-review-service">{review.service}</small>}</article>) : <p className="find-service-no-reviews">Wala pang review para sa provider na ito.</p>}</div>}
+                                <p className="find-service-detail-rating"><i className="bi bi-star-fill" /> {activeProviderDetails.rating > 0 ? Number(activeProviderDetails.rating).toFixed(1) : 'No reviews yet'} {activeProviderDetails.reviews > 0 && `(${activeProviderDetails.reviews} reviews)`}</p>
+                                <div className="find-service-detail-tabs">{['Details', 'Services', 'Reviews'].map((tab) => <button type="button" key={tab} className={detailTab === tab ? 'active' : ''} onClick={() => setDetailTab(tab)}>{tab}{tab === 'Reviews' && activeProviderDetails.reviews > 0 ? ` (${activeProviderDetails.reviews})` : ''}</button>)}</div>
+                                {detailTab === 'Details' ? <dl className="find-service-detail-list"><div><dt><i className="bi bi-person-badge" /> Provider</dt><dd>{activeProviderDetails.fullName || activeProviderDetails.name}</dd></div><div><dt><i className="bi bi-card-text" /> About</dt><dd>{activeProviderDetails.bio || activeProviderDetails.qualifications || 'Verified service provider.'}</dd></div><div><dt><i className="bi bi-geo-alt" /> Service Area</dt><dd>{activeProviderDetails.serviceArea || activeProviderDetails.location || 'Not provided'}</dd></div><div><dt><i className="bi bi-cash-coin" /> Starting Price</dt><dd>{formatPrice(activeProviderDetails.rate)}</dd></div></dl> : detailTab === 'Services' ? <div className="find-service-detail-list find-service-offerings">{bookingServices.length ? bookingServices.map((service, index) => <div key={`${service.name}-${index}`}><dt><i className="bi bi-check-circle" /> {service.name}</dt><dd>{formatPrice(service.price)}</dd></div>) : <p>Contact provider for service details.</p>}</div> : <div className="find-service-reviews">{activeProviderDetailsError ? <p className="find-service-no-reviews">{activeProviderDetailsError}</p> : activeProviderDetails.reviewDetails?.length ? activeProviderDetails.reviewDetails.map((review) => <article className="find-service-review" key={review.id}><div className="find-service-review-heading"><strong><i className="bi bi-person-circle" /> Homeowner</strong><span>{formatReviewDate(review.createdAt)}</span></div><p className="find-service-review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} <small>{review.rating}/5</small></p><p className="find-service-review-comment">{review.comment || 'No comment provided.'}</p>{review.service && <small className="find-service-review-service">{review.service}</small>}</article>) : <p className="find-service-no-reviews">{Array.isArray(activeProviderDetails.reviewDetails) ? 'Wala pang review para sa provider na ito.' : 'Naglo-load ang reviews...'}</p>}</div>}
                                 <button type="button" className="find-service-detail-book" onClick={() => setShowBooking(true)}><i className="bi bi-calendar-check" /> Book This Service</button>
                             </div>
                         </> : <div className="find-service-detail-empty"><i className="bi bi-hand-index-thumb" /><h3>Select a provider</h3><p>Choose a service card to see provider details.</p></div>}
@@ -215,7 +245,7 @@ export default function FindService() {
                 </div>
             </div>
 
-            {providerDetails && <BookingModal show={showBooking} handleClose={() => setShowBooking(false)} providerId={providerDetails.id} initialCategory={providerDetails.category || 'Home service'} providerServices={bookingServices} />}
+            {activeProviderDetails && <BookingModal show={showBooking} handleClose={() => setShowBooking(false)} providerId={activeProviderDetails.id} initialCategory={bookingServices[0]?.category || activeProviderDetails.category?.split(',')[0]?.trim() || 'Home service'} providerServices={bookingServices} />}
         </main>
     );
 }
