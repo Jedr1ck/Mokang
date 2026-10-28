@@ -54,6 +54,7 @@ def create_app(test_config=None):
     from app.routes.admin_verifications import admin_verifications_bp
     from app.routes.admin_users import admin_users_bp
     from app.routes.admin_analytics import admin_analytics_bp
+    from app.routes.admin_dashboard import admin_dashboard_bp
     from app.routes.feedback import feedback_bp
 
     app.register_blueprint(auth_bp)
@@ -66,6 +67,7 @@ def create_app(test_config=None):
     app.register_blueprint(admin_verifications_bp)
     app.register_blueprint(admin_users_bp)
     app.register_blueprint(admin_analytics_bp)
+    app.register_blueprint(admin_dashboard_bp)
     app.register_blueprint(feedback_bp)
 
     @app.after_request

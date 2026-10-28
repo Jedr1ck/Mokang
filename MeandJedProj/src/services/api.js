@@ -117,6 +117,10 @@ export async function getAdminBookingAnalytics() {
     return api('/admin/analytics');
 }
 
+export async function getAdminDashboard() {
+    return api('/admin/dashboard');
+}
+
 export async function createAdminAccount(account) {
     return api('/admin/users', {
         method: 'POST',

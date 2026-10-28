@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAdminDashboard } from '../../services/api';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -11,44 +12,74 @@ function DashboardOverview() {
     const [showAllCustomers, setShowAllCustomers] = useState(false);
     const [showAllApprovals, setShowAllApprovals] = useState(false);
     const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
+    const [dashboard, setDashboard] = useState(null);
+    const [loadError, setLoadError] = useState('');
 
-    // =====================================================
-    // TEMPORARY DATA
-    // =====================================================
-    // These will later be replaced with backend data.
+    useEffect(() => {
+        let active = true;
+        getAdminDashboard()
+            .then((data) => {
+                if (active) setDashboard(data);
+            })
+            .catch((error) => {
+                if (active) setLoadError(error.message || 'Unable to load dashboard data.');
+            });
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    if (loadError) {
+        return (
+            <div className="admin-overview">
+                <div className="alert alert-danger d-flex align-items-center gap-2 shadow-sm" role="alert">
+                    <i className="bi bi-exclamation-triangle-fill"></i>
+                    <span>Unable to load dashboard data: {loadError}</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (!dashboard) {
+        return (
+            <div className="admin-overview py-5 text-center" role="status">
+                <div className="spinner-border text-success" aria-hidden="true"></div>
+                <p className="mt-3 mb-0 text-secondary">Loading dashboard data...</p>
+            </div>
+        );
+    }
 
     const summaryData = [
         {
             title: "Total Homeowners",
-            value: "0",
+            value: dashboard.counts.homeowners,
             description: "Registered customers",
             icon: "bi-people-fill",
         },
         {
             title: "Total Service Providers",
-            value: "0",
+            value: dashboard.counts.providers,
             description: "Registered providers",
             icon: "bi-person-badge-fill",
         },
         {
             title: "Total Bookings",
-            value: "0",
+            value: dashboard.counts.bookings,
             description: "All service bookings",
             icon: "bi-calendar-check-fill",
         },
         {
             title: "Pending Approvals",
-            value: "0",
+            value: dashboard.counts.pendingApprovals,
             description: "Requires admin action",
             icon: "bi-hourglass-split",
         },
     ];
 
-    const recentBookings = [];
-
-    const newCustomers = [];
-
-    const pendingApprovals = [];
+    const recentBookings = dashboard.recentBookings;
+    const newCustomers = dashboard.newCustomers;
+    const pendingApprovals = dashboard.pendingApprovals;
 
     const announcements = [];
 
@@ -69,13 +100,13 @@ function DashboardOverview() {
     // =====================================================
 
     return (
-        <div className="admin-overview">
+        <div className="admin-overview container-fluid px-0">
 
             {/* =================================================
                         PAGE INTRO
             ================================================== */}
 
-            <div className="admin-overview-intro">
+            <div className="admin-overview-intro card border-0 shadow-sm">
                 <div>
                     <span className="admin-section-label">
                         SYSTEM OVERVIEW
@@ -89,7 +120,7 @@ function DashboardOverview() {
                     </p>
                 </div>
 
-                <div className="admin-overview-date">
+                <div className="admin-overview-date badge rounded-pill">
                     <i className="bi bi-calendar3"></i>
 
                     <span>
@@ -106,23 +137,25 @@ function DashboardOverview() {
                         SUMMARY CARDS
             ================================================== */}
 
-            <div className="admin-overview-summary-grid">
+            <div className="admin-overview-summary-grid row g-3">
 
                 {summaryData.map((item) => (
                     <div
-                        className="admin-overview-summary-card"
+                        className="admin-overview-summary-column col-12 col-sm-6 col-xl-3"
                         key={item.title}
                     >
-                        <div className="admin-overview-summary-icon">
-                            <i className={`bi ${item.icon}`}></i>
-                        </div>
+                        <div className={`admin-overview-summary-card card h-100 ${item.title === "Pending Approvals" ? "admin-summary-warning" : ""}`}>
+                            <div className="card-body d-flex align-items-center gap-3">
+                                <div className="admin-overview-summary-icon">
+                                    <i className={`bi ${item.icon}`}></i>
+                                </div>
 
-                        <div className="admin-overview-summary-info">
-                            <span>{item.title}</span>
-
-                            <strong>{item.value}</strong>
-
-                            <small>{item.description}</small>
+                                <div className="admin-overview-summary-info">
+                                    <span>{item.title}</span>
+                                    <strong>{item.value.toLocaleString()}</strong>
+                                    <small>{item.description}</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -133,17 +166,17 @@ function DashboardOverview() {
                         MONITORING SECTIONS
             ================================================== */}
 
-            <div className="admin-overview-grid">
+            <div className="admin-overview-grid row g-4">
 
                 {/* =================================================
                             RECENT BOOKINGS
                 ================================================== */}
 
-                <section className="admin-overview-card">
+                <section className="admin-overview-card card col-12 col-lg-6">
 
                     <div className="admin-overview-card-header">
 
-                        <div>
+                        <div className="admin-overview-heading">
                             <span className="admin-card-label">
                                 ACTIVITY
                             </span>
@@ -157,6 +190,7 @@ function DashboardOverview() {
 
                         <button
                             type="button"
+                            className="btn btn-sm btn-outline-success rounded-pill"
                             onClick={() =>
                                 setShowAllBookings(!showAllBookings)
                             }
@@ -173,14 +207,14 @@ function DashboardOverview() {
 
                     </div>
 
-                    <div className="admin-overview-table-wrapper">
+                    <div className="admin-overview-table-wrapper table-responsive">
 
                         {getVisibleItems(
                             recentBookings,
                             showAllBookings
                         ).length > 0 ? (
 
-                            <table className="admin-overview-table">
+                            <table className="admin-overview-table table table-hover align-middle mb-0">
 
                                 <thead>
                                     <tr>
@@ -201,11 +235,7 @@ function DashboardOverview() {
                                             <td>{booking.service}</td>
                                             <td>{booking.date}</td>
                                             <td>
-                                                <span
-                                                    className={`admin-status ${booking.status
-                                                        ?.toLowerCase()
-                                                        }`}
-                                                >
+                                                <span className={`badge rounded-pill ${booking.status === "Completed" ? "text-bg-success" : booking.status === "Pending" ? "text-bg-warning" : booking.status === "Cancelled" || booking.status === "Rejected" ? "text-bg-danger" : "text-bg-primary"}`}>
                                                     {booking.status}
                                                 </span>
                                             </td>
@@ -241,11 +271,11 @@ function DashboardOverview() {
                             NEW CUSTOMERS
                 ================================================== */}
 
-                <section className="admin-overview-card">
+                <section className="admin-overview-card card col-12 col-lg-6">
 
                     <div className="admin-overview-card-header">
 
-                        <div>
+                        <div className="admin-overview-heading">
                             <span className="admin-card-label">
                                 REGISTRATION
                             </span>
@@ -259,6 +289,7 @@ function DashboardOverview() {
 
                         <button
                             type="button"
+                            className="btn btn-sm btn-outline-success rounded-pill"
                             onClick={() =>
                                 setShowAllCustomers(!showAllCustomers)
                             }
@@ -275,14 +306,14 @@ function DashboardOverview() {
 
                     </div>
 
-                    <div className="admin-overview-table-wrapper">
+                    <div className="admin-overview-table-wrapper table-responsive">
 
                         {getVisibleItems(
                             newCustomers,
                             showAllCustomers
                         ).length > 0 ? (
 
-                            <table className="admin-overview-table">
+                            <table className="admin-overview-table table table-hover align-middle mb-0">
 
                                 <thead>
                                     <tr>
@@ -303,8 +334,8 @@ function DashboardOverview() {
                                             <td>{customer.email}</td>
                                             <td>{customer.date}</td>
                                             <td>
-                                                <span className="admin-status active">
-                                                    Active
+                                                <span className={`badge rounded-pill ${customer.status === "Active" ? "text-bg-success" : "text-bg-secondary"}`}>
+                                                    {customer.status}
                                                 </span>
                                             </td>
                                         </tr>
@@ -340,11 +371,11 @@ function DashboardOverview() {
                             PENDING APPROVAL
                 ================================================== */}
 
-                <section className="admin-overview-card">
+                <section className="admin-overview-card card col-12 col-lg-6">
 
                     <div className="admin-overview-card-header">
 
-                        <div>
+                        <div className="admin-overview-heading">
                             <span className="admin-card-label">
                                 APPROVAL
                             </span>
@@ -358,6 +389,7 @@ function DashboardOverview() {
 
                         <button
                             type="button"
+                            className="btn btn-sm btn-outline-success rounded-pill"
                             onClick={() =>
                                 setShowAllApprovals(!showAllApprovals)
                             }
@@ -374,14 +406,14 @@ function DashboardOverview() {
 
                     </div>
 
-                    <div className="admin-overview-table-wrapper">
+                    <div className="admin-overview-table-wrapper table-responsive">
 
                         {getVisibleItems(
                             pendingApprovals,
                             showAllApprovals
                         ).length > 0 ? (
 
-                            <table className="admin-overview-table">
+                            <table className="admin-overview-table table table-hover align-middle mb-0">
 
                                 <thead>
                                     <tr>
@@ -404,7 +436,7 @@ function DashboardOverview() {
                                             <td>
                                                 <button
                                                     type="button"
-                                                    className="admin-review-button"
+                                                    className="btn btn-sm btn-outline-success rounded-pill"
                                                 >
                                                     Review
                                                 </button>
@@ -442,11 +474,11 @@ function DashboardOverview() {
                             SYSTEM ANNOUNCEMENT
                 ================================================== */}
 
-                <section className="admin-overview-card">
+                <section className="admin-overview-card card col-12 col-lg-6">
 
                     <div className="admin-overview-card-header">
 
-                        <div>
+                        <div className="admin-overview-heading">
                             <span className="admin-card-label">
                                 SYSTEM
                             </span>
@@ -460,6 +492,7 @@ function DashboardOverview() {
 
                         <button
                             type="button"
+                            className="btn btn-sm btn-outline-success rounded-pill"
                             onClick={() =>
                                 setShowAllAnnouncements(
                                     !showAllAnnouncements

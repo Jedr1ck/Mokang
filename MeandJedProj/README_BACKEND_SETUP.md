@@ -57,10 +57,11 @@ Optional `.env` in project root:
 ## Current backend endpoints
 - POST /auth/register
 - POST /auth/login
-- POST /auth/admin/login
+- POST /auth/admin/login (admin username or email)
 - GET /auth/me
 - GET/PUT /profile/me
 - GET /public/stats
+- GET /admin/dashboard (administrator-only database counts and recent activity)
 - GET/POST /messages
 - GET/POST /messages/presence (authenticated online status)
 - GET /categories

@@ -33,6 +33,10 @@ function ManageHomeowners() {
     });
 
     const itemsPerPage = 5;
+    const activeHomeowners = homeowners.filter(
+        (homeowner) => homeowner.status === "Active"
+    ).length;
+    const inactiveHomeowners = homeowners.length - activeHomeowners;
 
     useEffect(() => {
         let active = true;
@@ -294,13 +298,13 @@ function ManageHomeowners() {
     // =====================================================
 
     return (
-        <div className="admin-management-page">
+        <div className="admin-management-page container-fluid px-0">
 
             {/* =================================================
                         PAGE HEADER
             ================================================== */}
 
-            <div className="admin-management-header">
+            <div className="admin-management-header card border-0 shadow-sm">
 
                 <div>
                     <span className="admin-section-label">
@@ -338,11 +342,53 @@ function ManageHomeowners() {
 
             </div>
 
+            <div className="row g-3 admin-homeowner-summary">
+                <div className="col-12 col-sm-6 col-xl-4">
+                    <div className="card h-100">
+                        <div className="card-body d-flex align-items-center gap-3">
+                            <span className="admin-homeowner-summary-icon total">
+                                <i className="bi bi-people-fill"></i>
+                            </span>
+                            <div>
+                                <span className="admin-homeowner-summary-label">Total homeowners</span>
+                                <strong className="admin-homeowner-summary-value">{homeowners.length}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 col-sm-6 col-xl-4">
+                    <div className="card h-100">
+                        <div className="card-body d-flex align-items-center gap-3">
+                            <span className="admin-homeowner-summary-icon active">
+                                <i className="bi bi-person-check-fill"></i>
+                            </span>
+                            <div>
+                                <span className="admin-homeowner-summary-label">Active accounts</span>
+                                <strong className="admin-homeowner-summary-value">{activeHomeowners}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 col-sm-6 col-xl-4">
+                    <div className="card h-100">
+                        <div className="card-body d-flex align-items-center gap-3">
+                            <span className="admin-homeowner-summary-icon inactive">
+                                <i className="bi bi-person-lock"></i>
+                            </span>
+                            <div>
+                                <span className="admin-homeowner-summary-label">Inactive accounts</span>
+                                <strong className="admin-homeowner-summary-value">{inactiveHomeowners}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* =================================================
                         TOOLBAR
             ================================================== */}
 
-            <div className="admin-management-toolbar">
+            <div className="admin-management-toolbar card">
 
                 {/* Search */}
                 <div className="admin-search-box">
@@ -401,7 +447,7 @@ function ManageHomeowners() {
                         TABLE
             ================================================== */}
 
-            <div className="admin-management-card">
+            <div className="admin-management-card card">
 
                 <div className="admin-management-card-header">
 
@@ -422,9 +468,9 @@ function ManageHomeowners() {
 
                 </div>
 
-                <div className="admin-table-container">
+                <div className="admin-table-container table-responsive">
 
-                    <table className="admin-management-table">
+                    <table className="admin-management-table table table-hover align-middle mb-0">
 
                         <thead>
                             <tr>

@@ -1740,6 +1740,221 @@
 
 }
 
+/* Bootstrap-based admin overview refinements */
+.admin-overview {
+    color: #172033;
+}
+
+.admin-overview .admin-overview-intro {
+    min-height: 150px;
+    margin-bottom: 24px;
+    padding: 26px 30px;
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 88% 20%, rgba(255, 255, 255, 0.3), transparent 25%),
+        linear-gradient(120deg, #eaf8f0 0%, #f8fbf9 58%, #fff5eb 100%);
+    flex-direction: row;
+    align-items: center;
+}
+
+.admin-overview .admin-section-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+.admin-overview .admin-overview-intro h2 {
+    margin: 7px 0 8px;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 750;
+    letter-spacing: -1.2px;
+}
+
+.admin-overview .admin-overview-intro p {
+    font-size: 14px;
+}
+
+.admin-overview .admin-overview-date {
+    min-height: 40px;
+    border-color: rgba(5, 150, 105, 0.12);
+    background: rgba(255, 255, 255, 0.82);
+    color: #475569;
+    font-size: 12px;
+}
+
+.admin-overview .admin-overview-summary-grid {
+    display: flex;
+    margin: 0 calc(var(--bs-gutter-x) * -0.5) 24px;
+}
+
+.admin-overview-summary-column {
+    min-width: 0;
+}
+
+.admin-overview .admin-overview-summary-card {
+    min-height: 126px;
+    padding: 0;
+    border: 1px solid #e8eeea;
+    border-radius: 14px;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+}
+
+.admin-overview .admin-overview-summary-card:hover {
+    border-color: #ccebd9;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.075);
+}
+
+.admin-overview .admin-overview-summary-card .card-body {
+    padding: 20px;
+}
+
+.admin-overview .admin-overview-summary-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    background: #e9f8ef;
+    color: #07875d;
+}
+
+.admin-overview .admin-overview-summary-info > span {
+    font-size: 12px;
+}
+
+.admin-overview .admin-overview-summary-info strong {
+    margin-top: 5px;
+    font-size: 30px;
+    letter-spacing: -0.8px;
+}
+
+.admin-overview .admin-overview-summary-info small {
+    margin-top: 7px;
+    font-size: 11px;
+}
+
+.admin-overview .admin-summary-warning .admin-overview-summary-icon {
+    background: #fff3e7;
+    color: #e87516;
+}
+
+.admin-overview .admin-overview-grid {
+    display: flex;
+    margin-top: 0;
+}
+
+.admin-overview .admin-overview-card {
+    min-width: 0;
+    padding: 0;
+    border: 1px solid #e8eeea;
+    border-radius: 15px;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+}
+
+.admin-overview .admin-overview-card-header {
+    min-height: 94px;
+    padding: 20px 22px;
+    align-items: center;
+    border-bottom-color: #edf1ee;
+}
+
+.admin-overview .admin-card-label {
+    color: #07875d;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.admin-overview .admin-overview-card-header h3 {
+    margin: 5px 0 4px;
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.admin-overview .admin-overview-card-header p {
+    font-size: 12px;
+}
+
+.admin-overview .admin-overview-card-header .btn {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.admin-overview .admin-overview-table-wrapper {
+    min-height: 226px;
+}
+
+.admin-overview .admin-overview-table {
+    min-width: 520px;
+    font-size: 12px;
+}
+
+.admin-overview .admin-overview-table thead th {
+    padding: 13px 18px;
+    border-bottom-color: #edf1ee;
+    background: #f8faf9;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.admin-overview .admin-overview-table tbody td {
+    padding: 14px 18px;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.admin-overview .admin-overview-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.admin-overview .admin-overview-table .badge {
+    padding: 6px 9px;
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.admin-overview .admin-overview-empty {
+    min-height: 226px;
+    padding: 26px;
+}
+
+.admin-overview .admin-empty-icon {
+    background: #effaf3;
+    color: #07875d;
+}
+
+.admin-overview .admin-overview-empty strong {
+    color: #334155;
+    font-size: 13px;
+}
+
+.admin-overview .admin-overview-empty span {
+    font-size: 11px;
+}
+
+.admin-overview .admin-overview-announcements {
+    min-height: 226px;
+    padding: 10px 20px;
+}
+
+@media (max-width: 767.98px) {
+    .admin-overview .admin-overview-intro {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+        padding: 22px;
+    }
+
+    .admin-overview .admin-overview-card-header {
+        padding: 17px;
+    }
+}
+
 /* =========================================================
    BOOKING MANAGEMENT
    SmartHome Admin
@@ -12576,5 +12791,594 @@
     .booking-forecast-value,
     .booking-forecast-month {
         font-size: 8px;
+    }
+}
+
+/* Bootstrap-based homeowner and provider management pages */
+.admin-management-page,
+.providers-management {
+    color: #172033;
+}
+
+.admin-management-page .admin-management-header,
+.providers-management .providers-page-header {
+    min-height: 142px;
+    margin-bottom: 20px;
+    padding: 24px 26px;
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.42), transparent 25%),
+        linear-gradient(120deg, #eaf8f0 0%, #f8fbf9 58%, #fff5eb 100%);
+    align-items: center;
+}
+
+.admin-management-page .admin-section-label,
+.providers-management .providers-section-label {
+    margin-bottom: 7px;
+    color: #07875d;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+}
+
+.admin-management-page .admin-management-header h2,
+.providers-management .providers-page-header h2 {
+    margin: 0 0 7px;
+    color: #172033;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    font-size: clamp(25px, 3vw, 32px);
+    font-weight: 750;
+    letter-spacing: -0.8px;
+}
+
+.admin-management-page .admin-management-header p,
+.providers-management .providers-page-header p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.admin-management-page .admin-management-header .btn,
+.providers-management .providers-page-header .btn,
+.providers-management .verification-open-button {
+    min-height: 42px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 650;
+    box-shadow: 0 5px 12px rgba(5, 150, 105, 0.12);
+}
+
+.admin-management-page .admin-management-total,
+.providers-management .providers-total-card {
+    min-width: 170px;
+    padding: 10px 13px;
+    border-color: #dcefe4;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.admin-management-page .admin-management-total > i {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: #07875d;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+}
+
+.admin-management-page .admin-management-total span,
+.providers-management .providers-total-card span {
+    font-size: 10px;
+}
+
+.admin-management-page .admin-management-total strong,
+.providers-management .providers-total-card strong {
+    margin-top: 3px;
+    font-size: 23px;
+}
+
+.admin-homeowner-summary {
+    margin-bottom: 18px;
+}
+
+.admin-homeowner-summary .card,
+.providers-management .providers-summary-card {
+    min-height: 96px;
+    border: 1px solid #e8eeea;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.admin-homeowner-summary .card:hover,
+.providers-management .providers-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 11px 22px rgba(15, 23, 42, 0.07);
+}
+
+.admin-homeowner-summary .card-body {
+    padding: 17px 19px;
+}
+
+.admin-homeowner-summary-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+}
+
+.admin-homeowner-summary-icon.total,
+.admin-homeowner-summary-icon.active {
+    background: #eaf8f0;
+    color: #07875d;
+}
+
+.admin-homeowner-summary-icon.inactive {
+    background: #fff3e7;
+    color: #e87516;
+}
+
+.admin-homeowner-summary-label {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-homeowner-summary-value {
+    display: block;
+    margin-top: 4px;
+    color: #172033;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.admin-management-page .admin-management-toolbar,
+.providers-management .providers-filter-card {
+    margin-bottom: 18px;
+    padding: 15px 17px;
+    border: 1px solid #e8eeea;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.03);
+}
+
+.admin-management-page .admin-search-box input,
+.admin-management-page .admin-filter-box select,
+.providers-management .providers-search input,
+.providers-management .providers-filter-select select {
+    height: 43px;
+    border-color: #e2e8e4;
+    border-radius: 10px;
+    background-color: #fbfcfb;
+    font-size: 12px;
+}
+
+.admin-management-page .admin-management-card,
+.providers-management .providers-table-card {
+    border: 1px solid #e8eeea;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+}
+
+.admin-management-page .admin-management-card-header,
+.providers-management .providers-table-header {
+    min-height: 88px;
+    padding: 19px 22px;
+    border-bottom-color: #edf1ee;
+    align-items: center;
+}
+
+.admin-management-page .admin-management-card-header h3,
+.providers-management .providers-table-header h3 {
+    margin-bottom: 5px;
+    color: #172033;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.admin-management-page .admin-management-card-header p,
+.providers-management .providers-table-header p {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.admin-management-page .admin-result-count,
+.providers-management .providers-result-count {
+    padding: 7px 11px;
+    border: 1px solid #e4ece7;
+    border-radius: 999px;
+    background: #f5faf7;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-management-page .admin-management-table,
+.providers-management .providers-table {
+    min-width: 850px;
+    margin: 0;
+}
+
+.providers-management .providers-table {
+    min-width: 1080px;
+}
+
+.admin-management-page .admin-management-table thead th,
+.providers-management .providers-table thead th {
+    padding: 13px 15px;
+    background: #f7faf8;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.5px;
+}
+
+.admin-management-page .admin-management-table tbody td,
+.providers-management .providers-table tbody td {
+    padding: 14px 15px;
+    color: #475569;
+    font-size: 12px;
+}
+
+.admin-management-page .admin-management-table tbody tr:hover,
+.providers-management .providers-table tbody tr:hover {
+    background-color: #f8fcf9;
+}
+
+.admin-management-page .admin-user-avatar,
+.providers-management .provider-avatar {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dcefe4, 0 4px 10px rgba(5, 150, 105, 0.1);
+    font-size: 15px;
+}
+
+.admin-management-page .admin-user-cell strong,
+.providers-management .provider-user strong {
+    color: #263445;
+    font-size: 12px;
+}
+
+.admin-management-page .admin-user-cell span,
+.providers-management .provider-user span {
+    margin-top: 3px;
+    font-size: 10px;
+}
+
+.admin-management-page .admin-account-status,
+.providers-management .provider-approval,
+.providers-management .provider-account {
+    padding: 6px 10px;
+    font-size: 10px;
+}
+
+.admin-management-page .admin-account-status > span,
+.providers-management .status-dot {
+    width: 6px;
+    height: 6px;
+}
+
+.admin-management-page .admin-action-button,
+.providers-management .provider-action {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    font-size: 12px;
+}
+
+.admin-management-page .admin-pagination,
+.providers-management .providers-pagination {
+    min-height: 60px;
+    padding: 12px 18px;
+    border-top: 1px solid #edf1ee;
+}
+
+.admin-management-page .admin-table-no-results,
+.providers-management .providers-empty-cell {
+    height: 250px;
+    color: #64748b;
+}
+
+.admin-management-page .admin-table-no-results i,
+.providers-management .providers-empty-icon {
+    color: #07875d;
+}
+
+.admin-management-page .alert,
+.providers-management .alert {
+    border-radius: 12px;
+}
+
+@media (max-width: 991.98px) {
+    .providers-management .providers-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .providers-management .providers-filter-card {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .providers-management .providers-filter-controls {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .admin-management-page .admin-management-header,
+    .providers-management .providers-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .admin-management-page .admin-management-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-management-page .admin-search-box {
+        min-width: 0;
+    }
+
+    .admin-management-page .admin-filter-box {
+        width: 100%;
+    }
+
+    .providers-management .verification-header-actions {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .providers-management .providers-filter-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .providers-management .providers-search,
+    .providers-management .providers-filter-select {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .providers-management .providers-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-management-page .admin-management-card-header,
+    .providers-management .providers-table-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Homeowner account list layout refinements */
+.admin-management-page .admin-management-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+}
+
+.admin-management-page .admin-search-box {
+    flex: 1 1 auto;
+    min-width: 240px;
+}
+
+.admin-management-page .admin-search-box input {
+    padding-right: 40px;
+    padding-left: 42px;
+    background: #fff;
+}
+
+.admin-management-page .admin-search-box > i {
+    left: 15px;
+    color: #07875d;
+}
+
+.admin-management-page .admin-search-box > button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 50%;
+    background: #f1f5f3;
+    color: #64748b;
+    display: grid;
+    place-items: center;
+}
+
+.admin-management-page .admin-filter-box {
+    position: relative;
+    flex: 0 0 200px;
+    width: 200px;
+}
+
+.admin-management-page .admin-filter-box > i {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: #07875d;
+    pointer-events: none;
+}
+
+.admin-management-page .admin-filter-box select {
+    width: 100%;
+    padding: 0 34px 0 40px;
+    appearance: none;
+    color: #334155;
+    cursor: pointer;
+}
+
+.admin-management-page .admin-filter-box::after {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: #64748b;
+    content: "\F282";
+    font-family: "bootstrap-icons";
+    font-size: 11px;
+    pointer-events: none;
+}
+
+.admin-management-page .admin-management-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.admin-management-page .admin-user-cell {
+    min-width: 230px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-management-page .admin-user-avatar {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #07875d, #35b783);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 12px rgba(5, 150, 105, 0.16);
+}
+
+.admin-management-page .admin-user-cell > div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.admin-management-page .admin-user-cell strong,
+.admin-management-page .admin-user-cell span {
+    display: block;
+    max-width: 260px;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-management-page .admin-user-cell span {
+    color: #7b8794;
+    font-size: 11px;
+}
+
+.admin-management-page .admin-contact-text {
+    color: #475569;
+    white-space: nowrap;
+}
+
+.admin-management-page .admin-location-text {
+    max-width: 230px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.admin-management-page .admin-location-text i {
+    flex: 0 0 auto;
+    color: #e87516;
+}
+
+.admin-management-page .admin-location-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-management-page .admin-account-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.admin-management-page .admin-account-status.active {
+    background: #eaf8f0;
+    color: #07875d;
+}
+
+.admin-management-page .admin-account-status.inactive {
+    background: #fff3e7;
+    color: #c65e0d;
+}
+
+.admin-management-page .admin-account-status > span {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.admin-management-page .admin-table-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.admin-management-page .admin-action-button {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+}
+
+.admin-management-page .admin-action-button.block {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+}
+
+.admin-management-page .admin-action-button.block:hover {
+    border-color: #fed7aa;
+    background: #fff3e7;
+    color: #c65e0d;
+}
+
+@media (max-width: 767.98px) {
+    .admin-management-page .admin-management-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-management-page .admin-search-box,
+    .admin-management-page .admin-filter-box {
+        width: 100%;
+        min-width: 0;
+        flex-basis: auto;
+    }
+
+    .admin-management-page .admin-management-card-header {
+        align-items: flex-start;
     }
 }

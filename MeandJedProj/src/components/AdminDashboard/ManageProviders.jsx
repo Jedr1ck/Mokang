@@ -410,14 +410,14 @@ function ManageProviders() {
 
     return (
 
-        <div className="providers-management">
+        <div className="providers-management container-fluid px-0">
 
 
             {/* =================================================
                 HEADER
             ================================================= */}
 
-            <div className="providers-page-header">
+            <div className="providers-page-header card border-0 shadow-sm">
 
                 <div>
 
@@ -606,7 +606,7 @@ function ManageProviders() {
                 FILTER CARD
             ================================================= */}
 
-            <div className="providers-filter-card">
+            <div className="providers-filter-card card">
 
                 <div className="providers-filter-title">
 
@@ -764,7 +764,7 @@ function ManageProviders() {
                 TABLE
             ================================================= */}
 
-            <div className="providers-table-card">
+            <div className="providers-table-card card">
 
 
                 <div className="providers-table-header">
@@ -806,9 +806,9 @@ function ManageProviders() {
                 </div>
 
 
-                <div className="providers-table-wrapper">
+                <div className="providers-table-wrapper table-responsive">
 
-                    <table className="providers-table">
+                    <table className="providers-table table table-hover align-middle mb-0">
 
                         <thead>
 

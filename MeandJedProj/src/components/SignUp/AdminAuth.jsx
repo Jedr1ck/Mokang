@@ -28,7 +28,7 @@ const AdminAuth = () => {
         setFormError("");
 
         if (!username.trim()) {
-            setFormError("Please enter an admin username.");
+            setFormError("Please enter your admin username or email.");
             return;
         }
 
@@ -107,7 +107,7 @@ const AdminAuth = () => {
 
                             <input
                                 type="text"
-                                placeholder="Admin Username"
+                                placeholder="Admin Username or Email"
                                 value={username}
                                 onChange={(e) => {
                                     setUsername(e.target.value);

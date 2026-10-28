@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from sqlalchemy import func, or_
 
 from app.common import (
     ApiError,
@@ -87,8 +88,11 @@ def login_admin():
             session.query(User)
             .filter(
                 User.role == "admin",
-                User.full_name == username,
                 User.is_active.is_(True),
+                or_(
+                    User.full_name == username,
+                    func.lower(User.email) == username.lower(),
+                ),
             )
             .first()
         )
