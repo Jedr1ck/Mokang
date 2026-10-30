@@ -453,28 +453,6 @@ function ManageProviders() {
                         <i className="bi bi-shield-check" aria-hidden="true"></i>
                         Review verification requests
                     </button>
-
-                    <div className="providers-total-card">
-
-                        <div className="providers-total-icon">
-
-                            <i className="bi bi-person-badge-fill"></i>
-
-                        </div>
-
-                        <div>
-
-                            <span>
-                                Total Providers
-                            </span>
-
-                            <strong>
-                                {totalProviders}
-                            </strong>
-
-                        </div>
-
-                    </div>
                 </div>
 
             </div>

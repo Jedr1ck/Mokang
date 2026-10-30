@@ -318,7 +318,7 @@ function ManageHomeowners() {
                     </p>
                 </div>
 
-                <div className="d-flex align-items-center gap-3 flex-wrap">
+                <div className="admin-management-header-actions">
                     <button
                         type="button"
                         className="btn btn-success"
@@ -327,17 +327,6 @@ function ManageHomeowners() {
                         <i className="bi bi-person-plus-fill me-2"></i>
                         Add Homeowner
                     </button>
-
-                    <div className="admin-management-total">
-
-                        <i className="bi bi-people-fill"></i>
-
-                        <div>
-                            <span>Total Homeowners</span>
-                            <strong>{homeowners.length}</strong>
-                        </div>
-
-                    </div>
                 </div>
 
             </div>
