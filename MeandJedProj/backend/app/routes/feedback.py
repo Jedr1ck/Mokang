@@ -4,6 +4,7 @@ from app.common import (
     ApiError,
     current_user,
     get_session,
+    notify_admins,
     require_auth,
     validated,
 )
@@ -75,6 +76,12 @@ def create_review(booking_id):
             comment=data.comment,
         )
         session.add(review)
+        notify_admins(
+            session,
+            "New homeowner review",
+            f"Homeowner {user.full_name} submitted a {data.rating}-star review for a completed service.",
+            "review",
+        )
         session.commit()
         return jsonify(id=review.id, rating=review.rating, comment=review.comment), 201
 
@@ -95,6 +102,12 @@ def create_complaint(booking_id):
             message=data.message,
         )
         session.add(complaint)
+        notify_admins(
+            session,
+            "New homeowner complaint",
+            f"Homeowner {user.full_name} submitted a complaint: {data.subject}.",
+            "complaint",
+        )
         session.commit()
         return jsonify(id=complaint.id, status=complaint.status), 201
 

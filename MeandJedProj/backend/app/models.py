@@ -60,6 +60,14 @@ class Category(Base):
     id = Column(ID_TYPE, primary_key=True)
     name = Column(String(100), unique=True)
     description = Column(Text)
+    is_active = Column(Boolean, nullable=False, default=True)
+
+
+class SystemSetting(Base):
+    __tablename__ = "system_settings"
+
+    key = Column(String(100), primary_key=True)
+    value = Column(Text, nullable=False)
 
 
 class ProviderProfile(Base):

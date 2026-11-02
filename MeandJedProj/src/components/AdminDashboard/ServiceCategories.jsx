@@ -1,11 +1,22 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./AdminDashboard.css";
+import {
+    createAdminCategory,
+    deleteAdminCategory,
+    getAdminCategories,
+    updateAdminCategory,
+} from "../../services/api";
 
 function ServiceCategories() {
     const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
+    const [actionError, setActionError] = useState("");
+    const [saving, setSaving] = useState(false);
+    const [reloadToken, setReloadToken] = useState(0);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
@@ -22,6 +33,29 @@ function ServiceCategories() {
     const [categoryToDelete, setCategoryToDelete] = useState(null);
 
     const itemsPerPage = 5;
+
+    useEffect(() => {
+        let active = true;
+        getAdminCategories()
+            .then((data) => {
+                if (active) {
+                    setCategories(data);
+                    setLoadError("");
+                }
+            })
+            .catch((error) => {
+                if (active) {
+                    setLoadError(error.message || "Unable to load service categories.");
+                }
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [reloadToken]);
 
     const filteredCategories = useMemo(() => {
         return categories.filter((category) => {
@@ -71,6 +105,7 @@ function ServiceCategories() {
     };
 
     const openAddModal = () => {
+        setActionError("");
         setEditingCategory(null);
         setCategoryName("");
         setCategoryDescription("");
@@ -79,6 +114,7 @@ function ServiceCategories() {
     };
 
     const openEditModal = (category) => {
+        setActionError("");
         setEditingCategory(category);
         setCategoryName(category.name || "");
         setCategoryDescription(category.description || "");
@@ -94,61 +130,57 @@ function ServiceCategories() {
         setCategoryStatus("Active");
     };
 
-    const handleSaveCategory = (event) => {
+    const handleSaveCategory = async (event) => {
         event.preventDefault();
 
         const trimmedName = categoryName.trim();
 
         if (!trimmedName) {
+            setActionError("Category name is required.");
             return;
         }
 
-        if (editingCategory) {
-            setCategories((previousCategories) =>
-                previousCategories.map((category) =>
-                    category.id === editingCategory.id
-                        ? {
-                            ...category,
-                            name: trimmedName,
-                            description: categoryDescription.trim(),
-                            status: categoryStatus,
-                        }
-                        : category
-                )
-            );
-        } else {
-            const newCategory = {
-                id: Date.now(),
+        setSaving(true);
+        setActionError("");
+        try {
+            const categoryData = {
                 name: trimmedName,
                 description: categoryDescription.trim(),
                 status: categoryStatus,
             };
-
-            setCategories((previousCategories) => [
-                ...previousCategories,
-                newCategory,
-            ]);
+            if (editingCategory) {
+                await updateAdminCategory(editingCategory.id, categoryData);
+            } else {
+                await createAdminCategory(categoryData);
+            }
+            const refreshedCategories = await getAdminCategories();
+            setCategories(refreshedCategories);
+            setCurrentPage(1);
+            closeCategoryModal();
+        } catch (error) {
+            setActionError(error.message || "Unable to save the service category.");
+        } finally {
+            setSaving(false);
         }
-
-        closeCategoryModal();
     };
 
-    const toggleCategoryStatus = (category) => {
+    const toggleCategoryStatus = async (category) => {
         const updatedStatus =
             category.status === "Active"
                 ? "Inactive"
                 : "Active";
 
-        setCategories((previousCategories) =>
-            previousCategories.map((item) =>
-                item.id === category.id
-                    ? {
-                        ...item,
-                        status: updatedStatus,
-                    }
-                    : item
-            )
-        );
+        setActionError("");
+        try {
+            await updateAdminCategory(category.id, {
+                name: category.name,
+                description: category.description || "",
+                status: updatedStatus,
+            });
+            setCategories(await getAdminCategories());
+        } catch (error) {
+            setActionError(error.message || "Unable to update category status.");
+        }
     };
 
     const openDeleteModal = (category) => {
@@ -161,24 +193,25 @@ function ServiceCategories() {
         setShowDeleteModal(false);
     };
 
-    const handleDeleteCategory = () => {
+    const handleDeleteCategory = async () => {
         if (!categoryToDelete) {
             return;
         }
 
-        setCategories((previousCategories) =>
-            previousCategories.filter(
-                (category) => category.id !== categoryToDelete.id
-            )
-        );
-
-        closeDeleteModal();
-
-        if (
-            currentPage > 1 &&
-            paginatedCategories.length === 1
-        ) {
-            setCurrentPage((page) => Math.max(page - 1, 1));
+        setActionError("");
+        setSaving(true);
+        try {
+            await deleteAdminCategory(categoryToDelete.id);
+            const refreshedCategories = await getAdminCategories();
+            setCategories(refreshedCategories);
+            if (currentPage > 1 && paginatedCategories.length === 1) {
+                setCurrentPage((page) => Math.max(page - 1, 1));
+            }
+            closeDeleteModal();
+        } catch (error) {
+            setActionError(error.message || "Unable to delete the service category.");
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -225,6 +258,24 @@ function ServiceCategories() {
                     Add Category
                 </button>
             </div>
+
+            {(loadError || actionError) && (
+                <div className="alert alert-danger d-flex align-items-center justify-content-between gap-3" role="alert" aria-live="polite">
+                    <span>{actionError || loadError}</span>
+                    {loadError && (
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => {
+                                setLoading(true);
+                                setReloadToken((current) => current + 1);
+                            }}
+                        >
+                            Retry
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* SUMMARY */}
             <div className="service-summary-grid">
@@ -336,7 +387,17 @@ function ServiceCategories() {
 
                         <tbody>
 
-                            {paginatedCategories.length > 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="4" className="service-table-empty">
+                                        <div className="service-empty-state" role="status">
+                                            <span className="spinner-border spinner-border-sm text-success" aria-hidden="true"></span>
+                                            <h4>Loading service categories</h4>
+                                            <p>Retrieving categories from the database.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : !loadError && paginatedCategories.length > 0 ? (
                                 paginatedCategories.map((category) => (
                                     <tr key={category.id}>
 
@@ -443,12 +504,15 @@ function ServiceCategories() {
                                             </div>
 
                                             <h4>
-                                                No service categories found
+                                                {loadError
+                                                    ? "Unable to load service categories"
+                                                    : "No service categories found"}
                                             </h4>
 
                                             <p>
-                                                Service categories will appear
-                                                here once data is available.
+                                                {loadError
+                                                    ? "Retry the request to load categories from the database."
+                                                    : "Service categories will appear here once data is available."}
                                             </p>
 
                                         </div>
@@ -646,6 +710,7 @@ function ServiceCategories() {
                                 <button
                                     type="submit"
                                     className="service-modal-save"
+                                    disabled={saving}
                                 >
                                     <i
                                         className={`bi ${editingCategory
@@ -654,9 +719,11 @@ function ServiceCategories() {
                                             }`}
                                     ></i>
 
-                                    {editingCategory
-                                        ? "Save Changes"
-                                        : "Add Category"}
+                                    {saving
+                                        ? "Saving..."
+                                        : editingCategory
+                                            ? "Save Changes"
+                                            : "Add Category"}
                                 </button>
 
                             </div>
@@ -734,9 +801,10 @@ function ServiceCategories() {
                                 type="button"
                                 className="service-modal-delete"
                                 onClick={handleDeleteCategory}
+                                disabled={saving}
                             >
                                 <i className="bi bi-trash3"></i>
-                                Delete Category
+                                {saving ? "Deleting..." : "Delete Category"}
                             </button>
 
                         </div>

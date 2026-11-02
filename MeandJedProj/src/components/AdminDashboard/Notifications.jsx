@@ -1,4 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import {
+    deleteNotification,
+    getAdminNotifications,
+    markAllNotificationsRead,
+    updateNotificationReadStatus,
+} from '../../services/api';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -8,6 +14,8 @@ import "./AdminDashboard.css";
 
 function Notifications() {
     const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
     const [searchTerm, setSearchTerm] = useState("");
     const [typeFilter, setTypeFilter] = useState("All");
@@ -23,6 +31,43 @@ function Notifications() {
         useState(null);
 
     const itemsPerPage = 5;
+
+    useEffect(() => {
+        let active = true;
+
+        const loadNotifications = async () => {
+            try {
+                const data = await getAdminNotifications();
+                if (!active) return;
+
+                setNotifications(data.map((notification) => ({
+                    ...notification,
+                    message: notification.body || '',
+                    type: notification.type
+                        ? notification.type.charAt(0).toUpperCase() + notification.type.slice(1).toLowerCase()
+                        : 'System',
+                    date: notification.createdAt
+                        ? new Date(notification.createdAt).toLocaleString()
+                        : '',
+                })));
+                setLoadError('');
+            } catch (error) {
+                if (active) {
+                    setLoadError(error.message || 'Unable to load admin notifications.');
+                }
+            } finally {
+                if (active) setLoading(false);
+            }
+        };
+
+        loadNotifications();
+        const intervalId = window.setInterval(loadNotifications, 8000);
+
+        return () => {
+            active = false;
+            window.clearInterval(intervalId);
+        };
+    }, []);
 
     const filteredNotifications = useMemo(() => {
         return notifications.filter((notification) => {
@@ -109,52 +154,47 @@ function Notifications() {
         setShowViewModal(true);
 
         if (!notification.isRead) {
-            setNotifications((previousNotifications) =>
-                previousNotifications.map((item) =>
-                    item.id === notification.id
-                        ? {
-                            ...item,
-                            isRead: true,
-                        }
-                        : item
-                )
-            );
+            handleReadStatusChange(notification, true);
         }
     };
 
-    const handleMarkAsRead = (notification) => {
-        setNotifications((previousNotifications) =>
-            previousNotifications.map((item) =>
-                item.id === notification.id
-                    ? {
-                        ...item,
-                        isRead: true,
-                    }
-                    : item
-            )
-        );
+    const handleReadStatusChange = async (notification, isRead) => {
+        try {
+            await updateNotificationReadStatus(notification.id, isRead);
+            setNotifications((previousNotifications) =>
+                previousNotifications.map((item) =>
+                    item.id === notification.id
+                        ? { ...item, isRead }
+                        : item
+                )
+            );
+            setSelectedNotification((previous) =>
+                previous?.id === notification.id
+                    ? { ...previous, isRead }
+                    : previous
+            );
+            setLoadError('');
+        } catch (error) {
+            setLoadError(error.message || 'Unable to update notification status.');
+        }
     };
 
-    const handleMarkAsUnread = (notification) => {
-        setNotifications((previousNotifications) =>
-            previousNotifications.map((item) =>
-                item.id === notification.id
-                    ? {
-                        ...item,
-                        isRead: false,
-                    }
-                    : item
-            )
-        );
-    };
-
-    const handleMarkAllAsRead = () => {
-        setNotifications((previousNotifications) =>
-            previousNotifications.map((notification) => ({
-                ...notification,
-                isRead: true,
-            }))
-        );
+    const handleMarkAllAsRead = async () => {
+        try {
+            await markAllNotificationsRead();
+            setNotifications((previousNotifications) =>
+                previousNotifications.map((notification) => ({
+                    ...notification,
+                    isRead: true,
+                }))
+            );
+            setSelectedNotification((previous) =>
+                previous ? { ...previous, isRead: true } : previous
+            );
+            setLoadError('');
+        } catch (error) {
+            setLoadError(error.message || 'Unable to mark notifications as read.');
+        }
     };
 
     const openDeleteModal = (notification) => {
@@ -167,8 +207,15 @@ function Notifications() {
         setShowDeleteModal(false);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!notificationToDelete) {
+            return;
+        }
+
+        try {
+            await deleteNotification(notificationToDelete.id);
+        } catch (error) {
+            setLoadError(error.message || 'Unable to delete notification.');
             return;
         }
 
@@ -181,6 +228,7 @@ function Notifications() {
         );
 
         closeDeleteModal();
+        setLoadError('');
 
         if (
             currentPage > 1 &&
@@ -278,6 +326,18 @@ function Notifications() {
                 </button>
 
             </div>
+
+            {loadError && (
+                <div className="alert alert-danger" role="alert">
+                    Notification feed error: {loadError}
+                </div>
+            )}
+
+            {loading && (
+                <div className="alert alert-info" role="status">
+                    Loading notifications...
+                </div>
+            )}
 
             {/* SUMMARY */}
             <div className="admin-management-summary">
@@ -463,11 +523,10 @@ function Notifications() {
                 <div className="admin-table-header">
 
                     <div>
-                        <h3>System Notifications</h3>
+                        <h3>Homeowner &amp; Provider Activity</h3>
 
                         <p>
-                            Important updates and activities
-                            from the SmartHome platform.
+                            Live activity updates, refreshed every 8 seconds.
                         </p>
                     </div>
 
@@ -593,13 +652,10 @@ function Notifications() {
                                                                 : "Mark as Read"
                                                         }
                                                         onClick={() =>
-                                                            notification.isRead
-                                                                ? handleMarkAsUnread(
-                                                                    notification
-                                                                )
-                                                                : handleMarkAsRead(
-                                                                    notification
-                                                                )
+                                                            handleReadStatusChange(
+                                                                notification,
+                                                                !notification.isRead
+                                                            )
                                                         }
                                                     >
                                                         <i

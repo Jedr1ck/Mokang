@@ -2,7 +2,14 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, jsonify
 
-from app.common import ApiError, current_user, get_session, require_auth, validated
+from app.common import (
+    ApiError,
+    current_user,
+    get_session,
+    notify_admins,
+    require_auth,
+    validated,
+)
 from app.models import Booking, Message, Notification, ProviderProfile, User
 from app.schemas import MessageIn
 
@@ -128,6 +135,14 @@ def send_message():
                 type="message",
             )
         )
+        if user.role in {"homeowner", "provider"}:
+            actor_label = "Homeowner" if user.role == "homeowner" else "Provider"
+            notify_admins(
+                session,
+                f"New {user.role} message activity",
+                f"{actor_label} {user.full_name} sent a message to {recipient.full_name}.",
+                "user" if user.role == "homeowner" else "provider",
+            )
         session.commit()
         session.refresh(message)
         return jsonify(

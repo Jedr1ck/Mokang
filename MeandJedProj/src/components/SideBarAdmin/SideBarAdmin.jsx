@@ -1,4 +1,3 @@
-import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -10,6 +9,7 @@ function SideBarAdmin({
     sidebarOpen,
     setSidebarOpen,
     handleLogout,
+    unreadNotificationCount,
 }) {
 
     const menuItems = [
@@ -36,10 +36,6 @@ function SideBarAdmin({
         {
             label: "Reviews and Complaints",
             icon: "bi-chat-left-text-fill",
-        },
-        {
-            label: "Report and Analytics",
-            icon: "bi-bar-chart-fill",
         },
         {
             label: "Notification",
@@ -138,9 +134,11 @@ function SideBarAdmin({
 
                             {/* Notification count */}
 
-                            {item.label === "Notification" && (
+                            {item.label === "Notification" && unreadNotificationCount > 0 && (
                                 <span className="admin-notification-badge">
-                                    0
+                                    {unreadNotificationCount > 99
+                                        ? "99+"
+                                        : unreadNotificationCount}
                                 </span>
                             )}
 

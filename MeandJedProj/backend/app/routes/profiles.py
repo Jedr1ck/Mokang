@@ -11,6 +11,7 @@ from app.common import (
     current_user,
     get_current_provider,
     get_session,
+    notify_admins,
     require_auth,
     user_out,
     validated,
@@ -417,6 +418,12 @@ def submit_provider_verification():
         provider.verification_reviewed_at = None
         provider.verification_reviewed_by = None
         provider.verification_review_notes = None
+        notify_admins(
+            session,
+            "Provider verification submitted",
+            f"Provider {provider.business_name or provider.user.full_name} submitted profile verification for review.",
+            "provider",
+        )
         session.commit()
         session.refresh(provider)
         return jsonify(

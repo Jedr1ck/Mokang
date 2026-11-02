@@ -81,8 +81,17 @@ def categories():
     with get_session() as session:
         return jsonify(
             [
-                {"id": category.id, "name": category.name}
-                for category in session.query(Category).all()
+                {
+                    "id": category.id,
+                    "name": category.name,
+                    "description": category.description or "",
+                }
+                for category in (
+                    session.query(Category)
+                    .filter(Category.is_active.is_(True))
+                    .order_by(func.lower(Category.name), Category.id)
+                    .all()
+                )
             ]
         )
 

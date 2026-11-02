@@ -27,6 +27,16 @@ export async function getPresence() { return api('/messages/presence'); }
 export async function getNotifications() { return api('/notifications'); }
 export async function markNotificationRead(id) { return api(`/notifications/${id}/read`, { method: 'PATCH' }); }
 export async function markAllNotificationsRead() { return api('/notifications/read', { method: 'PATCH' }); }
+export async function getAdminNotifications() { return api('/admin/notifications'); }
+export async function updateNotificationReadStatus(id, isRead) {
+    return api(`/notifications/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isRead }),
+    });
+}
+export async function deleteNotification(id) {
+    return api(`/notifications/${id}`, { method: 'DELETE' });
+}
 export const logout = () => { localStorage.removeItem('access_token'); localStorage.removeItem('user'); };
 // PROFILE API
 export async function getMyProfile() {
@@ -113,8 +123,44 @@ export async function getAdminHomeowners() {
     return api('/admin/users/homeowners');
 }
 
-export async function getAdminBookingAnalytics() {
-    return api('/admin/analytics');
+export async function getAdminCategories() {
+    return api('/admin/categories');
+}
+
+export async function createAdminCategory(category) {
+    return api('/admin/categories', {
+        method: 'POST',
+        body: JSON.stringify(category),
+    });
+}
+
+export async function updateAdminCategory(id, category) {
+    return api(`/admin/categories/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        body: JSON.stringify(category),
+    });
+}
+
+export async function deleteAdminCategory(id) {
+    return api(`/admin/categories/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+    });
+}
+
+export async function getAdminBookingAnalytics(params = {}) {
+    const query = new URLSearchParams(params);
+    return api(`/admin/analytics${query.toString() ? `?${query}` : ''}`);
+}
+
+export async function getAnalyticsCoverage() {
+    return api('/admin/analytics/coverage');
+}
+
+export async function updateAnalyticsCoverage(coverageStartDate) {
+    return api('/admin/analytics/coverage', {
+        method: 'PUT',
+        body: JSON.stringify({ coverageStartDate }),
+    });
 }
 
 export async function getAdminDashboard() {

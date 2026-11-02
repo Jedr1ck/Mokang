@@ -3,11 +3,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker
 from werkzeug.exceptions import HTTPException
 
 from app.common import ApiError, api_error_handler
+from app.models import Category, SystemSetting
+
+
 def create_app(test_config=None):
     load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
@@ -21,6 +24,25 @@ def create_app(test_config=None):
         DATABASE_URL=os.getenv(
             "DATABASE_URL",
             "mysql+pymysql://root@localhost:3306/Smarthomes",
+        ),
+        ANALYTICS_COVERAGE_START_DATE=os.getenv(
+            "ANALYTICS_COVERAGE_START_DATE",
+            "",
+        ).strip(),
+        ANALYTICS_BASELINE_MIN_PERIODS=int(
+            os.getenv("ANALYTICS_BASELINE_MIN_PERIODS", "12")
+        ),
+        ANALYTICS_ARIMA_MIN_TRAINING_PERIODS=int(
+            os.getenv("ANALYTICS_ARIMA_MIN_TRAINING_PERIODS", "24")
+        ),
+        ANALYTICS_ARIMA_MIN_VALIDATION_FOLDS=int(
+            os.getenv("ANALYTICS_ARIMA_MIN_VALIDATION_FOLDS", "3")
+        ),
+        ANALYTICS_ARIMA_MIN_MAE_IMPROVEMENT_PERCENT=float(
+            os.getenv("ANALYTICS_ARIMA_MIN_MAE_IMPROVEMENT_PERCENT", "5")
+        ),
+        ANALYTICS_ARIMA_MAX_WAPE_PERCENT=float(
+            os.getenv("ANALYTICS_ARIMA_MAX_WAPE_PERCENT", "100")
         ),
         CORS_ORIGINS=[
             origin.strip()
@@ -36,6 +58,20 @@ def create_app(test_config=None):
         app.config["DATABASE_URL"],
         pool_pre_ping=True,
     )
+    SystemSetting.__table__.create(engine, checkfirst=True)
+    if inspect(engine).has_table(Category.__tablename__):
+        category_columns = {
+            column["name"]
+            for column in inspect(engine).get_columns(Category.__tablename__)
+        }
+        if "is_active" not in category_columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text(
+                        "ALTER TABLE service_categories "
+                        "ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE"
+                    )
+                )
     app.extensions["database_engine"] = engine
     app.extensions["session_factory"] = sessionmaker(
         bind=engine,
@@ -53,6 +89,7 @@ def create_app(test_config=None):
     from app.routes.admin_providers import admin_providers_bp
     from app.routes.admin_verifications import admin_verifications_bp
     from app.routes.admin_users import admin_users_bp
+    from app.routes.admin_categories import admin_categories_bp
     from app.routes.admin_analytics import admin_analytics_bp
     from app.routes.admin_dashboard import admin_dashboard_bp
     from app.routes.feedback import feedback_bp
@@ -66,6 +103,7 @@ def create_app(test_config=None):
     app.register_blueprint(admin_providers_bp)
     app.register_blueprint(admin_verifications_bp)
     app.register_blueprint(admin_users_bp)
+    app.register_blueprint(admin_categories_bp)
     app.register_blueprint(admin_analytics_bp)
     app.register_blueprint(admin_dashboard_bp)
     app.register_blueprint(feedback_bp)

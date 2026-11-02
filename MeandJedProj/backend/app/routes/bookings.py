@@ -7,6 +7,7 @@ from app.common import (
     current_user,
     get_session,
     normalize_category_name,
+    notify_admins,
     profile_missing_fields,
     provider_booking_query,
     require_auth,
@@ -132,6 +133,12 @@ def create_booking():
                 type="booking",
             )
         )
+        notify_admins(
+            session,
+            "New booking request",
+            f"Homeowner {user.full_name} submitted a {service_label} booking request.",
+            "booking",
+        )
         session.flush()
         if provider:
             request_details = (
@@ -209,6 +216,12 @@ def cancel_homeowner_booking(booking_id):
                         type="booking",
                     )
                 )
+        notify_admins(
+            session,
+            "Booking cancelled by homeowner",
+            f"Homeowner {user.full_name} cancelled a {category_name} booking request.",
+            "booking",
+        )
         session.commit()
         return jsonify(booking_out(booking))
 
@@ -258,6 +271,12 @@ def admin_change_booking_status(booking_id):
                     body=f"Your {category_name} booking is now {data.status}.",
                     type="booking",
                 )
+            )
+            notify_admins(
+                session,
+                "Provider updated booking",
+                f"Provider {provider_name} changed {category_name} booking to {data.status}.",
+                "booking",
             )
             session.commit()
         return jsonify(booking_out(booking))
@@ -380,6 +399,12 @@ def change_status(booking_id):
                 type="booking",
             )
         )
+        notify_admins(
+            session,
+            "Provider updated booking",
+            f"Provider {provider_name} changed a {category_name} booking to {data.status}.",
+            "booking",
+        )
         session.commit()
         return jsonify(booking_out(booking))
 
@@ -423,6 +448,14 @@ def reschedule_booking(booking_id):
                 ),
                 type="booking",
             )
+        )
+        provider_name = provider.business_name or user.full_name
+        notify_admins(
+            session,
+            "Provider rescheduled booking",
+            f"Provider {provider_name} rescheduled a {category_name} booking to "
+            f"{data.preferred_date.isoformat()} at {data.preferred_time.strftime('%H:%M')}.",
+            "booking",
         )
         session.commit()
         return jsonify(booking_out(booking))

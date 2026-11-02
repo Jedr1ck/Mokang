@@ -1,10 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import {
+    getAdminBookingAnalytics,
+    getAnalyticsCoverage,
+    updateAnalyticsCoverage,
+} from '../../services/api';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import "./AdminDashboard.css";
+
+const getTodayDateInputValue = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 function SystemSettings() {
     const [settings, setSettings] = useState({
@@ -17,6 +30,60 @@ function SystemSettings() {
     });
 
     const [saved, setSaved] = useState(false);
+    const [coverageStartDate, setCoverageStartDate] = useState('');
+    const [coverageLoading, setCoverageLoading] = useState(true);
+    const [coverageSaving, setCoverageSaving] = useState(false);
+    const [coverageError, setCoverageError] = useState('');
+    const [coverageSaved, setCoverageSaved] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+        getAnalyticsCoverage()
+            .then((coverage) => {
+                if (active) {
+                    setCoverageStartDate(coverage.coverageStartDate || '');
+                    setCoverageError('');
+                }
+            })
+            .catch((error) => {
+                if (active) {
+                    setCoverageError(error.message || 'Unable to load historical coverage settings.');
+                }
+            })
+            .finally(() => {
+                if (active) setCoverageLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const handleSaveCoverage = async (event) => {
+        event.preventDefault();
+        setCoverageSaving(true);
+        setCoverageError('');
+        setCoverageSaved(false);
+        try {
+            const result = await updateAnalyticsCoverage(coverageStartDate || null);
+            setCoverageStartDate(result.coverageStartDate || '');
+            try {
+                await getAdminBookingAnalytics({
+                    frequency: 'monthly',
+                    horizon: '3',
+                });
+                setCoverageSaved(true);
+            } catch (error) {
+                setCoverageError(
+                    `Coverage was saved, but the forecast refresh failed: ${error.message || 'Unable to recalculate analytics.'}`
+                );
+            }
+        } catch (error) {
+            setCoverageError(error.message || 'Unable to save historical coverage settings.');
+        } finally {
+            setCoverageSaving(false);
+        }
+    };
 
     const handleToggle = (settingName) => {
         setSettings((previousSettings) => ({
@@ -74,6 +141,61 @@ function SystemSettings() {
                 </div>
 
             </div>
+
+            <section className="admin-settings-card admin-coverage-settings">
+                <div className="admin-settings-card-header">
+                    <div className="admin-settings-card-icon">
+                        <i className="bi bi-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h3>Historical Coverage Settings</h3>
+                        <p>Define when the system began reliably recording appointment bookings.</p>
+                    </div>
+                    <span className={`admin-coverage-status ${coverageStartDate ? 'configured' : 'unconfigured'}`}>
+                        {coverageLoading ? 'Loading' : coverageStartDate ? 'Configured' : 'Not configured'}
+                    </span>
+                </div>
+                <form className="admin-coverage-form" onSubmit={handleSaveCoverage}>
+                    <label htmlFor="analytics-coverage-start-date">
+                        Booking coverage start date
+                    </label>
+                    <input
+                        id="analytics-coverage-start-date"
+                        type="date"
+                        value={coverageStartDate}
+                        max={getTodayDateInputValue()}
+                        disabled={coverageLoading || coverageSaving}
+                        onChange={(event) => {
+                            setCoverageStartDate(event.target.value);
+                            setCoverageSaved(false);
+                        }}
+                    />
+                    <small>
+                        Use a date supported by verified operational records, not an assumed date. A partial first week or month is excluded from forecasting.
+                    </small>
+                    {coverageError && (
+                        <div className="admin-coverage-message error" role="alert">
+                            <i className="bi bi-exclamation-circle"></i>
+                            <span>{coverageError}</span>
+                        </div>
+                    )}
+                    {coverageSaved && (
+                        <div className="admin-coverage-message success" role="status">
+                            <i className="bi bi-check-circle"></i>
+                            <span>Coverage saved; analytics refreshed, including a backtest when enough verified data exists.</span>
+                        </div>
+                    )}
+                    <div className="admin-coverage-actions">
+                        <span>
+                            <i className="bi bi-info-circle"></i>
+                            Saving validates historical coverage and refreshes monthly analytics with an eligible backtest.
+                        </span>
+                        <button type="submit" disabled={coverageLoading || coverageSaving}>
+                            {coverageSaving ? 'Saving and validating...' : 'Save coverage'}
+                        </button>
+                    </div>
+                </form>
+            </section>
 
             {/* SUCCESS MESSAGE */}
             {saved && (

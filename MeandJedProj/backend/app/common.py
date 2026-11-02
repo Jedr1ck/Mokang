@@ -10,6 +10,7 @@ from sqlalchemy import and_, or_
 
 from app.models import (
     Booking,
+    Notification,
     ProviderProfile,
     ProviderService,
     User,
@@ -86,6 +87,23 @@ def require_auth(function):
 
 def current_user(session):
     return session.get(User, g.current_user_id)
+
+
+def notify_admins(session, title, body, notification_type):
+    admins = (
+        session.query(User)
+        .filter(User.role == "admin", User.is_active.is_(True))
+        .all()
+    )
+    session.add_all(
+        Notification(
+            user_id=admin.id,
+            title=title,
+            body=body,
+            type=notification_type,
+        )
+        for admin in admins
+    )
 
 
 def create_token(user):

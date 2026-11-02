@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react"; import { createPortal } from "react-dom"; import { useNavigate } from "react-router-dom";
 
-import { api, logout } from "../../services/api";
+import {
+    api,
+    getAdminNotifications,
+    logout,
+} from "../../services/api";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -37,6 +41,8 @@ function AdminDashboard() {
 
     const [sidebarOpen, setSidebarOpen] =
         useState(true);
+    const [unreadNotificationCount, setUnreadNotificationCount] =
+        useState(0);
     const [showLogoutModal, setShowLogoutModal] =
         useState(false);
 
@@ -86,6 +92,42 @@ function AdminDashboard() {
         checkAdmin();
 
     }, [navigate]);
+
+    useEffect(() => {
+        if (!user) {
+            return undefined;
+        }
+
+        let active = true;
+        const refreshUnreadNotificationCount = async () => {
+            try {
+                const notifications = await getAdminNotifications();
+                if (active) {
+                    setUnreadNotificationCount(
+                        notifications.filter((notification) => !notification.isRead).length
+                    );
+                }
+            } catch (error) {
+                if (active) {
+                    console.error(
+                        "Unable to refresh admin notification count:",
+                        error
+                    );
+                }
+            }
+        };
+
+        refreshUnreadNotificationCount();
+        const intervalId = window.setInterval(
+            refreshUnreadNotificationCount,
+            8000
+        );
+
+        return () => {
+            active = false;
+            window.clearInterval(intervalId);
+        };
+    }, [user]);
 
 
     /* =========================================================
@@ -138,7 +180,12 @@ function AdminDashboard() {
         switch (activePage) {
 
             case "Dashboard":
-                return <DashboardOverview />;
+                return (
+                    <>
+                        <DashboardOverview />
+                        <ReportsAnalytics />
+                    </>
+                );
 
             case "Manage Homeowners":
                 return <ManageHomeowners />;
@@ -154,9 +201,6 @@ function AdminDashboard() {
 
             case "Reviews and Complaints":
                 return <ReviewsComplaints />;
-
-            case "Report and Analytics":
-                return <ReportsAnalytics />;
 
             case "Notification":
                 return <Notifications />;
@@ -233,6 +277,7 @@ function AdminDashboard() {
                     sidebarOpen={sidebarOpen}
                     setSidebarOpen={setSidebarOpen}
                     handleLogout={handleLogout}
+                    unreadNotificationCount={unreadNotificationCount}
                 />
 
                 <main className="admin-main-content">
@@ -274,9 +319,16 @@ function AdminDashboard() {
                                     )
                                 }
                                 title="Notifications"
+                                aria-label={
+                                    unreadNotificationCount > 0
+                                        ? `${unreadNotificationCount} unread notifications`
+                                        : "Notifications"
+                                }
                             >
                                 <i className="bi bi-bell"></i>
-                                <span className="admin-topbar-notification-dot"></span>
+                                {unreadNotificationCount > 0 && (
+                                    <span className="admin-topbar-notification-dot"></span>
+                                )}
                             </button>
 
                             <button
