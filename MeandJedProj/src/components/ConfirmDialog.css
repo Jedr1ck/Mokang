@@ -13,7 +13,7 @@
 .confirm-dialog {
     width: min(100%, 410px);
     padding: 24px;
-    border: 1px solid #e8eeeb;
+    border: 1px solid #F5F5F5;
     border-radius: 18px;
     background: #fff;
     box-shadow: 0 24px 70px rgb(15 23 42 / 24%);
@@ -27,8 +27,8 @@
     margin-bottom: 14px;
     place-items: center;
     border-radius: 13px;
-    background: #eaf5ef;
-    color: #138258;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 1.15rem;
 }
 
@@ -39,7 +39,7 @@
 
 .confirm-dialog h2 {
     margin: 0 0 8px;
-    color: #17231e;
+    color: #303030;
     font-size: 1.2rem;
     font-weight: 750;
     letter-spacing: -0.02em;
@@ -86,22 +86,23 @@
 }
 
 .confirm-dialog-cancel {
-    border-color: #dce5e0 !important;
+    border-color: #F5F5F5 !important;
     background: #fff;
     color: #42514a;
 }
 
 .confirm-dialog-cancel:hover:not(:disabled) {
-    background: #f5f8f6;
+    background: #F5F5F5;
 }
 
 .confirm-dialog-confirm {
-    background: #11845a;
-    color: #fff;
+    background: #FF6900;
+    color: #ffffff;
 }
 
 .confirm-dialog-confirm:hover:not(:disabled) {
-    background: #0c704b;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .confirm-dialog-danger .confirm-dialog-confirm {

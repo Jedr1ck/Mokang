@@ -16,8 +16,10 @@ def create_app(test_config=None):
 
     app = Flask(__name__)
     default_cors_origins = (
-        "http://localhost:5173,http://127.0.0.1:5173,"
-        "http://localhost:5174,http://127.0.0.1:5174"
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "http://localhost:5174,http://127.0.0.1:5174,"
+    "http://localhost:62921,http://127.0.0.1:62921"
+
     )
     app.config.from_mapping(
         SECRET_KEY=os.getenv("SECRET_KEY", "CHANGE_ME"),

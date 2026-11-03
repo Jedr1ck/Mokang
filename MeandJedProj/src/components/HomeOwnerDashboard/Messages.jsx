@@ -139,7 +139,8 @@ const Messages = ({ embedded = false, bookings }) => {
                 id: row.id,
                 senderId: Number(row.senderId),
                 text: row.body,
-                time
+                time,
+                status: isSender ? (row.isRead ? 'delivered' : 'sent') : ''
             });
             conversation.lastMessage = row.body;
             conversation.time = time;
@@ -168,6 +169,22 @@ const Messages = ({ embedded = false, bookings }) => {
             return;
         }
         setMessageError('');
+        const pendingId = `sending-${Date.now()}`;
+        const createdAt = new Date().toISOString();
+        setMessageRows((previousRows) => [
+            ...previousRows,
+            {
+                id: pendingId,
+                senderId: currentUserId,
+                recipientId: activeChat.recipientId,
+                bookingId: activeChat.bookingId,
+                body: cleanMessage,
+                createdAt,
+                senderName: currentUser.fullName,
+                recipientName: activeChat.name,
+                status: 'sending'
+            }
+        ]);
 
         try {
             const result = await sendMessage(
@@ -175,21 +192,20 @@ const Messages = ({ embedded = false, bookings }) => {
                 cleanMessage,
                 activeChat.bookingId
             );
-            setMessageRows((previousRows) => [
-                ...previousRows,
-                {
-                    id: result.id,
-                    senderId: currentUserId,
-                    recipientId: activeChat.recipientId,
-                    bookingId: result.bookingId,
-                    body: cleanMessage,
-                    createdAt: result.createdAt,
-                    senderName: currentUser.fullName,
-                    recipientName: activeChat.name
-                }
-            ]);
+            setMessageRows((previousRows) =>
+                previousRows.map((row) =>
+                    row.id === pendingId
+                        ? { ...row, id: result.id, bookingId: result.bookingId, createdAt: result.createdAt, status: 'sent' }
+                        : row
+                )
+            );
             setNewMessage('');
-        } catch (error) { setMessageError(error.message); }
+        } catch (error) {
+            setMessageRows((previousRows) =>
+                previousRows.filter((row) => row.id !== pendingId)
+            );
+            setMessageError(error.message);
+        }
     };
 
     return (
@@ -207,7 +223,7 @@ const Messages = ({ embedded = false, bookings }) => {
 
                     {/* Left Panel: Contact List */}
                     <div style={sidebarListStyle}>
-                        <div style={{ padding: '15px', borderBottom: '1px solid #f3f4f6' }}>
+                        <div style={{ padding: '15px', borderBottom: '1px solid #F5F5F5' }}>
                             <input
                                 type="text"
                                 placeholder="Search messages..."
@@ -222,7 +238,7 @@ const Messages = ({ embedded = false, bookings }) => {
                                     onClick={() => setActiveChatId(item.id)}
                                     style={{
                                         ...contactItemStyle,
-                                        backgroundColor: item.id === activeChat?.id ? '#f0fdf4' : '#fff'
+                                        backgroundColor: item.id === activeChat?.id ? 'var(--theme-soft-blue)' : '#fff'
                                     }}
                                 >
                                     <div style={{ position: 'relative' }}>
@@ -239,12 +255,12 @@ const Messages = ({ embedded = false, bookings }) => {
                                 </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <h5 style={{ margin: 0, fontSize: '0.9rem', color: '#111827', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                            <h5 style={{ margin: 0, fontSize: '0.9rem', color: '#303030', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                                 {item.name}
                                             </h5>
                                             <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{item.time}</span>
                                         </div>
-                                        <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: item.unread ? '#111827' : '#6b7280', fontWeight: item.unread ? 'bold' : 'normal', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                        <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: item.unread ? '#6B6B6B' : '#6b7280', fontWeight: item.unread ? 'bold' : 'normal', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                             {item.lastMessage}
                                         </p>
                                     </div>
@@ -282,8 +298,8 @@ const Messages = ({ embedded = false, bookings }) => {
                                             <div style={avatarStyle}>{activeChat.name.charAt(0)}</div>
                                         )}
                                         <div>
-                                            <h4 style={{ margin: 0, fontSize: '1rem', color: '#111827' }}>{activeChat.name}</h4>
-                                            <span style={{ fontSize: '0.75rem', color: activeChat.online ? '#10b981' : '#9ca3af' }}>
+                                            <h4 style={{ margin: 0, fontSize: '1rem', color: '#303030' }}>{activeChat.name}</h4>
+                                            <span style={{ fontSize: '0.75rem', color: activeChat.online ? '#FF6900' : '#9ca3af' }}>
                                                 {presenceError
                                                     ? 'Status unavailable'
                                                     : !presenceLoaded
@@ -326,8 +342,8 @@ const Messages = ({ embedded = false, bookings }) => {
                                         >
                                             <div style={{
                                                 ...messageBubbleStyle,
-                                                backgroundColor: msg.senderId === currentUserId ? '#10b981' : '#f3f4f6',
-                                                color: msg.senderId === currentUserId ? '#fff' : '#1f2937'
+                                                backgroundColor: msg.senderId === currentUserId ? 'var(--theme-primary)' : '#F5F5F5',
+                                                color: msg.senderId === currentUserId ? '#fff' : '#6B6B6B'
                                             }}>
                                                 <p style={{ margin: 0, fontSize: '0.9rem' }}>{msg.text}</p>
                                                 <span style={{
@@ -335,10 +351,26 @@ const Messages = ({ embedded = false, bookings }) => {
                                                     display: 'block',
                                                     textAlign: 'right',
                                                     marginTop: '4px',
-                                                    color: msg.senderId === currentUserId ? '#d1fae5' : '#9ca3af'
+                                                    color: msg.senderId === currentUserId ? 'var(--theme-soft-blue)' : '#9ca3af'
                                                 }}>
                                                     {msg.time}
                                                 </span>
+                                                {msg.senderId === currentUserId && (
+                                                    <span className="homeowner-message-delivery-status">
+                                                        <i className={`bi ${
+                                                            msg.status === 'sending'
+                                                                ? 'bi-arrow-repeat'
+                                                                : msg.status === 'delivered'
+                                                                    ? 'bi-check2-all'
+                                                                    : 'bi-check2'
+                                                        }`} />
+                                                        {msg.status === 'sending'
+                                                            ? 'Sending…'
+                                                            : msg.status === 'delivered'
+                                                                ? 'Delivered'
+                                                                : 'Sent'}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
@@ -382,7 +414,7 @@ const chatContainerStyle = {
     gridTemplateColumns: '320px 1fr',
     backgroundColor: '#fff',
     borderRadius: '12px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    boxShadow: '0 1px 3px rgba(37, 37, 37, 0.1)',
     marginTop: '20px',
     height: 'calc(100vh - 160px)',
     minHeight: 0,
@@ -390,7 +422,7 @@ const chatContainerStyle = {
 };
 
 const sidebarListStyle = {
-    borderRight: '1px solid #e5e7eb',
+    borderRight: '1px solid #F5F5F5',
     display: 'flex',
     flexDirection: 'column'
 };
@@ -408,7 +440,7 @@ const contactItemStyle = {
     gap: '12px',
     padding: '12px 15px',
     cursor: 'pointer',
-    borderBottom: '1px solid #f9fafb',
+    borderBottom: '1px solid #F5F5F5',
     alignItems: 'center'
 };
 
@@ -416,8 +448,8 @@ const avatarStyle = {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
-    backgroundColor: '#10b981',
-    color: '#fff',
+    backgroundColor: 'var(--theme-primary)',
+    color: '#ffffff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -428,7 +460,7 @@ const avatarStyle = {
 const onlineDotStyle = {
     width: '10px',
     height: '10px',
-    backgroundColor: '#10b981',
+    backgroundColor: 'var(--theme-primary)',
     borderRadius: '50%',
     position: 'absolute',
     bottom: '0',
@@ -446,7 +478,7 @@ const chatAreaStyle = {
 
 const chatHeaderStyle = {
     padding: '12px 20px',
-    borderBottom: '1px solid #e5e7eb',
+    borderBottom: '1px solid #F5F5F5',
     backgroundColor: '#fff',
     display: 'flex',
     alignItems: 'center',
@@ -455,11 +487,11 @@ const chatHeaderStyle = {
 };
 
 const trackingButtonStyle = {
-    border: '1px solid #10b981',
+    border: '1px solid var(--theme-primary)',
     borderRadius: '6px',
     padding: '7px 12px',
     backgroundColor: '#fff',
-    color: '#047857',
+    color: 'var(--theme-text)',
     fontSize: '0.8rem',
     fontWeight: 600,
     cursor: 'pointer'
@@ -483,7 +515,7 @@ const messageBubbleStyle = {
     maxWidth: '65%',
     padding: '10px 14px',
     borderRadius: '12px',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+    boxShadow: '0 1px 2px rgba(37, 37, 37, 0.05)'
 };
 
 const chatInputFormStyle = {
@@ -491,7 +523,7 @@ const chatInputFormStyle = {
     alignItems: 'center',
     padding: '15px',
     backgroundColor: '#fff',
-    borderTop: '1px solid #e5e7eb',
+    borderTop: '1px solid #F5F5F5',
     gap: '10px',
     flexShrink: 0
 };
@@ -506,8 +538,8 @@ const messageInputStyle = {
 };
 
 const sendBtnStyle = {
-    backgroundColor: '#10b981',
-    color: '#fff',
+    backgroundColor: 'var(--theme-primary)',
+    color: '#ffffff',
     border: 'none',
     padding: '0 16px',
     borderRadius: '8px',

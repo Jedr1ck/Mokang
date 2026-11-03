@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 
 from flask import Blueprint, jsonify, request
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 
 from app.common import (
     ApiError,
@@ -12,13 +14,15 @@ from app.common import (
     get_current_provider,
     get_session,
     notify_admins,
+    pwd,
     require_auth,
     user_out,
     validated,
 )
-from app.models import Category, ProviderService, UserProfile
+from app.models import Category, ProviderService, User, UserProfile
 from app.schemas import (
     ProfileUpdate,
+    ProfileSecurityUpdate,
     ProviderServiceSelection,
     ProviderServicesUpdate,
     ProviderVerificationUpdate,
@@ -111,6 +115,43 @@ def update_my_profile():
         except Exception as error:
             session.rollback()
             raise ApiError("Unable to save profile changes", 500) from error
+        return jsonify(user_out(user))
+
+
+@profiles_bp.put("/profile/security")
+@require_auth
+def update_my_security():
+    data = validated(ProfileSecurityUpdate)
+    if data.newEmail is None and data.newPassword is None:
+        raise ApiError("Enter a new email address or password.", 422)
+
+    with get_session() as session:
+        user = current_user(session)
+        if not pwd.verify(data.currentPassword, user.password_hash):
+            raise ApiError("Current password is incorrect.", 401)
+
+        if data.newEmail is not None and str(data.newEmail).lower() != user.email.lower():
+            existing_user = (
+                session.query(User)
+                .filter(
+                    func.lower(User.email) == str(data.newEmail).lower(),
+                    User.id != user.id,
+                )
+                .first()
+            )
+            if existing_user:
+                raise ApiError("That email address is already in use.", 409)
+            user.email = str(data.newEmail)
+
+        if data.newPassword is not None:
+            user.password_hash = pwd.hash(data.newPassword)
+
+        try:
+            session.commit()
+            session.refresh(user)
+        except IntegrityError as error:
+            session.rollback()
+            raise ApiError("Unable to update account security.", 409) from error
         return jsonify(user_out(user))
 
 

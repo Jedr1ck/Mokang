@@ -43,22 +43,22 @@ const BookingsTab = () => {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'Pending':
-                return <span className="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 fw-semibold">Pending</span>;
+                return <span className="badge text-bg-warning rounded-pill px-3 py-2 fw-semibold">Pending</span>;
             case 'Matched':
-                return <span className="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-2 fw-semibold">Matched</span>;
+                return <span className="badge text-bg-info rounded-pill px-3 py-2 fw-semibold">Matched</span>;
             case 'Accepted':
-                return <span className="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">Accepted</span>;
+                return <span className="badge text-bg-primary rounded-pill px-3 py-2 fw-semibold">Accepted</span>;
             case 'On the Way':
-                return <span className="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-2 fw-semibold">On the Way</span>;
+                return <span className="badge text-bg-warning rounded-pill px-3 py-2 fw-semibold">On the Way</span>;
             case 'In Progress':
-                return <span className="badge bg-primary rounded-pill px-3 py-2 fw-semibold">In Progress</span>;
+                return <span className="badge text-bg-primary rounded-pill px-3 py-2 fw-semibold">In Progress</span>;
             case 'Completed':
-                return <span className="badge bg-warning text-white rounded-pill px-3 py-2 fw-semibold" style={{ backgroundColor: '#fd7e14' }}>Completed</span>;
+                return <span className="badge text-bg-success rounded-pill px-3 py-2 fw-semibold">Completed</span>;
             case 'Cancelled':
             case 'Rejected':
-                return <span className="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 fw-semibold">{status}</span>;
+                return <span className="badge text-bg-danger rounded-pill px-3 py-2 fw-semibold">{status}</span>;
             default:
-                return <span className="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 fw-semibold">{status || 'Pending'}</span>;
+                return <span className="badge text-bg-secondary rounded-pill px-3 py-2 fw-semibold">{status || 'Pending'}</span>;
         }
     };
 
@@ -90,7 +90,7 @@ const BookingsTab = () => {
                         <h2>My Bookings</h2>
                         <p className="text-muted mb-0">Check requests, track service progress, and view completed services.</p>
                     </div>
-                    <button type="button" className="btn btn-success rounded-pill px-3" onClick={() => navigate('/services')}>
+                    <button type="button" className="btn homeowner-book-service rounded-pill px-3" onClick={() => navigate('/services')}>
                         <i className="bi bi-plus-lg me-2" />Book a Service
                     </button>
                 </header>
@@ -100,7 +100,7 @@ const BookingsTab = () => {
                         <button
                             type="button"
                             key={filter.label}
-                            className={`btn btn-sm rounded-pill px-3 ${activeFilter === filter.label ? 'btn-success' : 'btn-outline-secondary'}`}
+                            className={`btn btn-sm rounded-pill px-3 ${activeFilter === filter.label ? 'btn-brand' : 'btn-outline-secondary'}`}
                             aria-pressed={activeFilter === filter.label}
                             onClick={() => setActiveFilter(filter.label)}
                         >
@@ -114,7 +114,7 @@ const BookingsTab = () => {
                 {actionError && <div className="alert alert-danger" role="alert">{actionError}</div>}
                 {loading ? (
                     <div className="text-center py-5" role="status">
-                        <span className="spinner-border text-success" aria-hidden="true" />
+                        <span className="spinner-border text-warning" aria-hidden="true" />
                         <span className="visually-hidden">Loading bookings...</span>
                     </div>
                 ) : filteredBookings.length === 0 ? (
@@ -123,7 +123,7 @@ const BookingsTab = () => {
                         <h5 className="fw-bold text-muted">{bookings.length ? `No ${activeFilter.toLowerCase()} bookings` : 'No Bookings Yet'}</h5>
                         <p className="text-muted small">{bookings.length ? 'Bookings in this category will appear here.' : "You haven't requested any services yet."}</p>
                         {!bookings.length && (
-                            <button type="button" className="btn btn-success rounded-pill px-3" onClick={() => navigate('/services')}>Browse Services</button>
+                            <button type="button" className="btn homeowner-book-service rounded-pill px-3" onClick={() => navigate('/services')}>Browse Services</button>
                         )}
                     </div>
                 ) : (
@@ -134,11 +134,11 @@ const BookingsTab = () => {
                             const isClosed = ['Cancelled', 'Rejected'].includes(status);
                             return (
                                 <div key={booking.id} className="col-12">
-                                    <article className="card border-0 shadow-sm rounded-4 p-3 p-md-4 bg-white">
+                                    <article className="card homeowner-booking-card shadow-sm rounded-4 p-3 p-md-4">
                                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                             <div className="d-flex align-items-center gap-3">
                                                 <div className="rounded-circle bg-light p-3 d-flex align-items-center justify-content-center" style={{ width: '50px', height: '50px' }}>
-                                                    <i className={`bi ${status === 'Completed' ? 'bi-check-circle-fill' : 'bi-tools'} text-success fs-4`} />
+                                                    <i className={`bi ${status === 'Completed' ? 'bi-check-circle-fill' : 'bi-tools'} text-warning fs-4`} />
                                                 </div>
                                                 <div>
                                                     <span className="text-muted extra-small d-block fw-bold">{booking.bookingCode || `REQ-${booking.id}`}</span>
@@ -155,7 +155,7 @@ const BookingsTab = () => {
                                                 {!isClosed && (
                                                     <button
                                                         type="button"
-                                                        className="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1"
+                                                        className="btn btn-outline-warning btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1"
                                                         onClick={() => handleTrackBooking(booking)}
                                                     >
                                                         <i className="bi bi-geo-alt" /> Track Status

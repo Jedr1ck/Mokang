@@ -168,6 +168,15 @@ def get_messages():
             .order_by(Message.created_at.asc())
             .all()
         )
+        incoming_unread = [
+            row for row in rows
+            if row.recipient_id == user.id and not row.is_read
+        ]
+        if incoming_unread:
+            for row in incoming_unread:
+                row.is_read = True
+            session.commit()
+
         user_ids = {
             value
             for row in rows
@@ -187,6 +196,7 @@ def get_messages():
                     "bookingId": row.booking_id,
                     "body": row.body,
                     "createdAt": row.created_at.isoformat(),
+                    "isRead": row.is_read,
                     "senderName": (
                         users[row.sender_id].full_name
                         if row.sender_id in users

@@ -3,7 +3,7 @@
     min-height: 100vh;
     margin: 0 auto;
     padding: 28px 0;
-    color: #17231e;
+    color: #303030;
 }
 
 .tracking-loading {
@@ -21,14 +21,14 @@
 
 .tracking-header h1 {
     margin: 0;
-    color: #123d30;
+    color: var(--theme-text);
     font-size: clamp(1.25rem, 3vw, 1.65rem);
     font-weight: 750;
 }
 
 .tracking-card {
     padding: clamp(18px, 4vw, 30px);
-    border: 1px solid #e8eeeb;
+    border: 1px solid #F5F5F5;
     border-radius: 20px;
     background: #fff;
     box-shadow: 0 12px 34px rgb(22 46 36 / 7%);
@@ -40,7 +40,7 @@
     justify-content: space-between;
     gap: 16px;
     padding-bottom: 18px;
-    border-bottom: 1px solid #edf1ef;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .tracking-card-heading > div {
@@ -56,7 +56,7 @@
 }
 
 .tracking-card-heading strong {
-    color: #153f31;
+    color: var(--theme-text);
     font-size: clamp(1.05rem, 3vw, 1.4rem);
 }
 
@@ -72,28 +72,28 @@
 }
 
 .tracking-status-pending {
-    background: #fff4d6;
-    color: #9a5c00;
+    background: #fff3cd;
+    color: #664d03;
 }
 
 .tracking-status-confirmed {
-    background: #e4efff;
-    color: #2457a6;
+    background: #cff4fc;
+    color: #055160;
 }
 
 .tracking-status-in-progress {
-    background: #efe9ff;
-    color: #6436a5;
+    background: #cfe2ff;
+    color: #084298;
 }
 
 .tracking-status-completed {
-    background: #e2f5e9;
-    color: #167044;
+    background: #d1e7dd;
+    color: #0f5132;
 }
 
 .tracking-status-closed {
-    background: #ffebe8;
-    color: #b83b2d;
+    background: #f8d7da;
+    color: #842029;
 }
 
 .tracking-booking-summary {
@@ -107,7 +107,7 @@
 
 .tracking-booking-summary strong {
     width: 100%;
-    color: #23332c;
+    color: #303030;
     font-size: 1rem;
 }
 
@@ -148,7 +148,7 @@
 }
 
 .tracking-step small.active {
-    color: #14724e;
+    color: #303030;
     font-weight: 750;
 }
 
@@ -168,7 +168,7 @@
 
 .tracking-status-message h2 {
     margin: 0 0 5px;
-    color: #20342b;
+    color: #303030;
     font-size: 1rem;
     font-weight: 750;
 }
@@ -179,11 +179,11 @@
     font-size: 0.85rem;
 }
 
-.tracking-status-message-pending { background: #fffaf0; }
-.tracking-status-message-confirmed { background: #f3f7ff; }
-.tracking-status-message-in-progress { background: #f7f4ff; }
-.tracking-status-message-completed { background: #f0faf3; }
-.tracking-status-message-closed { background: #fff4f2; }
+.tracking-status-message-pending { background: #fff3cd; }
+.tracking-status-message-confirmed { background: #cff4fc; }
+.tracking-status-message-in-progress { background: #cfe2ff; }
+.tracking-status-message-completed { background: #d1e7dd; }
+.tracking-status-message-closed { background: #f8d7da; }
 
 .tracking-refresh-note {
     margin: 12px 0 0;

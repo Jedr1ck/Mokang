@@ -91,7 +91,7 @@ const TrackBooking = () => {
     };
 
     if (loading) {
-        return <div className="tracking-page tracking-loading"><div className="spinner-border text-success" role="status"><span className="visually-hidden">Loading booking...</span></div></div>;
+        return <div className="tracking-page tracking-loading"><div className="spinner-border text-warning" role="status"><span className="visually-hidden">Loading booking...</span></div></div>;
     }
 
     if (loadError || !bookingData) {
@@ -101,7 +101,7 @@ const TrackBooking = () => {
                     <i className="bi bi-arrow-left me-2"></i>Back to Dashboard
                 </Link>
                 <div className="alert alert-info mt-4" role="status">{loadError || 'No booking selected.'}</div>
-                <Link to="/bookings" className="btn btn-success rounded-pill">View My Bookings</Link>
+                <Link to="/bookings" className="btn btn-brand rounded-pill">View My Bookings</Link>
             </div>
         );
     }
@@ -141,14 +141,14 @@ const TrackBooking = () => {
                         const isPassed = index < activeIndex;
                         const isCurrent = index === activeIndex;
                         const hasLine = index < steps.length - 1;
-                        let bgColor = '#e9ecef';
+                        let bgColor = '#F5F5F5';
                         let textColor = '#adb5bd';
 
                         if (isCurrent && index === 5) {
-                            bgColor = '#15803d';
+                            bgColor = '#198754';
                             textColor = '#ffffff';
                         } else if (isCurrent || isPassed) {
-                            bgColor = '#198754';
+                            bgColor = '#FF6900';
                             textColor = '#ffffff';
                         }
 
@@ -176,7 +176,7 @@ const TrackBooking = () => {
                                     <div
                                         className="tracking-step-line"
                                         style={{
-                                            backgroundColor: (index < activeIndex) ? '#198754' : '#e9ecef',
+                                            backgroundColor: (index < activeIndex) ? '#FF6900' : '#F5F5F5',
                                         }}
                                     />
                                 )}

@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 import { api } from '../../services/api';
 
 const History = () => {
+    const navigate = useNavigate();
     const [historyData, setHistoryData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [feedbackBooking, setFeedbackBooking] = useState(null);
     const [feedbackType, setFeedbackType] = useState('review');
-    const [rating, setRating] = useState('5');
+    const [rating, setRating] = useState(0);
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
     const [feedbackError, setFeedbackError] = useState('');
@@ -52,19 +54,30 @@ const History = () => {
         switch (status) {
             case 'Completed':
             case 'Paid':
-                return 'status-badge completed';
+                return 'badge text-bg-success rounded-pill px-3 py-2';
+            case 'Pending':
+                return 'badge text-bg-warning rounded-pill px-3 py-2';
+            case 'Matched':
+            case 'Accepted':
+                return 'badge text-bg-info rounded-pill px-3 py-2';
             case 'In Progress':
-                return 'status-badge in-progress';
+            case 'On the Way':
+                return 'badge text-bg-primary rounded-pill px-3 py-2';
             case 'Cancelled':
-                return 'status-badge cancelled';
+            case 'Rejected':
+                return 'badge text-bg-danger rounded-pill px-3 py-2';
             default:
-                return 'status-badge neutral';
+                return 'badge text-bg-secondary rounded-pill px-3 py-2';
         }
     };
 
     const submitFeedback = async (event) => {
         event.preventDefault();
         if (!feedbackBooking) return;
+        if (feedbackType === 'review' && rating === 0) {
+            setFeedbackError('Choose a star rating before submitting.');
+            return;
+        }
         setFeedbackError('');
         setFeedbackSaving(true);
         try {
@@ -105,7 +118,12 @@ const History = () => {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <button className="icon-btn">
+                        <button
+                            type="button"
+                            className="icon-btn homeowner-notification-button"
+                            aria-label="Open notifications"
+                            onClick={() => navigate('/notifications')}
+                        >
                             <i className="bi bi-bell"></i>
                         </button>
                     </div>
@@ -113,16 +131,16 @@ const History = () => {
 
                 {/* Filter Bar */}
                 <div style={filterContainerStyle}>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div className="homeowner-history-filters">
                         {['All', 'Pending', 'Accepted', 'In Progress', 'Completed', 'Cancelled', 'Rejected'].map((type) => (
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type)}
                                 style={{
                                     ...filterBtnStyle,
-                                    backgroundColor: filterType === type ? '#f97316' : '#fff',
-                                    color: filterType === type ? '#fff' : '#374151',
-                                    border: filterType === type ? 'none' : '1px solid #e5e7eb'
+                                    backgroundColor: filterType === type ? '#FF6900' : '#fff',
+                                    color: filterType === type ? '#fff' : '#6B6B6B',
+                                    border: filterType === type ? 'none' : '1px solid #F5F5F5'
                                 }}
                             >
                                 {type}
@@ -137,7 +155,7 @@ const History = () => {
                 <section className="dashboard-box" style={{ marginTop: '20px', overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                         <thead>
-                            <tr style={{ borderBottom: '2px solid #f3f4f6', color: '#6b7280', fontSize: '0.9rem' }}>
+                            <tr style={{ borderBottom: '2px solid #F5F5F5', color: '#6b7280', fontSize: '0.9rem' }}>
                                 <th style={thStyle}>Ref / Log ID</th>
                                 <th style={thStyle}>Type</th>
                                 <th style={thStyle}>Activity / Service</th>
@@ -153,15 +171,15 @@ const History = () => {
                                 <tr><td colSpan="8" style={{ textAlign: 'center', padding: '30px' }}>Loading service history...</td></tr>
                             ) : filteredHistory.length > 0 ? (
                                 filteredHistory.map((item) => (
-                                    <tr key={item.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                    <tr key={item.id} style={{ borderBottom: '1px solid #F5F5F5' }}>
                                         <td style={tdStyle}><strong>{item.id}</strong></td>
                                         <td style={tdStyle}>
-                                            <span style={{ fontSize: '0.85rem', color: '#4b5563', backgroundColor: '#f3f4f6', padding: '4px 8px', borderRadius: '4px' }}>
+                                            <span style={{ fontSize: '0.85rem', color: '#4b5563', backgroundColor: '#F5F5F5', padding: '4px 8px', borderRadius: '4px' }}>
                                                 {item.type}
                                             </span>
                                         </td>
                                         <td style={tdStyle}>
-                                            <div style={{ fontWeight: 'bold', color: '#111827' }}>{item.title}</div>
+                                            <div style={{ fontWeight: 'bold', color: '#303030' }}>{item.title}</div>
                                             <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{item.detail}</div>
                                         </td>
                                         <td style={tdStyle}>
@@ -169,20 +187,22 @@ const History = () => {
                                             <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>{item.time}</div>
                                         </td>
                                         <td style={tdStyle}>{item.provider}</td>
-                                        <td style={{ ...tdStyle, fontWeight: 'bold', color: '#059669' }}>{item.amount}</td>
+                                        <td style={{ ...tdStyle, fontWeight: 'bold', color: 'var(--theme-text)' }}>{item.amount}</td>
                                         <td style={tdStyle}>
                                             <span className={getStatusBadgeClass(item.status)}>
                                                 {item.status}
                                             </span>
                                         </td>
                                         <td style={tdStyle}>
+                                            <div className="homeowner-history-feedback-actions">
                                             {item.status === 'Completed' && (
                                                 <button
                                                     type="button"
-                                                    className="btn btn-sm btn-outline-warning me-1"
+                                                    className="btn btn-sm btn-outline-warning"
                                                     onClick={() => {
                                                         setFeedbackBooking(item);
                                                         setFeedbackType('review');
+                                                        setRating(0);
                                                         setFeedbackError('');
                                                     }}
                                                 >
@@ -200,6 +220,7 @@ const History = () => {
                                             >
                                                 Report
                                             </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -228,10 +249,25 @@ const History = () => {
                                 {feedbackError && <div className="alert alert-danger" role="alert">{feedbackError}</div>}
                                 {feedbackType === 'review' ? (
                                     <div className="mb-3">
-                                        <label className="form-label" htmlFor="service-rating">Rating</label>
-                                        <select id="service-rating" className="form-select" value={rating} onChange={(event) => setRating(event.target.value)}>
-                                            {[5, 4, 3, 2, 1].map((value) => <option key={value} value={value}>{value} star{value !== 1 ? 's' : ''}</option>)}
-                                        </select>
+                                        <span className="form-label d-block" id="service-rating-label">Rating</span>
+                                        <div className="homeowner-review-stars" role="group" aria-labelledby="service-rating-label">
+                                            {[1, 2, 3, 4, 5].map((value) => (
+                                                <button
+                                                    key={value}
+                                                    type="button"
+                                                    className={value <= rating ? 'selected' : ''}
+                                                    aria-label={`${value} star${value === 1 ? '' : 's'}`}
+                                                    aria-pressed={rating === value}
+                                                    onClick={() => {
+                                                        setRating(value);
+                                                        setFeedbackError('');
+                                                    }}
+                                                >
+                                                    <i className={`bi ${value <= rating ? 'bi-star-fill' : 'bi-star'}`} />
+                                                </button>
+                                            ))}
+                                            <span>{rating ? `${rating} of 5` : 'Select a rating'}</span>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="mb-3">
@@ -255,7 +291,7 @@ const History = () => {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-light" onClick={() => setFeedbackBooking(null)}>Cancel</button>
-                                <button type="submit" className="btn btn-warning text-white" disabled={feedbackSaving}>
+                                <button type="submit" className="btn btn-brand" disabled={feedbackSaving || (feedbackType === 'review' && rating === 0)}>
                                     {feedbackSaving ? 'Submitting...' : 'Submit'}
                                 </button>
                             </div>

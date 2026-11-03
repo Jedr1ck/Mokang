@@ -1,5 +1,5 @@
 .verification-reviews {
-    color: #172033;
+    color: #303030;
     padding-bottom: 32px;
 }
 
@@ -7,8 +7,8 @@
     flex: 0 0 auto;
     border: 0;
     border-radius: 9px;
-    background: #059669;
-    color: #fff;
+    background: #FF6900;
+    color: #ffffff;
     padding: 11px 15px;
     font-weight: 700;
 }
@@ -40,16 +40,16 @@
 .verification-reviews-header p,
 .verification-request-title p,
 .verification-documents-heading p {
-    color: #64748b;
+    color: #303030;
     margin: 0;
 }
 
 .verification-back-button,
 .verification-empty button {
-    border: 1px solid #cbd5e1;
+    border: 1px solid #F5F5F5;
     border-radius: 9px;
     background: #fff;
-    color: #065f46;
+    color: #303030;
     padding: 10px 14px;
     font-weight: 650;
 }
@@ -65,10 +65,10 @@
 
 .verification-request-card {
     background: #fff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #F5F5F5;
     border-radius: 16px;
     padding: 22px;
-    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.045);
+    box-shadow: 0 5px 20px rgba(37, 37, 37, 0.045);
 }
 
 .verification-request-title,
@@ -82,20 +82,20 @@
 
 .verification-request-title {
     padding-bottom: 18px;
-    border-bottom: 1px solid #e8edf2;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .verification-request-title h3 {
     margin: 0 0 4px;
     font-size: 20px;
-    color: #064e3b;
+    color: #303030;
 }
 
 .verification-pending-badge {
     white-space: nowrap;
     border-radius: 999px;
-    color: #92400e;
-    background: #fef3c7;
+    color: #ffffff;
+    background: #FF6900;
     padding: 7px 11px;
     font-size: 12px;
     font-weight: 700;
@@ -110,7 +110,7 @@
 
 .verification-detail-grid section h4,
 .verification-documents-heading h4 {
-    color: #064e3b;
+    color: #303030;
     font-size: 16px;
     font-weight: 750;
     margin: 0 0 12px;
@@ -126,7 +126,7 @@
 }
 
 .verification-detail-grid p b {
-    color: #475569;
+    color: #303030;
 }
 
 .verification-service-prices {
@@ -139,7 +139,7 @@
 }
 
 .verification-service-prices > b {
-    color: #475569;
+    color: #303030;
 }
 
 .verification-service-prices > span {
@@ -147,7 +147,7 @@
 }
 
 .verification-documents {
-    border-top: 1px solid #e8edf2;
+    border-top: 1px solid #F5F5F5;
     padding-top: 18px;
 }
 
@@ -174,7 +174,7 @@
 .verification-document > strong {
     display: block;
     margin-bottom: 8px;
-    color: #475569;
+    color: #303030;
 }
 
 .verification-document img {
@@ -182,30 +182,30 @@
     width: 100%;
     max-height: 320px;
     object-fit: contain;
-    border: 1px solid #dce4eb;
+    border: 1px solid #F5F5F5;
     border-radius: 10px;
-    background: #f8fafc;
+    background: #F5F5F5;
 }
 
 .verification-document-placeholder {
     display: grid;
     min-height: 120px;
     place-items: center;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed #F5F5F5;
     border-radius: 10px;
-    color: #64748b;
+    color: #303030;
     padding: 16px;
     text-align: center;
 }
 
 .verification-review-actions {
-    border-top: 1px solid #e8edf2;
+    border-top: 1px solid #F5F5F5;
     padding-top: 18px;
     margin-top: 18px;
 }
 
 .verification-review-actions > span {
-    color: #64748b;
+    color: #303030;
     font-size: 13px;
 }
 
@@ -213,8 +213,8 @@
     flex: 0 0 auto;
     border: 0;
     border-radius: 9px;
-    background: #059669;
-    color: #fff;
+    background: #FF6900;
+    color: #ffffff;
     padding: 11px 16px;
     font-weight: 700;
 }
@@ -233,19 +233,19 @@
     justify-items: center;
     gap: 12px;
     padding: 54px 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #F5F5F5;
     border-radius: 16px;
     background: #fff;
-    color: #64748b;
+    color: #303030;
 }
 
 .verification-empty > i {
-    color: #059669;
+    color: #303030;
     font-size: 32px;
 }
 
 .verification-empty strong {
-    color: #172033;
+    color: #303030;
     font-size: 18px;
 }
 
@@ -261,8 +261,8 @@
 }
 
 .verification-alert.success {
-    background: #ecfdf5;
-    color: #065f46;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 @media (max-width: 760px) {

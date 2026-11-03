@@ -12,6 +12,7 @@ import {
     getMyProfile,
     getMyProviderReviews,
     getProviderVerification,
+    getNotifications,
 } from '../../services/api';
 import Messages from '../HomeOwnerDashboard/Messages';
 import ProviderNotifications from './ProviderNotifications';
@@ -63,6 +64,31 @@ const ProviderDashboard = () => {
     const [providerServices, setProviderServices] = useState([]);
     const [providerServicesLoading, setProviderServicesLoading] = useState(true);
     const [providerServicesError, setProviderServicesError] = useState('');
+    const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+
+    useEffect(() => {
+        let isMounted = true;
+        const refreshUnreadCount = () => {
+            getNotifications()
+                .then((notifications) => {
+                    if (isMounted && Array.isArray(notifications)) {
+                        setUnreadNotificationCount(
+                            notifications.filter((notification) => !notification.isRead).length
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error('Unable to load provider notification count:', error);
+                });
+        };
+
+        refreshUnreadCount();
+        const intervalId = window.setInterval(refreshUnreadCount, 15000);
+        return () => {
+            isMounted = false;
+            window.clearInterval(intervalId);
+        };
+    }, []);
 
     useEffect(() => {
         getMyProfile()
@@ -211,7 +237,11 @@ const ProviderDashboard = () => {
                             title="Notifications"
                         >
                             <i className="bi bi-bell fs-5"></i>
-                            <span className="provider-notification-count">3</span>
+                            {unreadNotificationCount > 0 && (
+                                <span className="provider-notification-count">
+                                    {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
+                                </span>
+                            )}
                         </button>
 
                         <button
@@ -324,7 +354,10 @@ const ProviderDashboard = () => {
                             </button>
                             <div className="provider-stat-card stat-yellow">
                                 <span className="provider-stat-icon"><i className="bi bi-star-fill"></i></span>
-                                <span><strong>—</strong><small>Average Rating</small></span>
+                                <span>
+                                    <strong>{averageRating ? averageRating.toFixed(1) : '—'}</strong>
+                                    <small>Average Rating</small>
+                                </span>
                             </div>
 
                         </section>
@@ -750,7 +783,9 @@ const ProviderDashboard = () => {
 
 
                 {activeSection === 'notifications' && (
-                    <ProviderNotifications bookings={bookings} />
+                    <ProviderNotifications
+                        onUnreadCountChange={setUnreadNotificationCount}
+                    />
                 )}
 
 

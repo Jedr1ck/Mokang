@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./SideBarAdmin.css";
+import logo from "../../assets/images/logo.png";
 
 function SideBarAdmin({
     activePage,
@@ -70,7 +71,7 @@ function SideBarAdmin({
             <div className="admin-sidebar-logo">
 
                 <div className="admin-logo-icon">
-                    <i className="bi bi-house-heart-fill"></i>
+                    <img src={logo} alt="SmartHome logo" />
                 </div>
 
                 {sidebarOpen && (

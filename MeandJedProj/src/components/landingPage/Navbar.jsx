@@ -78,11 +78,11 @@ function Navbar() {
                             top: '110%',
                             backgroundColor: '#ffffff',
                             borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                            boxShadow: '0 4px 12px rgba(37, 37, 37, 0.15)',
                             padding: '12px',
                             minWidth: '240px',
                             zIndex: 1000,
-                            color: '#333'
+                            color: '#303030'
                         }}
                     >
                         {recentAccounts.length > 0 ? (
@@ -103,9 +103,9 @@ function Navbar() {
                                             transition: 'background 0.2s',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            borderBottom: '1px solid #f0f0f0'
+                                            borderBottom: '1px solid #F5F5F5'
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F5F5'}
                                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                                     >
                                         <span style={{ fontWeight: 'bold', fontSize: '13px' }}>{account.name}</span>
@@ -121,7 +121,7 @@ function Navbar() {
                                         textAlign: 'center',
                                         fontSize: '12px',
                                         fontWeight: 'bold',
-                                        color: '#e65100',
+                                        color: '#F45B00',
                                         cursor: 'pointer'
                                     }}
                                 >
@@ -141,8 +141,8 @@ function Navbar() {
                                 <button
                                     onClick={handleGoToHomeAndRegister}
                                     style={{
-                                        backgroundColor: '#e65100',
-                                        color: '#fff',
+                                        backgroundColor: '#F45B00',
+                                        color: '#ffffff',
                                         border: 'none',
                                         padding: '6px 12px',
                                         borderRadius: '4px',

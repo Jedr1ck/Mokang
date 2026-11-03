@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 import { api } from '../../services/api';
 
 const CalendarView = () => {
+    const navigate = useNavigate();
     const today = new Date();
     const toDateString = (date) => {
         const year = date.getFullYear();
@@ -71,19 +73,24 @@ const CalendarView = () => {
                 <header className="profile-header">
                     <h2>Schedule & Calendar</h2>
                     <div className="header-actions">
-                        <button className="icon-btn">
+                        <button
+                            type="button"
+                            className="icon-btn homeowner-notification-button"
+                            aria-label="Open notifications"
+                            onClick={() => navigate('/notifications')}
+                        >
                             <i className="bi bi-bell"></i>
                         </button>
                     </div>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginTop: '20px' }}>
+                <div className="homeowner-calendar-layout">
 
                     {/* Left Side: Calendar Grid */}
                     <section className="dashboard-box" style={{ padding: '20px' }}>
                         {/* Month Navigation */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h3 style={{ margin: 0, color: '#111827' }}>
+                            <h3 style={{ margin: 0, color: '#303030' }}>
                                 {monthNames[month]} {year}
                             </h3>
                             <div style={{ display: 'flex', gap: '8px' }}>
@@ -124,9 +131,9 @@ const CalendarView = () => {
                                         aria-pressed={isSelected}
                                         style={{
                                             ...dayCellStyle,
-                                            backgroundColor: isSelected ? '#10b981' : '#fff',
-                                            color: isSelected ? '#fff' : '#111827',
-                                            border: isSelected ? '1px solid #10b981' : '1px solid #f3f4f6'
+                                            backgroundColor: isSelected ? 'var(--theme-primary)' : '#fff',
+                                            color: isSelected ? '#fff' : '#6B6B6B',
+                                            border: isSelected ? '1px solid var(--theme-primary)' : '1px solid #F5F5F5'
                                         }}
                                     >
                                         <span>{dayNum}</span>
@@ -160,7 +167,7 @@ const CalendarView = () => {
 
                     {/* Right Side: Selected Date Schedules */}
                     <section className="dashboard-box" style={{ padding: '20px' }}>
-                        <h4 style={{ margin: '0 0 15px 0', color: '#111827' }}>
+                        <h4 style={{ margin: '0 0 15px 0', color: '#303030' }}>
                             Events on {selectedDate}
                         </h4>
 
@@ -176,7 +183,7 @@ const CalendarView = () => {
                                             {item.status || 'Unknown'}
                                         </span>
                                     </div>
-                                    <h5 style={{ margin: '8px 0 4px 0', fontSize: '1rem', color: '#1f2937' }}>{item.title}</h5>
+                                    <h5 style={{ margin: '8px 0 4px 0', fontSize: '1rem', color: '#303030' }}>{item.title}</h5>
                                     <p style={{ margin: 0, fontSize: '0.85rem', color: '#6b7280' }}>
                                         <i className="bi bi-person"></i> {item.provider}
                                     </p>
@@ -202,12 +209,12 @@ const CalendarView = () => {
 
 // Inline Styles
 const navBtnStyle = {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#F5F5F5',
     border: 'none',
     padding: '6px 12px',
     borderRadius: '6px',
     cursor: 'pointer',
-    color: '#374151'
+    color: '#303030'
 };
 
 const gridHeaderStyle = {
@@ -258,16 +265,16 @@ const eventDotsStyle = {
 };
 
 const eventCardStyle = {
-    backgroundColor: '#f9fafb',
-    borderLeft: '4px solid #10b981',
+    backgroundColor: '#f8f9fa',
+    borderLeft: '4px solid var(--theme-primary)',
     padding: '12px',
     borderRadius: '6px',
     marginBottom: '12px'
 };
 
 const typeBadgeStyle = {
-    backgroundColor: '#e5e7eb',
-    color: '#374151',
+    backgroundColor: '#F5F5F5',
+    color: '#303030',
     fontSize: '0.7rem',
     padding: '2px 6px',
     borderRadius: '4px',
@@ -282,12 +289,12 @@ const statusBadgeStyle = {
 };
 
 const statusLegend = [
-    { label: 'Pending', color: '#b45309' },
-    { label: 'Confirmed / Accepted', color: '#1d4ed8' },
-    { label: 'In Progress', color: '#6d28d9' },
-    { label: 'Completed', color: '#15803d' },
-    { label: 'Cancelled / Rejected', color: '#b91c1c' },
-    { label: 'Other', color: '#4b5563' }
+    { label: 'Pending', color: '#ffc107' },
+    { label: 'Confirmed / Accepted', color: '#0dcaf0' },
+    { label: 'In Progress', color: '#0d6efd' },
+    { label: 'Completed', color: '#198754' },
+    { label: 'Cancelled / Rejected', color: '#dc3545' },
+    { label: 'Other', color: '#6c757d' }
 ];
 
 const statusLegendStyle = {
@@ -316,22 +323,22 @@ const getStatusStyle = (status) => {
     const normalizedStatus = String(status || '').trim().toLowerCase().replace(/[_-]+/g, ' ');
 
     if (normalizedStatus === 'pending') {
-        return { color: '#b45309', backgroundColor: '#fef3c7' };
+        return { color: '#664d03', backgroundColor: '#fff3cd' };
     }
     if (['confirmed', 'accepted', 'matched'].includes(normalizedStatus)) {
-        return { color: '#1d4ed8', backgroundColor: '#dbeafe' };
+        return { color: '#055160', backgroundColor: '#cff4fc' };
     }
-    if (normalizedStatus === 'in progress') {
-        return { color: '#6d28d9', backgroundColor: '#ede9fe' };
+    if (['in progress', 'on the way'].includes(normalizedStatus)) {
+        return { color: '#084298', backgroundColor: '#cfe2ff' };
     }
     if (normalizedStatus === 'completed') {
-        return { color: '#15803d', backgroundColor: '#dcfce7' };
+        return { color: '#0f5132', backgroundColor: '#d1e7dd' };
     }
     if (['cancelled', 'canceled', 'rejected'].includes(normalizedStatus)) {
-        return { color: '#b91c1c', backgroundColor: '#fee2e2' };
+        return { color: '#842029', backgroundColor: '#f8d7da' };
     }
 
-    return { color: '#4b5563', backgroundColor: '#f3f4f6' };
+    return { color: '#41464b', backgroundColor: '#e2e3e5' };
 };
 
 export default CalendarView;

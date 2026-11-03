@@ -1,7 +1,7 @@
 /* =========================================================
    SMART HOME ADMIN DASHBOARD
    Main Layout + Dashboard UI
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 
@@ -11,28 +11,28 @@
 
 .admin-dashboard-page {
 
-    --green-900: #064e3b;
-    --green-800: #065f46;
-    --green-700: #047857;
-    --green-600: #059669;
-    --green-500: #10b981;
-    --green-100: #d1fae5;
-    --green-50: #ecfdf5;
+    --green-900: #303030;
+    --green-800: #303030;
+    --green-700: #F45B00;
+    --green-600: #929292;
+    --green-500: #FF6900;
+    --green-100: #F5F5F5;
+    --green-50: #F5F5F5;
 
-    --orange-600: #ea580c;
-    --orange-500: #f97316;
-    --orange-100: #ffedd5;
-    --orange-50: #fff7ed;
+    --orange-600: #F45B00;
+    --orange-500: #FF6900;
+    --orange-100: #F5F5F5;
+    --orange-50: #F5F5F5;
 
-    --dark: #172033;
-    --gray-700: #475569;
-    --gray-600: #64748b;
-    --gray-500: #94a3b8;
-    --gray-300: #cbd5e1;
-    --gray-200: #e5e7eb;
-    --gray-100: #f1f5f9;
+    --dark: #303030;
+    --gray-700: #303030;
+    --gray-600: #929292;
+    --gray-500: #929292;
+    --gray-300: #E5E5E5;
+    --gray-200: #E5E5E5;
+    --gray-100: #F5F5F5;
 
-    --background: #f7faf8;
+    --background: #FFFFFF;
     --white: #ffffff;
 
     min-height: 100vh;
@@ -72,8 +72,8 @@
 
     background:
         linear-gradient(135deg,
-            #f0fdf4,
-            #fff7ed);
+            #F5F5F5,
+            #F5F5F5);
 
     display: flex;
     align-items: center;
@@ -96,7 +96,7 @@
     text-align: center;
 
     box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.08);
+        0 15px 40px rgba(37, 37, 37, 0.08);
 }
 
 .admin-loading-logo {
@@ -592,7 +592,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(20, 28, 25, 0.45);
+    background: rgba(37, 37, 37, 0.45);
     z-index: 2000;
     padding: 20px;
 }
@@ -600,11 +600,11 @@
 .admin-logout-modal {
     position: relative;
     width: min(520px, 90vw);
-    background: #f3f4f5;
+    background: #F5F5F5;
     border-radius: 18px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 18px 40px rgba(37, 37, 37, 0.2);
     padding: 30px 28px 22px;
-    border: 1px solid rgba(16, 74, 60, 0.08);
+    border: 1px solid rgba(37, 37, 37, 0.08);
 }
 
 .admin-logout-modal-content {
@@ -617,7 +617,7 @@
 .admin-logout-modal-content h3 {
     margin: 0;
     font-size: 2.1rem;
-    color: #1b1b1b;
+    color: #303030;
     font-weight: 700;
     letter-spacing: -0.03em;
 }
@@ -625,7 +625,7 @@
 .admin-logout-modal-content p {
     margin: 0;
     font-size: 1.05rem;
-    color: #1f2937;
+    color: #303030;
     line-height: 1.6;
 }
 
@@ -648,15 +648,15 @@
 }
 
 .admin-logout-confirm-btn {
-    background: linear-gradient(135deg, #059669, #f97316);
+    background: linear-gradient(135deg, #FF6900, #FF6900);
     color: #fff;
     min-width: 110px;
-    box-shadow: 0 10px 20px rgba(5, 150, 105, 0.15);
+    box-shadow: 0 10px 20px rgba(255, 105, 0, 0.15);
 }
 
 .admin-logout-cancel-btn {
     background: #e5e7eb;
-    color: #111827;
+    color: #303030;
     min-width: 110px;
 }
 
@@ -766,7 +766,7 @@
     font-weight: 600;
 
     box-shadow:
-        0 2px 7px rgba(0, 0, 0, 0.03);
+        0 2px 7px rgba(37, 37, 37, 0.03);
 
     white-space: nowrap;
 }
@@ -817,7 +817,7 @@
     gap: 15px;
 
     box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.025);
+        0 3px 10px rgba(37, 37, 37, 0.025);
 
     transition:
         transform 0.2s ease,
@@ -830,7 +830,7 @@
         translateY(-3px);
 
     box-shadow:
-        0 10px 25px rgba(0, 0, 0, 0.07);
+        0 10px 25px rgba(37, 37, 37, 0.07);
 }
 
 
@@ -955,7 +955,7 @@
     overflow: hidden;
 
     box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.025);
+        0 3px 10px rgba(37, 37, 37, 0.025);
 }
 
 
@@ -979,7 +979,7 @@
     gap: 15px;
 
     border-bottom:
-        1px solid #eef2f0;
+        1px solid #F5F5F5;
 }
 
 .admin-overview-card-header h3 {
@@ -1145,7 +1145,7 @@
 
     background:
         linear-gradient(90deg,
-            #ecfdf5,
+            #F5F5F5,
             #ffffff);
 
     border:
@@ -1179,7 +1179,7 @@
     justify-content: center;
 
     box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.04);
+        0 2px 8px rgba(37, 37, 37, 0.04);
 }
 
 .admin-system-status-content {
@@ -1332,7 +1332,7 @@
     overflow: hidden;
 
     box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.025);
+        0 3px 10px rgba(37, 37, 37, 0.025);
 }
 
 .admin-management-table {
@@ -1376,13 +1376,13 @@
     font-size: 11px;
 
     border-bottom:
-        1px solid #f1f5f2;
+        1px solid #F5F5F5;
 }
 
 .admin-management-table tbody tr:hover {
 
     background:
-        #fafffb;
+        #F5F5F5;
 }
 
 
@@ -1433,7 +1433,7 @@
         var(--green-500);
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.08);
+        0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 
@@ -1527,7 +1527,7 @@
     padding: 20px;
 
     background:
-        rgba(15, 23, 42, 0.55);
+        rgba(37, 37, 37, 0.55);
 
     display: flex;
 
@@ -1552,7 +1552,7 @@
     border-radius: 14px;
 
     box-shadow:
-        0 25px 60px rgba(0, 0, 0, 0.2);
+        0 25px 60px rgba(37, 37, 37, 0.2);
 }
 
 .admin-small-modal {
@@ -1742,7 +1742,7 @@
 
 /* Bootstrap-based admin overview refinements */
 .admin-overview {
-    color: #172033;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-intro {
@@ -1752,7 +1752,7 @@
     border-radius: 16px;
     background:
         radial-gradient(circle at 88% 20%, rgba(255, 255, 255, 0.3), transparent 25%),
-        linear-gradient(120deg, #eaf8f0 0%, #f8fbf9 58%, #fff5eb 100%);
+        linear-gradient(120deg, #F5F5F5 0%, #FFFFFF 58%, #F5F5F5 100%);
     flex-direction: row;
     align-items: center;
 }
@@ -1776,7 +1776,7 @@
 
 .admin-overview .admin-overview-date {
     min-height: 40px;
-    border-color: rgba(5, 150, 105, 0.12);
+    border-color: rgba(255, 105, 0, 0.12);
     background: rgba(255, 255, 255, 0.82);
     color: #475569;
     font-size: 12px;
@@ -1796,12 +1796,12 @@
     padding: 0;
     border: 1px solid #e8eeea;
     border-radius: 14px;
-    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+    box-shadow: 0 5px 16px rgba(37, 37, 37, 0.035);
 }
 
 .admin-overview .admin-overview-summary-card:hover {
-    border-color: #ccebd9;
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.075);
+    border-color: #F5F5F5;
+    box-shadow: 0 12px 24px rgba(37, 37, 37, 0.075);
 }
 
 .admin-overview .admin-overview-summary-card .card-body {
@@ -1812,8 +1812,8 @@
     width: 52px;
     height: 52px;
     border-radius: 15px;
-    background: #e9f8ef;
-    color: #07875d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-summary-info > span {
@@ -1832,8 +1832,8 @@
 }
 
 .admin-overview .admin-summary-warning .admin-overview-summary-icon {
-    background: #fff3e7;
-    color: #e87516;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-grid {
@@ -1846,18 +1846,18 @@
     padding: 0;
     border: 1px solid #e8eeea;
     border-radius: 15px;
-    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+    box-shadow: 0 5px 16px rgba(37, 37, 37, 0.035);
 }
 
 .admin-overview .admin-overview-card-header {
     min-height: 94px;
     padding: 20px 22px;
     align-items: center;
-    border-bottom-color: #edf1ee;
+    border-bottom-color: #F5F5F5;
 }
 
 .admin-overview .admin-card-label {
-    color: #07875d;
+    color: #303030;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.1px;
@@ -1892,7 +1892,7 @@
 
 .admin-overview .admin-overview-table thead th {
     padding: 13px 18px;
-    border-bottom-color: #edf1ee;
+    border-bottom-color: #F5F5F5;
     background: #f8faf9;
     color: #64748b;
     font-size: 10px;
@@ -1924,8 +1924,8 @@
 }
 
 .admin-overview .admin-empty-icon {
-    background: #effaf3;
-    color: #07875d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-empty strong {
@@ -1958,14 +1958,14 @@
 /* =========================================================
    BOOKING MANAGEMENT
    SmartHome Admin
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 .booking-management {
 
     width: 100%;
 
-    color: #172033;
+    color: #303030;
 
     font-family:
         "Inter",
@@ -1997,7 +1997,7 @@
 
     margin-bottom: 7px;
 
-    color: #059669;
+    color: #303030;
 
     font-size: 9px;
 
@@ -2010,7 +2010,7 @@
 
     margin: 0 0 7px;
 
-    color: #172033;
+    color: #303030;
 
     font-family:
         Georgia,
@@ -2044,13 +2044,13 @@
 
     background:
         linear-gradient(135deg,
-            #ecfdf5,
-            #fff7ed);
+            #F5F5F5,
+            #F5F5F5);
 
     border:
-        1px solid #d1fae5;
+        1px solid #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 
     display: flex;
 
@@ -2097,7 +2097,7 @@
     gap: 14px;
 
     box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.035);
+        0 3px 12px rgba(37, 37, 37, 0.035);
 
     transition:
         transform 0.2s ease,
@@ -2110,7 +2110,7 @@
         translateY(-3px);
 
     box-shadow:
-        0 12px 28px rgba(15, 23, 42, 0.08);
+        0 12px 28px rgba(37, 37, 37, 0.08);
 }
 
 
@@ -2137,23 +2137,23 @@
 
 .booking-summary-icon.green {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 .booking-summary-icon.orange {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 .booking-summary-icon.blue {
 
-    background: #eff6ff;
+    background: #F5F5F5;
 
-    color: #2563eb;
+    color: #303030;
 }
 
 
@@ -2183,7 +2183,7 @@
 
     margin-top: 3px;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 26px;
 
@@ -2228,7 +2228,7 @@
     gap: 25px;
 
     box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.035);
+        0 3px 12px rgba(37, 37, 37, 0.035);
 }
 
 .booking-filter-title {
@@ -2249,9 +2249,9 @@
 
     border-radius: 10px;
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 
     display: flex;
 
@@ -2263,7 +2263,7 @@
 
     display: block;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 12px;
 
@@ -2347,7 +2347,7 @@
 
     background: #ffffff;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 11px;
 
@@ -2363,10 +2363,10 @@
 
 .booking-search input:focus {
 
-    border-color: #10b981;
+    border-color: #303030;
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.09);
+        0 0 0 3px rgba(255, 105, 0, 0.09);
 }
 
 .booking-search-clear {
@@ -2387,7 +2387,7 @@
 
     border-radius: 50%;
 
-    background: #f1f5f9;
+    background: #F5F5F5;
 
     color: #64748b;
 
@@ -2401,9 +2401,9 @@
 
 .booking-search-clear:hover {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 
@@ -2445,7 +2445,7 @@
     transform:
         translateY(-50%);
 
-    color: #059669;
+    color: #303030;
 
     font-size: 12px;
 
@@ -2481,10 +2481,10 @@
 
 .booking-select select:focus {
 
-    border-color: #10b981;
+    border-color: #303030;
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.09);
+        0 0 0 3px rgba(255, 105, 0, 0.09);
 }
 
 
@@ -2506,7 +2506,7 @@
     overflow: hidden;
 
     box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.035);
+        0 3px 12px rgba(37, 37, 37, 0.035);
 }
 
 
@@ -2530,7 +2530,7 @@
     gap: 20px;
 
     border-bottom:
-        1px solid #eef2f0;
+        1px solid #F5F5F5;
 }
 
 .booking-table-label {
@@ -2539,7 +2539,7 @@
 
     margin-bottom: 4px;
 
-    color: #059669;
+    color: #303030;
 
     font-size: 8px;
 
@@ -2552,7 +2552,7 @@
 
     margin: 0 0 4px;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 16px;
 
@@ -2603,12 +2603,12 @@
 
 .booking-count i {
 
-    color: #059669;
+    color: #303030;
 }
 
 .booking-count span {
 
-    color: #172033;
+    color: #303030;
 
     font-weight: 700;
 }
@@ -2667,7 +2667,7 @@
     font-size: 10px;
 
     border-bottom:
-        1px solid #f1f5f2;
+        1px solid #F5F5F5;
 
     vertical-align: middle;
 }
@@ -2680,7 +2680,7 @@
 
 .booking-table tbody tr:hover {
 
-    background: #fafffb;
+    background: #F5F5F5;
 }
 
 .booking-table tbody tr:last-child td {
@@ -2711,7 +2711,7 @@
 
 .booking-id strong {
 
-    color: #172033;
+    color: #303030;
 
     font-size: 10px;
     font-weight: 700;
@@ -2752,16 +2752,16 @@
 
 .booking-person-avatar.green {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 .booking-person-avatar.orange {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 .booking-person span {
@@ -2787,7 +2787,7 @@
 
 .booking-service i {
 
-    color: #059669;
+    color: #303030;
 
     font-size: 12px;
 }
@@ -2837,7 +2837,7 @@
 
 .booking-date i {
 
-    color: #059669;
+    color: #303030;
 }
 
 
@@ -2880,9 +2880,9 @@
 
 .booking-status-pending {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #ea580c;
+    color: #303030;
 }
 
 
@@ -2890,9 +2890,9 @@
 
 .booking-status-confirmed {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 
@@ -2900,9 +2900,9 @@
 
 .booking-status-progress {
 
-    background: #eff6ff;
+    background: #F5F5F5;
 
-    color: #2563eb;
+    color: #303030;
 }
 
 
@@ -2910,9 +2910,9 @@
 
 .booking-status-completed {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #047857;
+    color: #303030;
 }
 
 
@@ -2940,7 +2940,7 @@
 
 .booking-status-default {
 
-    background: #f1f5f9;
+    background: #F5F5F5;
 
     color: #64748b;
 }
@@ -2989,14 +2989,14 @@
 
 .booking-action.view {
 
-    color: #059669;
+    color: #303030;
 }
 
 .booking-action.view:hover {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    border-color: #a7f3d0;
+    border-color: #303030;
 
     transform:
         translateY(-1px);
@@ -3004,14 +3004,14 @@
 
 .booking-action.edit {
 
-    color: #f97316;
+    color: #303030;
 }
 
 .booking-action.edit:hover {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    border-color: #fed7aa;
+    border-color: #303030;
 
     transform:
         translateY(-1px);
@@ -3053,9 +3053,9 @@
 
     border-radius: 50%;
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 
     display: flex;
 
@@ -3160,20 +3160,20 @@
 
 .booking-pagination-buttons button:hover:not(:disabled) {
 
-    border-color: #a7f3d0;
+    border-color: #303030;
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 .booking-pagination-buttons button.active {
 
-    background: #059669;
+    background: #FF6900;
 
-    border-color: #059669;
+    border-color: #ffffff;
 
-    color: white;
+    color: #ffffff;
 }
 
 .booking-pagination-buttons button:disabled {
@@ -3199,7 +3199,7 @@
     padding: 20px;
 
     background:
-        rgba(15, 23, 42, 0.58);
+        rgba(37, 37, 37, 0.58);
 
     display: flex;
 
@@ -3244,7 +3244,7 @@
     border-radius: 16px;
 
     box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.22);
+        0 25px 70px rgba(37, 37, 37, 0.22);
 
     animation:
         bookingModalIn 0.2s ease;
@@ -3300,7 +3300,7 @@
 
 .booking-modal-header span {
 
-    color: #059669;
+    color: #303030;
 
     font-size: 8px;
 
@@ -3313,7 +3313,7 @@
 
     margin: 4px 0 0;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 17px;
 
@@ -3329,7 +3329,7 @@
 
     border-radius: 8px;
 
-    background: #f8fafc;
+    background: #F5F5F5;
 
     color: #64748b;
 
@@ -3346,9 +3346,9 @@
 
 .booking-modal-close:hover {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 
@@ -3376,11 +3376,11 @@
 
     background:
         linear-gradient(90deg,
-            #f0fdf4,
+            #F5F5F5,
             #ffffff);
 
     border:
-        1px solid #d1fae5;
+        1px solid #F5F5F5;
 
     display: flex;
 
@@ -3429,11 +3429,11 @@
     padding: 12px;
 
     border:
-        1px solid #eef2f0;
+        1px solid #F5F5F5;
 
     border-radius: 9px;
 
-    background: #fbfdfc;
+    background: #F5F5F5;
 
     display: flex;
 
@@ -3489,10 +3489,10 @@
 
     border-radius: 10px;
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
     border:
-        1px solid #fed7aa;
+        1px solid #FF6900;
 
     display: flex;
 
@@ -3512,7 +3512,7 @@
 
     background: white;
 
-    color: #f97316;
+    color: #303030;
 
     display: flex;
 
@@ -3575,7 +3575,7 @@
     transform:
         translateY(-50%);
 
-    color: #059669;
+    color: #303030;
 
     font-size: 13px;
 
@@ -3611,10 +3611,10 @@
 
 .booking-modal-select select:focus {
 
-    border-color: #10b981;
+    border-color: #303030;
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.09);
+        0 0 0 3px rgba(255, 105, 0, 0.09);
 }
 
 
@@ -3678,7 +3678,7 @@
 
 .booking-secondary-button:hover {
 
-    background: #f8fafc;
+    background: #F5F5F5;
 
     color: #334155;
 }
@@ -3686,24 +3686,24 @@
 .booking-primary-button {
 
     border:
-        1px solid #059669;
+        1px solid #FF6900;
 
-    background: #059669;
+    background: #FF6900;
 
-    color: white;
+    color: #ffffff;
 }
 
 .booking-primary-button:hover {
 
-    border-color: #047857;
+    border-color: #ffffff;
 
-    background: #047857;
+    background: #F45B00;
 
     transform:
         translateY(-1px);
 
     box-shadow:
-        0 5px 12px rgba(5, 150, 105, 0.2);
+        0 5px 12px rgba(255, 105, 0, 0.2);
 }
 
 
@@ -3853,14 +3853,14 @@
 /* =========================================================
    MANAGE HOMEOWNERS
    SmartHome Admin Dashboard
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 .homeowners-management {
 
     width: 100%;
 
-    color: #172033;
+    color: #303030;
 
     font-family:
         "Inter",
@@ -3893,7 +3893,7 @@
 
     margin-bottom: 7px;
 
-    color: #059669;
+    color: #303030;
 
     font-size: 9px;
 
@@ -3906,7 +3906,7 @@
 
     margin: 0 0 7px;
 
-    color: #172033;
+    color: #303030;
 
     font-family:
         Georgia,
@@ -3941,13 +3941,13 @@
     padding: 12px 15px;
 
     border:
-        1px solid #d1fae5;
+        1px solid #F5F5F5;
 
     border-radius: 12px;
 
     background:
         linear-gradient(135deg,
-            #f0fdf4,
+            #F5F5F5,
             #ffffff);
 
     display: flex;
@@ -3964,9 +3964,9 @@
 
     border-radius: 10px;
 
-    background: #059669;
+    background: #FF6900;
 
-    color: white;
+    color: #ffffff;
 
     display: flex;
 
@@ -3993,7 +3993,7 @@
 
     margin-top: 2px;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 21px;
 
@@ -4037,7 +4037,7 @@
     gap: 12px;
 
     box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.035);
+        0 3px 12px rgba(37, 37, 37, 0.035);
 
     transition:
         transform 0.2s ease,
@@ -4050,7 +4050,7 @@
         translateY(-2px);
 
     box-shadow:
-        0 10px 24px rgba(15, 23, 42, 0.07);
+        0 10px 24px rgba(37, 37, 37, 0.07);
 }
 
 
@@ -4077,23 +4077,23 @@
 
 .homeowners-summary-icon.green {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 .homeowners-summary-icon.orange {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 .homeowners-summary-icon.blue {
 
-    background: #eff6ff;
+    background: #F5F5F5;
 
-    color: #2563eb;
+    color: #303030;
 }
 
 
@@ -4121,7 +4121,7 @@
 
     margin-top: 2px;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 23px;
 
@@ -4164,7 +4164,7 @@
     gap: 20px;
 
     box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.035);
+        0 3px 12px rgba(37, 37, 37, 0.035);
 }
 
 .homeowners-filter-heading {
@@ -4185,9 +4185,9 @@
 
     border-radius: 9px;
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 
     display: flex;
 
@@ -4297,10 +4297,10 @@
 
 .homeowners-search input:focus {
 
-    border-color: #10b981;
+    border-color: #303030;
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.09);
+        0 0 0 3px rgba(255, 105, 0, 0.09);
 }
 
 .homeowners-clear-search {
@@ -4323,7 +4323,7 @@
 
     border-radius: 50%;
 
-    background: #f1f5f9;
+    background: #F5F5F5;
 
     color: #64748b;
 
@@ -4337,9 +4337,9 @@
 
 .homeowners-clear-search:hover {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 
@@ -4381,7 +4381,7 @@
     transform:
         translateY(-50%);
 
-    color: #059669;
+    color: #303030;
 
     font-size: 11px;
 
@@ -4417,10 +4417,10 @@
 
 .homeowners-select-wrapper select:focus {
 
-    border-color: #10b981;
+    border-color: #303030;
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.09);
+        0 0 0 3px rgba(255, 105, 0, 0.09);
 }
 
 
@@ -4440,7 +4440,7 @@
     border-radius: 13px;
 
     box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.035);
+        0 3px 12px rgba(37, 37, 37, 0.035);
 }
 
 
@@ -4464,7 +4464,7 @@
     gap: 15px;
 
     border-bottom:
-        1px solid #edf1ef;
+        1px solid #F5F5F5;
 }
 
 .homeowners-table-header>div:first-child>span {
@@ -4473,7 +4473,7 @@
 
     margin-bottom: 3px;
 
-    color: #059669;
+    color: #303030;
 
     font-size: 8px;
 
@@ -4486,7 +4486,7 @@
 
     margin: 0 0 4px;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 15px;
 
@@ -4534,12 +4534,12 @@
 
 .homeowners-result-count i {
 
-    color: #059669;
+    color: #303030;
 }
 
 .homeowners-result-count strong {
 
-    color: #172033;
+    color: #303030;
 
     font-size: 10px;
 }
@@ -4594,7 +4594,7 @@
         12px 14px;
 
     border-bottom:
-        1px solid #f1f5f3;
+        1px solid #F5F5F5;
 
     color: #475569;
 
@@ -4611,7 +4611,7 @@
 
 .homeowners-table tbody tr:hover {
 
-    background: #fbfefc;
+    background: #F5F5F5;
 }
 
 .homeowners-table tbody tr:last-child td {
@@ -4646,8 +4646,8 @@
 
     background:
         linear-gradient(135deg,
-            #059669,
-            #34d399);
+            #FF6900,
+            #FF6900);
 
     color: white;
 
@@ -4659,7 +4659,7 @@
     font-size: 12px;
 
     box-shadow:
-        0 3px 8px rgba(5, 150, 105, 0.16);
+        0 3px 8px rgba(255, 105, 0, 0.16);
 }
 
 .homeowner-user>div:last-child {
@@ -4723,7 +4723,7 @@
 
 .homeowner-contact i {
 
-    color: #059669;
+    color: #303030;
 
     font-size: 10px;
 }
@@ -4753,7 +4753,7 @@
 
     flex-shrink: 0;
 
-    color: #f97316;
+    color: #303030;
 
     font-size: 10px;
 }
@@ -4806,16 +4806,16 @@
 
 .homeowner-status.active {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 .homeowner-status.inactive {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #ea580c;
+    color: #303030;
 }
 
 
@@ -4864,14 +4864,14 @@
 
 .homeowner-action.view {
 
-    color: #059669;
+    color: #303030;
 }
 
 .homeowner-action.view:hover {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    border-color: #a7f3d0;
+    border-color: #303030;
 
     transform:
         translateY(-1px);
@@ -4879,14 +4879,14 @@
 
 .homeowner-action.edit {
 
-    color: #2563eb;
+    color: #303030;
 }
 
 .homeowner-action.edit:hover {
 
-    background: #eff6ff;
+    background: #F5F5F5;
 
-    border-color: #bfdbfe;
+    border-color: #F5F5F5;
 
     transform:
         translateY(-1px);
@@ -4894,14 +4894,14 @@
 
 .homeowner-action.block {
 
-    color: #f97316;
+    color: #303030;
 }
 
 .homeowner-action.block:hover {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    border-color: #fed7aa;
+    border-color: #303030;
 
     transform:
         translateY(-1px);
@@ -4958,9 +4958,9 @@
 
     border-radius: 50%;
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 
     display: flex;
 
@@ -5078,20 +5078,20 @@
 .homeowners-pagination-button:hover:not(:disabled),
 .homeowners-page-number:hover:not(.active) {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    border-color: #a7f3d0;
+    border-color: #303030;
 
-    color: #059669;
+    color: #303030;
 }
 
 .homeowners-page-number.active {
 
-    background: #059669;
+    background: #FF6900;
 
-    border-color: #059669;
+    border-color: #ffffff;
 
-    color: white;
+    color: #ffffff;
 
     font-weight: 700;
 }
@@ -5119,7 +5119,7 @@
     padding: 20px;
 
     background:
-        rgba(15, 23, 42, 0.58);
+        rgba(37, 37, 37, 0.58);
 
     display: flex;
 
@@ -5164,7 +5164,7 @@
     background: white;
 
     box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.23);
+        0 25px 70px rgba(37, 37, 37, 0.23);
 
     animation:
         homeownerModalIn 0.2s ease;
@@ -5216,7 +5216,7 @@
 
 .homeowners-modal-header span {
 
-    color: #059669;
+    color: #303030;
 
     font-size: 8px;
 
@@ -5229,7 +5229,7 @@
 
     margin: 4px 0 0;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 17px;
 
@@ -5245,7 +5245,7 @@
 
     border-radius: 8px;
 
-    background: #f8fafc;
+    background: #F5F5F5;
 
     color: #64748b;
 
@@ -5262,9 +5262,9 @@
 
 .homeowners-modal-close:hover {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 
@@ -5280,13 +5280,13 @@
     padding: 14px;
 
     border:
-        1px solid #d1fae5;
+        1px solid #F5F5F5;
 
     border-radius: 11px;
 
     background:
         linear-gradient(135deg,
-            #f0fdf4,
+            #F5F5F5,
             #ffffff);
 
     display: flex;
@@ -5305,8 +5305,8 @@
 
     background:
         linear-gradient(135deg,
-            #059669,
-            #34d399);
+            #FF6900,
+            #FF6900);
 
     color: white;
 
@@ -5354,11 +5354,11 @@
     padding: 11px;
 
     border:
-        1px solid #eef2f0;
+        1px solid #F5F5F5;
 
     border-radius: 9px;
 
-    background: #fbfdfc;
+    background: #F5F5F5;
 
     display: flex;
 
@@ -5453,7 +5453,7 @@
     transform:
         translateY(-50%);
 
-    color: #059669;
+    color: #303030;
 
     font-size: 12px;
 
@@ -5489,10 +5489,10 @@
 
 .homeowners-input-wrapper input:focus {
 
-    border-color: #10b981;
+    border-color: #303030;
 
     box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.09);
+        0 0 0 3px rgba(255, 105, 0, 0.09);
 }
 
 
@@ -5557,7 +5557,7 @@
 
 .homeowners-secondary-button:hover {
 
-    background: #f8fafc;
+    background: #F5F5F5;
 
     color: #334155;
 }
@@ -5565,24 +5565,24 @@
 .homeowners-primary-button {
 
     border:
-        1px solid #059669;
+        1px solid #FF6900;
 
-    background: #059669;
+    background: #FF6900;
 
-    color: white;
+    color: #ffffff;
 }
 
 .homeowners-primary-button:hover {
 
-    border-color: #047857;
+    border-color: #ffffff;
 
-    background: #047857;
+    background: #F45B00;
 
     transform:
         translateY(-1px);
 
     box-shadow:
-        0 5px 12px rgba(5, 150, 105, 0.2);
+        0 5px 12px rgba(255, 105, 0, 0.2);
 }
 
 .homeowners-danger-button {
@@ -5628,7 +5628,7 @@
     text-align: center;
 
     box-shadow:
-        0 25px 70px rgba(0, 0, 0, 0.23);
+        0 25px 70px rgba(37, 37, 37, 0.23);
 
     animation:
         homeownerModalIn 0.2s ease;
@@ -5654,16 +5654,16 @@
 
 .homeowners-confirm-icon.warning {
 
-    background: #fff7ed;
+    background: #F5F5F5;
 
-    color: #f97316;
+    color: #303030;
 }
 
 .homeowners-confirm-icon.success {
 
-    background: #ecfdf5;
+    background: #F5F5F5;
 
-    color: #059669;
+    color: #303030;
 }
 
 .homeowners-confirm-icon.danger {
@@ -5677,7 +5677,7 @@
 
     margin: 0 0 7px;
 
-    color: #172033;
+    color: #303030;
 
     font-size: 17px;
 
@@ -5887,12 +5887,12 @@
 /* =========================================================
    MANAGE PROVIDERS
    SmartHome Admin
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 .providers-management {
     width: 100%;
-    color: #172033;
+    color: #303030;
     font-family: "Inter", "Segoe UI", Arial, sans-serif;
 }
 
@@ -5912,7 +5912,7 @@
 .providers-section-label {
     display: block;
     margin-bottom: 7px;
-    color: #059669;
+    color: #303030;
     font-size: 9px;
     font-weight: 800;
     letter-spacing: 1.5px;
@@ -5920,7 +5920,7 @@
 
 .providers-page-header h2 {
     margin: 0 0 7px;
-    color: #172033;
+    color: #303030;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 31px;
     font-weight: 500;
@@ -5940,9 +5940,9 @@
 .providers-total-card {
     min-width: 180px;
     padding: 12px 15px;
-    border: 1px solid #d1fae5;
+    border: 1px solid #F5F5F5;
     border-radius: 12px;
-    background: linear-gradient(135deg, #f0fdf4, #ffffff);
+    background: linear-gradient(135deg, #F5F5F5, #ffffff);
     display: flex;
     align-items: center;
     gap: 11px;
@@ -5952,8 +5952,8 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: #059669;
-    color: white;
+    background: #FF6900;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5970,7 +5970,7 @@
 .providers-total-card strong {
     display: block;
     margin-top: 2px;
-    color: #172033;
+    color: #303030;
     font-size: 21px;
 }
 
@@ -5995,13 +5995,13 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, .035);
     transition: .2s ease;
 }
 
 .providers-summary-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 9px 22px rgba(15, 23, 42, .07);
+    box-shadow: 0 9px 22px rgba(37, 37, 37, .07);
 }
 
 .providers-summary-icon {
@@ -6016,13 +6016,13 @@
 }
 
 .providers-summary-icon.green {
-    background: #ecfdf5;
-    color: #059669;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .providers-summary-icon.orange {
-    background: #fff7ed;
-    color: #f97316;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .providers-summary-icon.red {
@@ -6040,7 +6040,7 @@
 .providers-summary-card strong {
     display: block;
     margin-top: 2px;
-    color: #172033;
+    color: #303030;
     font-size: 22px;
     line-height: 1;
 }
@@ -6067,7 +6067,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, .035);
 }
 
 .providers-filter-title {
@@ -6080,8 +6080,8 @@
     width: 38px;
     height: 38px;
     border-radius: 9px;
-    background: #ecfdf5;
-    color: #059669;
+    background: #F5F5F5;
+    color: #303030;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6141,8 +6141,8 @@
 }
 
 .providers-search input:focus {
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, .09);
+    border-color: #303030;
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, .09);
 }
 
 .providers-clear-search {
@@ -6154,7 +6154,7 @@
     height: 24px;
     border: none;
     border-radius: 50%;
-    background: #f1f5f9;
+    background: #F5F5F5;
     color: #64748b;
     display: flex;
     align-items: center;
@@ -6163,8 +6163,8 @@
 }
 
 .providers-clear-search:hover {
-    color: #f97316;
-    background: #fff7ed;
+    color: #303030;
+    background: #F5F5F5;
 }
 
 
@@ -6193,7 +6193,7 @@
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: #059669;
+    color: #303030;
     font-size: 11px;
     z-index: 1;
 }
@@ -6212,8 +6212,8 @@
 }
 
 .providers-filter-select select:focus {
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, .09);
+    border-color: #303030;
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, .09);
 }
 
 
@@ -6226,13 +6226,13 @@
     border: 1px solid #e5e7eb;
     border-radius: 13px;
     background: white;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, .035);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, .035);
 }
 
 .providers-table-header {
     min-height: 82px;
     padding: 15px 18px;
-    border-bottom: 1px solid #edf1ef;
+    border-bottom: 1px solid #F5F5F5;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -6242,7 +6242,7 @@
 .providers-table-header>div:first-child>span {
     display: block;
     margin-bottom: 3px;
-    color: #059669;
+    color: #303030;
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 1px;
@@ -6250,7 +6250,7 @@
 
 .providers-table-header h3 {
     margin: 0 0 4px;
-    color: #172033;
+    color: #303030;
     font-size: 15px;
     font-weight: 700;
 }
@@ -6274,11 +6274,11 @@
 }
 
 .providers-result-count i {
-    color: #059669;
+    color: #303030;
 }
 
 .providers-result-count strong {
-    color: #172033;
+    color: #303030;
 }
 
 
@@ -6311,14 +6311,14 @@
 
 .providers-table tbody td {
     padding: 11px 13px;
-    border-bottom: 1px solid #f1f5f3;
+    border-bottom: 1px solid #F5F5F5;
     color: #475569;
     font-size: 9px;
     vertical-align: middle;
 }
 
 .providers-table tbody tr:hover {
-    background: #fbfefc;
+    background: #F5F5F5;
 }
 
 .providers-table tbody tr:last-child td {
@@ -6342,7 +6342,7 @@
     height: 32px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: linear-gradient(135deg, #059669, #34d399);
+    background: linear-gradient(135deg, #FF6900, #FF6900);
     color: white;
     display: flex;
     align-items: center;
@@ -6390,15 +6390,15 @@
 }
 
 .provider-service i {
-    color: #059669;
+    color: #303030;
 }
 
 .provider-contact i {
-    color: #059669;
+    color: #303030;
 }
 
 .provider-location i {
-    color: #f97316;
+    color: #303030;
 }
 
 .provider-experience {
@@ -6432,13 +6432,13 @@
 
 .provider-approval.approved,
 .provider-account.active {
-    color: #059669;
-    background: #ecfdf5;
+    color: #303030;
+    background: #F5F5F5;
 }
 
 .provider-approval.pending {
-    color: #f97316;
-    background: #fff7ed;
+    color: #303030;
+    background: #F5F5F5;
 }
 
 .provider-approval.rejected,
@@ -6477,21 +6477,21 @@
 }
 
 .provider-action.view {
-    color: #059669;
+    color: #303030;
 }
 
 .provider-action.view:hover {
-    background: #ecfdf5;
-    border-color: #a7f3d0;
+    background: #F5F5F5;
+    border-color: #303030;
 }
 
 .provider-action.approve {
-    color: #059669;
+    color: #303030;
 }
 
 .provider-action.approve:hover {
-    background: #ecfdf5;
-    border-color: #86efac;
+    background: #F5F5F5;
+    border-color: #303030;
 }
 
 .provider-action.reject {
@@ -6504,12 +6504,12 @@
 }
 
 .provider-action.block {
-    color: #f97316;
+    color: #303030;
 }
 
 .provider-action.block:hover {
-    background: #fff7ed;
-    border-color: #fed7aa;
+    background: #F5F5F5;
+    border-color: #303030;
 }
 
 .provider-action.delete {
@@ -6545,8 +6545,8 @@
     height: 55px;
     margin-bottom: 11px;
     border-radius: 50%;
-    background: #ecfdf5;
-    color: #059669;
+    background: #F5F5F5;
+    color: #303030;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6617,15 +6617,15 @@
 
 .providers-pagination-button:hover:not(:disabled),
 .providers-page-number:hover:not(.active) {
-    background: #ecfdf5;
-    border-color: #a7f3d0;
-    color: #059669;
+    background: #F5F5F5;
+    border-color: #303030;
+    color: #303030;
 }
 
 .providers-page-number.active {
-    background: #059669;
-    border-color: #059669;
-    color: white;
+    background: #FF6900;
+    border-color: #ffffff;
+    color: #ffffff;
 }
 
 .providers-pagination-button:disabled {
@@ -6643,7 +6643,7 @@
     inset: 0;
     z-index: 3000;
     padding: 20px;
-    background: rgba(15, 23, 42, .58);
+    background: rgba(37, 37, 37, .58);
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
@@ -6668,7 +6668,7 @@
     overflow-y: auto;
     border-radius: 15px;
     background: white;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, .23);
+    box-shadow: 0 25px 70px rgba(37, 37, 37, .23);
     animation: providerModalIn .2s ease;
 }
 
@@ -6698,7 +6698,7 @@
 }
 
 .providers-modal-header span {
-    color: #059669;
+    color: #303030;
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 1px;
@@ -6706,7 +6706,7 @@
 
 .providers-modal-header h3 {
     margin: 4px 0 0;
-    color: #172033;
+    color: #303030;
     font-size: 17px;
 }
 
@@ -6715,7 +6715,7 @@
     height: 33px;
     border: none;
     border-radius: 8px;
-    background: #f8fafc;
+    background: #F5F5F5;
     color: #64748b;
     display: flex;
     align-items: center;
@@ -6724,8 +6724,8 @@
 }
 
 .providers-modal-close:hover {
-    background: #fff7ed;
-    color: #f97316;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 
@@ -6736,9 +6736,9 @@
 .providers-modal-profile {
     margin: 17px 20px;
     padding: 14px;
-    border: 1px solid #d1fae5;
+    border: 1px solid #F5F5F5;
     border-radius: 11px;
-    background: linear-gradient(135deg, #f0fdf4, #ffffff);
+    background: linear-gradient(135deg, #F5F5F5, #ffffff);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -6748,7 +6748,7 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #059669, #34d399);
+    background: linear-gradient(135deg, #FF6900, #FF6900);
     color: white;
     display: flex;
     align-items: center;
@@ -6782,9 +6782,9 @@
 .providers-detail-grid>div {
     min-height: 63px;
     padding: 11px;
-    border: 1px solid #eef2f0;
+    border: 1px solid #F5F5F5;
     border-radius: 9px;
-    background: #fbfdfc;
+    background: #F5F5F5;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -6841,13 +6841,13 @@
 }
 
 .providers-primary-button {
-    border: 1px solid #059669;
-    background: #059669;
-    color: white;
+    border: 1px solid #FF6900;
+    background: #FF6900;
+    color: #ffffff;
 }
 
 .providers-primary-button:hover {
-    background: #047857;
+    background: #F45B00;
 }
 
 .providers-danger-button {
@@ -6872,7 +6872,7 @@
     border-radius: 15px;
     background: white;
     text-align: center;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, .23);
+    box-shadow: 0 25px 70px rgba(37, 37, 37, .23);
     animation: providerModalIn .2s ease;
 }
 
@@ -6888,13 +6888,13 @@
 }
 
 .providers-confirm-icon.success {
-    background: #ecfdf5;
-    color: #059669;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .providers-confirm-icon.warning {
-    background: #fff7ed;
-    color: #f97316;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .providers-confirm-icon.danger {
@@ -6904,7 +6904,7 @@
 
 .providers-confirm-modal h3 {
     margin: 0 0 7px;
-    color: #172033;
+    color: #303030;
     font-size: 17px;
 }
 
@@ -7017,24 +7017,24 @@
 
 .service-categories-page {
     width: 100%;
-    color: #1f2937;
+    color: #303030;
 
-    --green: #16a34a;
-    --green-dark: #15803d;
-    --green-light: #f0fdf4;
+    --green: #FF6900;
+    --green-dark: #F45B00;
+    --green-light: #F5F5F5;
 
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --orange-light: #fff7ed;
+    --orange: #FF6900;
+    --orange-dark: #FF6900;
+    --orange-light: #F5F5F5;
 
     --red: #dc2626;
     --red-light: #fef2f2;
 
     --gray: #6b7280;
-    --gray-light: #f3f4f6;
+    --gray-light: #F5F5F5;
 
     --border: #e5e7eb;
-    --background: #f8faf8;
+    --background: #F5F5F5;
 }
 
 /* HEADER */
@@ -7060,7 +7060,7 @@
     margin: 0;
     font-size: 28px;
     font-weight: 800;
-    color: #17251d;
+    color: #303030;
 }
 
 .service-categories-header p {
@@ -7081,7 +7081,7 @@
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 5px 14px rgba(22, 163, 74, 0.18);
+    box-shadow: 0 5px 14px rgba(255, 105, 0, 0.18);
     transition: 0.2s ease;
 }
 
@@ -7112,7 +7112,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .service-summary-icon {
@@ -7151,7 +7151,7 @@
 
 .service-summary-card strong {
     display: block;
-    color: #17251d;
+    color: #303030;
     font-size: 25px;
     font-weight: 800;
 }
@@ -7168,7 +7168,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.03);
 }
 
 .service-search-box {
@@ -7195,14 +7195,14 @@
     border-radius: 8px;
     outline: none;
     background: #ffffff;
-    color: #1f2937;
+    color: #303030;
     font-size: 13px;
     transition: 0.2s ease;
 }
 
 .service-search-box input:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 .service-filter-box {
@@ -7232,7 +7232,7 @@
 
 .service-filter-box select:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 /* TABLE */
@@ -7242,7 +7242,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .service-table-header {
@@ -7256,7 +7256,7 @@
 
 .service-table-header h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 16px;
     font-weight: 800;
 }
@@ -7302,7 +7302,7 @@
 
 .service-table tbody td {
     padding: 16px 18px;
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
     vertical-align: middle;
     font-size: 13px;
 }
@@ -7316,7 +7316,7 @@
 }
 
 .service-table tbody tr:hover {
-    background: #fbfefb;
+    background: #F5F5F5;
 }
 
 /* CATEGORY */
@@ -7340,7 +7340,7 @@
 }
 
 .service-category-name strong {
-    color: #26352c;
+    color: #303030;
     font-size: 13px;
     font-weight: 700;
 }
@@ -7373,7 +7373,7 @@
 }
 
 .service-status.inactive {
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: #6b7280;
 }
 
@@ -7425,7 +7425,7 @@
 }
 
 .service-action-button.deactivate {
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: #6b7280;
 }
 
@@ -7467,7 +7467,7 @@
     justify-content: center;
     margin-bottom: 15px;
     border-radius: 50%;
-    background: #f5f8f5;
+    background: #F5F5F5;
     color: #aab4ae;
     font-size: 25px;
 }
@@ -7548,7 +7548,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(15, 23, 42, 0.52);
+    background: rgba(37, 37, 37, 0.52);
     backdrop-filter: blur(3px);
 }
 
@@ -7558,7 +7558,7 @@
     overflow: hidden;
     border-radius: 14px;
     background: #ffffff;
-    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 25px 70px rgba(37, 37, 37, 0.2);
     animation: serviceModalIn 0.2s ease;
 }
 
@@ -7597,7 +7597,7 @@
 
 .service-modal-header h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 18px;
     font-weight: 800;
 }
@@ -7610,7 +7610,7 @@
     justify-content: center;
     border: none;
     border-radius: 7px;
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: #6b7280;
     cursor: pointer;
     transition: 0.18s ease;
@@ -7618,7 +7618,7 @@
 
 .service-modal-header>button:hover {
     background: #e5e7eb;
-    color: #1f2937;
+    color: #303030;
 }
 
 .service-modal-body {
@@ -7649,7 +7649,7 @@
     border-radius: 8px;
     outline: none;
     background: #ffffff;
-    color: #1f2937;
+    color: #303030;
     font-size: 13px;
     transition: 0.2s ease;
 }
@@ -7670,7 +7670,7 @@
 .service-form-group textarea:focus,
 .service-form-group select:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 .service-form-group input::placeholder,
@@ -7707,7 +7707,7 @@
 }
 
 .service-modal-cancel:hover {
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: #374151;
 }
 
@@ -7759,7 +7759,7 @@
 
 .service-delete-body h4 {
     margin: 0 0 7px;
-    color: #1f2937;
+    color: #303030;
     font-size: 16px;
     font-weight: 800;
 }
@@ -7839,22 +7839,22 @@
 
 .reviews-complaints-page {
     width: 100%;
-    color: #1f2937;
+    color: #303030;
 
-    --green: #16a34a;
-    --green-dark: #15803d;
-    --green-light: #f0fdf4;
+    --green: #FF6900;
+    --green-dark: #F45B00;
+    --green-light: #F5F5F5;
 
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --orange-light: #fff7ed;
+    --orange: #FF6900;
+    --orange-dark: #FF6900;
+    --orange-light: #F5F5F5;
 
     --red: #dc2626;
     --red-dark: #b91c1c;
     --red-light: #fef2f2;
 
     --gray: #6b7280;
-    --gray-light: #f3f4f6;
+    --gray-light: #F5F5F5;
 
     --border: #e5e7eb;
 }
@@ -7876,7 +7876,7 @@
 
 .reviews-page-header h2 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 28px;
     font-weight: 800;
 }
@@ -7905,7 +7905,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .reviews-summary-icon {
@@ -7949,7 +7949,7 @@
 
 .reviews-summary-card strong {
     display: block;
-    color: #17251d;
+    color: #303030;
     font-size: 25px;
     font-weight: 800;
 }
@@ -7965,7 +7965,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.03);
 }
 
 .reviews-search-box {
@@ -7990,13 +7990,13 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     outline: none;
-    color: #1f2937;
+    color: #303030;
     font-size: 13px;
 }
 
 .reviews-search-box input:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 .reviews-filter-box {
@@ -8026,7 +8026,7 @@
 
 .reviews-filter-box select:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 /* TABLE */
@@ -8036,7 +8036,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .reviews-table-header {
@@ -8050,7 +8050,7 @@
 
 .reviews-table-header h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 16px;
     font-weight: 800;
 }
@@ -8095,7 +8095,7 @@
 
 .reviews-table tbody td {
     padding: 15px 16px;
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
     vertical-align: middle;
     color: #4b5563;
     font-size: 12px;
@@ -8106,7 +8106,7 @@
 }
 
 .reviews-table tbody tr:hover {
-    background: #fbfefb;
+    background: #F5F5F5;
 }
 
 .feedback-id {
@@ -8193,8 +8193,8 @@
 }
 
 .status-progress {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .status-rejected {
@@ -8280,7 +8280,7 @@
     justify-content: center;
     margin-bottom: 15px;
     border-radius: 50%;
-    background: #f5f8f5;
+    background: #F5F5F5;
     color: #aab4ae;
     font-size: 25px;
 }
@@ -8361,7 +8361,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(15, 23, 42, 0.52);
+    background: rgba(37, 37, 37, 0.52);
     backdrop-filter: blur(3px);
 }
 
@@ -8372,7 +8372,7 @@
     overflow-y: auto;
     border-radius: 14px;
     background: #ffffff;
-    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 25px 70px rgba(37, 37, 37, 0.2);
     animation: reviewsModalIn 0.2s ease;
 }
 
@@ -8411,7 +8411,7 @@
 
 .reviews-modal-header h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 18px;
     font-weight: 800;
 }
@@ -8424,14 +8424,14 @@
     justify-content: center;
     border: none;
     border-radius: 7px;
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: #6b7280;
     cursor: pointer;
 }
 
 .reviews-modal-header>button:hover {
     background: #e5e7eb;
-    color: #1f2937;
+    color: #303030;
 }
 
 .reviews-modal-body {
@@ -8446,7 +8446,7 @@
 
 .reviews-detail-item {
     padding: 13px;
-    border: 1px solid #edf0ee;
+    border: 1px solid #F5F5F5;
     border-radius: 9px;
     background: #fafcfb;
 }
@@ -8509,7 +8509,7 @@
 
 .reviews-form-group select:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 .reviews-modal-footer {
@@ -8540,7 +8540,7 @@
 }
 
 .reviews-modal-cancel:hover {
-    background: #f3f4f6;
+    background: #F5F5F5;
 }
 
 .reviews-modal-primary {
@@ -8591,7 +8591,7 @@
 
 .reviews-delete-body h4 {
     margin: 0 0 7px;
-    color: #1f2937;
+    color: #303030;
     font-size: 16px;
     font-weight: 800;
 }
@@ -8674,25 +8674,25 @@
 
 .reports-analytics-page {
     width: 100%;
-    color: #1f2937;
+    color: #303030;
 
-    --green: #16a34a;
-    --green-dark: #15803d;
-    --green-light: #f0fdf4;
+    --green: #FF6900;
+    --green-dark: #F45B00;
+    --green-light: #F5F5F5;
 
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --orange-light: #fff7ed;
+    --orange: #FF6900;
+    --orange-dark: #FF6900;
+    --orange-light: #F5F5F5;
 
     --red: #dc2626;
     --red-dark: #b91c1c;
     --red-light: #fef2f2;
 
-    --blue: #2563eb;
-    --blue-light: #eff6ff;
+    --blue: #FF6900;
+    --blue-light: #F5F5F5;
 
     --gray: #6b7280;
-    --gray-light: #f3f4f6;
+    --gray-light: #F5F5F5;
 
     --border: #e5e7eb;
 }
@@ -8714,7 +8714,7 @@
 
 .reports-page-header h2 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 28px;
     font-weight: 800;
 }
@@ -8743,7 +8743,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .reports-summary-icon {
@@ -8777,7 +8777,7 @@
 
 .reports-summary-card strong {
     display: block;
-    color: #17251d;
+    color: #303030;
     font-size: 25px;
     font-weight: 800;
 }
@@ -8797,7 +8797,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .reports-analytics-card-header {
@@ -8820,7 +8820,7 @@
 
 .reports-analytics-card-header h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 16px;
     font-weight: 800;
 }
@@ -8870,7 +8870,7 @@
     justify-content: center;
     margin-bottom: 12px;
     border-radius: 50%;
-    background: #f5f8f5;
+    background: #F5F5F5;
     color: #aab4ae;
     font-size: 20px;
 }
@@ -8899,7 +8899,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.03);
 }
 
 .reports-search-box {
@@ -8924,13 +8924,13 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     outline: none;
-    color: #1f2937;
+    color: #303030;
     font-size: 13px;
 }
 
 .reports-search-box input:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 .reports-filter-box {
@@ -8960,7 +8960,7 @@
 
 .reports-filter-box select:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 /* TABLE */
@@ -8970,7 +8970,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     background: #ffffff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .reports-table-header {
@@ -8984,7 +8984,7 @@
 
 .reports-table-header h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 16px;
     font-weight: 800;
 }
@@ -9029,7 +9029,7 @@
 
 .reports-table tbody td {
     padding: 15px 17px;
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
     vertical-align: middle;
     color: #4b5563;
     font-size: 12px;
@@ -9040,7 +9040,7 @@
 }
 
 .reports-table tbody tr:hover {
-    background: #fbfefb;
+    background: #F5F5F5;
 }
 
 .report-id {
@@ -9213,7 +9213,7 @@
     justify-content: center;
     margin-bottom: 15px;
     border-radius: 50%;
-    background: #f5f8f5;
+    background: #F5F5F5;
     color: #aab4ae;
     font-size: 25px;
 }
@@ -9331,27 +9331,27 @@
 
 /* =========================================================
    NOTIFICATIONS - SMART HOME ADMIN DASHBOARD
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 .admin-management-page {
-    --primary: #16a34a;
-    --primary-dark: #15803d;
-    --primary-light: #f0fdf4;
+    --primary: #FF6900;
+    --primary-dark: #F45B00;
+    --primary-light: #F5F5F5;
 
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --orange-light: #fff7ed;
+    --orange: #FF6900;
+    --orange-dark: #FF6900;
+    --orange-light: #F5F5F5;
 
     --danger: #dc2626;
     --danger-light: #fef2f2;
 
-    --text: #1f2937;
+    --text: #6B6B6B;
     --text-secondary: #6b7280;
     --text-muted: #9ca3af;
 
     --border: #e5e7eb;
-    --background: #f7faf7;
+    --background: #F5F5F5;
     --white: #ffffff;
 
     width: 100%;
@@ -9451,14 +9451,14 @@
     border: 1px solid var(--border);
     border-radius: 12px;
 
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+    box-shadow: 0 2px 8px rgba(37, 37, 37, 0.04);
 
     transition: 0.2s ease;
 }
 
 .admin-management-summary-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.07);
+    box-shadow: 0 6px 18px rgba(37, 37, 37, 0.07);
 }
 
 .admin-summary-icon {
@@ -9485,12 +9485,12 @@
 }
 
 .admin-management-summary-card:nth-child(3) .admin-summary-icon {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-management-summary-card:nth-child(4) .admin-summary-icon {
-    background: #fff7ed;
+    background: #F5F5F5;
     color: var(--orange-dark);
 }
 
@@ -9529,7 +9529,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
 
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.03);
+    box-shadow: 0 2px 8px rgba(37, 37, 37, 0.03);
 }
 
 .admin-search-box {
@@ -9575,7 +9575,7 @@
 
 .admin-search-box input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
 }
 
 .admin-filter-group {
@@ -9614,7 +9614,7 @@
 
 .admin-filter-group select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
 }
 
 
@@ -9629,7 +9629,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
 
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+    box-shadow: 0 2px 8px rgba(37, 37, 37, 0.04);
 }
 
 .admin-table-header {
@@ -9693,7 +9693,7 @@
 .admin-management-table thead th {
     padding: 13px 18px;
 
-    background: #fafcf9;
+    background: #F5F5F5;
     border-bottom: 1px solid var(--border);
 
     color: var(--text-secondary);
@@ -9710,7 +9710,7 @@
 .admin-management-table tbody td {
     padding: 15px 18px;
 
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
 
     color: var(--text);
     font-size: 13px;
@@ -9727,15 +9727,15 @@
 }
 
 .admin-management-table tbody tr:hover {
-    background: #fbfefb;
+    background: #F5F5F5;
 }
 
 .admin-management-table tbody tr.notification-unread-row {
-    background: #f0fdf4;
+    background: #F5F5F5;
 }
 
 .admin-management-table tbody tr.notification-unread-row:hover {
-    background: #eaf9ee;
+    background: #F5F5F5;
 }
 
 
@@ -9767,7 +9767,7 @@
 }
 
 .notification-type-booking {
-    background: #fff7ed;
+    background: #F5F5F5;
     color: var(--orange);
 }
 
@@ -9777,8 +9777,8 @@
 }
 
 .notification-type-user {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .notification-type-complaint {
@@ -9787,7 +9787,7 @@
 }
 
 .notification-type-system {
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: #4b5563;
 }
 
@@ -10051,7 +10051,7 @@
 
     padding: 20px;
 
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(37, 37, 37, 0.5);
 
     backdrop-filter: blur(3px);
 }
@@ -10065,7 +10065,7 @@
     background: var(--white);
     border-radius: 14px;
 
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 20px 50px rgba(37, 37, 37, 0.2);
 
     animation: notificationModalIn 0.2s ease;
 }
@@ -10141,7 +10141,7 @@
     border: none;
     border-radius: 7px;
 
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: var(--text-secondary);
 
     cursor: pointer;
@@ -10177,7 +10177,7 @@
     border: 1px solid var(--border);
     border-radius: 9px;
 
-    background: #fafcf9;
+    background: #F5F5F5;
 }
 
 .admin-detail-item.full {
@@ -10381,27 +10381,27 @@
 /* =========================================================
    ADMIN PROFILE
    SmartHome Admin Dashboard
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 .admin-profile-page {
-    --primary: #16a34a;
-    --primary-dark: #15803d;
-    --primary-light: #f0fdf4;
+    --primary: #FF6900;
+    --primary-dark: #F45B00;
+    --primary-light: #F5F5F5;
 
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --orange-light: #fff7ed;
+    --orange: #FF6900;
+    --orange-dark: #FF6900;
+    --orange-light: #F5F5F5;
 
     --danger: #dc2626;
     --danger-light: #fef2f2;
 
-    --text: #1f2937;
+    --text: #6B6B6B;
     --text-secondary: #6b7280;
     --text-muted: #9ca3af;
 
     --border: #e5e7eb;
-    --background: #f7faf7;
+    --background: #F5F5F5;
     --white: #ffffff;
 
     width: 100%;
@@ -10511,7 +10511,7 @@
     border: 1px solid var(--border);
     border-radius: 13px;
 
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+    box-shadow: 0 2px 8px rgba(37, 37, 37, 0.04);
 }
 
 .admin-profile-card:nth-child(3) {
@@ -10598,7 +10598,7 @@
     border: 1px solid var(--border);
     border-radius: 9px;
 
-    background: #fafcf9;
+    background: #F5F5F5;
 }
 
 .admin-profile-detail span {
@@ -10678,7 +10678,7 @@
     border-color: var(--primary);
 
     box-shadow:
-        0 0 0 3px rgba(22, 163, 74, 0.1);
+        0 0 0 3px rgba(255, 105, 0, 0.1);
 }
 
 .admin-form-group input::placeholder {
@@ -10766,7 +10766,7 @@
 
     padding: 15px 0;
 
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .admin-profile-account-row:last-child {
@@ -10809,7 +10809,7 @@
 
     border-radius: 8px;
 
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: var(--text-secondary);
 
     font-size: 14px;
@@ -10916,7 +10916,7 @@
     border: 1px solid var(--border);
     border-radius: 13px;
 
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+    box-shadow: 0 2px 8px rgba(37, 37, 37, 0.04);
 
     text-align: center;
 }
@@ -10981,7 +10981,7 @@
 
     padding: 20px;
 
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(37, 37, 37, 0.5);
 
     backdrop-filter: blur(3px);
 }
@@ -10996,7 +10996,7 @@
 
     border-radius: 14px;
 
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 20px 50px rgba(37, 37, 37, 0.2);
 
     animation: adminProfileModalIn 0.2s ease;
 }
@@ -11073,7 +11073,7 @@
     border: none;
     border-radius: 7px;
 
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: var(--text-secondary);
 
     cursor: pointer;
@@ -11146,7 +11146,7 @@
 }
 
 .admin-password-input>button:hover {
-    background: #f3f4f6;
+    background: #F5F5F5;
     color: var(--primary);
 }
 
@@ -11247,27 +11247,27 @@
 /* =========================================================
    SYSTEM SETTINGS
    SmartHome Admin Dashboard
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 .admin-settings-page {
-    --primary: #16a34a;
-    --primary-dark: #15803d;
-    --primary-light: #f0fdf4;
+    --primary: #FF6900;
+    --primary-dark: #F45B00;
+    --primary-light: #F5F5F5;
 
-    --orange: #f97316;
-    --orange-dark: #ea580c;
-    --orange-light: #fff7ed;
+    --orange: #FF6900;
+    --orange-dark: #FF6900;
+    --orange-light: #F5F5F5;
 
     --danger: #dc2626;
     --danger-light: #fef2f2;
 
-    --text: #1f2937;
+    --text: #6B6B6B;
     --text-secondary: #6b7280;
     --text-muted: #9ca3af;
 
     --border: #e5e7eb;
-    --background: #f7faf7;
+    --background: #F5F5F5;
     --white: #ffffff;
 
     width: 100%;
@@ -11344,7 +11344,7 @@
     margin-bottom: 20px;
     padding: 14px 16px;
 
-    border: 1px solid #bbf7d0;
+    border: 1px solid #F5F5F5;
     border-radius: 10px;
 
     background: var(--primary-light);
@@ -11403,7 +11403,7 @@
     border-radius: 13px;
 
     box-shadow:
-        0 2px 8px rgba(16, 24, 40, 0.04);
+        0 2px 8px rgba(37, 37, 37, 0.04);
 }
 
 .admin-coverage-settings {
@@ -11423,13 +11423,13 @@
 }
 
 .admin-coverage-status.configured {
-    background: #dcfce7;
-    color: #15803d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-coverage-status.unconfigured {
-    background: #ffedd5;
-    color: #c2410c;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-coverage-form {
@@ -11511,8 +11511,8 @@
 }
 
 .admin-coverage-message.success {
-    background: #f0fdf4;
-    color: #15803d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-settings-card-header {
@@ -11555,8 +11555,8 @@
 }
 
 .admin-settings-card:nth-child(4) .admin-settings-card-icon {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-settings-card-header h3 {
@@ -11595,7 +11595,7 @@
 
     padding: 17px 0;
 
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .admin-setting-row:last-child {
@@ -11693,7 +11693,7 @@
     background: var(--white);
 
     box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.2);
+        0 1px 3px rgba(37, 37, 37, 0.2);
 
     transition:
         transform 0.2s ease;
@@ -11701,7 +11701,7 @@
 
 .admin-toggle:hover {
     box-shadow:
-        0 0 0 3px rgba(22, 163, 74, 0.08);
+        0 0 0 3px rgba(255, 105, 0, 0.08);
 }
 
 .admin-toggle.active {
@@ -11734,7 +11734,7 @@
 
     padding: 15px 0;
 
-    border-bottom: 1px solid #f0f2f1;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .admin-system-info-row:last-child {
@@ -11844,7 +11844,7 @@
 
 .admin-toggle:focus-visible,
 .admin-settings-actions button:focus-visible {
-    outline: 3px solid rgba(22, 163, 74, 0.2);
+    outline: 3px solid rgba(255, 105, 0, 0.2);
     outline-offset: 2px;
 }
 
@@ -11943,7 +11943,7 @@
     justify-content: space-between;
     gap: 18px;
     padding: 25px 28px 22px;
-    border-bottom: 1px solid #edf1f4;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .admin-create-account-heading {
@@ -11960,15 +11960,15 @@
     height: 48px;
     flex: 0 0 48px;
     border-radius: 14px;
-    background: #eaf8ef;
-    color: #168346;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 21px;
 }
 
 .admin-create-account-eyebrow {
     display: block;
     margin-bottom: 5px;
-    color: #168346;
+    color: #303030;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.1px;
@@ -11976,7 +11976,7 @@
 
 .admin-create-account-header h3 {
     margin: 0;
-    color: #1e293b;
+    color: #303030;
     font-size: 21px;
     font-weight: 750;
     letter-spacing: -0.45px;
@@ -11997,7 +11997,7 @@
     flex: 0 0 34px;
     border: 0;
     border-radius: 9px;
-    background: #f3f5f7;
+    background: #F5F5F5;
     color: #64748b;
     cursor: pointer;
     transition: background 160ms ease, color 160ms ease;
@@ -12005,7 +12005,7 @@
 
 .admin-create-account-close:hover:not(:disabled) {
     background: #e8edf0;
-    color: #1e293b;
+    color: #303030;
 }
 
 .admin-create-account-close:disabled {
@@ -12042,7 +12042,7 @@
     border-radius: 9px;
     outline: none;
     background: #fff;
-    color: #1e293b;
+    color: #303030;
     font: inherit;
     font-size: 13px;
     font-weight: 400;
@@ -12054,9 +12054,9 @@
 }
 
 .admin-create-account-field input:focus {
-    border-color: #28a05d;
-    background: #fcfffd;
-    box-shadow: 0 0 0 3px rgba(40, 160, 93, 0.13);
+    border-color: #303030;
+    background: #F5F5F5;
+    box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.13);
 }
 
 .admin-create-account-field input::placeholder {
@@ -12069,10 +12069,10 @@
     gap: 10px;
     margin-top: 22px;
     padding: 13px 14px;
-    border: 1px solid #dcefe3;
+    border: 1px solid #F5F5F5;
     border-radius: 10px;
-    background: #f5fbf7;
-    color: #21804a;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-create-account-hint > i {
@@ -12110,8 +12110,8 @@
     justify-content: flex-end;
     gap: 10px;
     padding: 17px 28px 21px;
-    border-top: 1px solid #edf1f4;
-    background: #fbfcfd;
+    border-top: 1px solid #F5F5F5;
+    background: #F5F5F5;
     border-radius: 0 0 18px 18px;
 }
 
@@ -12142,17 +12142,17 @@
 }
 
 .admin-create-account-submit {
-    border: 1px solid #168346;
-    background: #168346;
-    color: #fff;
-    box-shadow: 0 2px 5px rgba(22, 131, 70, 0.16);
+    border: 1px solid #FF6900;
+    background: #FF6900;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(255, 105, 0, 0.16);
 }
 
 .admin-create-account-submit:hover:not(:disabled) {
     transform: translateY(-1px);
-    border-color: #116b39;
-    background: #116b39;
-    box-shadow: 0 4px 10px rgba(22, 131, 70, 0.2);
+    border-color: #ffffff;
+    background: #F45B00;
+    box-shadow: 0 4px 10px rgba(255, 105, 0, 0.2);
 }
 
 .admin-create-account-cancel:disabled,
@@ -12229,7 +12229,7 @@
     border: 1px solid #e6ece8;
     border-radius: 18px;
     background: #fff;
-    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+    box-shadow: 0 24px 70px rgba(37, 37, 37, 0.22);
 }
 
 .homeowner-detail-modal .admin-modal-header {
@@ -12239,13 +12239,13 @@
 
 .homeowner-detail-modal .admin-modal-header span {
     margin-bottom: 6px;
-    color: #168346;
+    color: #303030;
     font-size: 10px;
     letter-spacing: 1px;
 }
 
 .homeowner-detail-modal .admin-modal-header h3 {
-    color: #1f2937;
+    color: #303030;
     font-size: 21px;
     letter-spacing: -0.35px;
 }
@@ -12262,9 +12262,9 @@
     gap: 15px;
     margin: 22px 28px 18px;
     padding: 19px;
-    border: 1px solid #dcefe3;
+    border: 1px solid #F5F5F5;
     border-radius: 14px;
-    background: linear-gradient(120deg, #f0faf3, #fbfefc 75%);
+    background: linear-gradient(120deg, #F5F5F5, #F5F5F5 75%);
 }
 
 .homeowner-detail-avatar {
@@ -12275,9 +12275,9 @@
     place-items: center;
     border: 4px solid #fff;
     border-radius: 50%;
-    background: linear-gradient(135deg, #168346, #35ae6a);
+    background: linear-gradient(135deg, #FF6900, #FF6900);
     color: #fff;
-    box-shadow: 0 3px 10px rgba(22, 131, 70, 0.18);
+    box-shadow: 0 3px 10px rgba(255, 105, 0, 0.18);
     font-size: 23px;
 }
 
@@ -12287,7 +12287,7 @@
 
 .homeowner-detail-identity h4 {
     margin: 0 0 7px;
-    color: #1f2937;
+    color: #303030;
     font-size: 18px;
     font-weight: 700;
     letter-spacing: -0.25px;
@@ -12299,10 +12299,10 @@
     align-items: center;
     gap: 7px;
     padding: 5px 9px;
-    border: 1px solid #ccebd6;
+    border: 1px solid #F5F5F5;
     border-radius: 999px;
     background: #fff;
-    color: #168346;
+    color: #303030;
     font-size: 11px;
     font-weight: 650;
 }
@@ -12335,8 +12335,8 @@
 }
 
 .homeowner-detail-item:hover {
-    border-color: #ccebd6;
-    background: #fcfefc;
+    border-color: #F5F5F5;
+    background: #F5F5F5;
 }
 
 .homeowner-detail-item > i {
@@ -12346,8 +12346,8 @@
     flex: 0 0 36px;
     place-items: center;
     border-radius: 10px;
-    background: #eff8f2;
-    color: #168346;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 15px;
 }
 
@@ -12377,7 +12377,7 @@
 .homeowner-detail-modal .admin-modal-footer {
     gap: 10px;
     padding: 16px 28px 20px;
-    border-top: 1px solid #edf1ee;
+    border-top: 1px solid #F5F5F5;
     background: #fbfcfb;
 }
 
@@ -12389,14 +12389,14 @@
 }
 
 .homeowner-detail-modal .admin-modal-primary-button {
-    border-color: #168346;
-    background: #168346;
-    box-shadow: 0 2px 5px rgba(22, 131, 70, 0.15);
+    border-color: #ffffff;
+    background: #FF6900;
+    box-shadow: 0 2px 5px rgba(255, 105, 0, 0.15);
 }
 
 .homeowner-detail-modal .admin-modal-primary-button:hover {
-    border-color: #116b39;
-    background: #116b39;
+    border-color: #ffffff;
+    background: #F45B00;
     transform: translateY(-1px);
 }
 
@@ -12445,10 +12445,10 @@
 .booking-insights-date-note {
     flex: 0 0 auto;
     padding: 8px 12px;
-    border: 1px solid #dcefe3;
+    border: 1px solid #F5F5F5;
     border-radius: 999px;
-    background: #f5fbf7;
-    color: #21804a;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 11px;
     font-weight: 650;
 }
@@ -12505,7 +12505,7 @@
     border: 1px solid #e7ece9;
     border-radius: 14px;
     background: #fff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .booking-insights-kpi-icon,
@@ -12524,20 +12524,20 @@
 
 .booking-insights-kpi-icon.green,
 .booking-insights-panel-icon.green {
-    background: #eff9f2;
-    color: #168346;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-insights-kpi-icon.orange,
 .booking-insights-panel-icon.orange {
-    background: #fff5eb;
-    color: #e87918;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-insights-kpi-icon.blue,
 .booking-insights-panel-icon.blue {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-insights-kpi > div {
@@ -12555,7 +12555,7 @@
     display: block;
     margin-top: 3px;
     overflow: hidden;
-    color: #1f2937;
+    color: #303030;
     font-size: 20px;
     font-weight: 750;
     text-overflow: ellipsis;
@@ -12579,7 +12579,7 @@
     border: 1px solid #e7ece9;
     border-radius: 14px;
     background: #fff;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 3px 12px rgba(37, 37, 37, 0.04);
 }
 
 .booking-insights-panel-heading {
@@ -12588,12 +12588,12 @@
     justify-content: space-between;
     gap: 14px;
     padding: 20px 21px 17px;
-    border-bottom: 1px solid #edf1ee;
+    border-bottom: 1px solid #F5F5F5;
 }
 
 .booking-insights-panel-heading h3 {
     margin: 0;
-    color: #17251d;
+    color: #303030;
     font-size: 16px;
     font-weight: 750;
 }
@@ -12677,7 +12677,7 @@
 
 .booking-season-label strong {
     flex: 0 0 auto;
-    color: #26352d;
+    color: #303030;
     font-weight: 700;
 }
 
@@ -12686,7 +12686,7 @@
     height: 9px;
     overflow: hidden;
     border-radius: 999px;
-    background: #f0f3f1;
+    background: #F5F5F5;
 }
 
 .booking-insights-fill {
@@ -12698,11 +12698,11 @@
 }
 
 .booking-insights-fill.orange {
-    background: linear-gradient(90deg, #f8a44b, #ed7417);
+    background: linear-gradient(90deg, #FF6900, #FF6900);
 }
 
 .booking-insights-fill.green {
-    background: linear-gradient(90deg, #45b978, #168346);
+    background: linear-gradient(90deg, #FF6900, #FF6900);
 }
 
 .booking-season-highlights {
@@ -12711,14 +12711,14 @@
     gap: 10px 18px;
     margin-top: 4px;
     padding-top: 15px;
-    border-top: 1px solid #edf1ee;
+    border-top: 1px solid #F5F5F5;
     color: #718096;
     font-size: 11px;
 }
 
 .booking-season-highlights i {
     margin-right: 5px;
-    color: #168346;
+    color: #303030;
 }
 
 .booking-season-highlights strong {
@@ -12728,7 +12728,7 @@
 .booking-monthly-distribution {
     margin: 0 21px 20px;
     padding-top: 15px;
-    border-top: 1px solid #edf1ee;
+    border-top: 1px solid #F5F5F5;
 }
 
 .booking-monthly-distribution-heading,
@@ -12780,14 +12780,14 @@
     height: 7px;
     overflow: hidden;
     border-radius: 999px;
-    background: #edf1ee;
+    background: #F5F5F5;
 }
 
 .booking-monthly-distribution-track > span {
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #f8a44b, #ed7417);
+    background: linear-gradient(90deg, #FF6900, #FF6900);
     transition: width 180ms ease;
 }
 
@@ -12808,8 +12808,8 @@
     flex: 0 0 30px;
     place-items: center;
     border-radius: 9px;
-    background: #f2f7f3;
-    color: #168346;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 10px;
     font-weight: 750;
 }
@@ -12852,7 +12852,7 @@
     align-items: flex-end;
     overflow: hidden;
     border-radius: 7px 7px 2px 2px;
-    background: #f6f8f7;
+    background: #F5F5F5;
 }
 
 .booking-forecast-bar {
@@ -12863,16 +12863,16 @@
 }
 
 .booking-forecast-bar.actual {
-    background: linear-gradient(180deg, #49b878, #168346);
+    background: linear-gradient(180deg, #FF6900, #FF6900);
 }
 
 .booking-forecast-bar.forecast {
     background: repeating-linear-gradient(
         135deg,
-        #72a6f8,
-        #72a6f8 5px,
-        #a9c8fc 5px,
-        #a9c8fc 10px
+        #FF6900,
+        #FF6900 5px,
+        #FF6900 5px,
+        #FF6900 10px
     );
 }
 
@@ -12908,11 +12908,11 @@
 }
 
 .booking-forecast-legend i.actual {
-    background: #168346;
+    background: #FF6900;
 }
 
 .booking-forecast-legend i.forecast {
-    background: #72a6f8;
+    background: #FF6900;
 }
 
 .booking-insights-empty {
@@ -12933,7 +12933,7 @@
 }
 
 .booking-forecast-empty > i {
-    color: #e87918;
+    color: #303030;
     font-size: 23px;
 }
 
@@ -13037,8 +13037,8 @@
     padding: 7px 12px;
     border: 1px solid #d8eadd;
     border-radius: 9px;
-    background: #f5fbf7;
-    color: #168346;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
@@ -13075,21 +13075,21 @@
 }
 
 .booking-forecast-reliability.limited {
-    border-color: #fed7aa;
-    background: #fff7ed;
-    color: #c2410c;
+    border-color: #303030;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-forecast-reliability.moderate {
-    border-color: #fde68a;
-    background: #fffbeb;
-    color: #a16207;
+    border-color: #303030;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-forecast-reliability.sufficient {
-    border-color: #bbf7d0;
-    background: #f0fdf4;
-    color: #15803d;
+    border-color: #F5F5F5;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-forecast-model-status {
@@ -13123,24 +13123,24 @@
 }
 
 .booking-forecast-model-status.forecast_generated {
-    border-color: #bbf7d0;
-    background: #f0fdf4;
-    color: #15803d;
+    border-color: #F5F5F5;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-forecast-model-status.forecast_generated .booking-forecast-status-indicator {
-    background: #16a34a;
+    background: #FF6900;
 }
 
 .booking-forecast-model-status.insufficient_data {
-    border-color: #fde68a;
-    background: #fffbeb;
-    color: #a16207;
+    border-color: #303030;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-forecast-model-status.insufficient_data .booking-forecast-status-indicator,
 .booking-forecast-model-status.model_error .booking-forecast-status-indicator {
-    background: #d97706;
+    background: #FF6900;
 }
 
 .booking-forecast-model-status.model_error {
@@ -13154,13 +13154,13 @@
 }
 
 .booking-forecast-model-status.coverage_unconfigured {
-    border-color: #fed7aa;
-    background: #fff7ed;
-    color: #c2410c;
+    border-color: #303030;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .booking-forecast-model-status.coverage_unconfigured .booking-forecast-status-indicator {
-    background: #ea580c;
+    background: #FF6900;
 }
 
 .booking-forecast-data-availability {
@@ -13171,7 +13171,7 @@
     padding: 12px 14px;
     border: 1px solid #e8eeeb;
     border-radius: 11px;
-    background: #fbfdfc;
+    background: #F5F5F5;
     color: #344054;
     font-size: 11px;
 }
@@ -13188,7 +13188,7 @@
 
 .booking-forecast-data-availability b {
     margin-left: 4px;
-    color: #1f2937;
+    color: #303030;
 }
 
 .booking-forecast-data-availability small {
@@ -13201,10 +13201,10 @@
     align-items: flex-start;
     gap: 8px;
     padding: 9px 10px;
-    border: 1px solid #fed7aa;
+    border: 1px solid #FF6900;
     border-radius: 8px;
-    background: #fff7ed;
-    color: #9a3412;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 10px;
     line-height: 1.5;
 }
@@ -13218,7 +13218,7 @@
     padding: 14px;
     border: 1px solid #e8eeeb;
     border-radius: 11px;
-    background: #fbfdfc;
+    background: #F5F5F5;
 }
 
 .booking-demand-insights-header {
@@ -13230,7 +13230,7 @@
 
 .booking-demand-insights-header h4 {
     margin: 0 0 4px;
-    color: #1f2937;
+    color: #303030;
     font-size: 14px;
     font-weight: 700;
 }
@@ -13247,8 +13247,8 @@
     flex: 0 0 auto;
     padding: 4px 8px;
     border-radius: 20px;
-    background: #edf5f0;
-    color: #28714a;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 9px;
     font-weight: 700;
 }
@@ -13278,7 +13278,7 @@
 
 .booking-demand-insights-grid article > strong {
     overflow: hidden;
-    color: #1f2937;
+    color: #303030;
     font-size: 17px;
     font-weight: 750;
     text-overflow: ellipsis;
@@ -13335,21 +13335,21 @@
 }
 
 .booking-status-distribution-track > .status-pending {
-    background: #eab308;
+    background: #FF6900;
 }
 
 .booking-status-distribution-track > .status-matched,
 .booking-status-distribution-track > .status-accepted {
-    background: #3b82f6;
+    background: #FF6900;
 }
 
 .booking-status-distribution-track > .status-on-the-way,
 .booking-status-distribution-track > .status-in-progress {
-    background: #8b5cf6;
+    background: #FF6900;
 }
 
 .booking-status-distribution-track > .status-completed {
-    background: #22a06b;
+    background: #FF6900;
 }
 
 .booking-status-distribution-track > .status-cancelled,
@@ -13371,7 +13371,7 @@
     padding: 11px 13px;
     border: 1px solid #e8eeeb;
     border-radius: 9px;
-    background: #fbfdfc;
+    background: #F5F5F5;
     color: #667085;
     font-size: 10px;
     line-height: 1.55;
@@ -13429,7 +13429,7 @@
     padding: 14px;
     border: 1px solid #e8eeeb;
     border-radius: 11px;
-    background: #fbfdfc;
+    background: #F5F5F5;
 }
 
 .booking-forecast-model-information > span {
@@ -13458,7 +13458,7 @@
     padding: 12px 14px;
     border: 1px solid #e8eeeb;
     border-radius: 11px;
-    background: #fbfdfc;
+    background: #F5F5F5;
 }
 
 .booking-forecast-summary article > span,
@@ -13472,7 +13472,7 @@
     display: block;
     margin: 4px 0 2px;
     overflow: hidden;
-    color: #1f2937;
+    color: #303030;
     font-size: 17px;
     font-weight: 750;
     text-overflow: ellipsis;
@@ -13505,13 +13505,13 @@
 }
 
 .booking-forecast-gridline {
-    stroke: #edf1ee;
+    stroke: #F5F5F5;
     stroke-dasharray: 4 5;
     stroke-width: 1;
 }
 
 .booking-forecast-confidence-area {
-    fill: rgba(93, 150, 239, 0.18);
+    fill: rgba(255, 105, 0, 0.18);
     stroke: none;
 }
 
@@ -13524,11 +13524,11 @@
 }
 
 .booking-forecast-line.actual {
-    stroke: #168346;
+    stroke: #FF6900;
 }
 
 .booking-forecast-line.forecast {
-    stroke: #397de0;
+    stroke: #FF6900;
     stroke-dasharray: 7 5;
 }
 
@@ -13539,11 +13539,11 @@
 }
 
 .booking-forecast-point.actual {
-    fill: #168346;
+    fill: #FF6900;
 }
 
 .booking-forecast-point.forecast {
-    fill: #397de0;
+    fill: #FF6900;
 }
 
 .booking-forecast-axis-label {
@@ -13556,7 +13556,7 @@
     padding: 14px 14px 10px;
     border: 1px solid #e8eeeb;
     border-radius: 11px;
-    background: #fbfdfc;
+    background: #F5F5F5;
 }
 
 .booking-weekly-activity-header {
@@ -13568,7 +13568,7 @@
 
 .booking-weekly-activity-header h4 {
     margin: 0 0 4px;
-    color: #1f2937;
+    color: #303030;
     font-size: 14px;
     font-weight: 700;
 }
@@ -13584,8 +13584,8 @@
 .booking-weekly-activity-header > span {
     padding: 4px 8px;
     border-radius: 20px;
-    background: #edf5f0;
-    color: #28714a;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 9px;
     font-weight: 700;
 }
@@ -13599,7 +13599,7 @@
 }
 
 .booking-weekly-activity-gridline {
-    stroke: #edf1ee;
+    stroke: #F5F5F5;
     stroke-dasharray: 4 5;
     stroke-width: 1;
 }
@@ -13616,7 +13616,7 @@
 }
 
 .booking-weekly-activity-bar {
-    fill: #5797f5;
+    fill: #FF6900;
 }
 
 .booking-weekly-activity-bar.unverified {
@@ -13624,11 +13624,11 @@
 }
 
 .booking-weekly-activity-zero {
-    fill: #5797f5;
+    fill: #FF6900;
 }
 
 .booking-weekly-activity-unverified {
-    fill: #f5f7f6;
+    fill: #F5F5F5;
     stroke: #a7b2ac;
     stroke-dasharray: 3 2;
     stroke-width: 1;
@@ -13645,7 +13645,7 @@
 }
 
 .booking-forecast-legend i.confidence {
-    background: rgba(93, 150, 239, 0.35);
+    background: rgba(255, 105, 0, 0.35);
 }
 
 .booking-forecast-accuracy {
@@ -13657,7 +13657,7 @@
     padding: 14px 15px;
     border: 1px solid #e8eeeb;
     border-radius: 11px;
-    background: #fbfdfc;
+    background: #F5F5F5;
     color: #64748b;
     font-size: 10px;
 }
@@ -13680,7 +13680,7 @@
 
 .booking-forecast-accuracy > span strong {
     margin-left: 3px;
-    color: #26352d;
+    color: #303030;
     font-size: 11px;
 }
 
@@ -13691,7 +13691,7 @@
 }
 
 .booking-forecast-accuracy > small.caution {
-    color: #a16207;
+    color: #303030;
 }
 
 .booking-forecast-accuracy > small.poor {
@@ -13713,7 +13713,7 @@
     gap: 12px;
     padding: 12px 14px;
     border-bottom: 1px solid #e8eeeb;
-    background: #fbfdfc;
+    background: #F5F5F5;
 }
 
 .booking-forecast-validation-heading strong {
@@ -13739,7 +13739,7 @@
 .booking-forecast-validation-table th,
 .booking-forecast-validation-table td {
     padding: 9px 13px;
-    border-bottom: 1px solid #edf1ee;
+    border-bottom: 1px solid #F5F5F5;
     color: #475467;
     text-align: right;
     white-space: nowrap;
@@ -13861,7 +13861,7 @@
 /* Bootstrap-based homeowner and provider management pages */
 .admin-management-page,
 .providers-management {
-    color: #172033;
+    color: #303030;
 }
 
 .admin-management-page .admin-management-header,
@@ -13872,14 +13872,14 @@
     border-radius: 16px;
     background:
         radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.42), transparent 25%),
-        linear-gradient(120deg, #eaf8f0 0%, #f8fbf9 58%, #fff5eb 100%);
+        linear-gradient(120deg, #F5F5F5 0%, #FFFFFF 58%, #F5F5F5 100%);
     align-items: center;
 }
 
 .admin-management-page .admin-section-label,
 .providers-management .providers-section-label {
     margin-bottom: 7px;
-    color: #07875d;
+    color: #303030;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.4px;
@@ -13888,7 +13888,7 @@
 .admin-management-page .admin-management-header h2,
 .providers-management .providers-page-header h2 {
     margin: 0 0 7px;
-    color: #172033;
+    color: #303030;
     font-family: "Inter", "Segoe UI", Arial, sans-serif;
     font-size: clamp(25px, 3vw, 32px);
     font-weight: 750;
@@ -13909,14 +13909,14 @@
     border-radius: 10px;
     font-size: 12px;
     font-weight: 650;
-    box-shadow: 0 5px 12px rgba(5, 150, 105, 0.12);
+    box-shadow: 0 5px 12px rgba(255, 105, 0, 0.12);
 }
 
 .admin-management-page .admin-management-total,
 .providers-management .providers-total-card {
     min-width: 170px;
     padding: 10px 13px;
-    border-color: #dcefe4;
+    border-color: #F5F5F5;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.8);
 }
@@ -13925,8 +13925,8 @@
     width: 40px;
     height: 40px;
     border-radius: 11px;
-    background: #07875d;
-    color: #fff;
+    background: #F45B00;
+    color: #ffffff;
     display: grid;
     place-items: center;
     font-size: 17px;
@@ -13953,14 +13953,14 @@
     border: 1px solid #e8eeea;
     border-radius: 14px;
     background: #fff;
-    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+    box-shadow: 0 5px 16px rgba(37, 37, 37, 0.035);
     transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .admin-homeowner-summary .card:hover,
 .providers-management .providers-summary-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 11px 22px rgba(15, 23, 42, 0.07);
+    box-shadow: 0 11px 22px rgba(37, 37, 37, 0.07);
 }
 
 .admin-homeowner-summary .card-body {
@@ -13979,13 +13979,13 @@
 
 .admin-homeowner-summary-icon.total,
 .admin-homeowner-summary-icon.active {
-    background: #eaf8f0;
-    color: #07875d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-homeowner-summary-icon.inactive {
-    background: #fff3e7;
-    color: #e87516;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-homeowner-summary-label {
@@ -13998,7 +13998,7 @@
 .admin-homeowner-summary-value {
     display: block;
     margin-top: 4px;
-    color: #172033;
+    color: #303030;
     font-size: 24px;
     line-height: 1;
 }
@@ -14010,7 +14010,7 @@
     border: 1px solid #e8eeea;
     border-radius: 14px;
     background: #fff;
-    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.03);
+    box-shadow: 0 5px 16px rgba(37, 37, 37, 0.03);
 }
 
 .admin-management-page .admin-search-box input,
@@ -14029,21 +14029,21 @@
     border: 1px solid #e8eeea;
     border-radius: 15px;
     background: #fff;
-    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+    box-shadow: 0 5px 16px rgba(37, 37, 37, 0.035);
 }
 
 .admin-management-page .admin-management-card-header,
 .providers-management .providers-table-header {
     min-height: 88px;
     padding: 19px 22px;
-    border-bottom-color: #edf1ee;
+    border-bottom-color: #F5F5F5;
     align-items: center;
 }
 
 .admin-management-page .admin-management-card-header h3,
 .providers-management .providers-table-header h3 {
     margin-bottom: 5px;
-    color: #172033;
+    color: #303030;
     font-size: 16px;
     font-weight: 700;
 }
@@ -14059,7 +14059,7 @@
     padding: 7px 11px;
     border: 1px solid #e4ece7;
     border-radius: 999px;
-    background: #f5faf7;
+    background: #F5F5F5;
     color: #475569;
     font-size: 11px;
     font-weight: 600;
@@ -14078,7 +14078,7 @@
 .admin-management-page .admin-management-table thead th,
 .providers-management .providers-table thead th {
     padding: 13px 15px;
-    background: #f7faf8;
+    background: #F5F5F5;
     color: #64748b;
     font-size: 10px;
     font-weight: 750;
@@ -14094,7 +14094,7 @@
 
 .admin-management-page .admin-management-table tbody tr:hover,
 .providers-management .providers-table tbody tr:hover {
-    background-color: #f8fcf9;
+    background-color: #F5F5F5;
 }
 
 .admin-management-page .admin-user-avatar,
@@ -14102,7 +14102,7 @@
     width: 40px;
     height: 40px;
     border: 2px solid #fff;
-    box-shadow: 0 0 0 1px #dcefe4, 0 4px 10px rgba(5, 150, 105, 0.1);
+    box-shadow: 0 0 0 1px #F5F5F5, 0 4px 10px rgba(255, 105, 0, 0.1);
     font-size: 15px;
 }
 
@@ -14143,7 +14143,7 @@
 .providers-management .providers-pagination {
     min-height: 60px;
     padding: 12px 18px;
-    border-top: 1px solid #edf1ee;
+    border-top: 1px solid #F5F5F5;
 }
 
 .admin-management-page .admin-table-no-results,
@@ -14154,7 +14154,7 @@
 
 .admin-management-page .admin-table-no-results i,
 .providers-management .providers-empty-icon {
-    color: #07875d;
+    color: #303030;
 }
 
 .admin-management-page .alert,
@@ -14249,7 +14249,7 @@
 
 .admin-management-page .admin-search-box > i {
     left: 15px;
-    color: #07875d;
+    color: #303030;
 }
 
 .admin-management-page .admin-search-box > button {
@@ -14261,7 +14261,7 @@
     transform: translateY(-50%);
     border: 0;
     border-radius: 50%;
-    background: #f1f5f3;
+    background: #F5F5F5;
     color: #64748b;
     display: grid;
     place-items: center;
@@ -14279,7 +14279,7 @@
     top: 50%;
     left: 14px;
     transform: translateY(-50%);
-    color: #07875d;
+    color: #303030;
     pointer-events: none;
 }
 
@@ -14322,12 +14322,12 @@
     height: 42px;
     border: 0;
     border-radius: 13px;
-    background: linear-gradient(145deg, #07875d, #35b783);
+    background: linear-gradient(145deg, #F45B00, #FF6900);
     color: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 5px 12px rgba(5, 150, 105, 0.16);
+    box-shadow: 0 5px 12px rgba(255, 105, 0, 0.16);
 }
 
 .admin-management-page .admin-user-cell > div:last-child {
@@ -14366,7 +14366,7 @@
 
 .admin-management-page .admin-location-text i {
     flex: 0 0 auto;
-    color: #e87516;
+    color: #303030;
 }
 
 .admin-management-page .admin-location-text {
@@ -14387,13 +14387,13 @@
 }
 
 .admin-management-page .admin-account-status.active {
-    background: #eaf8f0;
-    color: #07875d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-management-page .admin-account-status.inactive {
-    background: #fff3e7;
-    color: #c65e0d;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-management-page .admin-account-status > span {
@@ -14419,14 +14419,14 @@
 
 .admin-management-page .admin-action-button.block {
     border-color: #e2e8f0;
-    background: #f8fafc;
+    background: #F5F5F5;
     color: #475569;
 }
 
 .admin-management-page .admin-action-button.block:hover {
-    border-color: #fed7aa;
-    background: #fff3e7;
-    color: #c65e0d;
+    border-color: #303030;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 @media (max-width: 767.98px) {
@@ -14456,8 +14456,8 @@
     border-radius: 18px;
     background:
         radial-gradient(circle at 92% 10%, rgba(255, 255, 255, 0.8), transparent 30%),
-        linear-gradient(115deg, #eff9f3 0%, #fbfcfa 58%, #fff8f1 100%);
-    box-shadow: 0 8px 24px rgba(22, 52, 39, 0.06) !important;
+        linear-gradient(115deg, #F5F5F5 0%, #fbfcfa 58%, #F5F5F5 100%);
+    box-shadow: 0 8px 24px rgba(37, 37, 37, 0.06) !important;
 }
 
 .admin-management-page .admin-management-header {
@@ -14503,7 +14503,7 @@
     font-size: 12px;
     font-weight: 650;
     white-space: nowrap;
-    box-shadow: 0 5px 13px rgba(5, 120, 83, 0.12);
+    box-shadow: 0 5px 13px rgba(244, 91, 0, 0.12);
     transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
 
@@ -14511,12 +14511,12 @@
 .providers-management .providers-page-header .btn:hover,
 .providers-management .verification-open-button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(5, 120, 83, 0.18);
+    box-shadow: 0 8px 18px rgba(244, 91, 0, 0.18);
 }
 
 .providers-management .verification-open-button {
-    background: #07875d;
-    color: #fff;
+    background: #F45B00;
+    color: #ffffff;
 }
 
 .admin-homeowner-summary {
@@ -14530,7 +14530,7 @@
     min-height: 104px;
     border-color: #e5ece7;
     border-radius: 15px;
-    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.035);
+    box-shadow: 0 5px 18px rgba(37, 37, 37, 0.035);
 }
 
 .admin-homeowner-summary .card-body {
@@ -14592,8 +14592,8 @@
     border: 0;
     background:
         radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.16), transparent 23%),
-        linear-gradient(115deg, #086b4d 0%, #07875d 56%, #119b6c 100%);
-    box-shadow: 0 14px 30px rgba(8, 107, 77, 0.15) !important;
+        linear-gradient(115deg, #F45B00 0%, #F45B00 56%, #FF6900 100%);
+    box-shadow: 0 14px 30px rgba(244, 91, 0, 0.15) !important;
 }
 
 .admin-overview .admin-overview-intro::after {
@@ -14615,7 +14615,7 @@
 }
 
 .admin-overview .admin-overview-intro .admin-section-label {
-    color: #b8f3d4;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-intro h2 {
@@ -14636,7 +14636,7 @@
 }
 
 .admin-overview .admin-overview-date i {
-    color: #b8f3d4;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-summary-grid {
@@ -14651,7 +14651,7 @@
     overflow: hidden;
     border-color: #e6ede8;
     border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(21, 48, 36, 0.045);
+    box-shadow: 0 6px 20px rgba(37, 37, 37, 0.045);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -14662,12 +14662,12 @@
     width: 38px;
     height: 3px;
     border-radius: 0 0 4px 4px;
-    background: #07875d;
+    background: #F45B00;
     content: "";
 }
 
 .admin-overview .admin-overview-summary-column:nth-child(2) .admin-overview-summary-card::before {
-    background: #3b82a0;
+    background: #FF6900;
 }
 
 .admin-overview .admin-overview-summary-column:nth-child(3) .admin-overview-summary-card::before {
@@ -14677,26 +14677,26 @@
 .admin-overview .admin-overview-summary-card:hover {
     transform: translateY(-3px);
     border-color: #cfe5d8;
-    box-shadow: 0 13px 26px rgba(21, 48, 36, 0.085);
+    box-shadow: 0 13px 26px rgba(37, 37, 37, 0.085);
 }
 
 .admin-overview .admin-overview-summary-icon {
     width: 54px;
     height: 54px;
-    border: 1px solid rgba(7, 135, 93, 0.08);
+    border: 1px solid rgba(244, 91, 0, 0.08);
     border-radius: 16px;
-    background: linear-gradient(145deg, #eaf8f0, #dff3e8);
+    background: linear-gradient(145deg, #F5F5F5, #F5F5F5);
 }
 
 .admin-overview .admin-overview-summary-column:nth-child(2) .admin-overview-summary-icon {
-    border-color: rgba(59, 130, 160, 0.1);
-    background: #eaf4f7;
-    color: #347b96;
+    border-color: rgba(255, 105, 0, 0.1);
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-summary-column:nth-child(3) .admin-overview-summary-icon {
     border-color: rgba(111, 143, 84, 0.1);
-    background: #f0f5e9;
+    background: #F5F5F5;
     color: #6f8f54;
 }
 
@@ -14704,7 +14704,7 @@
     position: relative;
     border-color: #e5ece7;
     border-radius: 16px;
-    box-shadow: 0 7px 22px rgba(21, 48, 36, 0.045);
+    box-shadow: 0 7px 22px rgba(37, 37, 37, 0.045);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
@@ -14716,18 +14716,18 @@
     left: 24px;
     height: 3px;
     border-radius: 0 0 4px 4px;
-    background: linear-gradient(90deg, #07875d, rgba(7, 135, 93, 0.12));
+    background: linear-gradient(90deg, #F45B00, rgba(244, 91, 0, 0.12));
     content: "";
 }
 
 .admin-overview .admin-overview-card:hover {
-    box-shadow: 0 12px 30px rgba(21, 48, 36, 0.075);
+    box-shadow: 0 12px 30px rgba(37, 37, 37, 0.075);
 }
 
 .admin-overview .admin-overview-card-header {
     min-height: 98px;
     padding: 22px 24px 18px;
-    border-bottom-color: #edf2ee;
+    border-bottom-color: #F5F5F5;
     background: linear-gradient(180deg, #fff 0%, #fcfdfc 100%);
 }
 
@@ -14737,15 +14737,15 @@
     min-height: 20px;
     padding: 3px 8px;
     border-radius: 6px;
-    background: #edf8f1;
-    color: #07875d;
+    background: #F5F5F5;
+    color: #303030;
     font-size: 9px;
     letter-spacing: 0.9px;
 }
 
 .admin-overview .admin-overview-card-header h3 {
     margin-top: 8px;
-    color: #172f25;
+    color: #303030;
     font-size: 16px;
     font-weight: 720;
 }
@@ -14760,15 +14760,15 @@
     padding: 7px 11px;
     border-color: #dcebe1;
     background: #fff;
-    color: #087c56;
+    color: #303030;
     transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
 .admin-overview .admin-overview-card-header .btn:hover {
     transform: translateY(-1px);
-    border-color: #b8dfc7;
-    background: #f0faf4;
-    color: #066744;
+    border-color: #303030;
+    background: #F5F5F5;
+    color: #303030;
 }
 
 .admin-overview .admin-overview-table-wrapper {
@@ -14781,7 +14781,7 @@
 
 .admin-overview .admin-overview-table thead th {
     padding: 12px 18px;
-    background: #f7faf8;
+    background: #F5F5F5;
     color: #78877f;
     font-size: 9px;
     letter-spacing: 0.65px;
@@ -14798,7 +14798,7 @@
 }
 
 .admin-overview .admin-overview-table tbody tr:hover {
-    background: #f6fbf7;
+    background: #F5F5F5;
 }
 
 .admin-overview .admin-overview-table .badge {
@@ -14809,21 +14809,21 @@
 }
 
 .admin-overview .admin-overview-table .text-bg-success {
-    border-color: #cbead6;
-    background: #eaf8ef !important;
-    color: #18764b !important;
+    border-color: #F5F5F5;
+    background: #F5F5F5 !important;
+    color: #303030 !important;
 }
 
 .admin-overview .admin-overview-table .text-bg-warning {
-    border-color: #f4dfb2;
-    background: #fff6df !important;
-    color: #9a6900 !important;
+    border-color: #303030;
+    background: #F5F5F5 !important;
+    color: #303030 !important;
 }
 
 .admin-overview .admin-overview-table .text-bg-primary {
-    border-color: #d5e5f4;
-    background: #edf5fc !important;
-    color: #356b9b !important;
+    border-color: #F5F5F5;
+    background: #F5F5F5 !important;
+    color: #303030 !important;
 }
 
 .admin-overview .admin-overview-table .text-bg-danger,
@@ -14835,15 +14835,15 @@
 
 .admin-overview .admin-overview-table .btn {
     padding: 5px 11px;
-    border-color: #cde8d7;
-    color: #087c56;
+    border-color: #F5F5F5;
+    color: #303030;
     font-size: 10px;
     font-weight: 650;
 }
 
 .admin-overview .admin-overview-table .btn:hover {
-    background: #07875d;
-    color: #fff;
+    background: #F45B00;
+    color: #ffffff;
 }
 
 .admin-overview .admin-overview-empty {
@@ -14855,9 +14855,9 @@
     width: 48px;
     height: 48px;
     margin-bottom: 10px;
-    border: 1px solid #e1f1e7;
-    background: linear-gradient(145deg, #f1faf4, #e8f6ed);
-    color: #07875d;
+    border: 1px solid #F5F5F5;
+    background: linear-gradient(145deg, #F5F5F5, #F5F5F5);
+    color: #303030;
 }
 
 .admin-overview .admin-overview-empty strong {
