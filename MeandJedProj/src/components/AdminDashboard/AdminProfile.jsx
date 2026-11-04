@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -6,11 +6,11 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { updateMyProfile, updateMySecurity } from "../../services/api";
 
 const defaultProfile = {
-    firstName: "Jedrick",
-    lastName: "Revilla",
-    contactNumber: "+63 912 345 6789",
-    address: "123 Main Street, Manila, Philippines",
-    displayName: "Admin",
+    firstName: "",
+    lastName: "",
+    contactNumber: "",
+    address: "",
+    displayName: "Administrator",
     role: "Administrator",
 };
 
@@ -37,15 +37,15 @@ const formatAccountDate = (value, includeTime = false) => {
 };
 
 const buildInitialProfile = (user) => {
-    const fullName = user?.fullName || defaultProfile.displayName;
+    const fullName = user?.fullName || "Administrator";
     const [firstName, ...lastNameParts] = fullName.split(" ");
 
     return {
         ...defaultProfile,
-        firstName: firstName || defaultProfile.firstName,
-        lastName: lastNameParts.join(" ") || defaultProfile.lastName,
-        contactNumber: user?.mobileNumber || defaultProfile.contactNumber,
-        address: user?.address || defaultProfile.address,
+        firstName: firstName === "Administrator" ? "" : firstName,
+        lastName: lastNameParts.join(" "),
+        contactNumber: user?.mobileNumber || "",
+        address: user?.address || "",
         displayName: fullName,
         role: user?.role === "admin" ? "Administrator" : defaultProfile.role,
         email: user?.email || "Not available",
@@ -65,14 +65,6 @@ function AdminProfile({ user }) {
         newPassword: "",
         confirmPassword: "",
     });
-    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-
-    useEffect(() => {
-        const nextProfile = buildInitialProfile(user);
-        setProfile(nextProfile);
-        setDraft(nextProfile);
-    }, [user]);
-
     const handleInputChange = (field, value) => {
         setDraft((current) => ({
             ...current,
@@ -150,44 +142,43 @@ function AdminProfile({ user }) {
         }));
     };
 
+    const profileInitials = profile.displayName
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0].toUpperCase())
+        .join("");
+
     return (
-        <div className="admin-profile-page !space-y-6">
-            <div className="admin-profile-header-wrap !mb-1">
+        <div className="admin-profile-page">
+            <div className="admin-profile-header-wrap">
                 <div>
-                    <span className="!text-xs !font-bold !tracking-[0.18em] !text-orange-600">ACCOUNT SETTINGS</span>
-                    <h1 className="!mt-2 !text-3xl !font-bold !tracking-tight !text-slate-950 md:!text-4xl">Admin Profile</h1>
-                    <p className="!mt-2 !text-sm !text-slate-500 md:!text-base">Manage your profile information and account settings.</p>
+                    <span className="admin-profile-eyebrow">ACCOUNT SETTINGS</span>
+                    <h1>Admin Profile</h1>
+                    <p>Manage your profile information and account settings.</p>
                 </div>
             </div>
 
-            <div className="admin-profile-hero-card !grid !grid-cols-1 !gap-6 !rounded-3xl !border !border-slate-800 !bg-gradient-to-br !from-slate-950 !via-slate-900 !to-orange-950 !p-6 !shadow-xl !shadow-slate-900/10 md:!p-8 lg:!grid-cols-[auto_minmax(0,1fr)_320px] lg:!items-center">
+            <div className="admin-profile-hero-card">
                 <div className="admin-profile-avatar-shell">
-                    <div className="admin-profile-avatar !h-28 !w-28 !border-4 !border-white/90 !shadow-xl md:!h-32 md:!w-32">
-                        <div className="admin-avatar-face">
-                            <span className="admin-avatar-hair" />
-                            <span className="admin-avatar-head" />
-                            <span className="admin-avatar-neck" />
-                            <span className="admin-avatar-shirt" />
-                        </div>
+                    <div className="admin-profile-avatar-initials" aria-hidden="true">
+                        {profileInitials}
                     </div>
-                    <button type="button" className="admin-avatar-camera" aria-label="Upload profile picture">
-                        <i className="bi bi-camera-fill" />
-                    </button>
                 </div>
 
-                <div className="admin-profile-identity !text-center lg:!text-left">
-                    <h2 className="!text-4xl !font-bold !tracking-tight !text-white md:!text-5xl">{profile.displayName}</h2>
-                    <div className="admin-profile-role !mt-2 !text-sm !font-semibold !text-orange-200">{profile.role}</div>
-                    <div className="admin-profile-email !mt-5 !inline-flex !rounded-full !border !border-white/15 !bg-white/10 !px-4 !py-2 !text-sm !text-white">
-                        <span className="admin-profile-email-icon !text-orange-200">
+                <div className="admin-profile-identity">
+                    <h2>{profile.displayName}</h2>
+                    <div className="admin-profile-role">{profile.role}</div>
+                    <div className="admin-profile-email">
+                        <span className="admin-profile-email-icon">
                             <i className="bi bi-envelope-fill" />
                         </span>
                         <span>{profile.email}</span>
                     </div>
                 </div>
 
-                <div className="admin-profile-account-card !rounded-2xl !border !border-white/60 !bg-white !p-5 !shadow-lg !shadow-slate-950/10">
-                    <h3 className="!mb-4 !text-base !font-bold !text-slate-900">Account Details</h3>
+                <div className="admin-profile-account-card">
+                    <h3>Account Details</h3>
 
                     <div className="admin-profile-detail-row">
                         <div className="admin-profile-detail-icon">
@@ -211,10 +202,10 @@ function AdminProfile({ user }) {
                 </div>
             </div>
 
-            <div className="admin-profile-lower-grid !grid !grid-cols-1 !gap-5 lg:!grid-cols-[1.2fr_0.9fr]">
-                <div className="admin-profile-panel !rounded-2xl !border !border-slate-200 !bg-white !p-5 !shadow-sm md:!p-7">
-                    <div className="admin-profile-panel-header !mb-6 !border-slate-100 !pb-4">
-                        <span className="admin-panel-icon admin-panel-icon-person !rounded-xl !bg-orange-50 !text-orange-600">
+            <div className="admin-profile-lower-grid">
+                <div className="admin-profile-panel">
+                    <div className="admin-profile-panel-header">
+                        <span className="admin-panel-icon admin-panel-icon-person">
                             <i className="bi bi-person-fill" />
                         </span>
                         <h3 className="!text-lg !font-bold !text-slate-900">Personal Information</h3>
@@ -222,32 +213,38 @@ function AdminProfile({ user }) {
 
                     <div className="admin-profile-fields">
                         <div className="admin-profile-field">
-                            <label>First Name</label>
+                            <label htmlFor="admin-profile-first-name">First Name</label>
                             <input
+                                id="admin-profile-first-name"
                                 type="text"
                                 value={draft.firstName}
+                                placeholder="Not provided"
                                 onChange={(event) => handleInputChange("firstName", event.target.value)}
                                 readOnly={!isEditing}
                             />
                         </div>
 
                         <div className="admin-profile-field">
-                            <label>Last Name</label>
+                            <label htmlFor="admin-profile-last-name">Last Name</label>
                             <input
+                                id="admin-profile-last-name"
                                 type="text"
                                 value={draft.lastName}
+                                placeholder="Not provided"
                                 onChange={(event) => handleInputChange("lastName", event.target.value)}
                                 readOnly={!isEditing}
                             />
                         </div>
 
                         <div className="admin-profile-field">
-                            <label>Contact Number</label>
+                            <label htmlFor="admin-profile-contact-number">Contact Number</label>
                             <div className="admin-profile-input-with-icon">
                                 <i className="bi bi-telephone-fill" />
                                 <input
+                                    id="admin-profile-contact-number"
                                     type="text"
                                     value={draft.contactNumber}
+                                    placeholder="Not provided"
                                     onChange={(event) => handleInputChange("contactNumber", event.target.value)}
                                     readOnly={!isEditing}
                                 />
@@ -255,12 +252,14 @@ function AdminProfile({ user }) {
                         </div>
 
                         <div className="admin-profile-field">
-                            <label>Address</label>
+                            <label htmlFor="admin-profile-address">Address</label>
                             <div className="admin-profile-input-with-icon">
                                 <i className="bi bi-geo-alt-fill" />
                                 <input
+                                    id="admin-profile-address"
                                     type="text"
                                     value={draft.address}
+                                    placeholder="Not provided"
                                     onChange={(event) => handleInputChange("address", event.target.value)}
                                     readOnly={!isEditing}
                                 />
@@ -269,9 +268,9 @@ function AdminProfile({ user }) {
                     </div>
                 </div>
 
-                <div className="admin-profile-panel !rounded-2xl !border !border-slate-200 !bg-white !p-5 !shadow-sm md:!p-7">
-                    <div className="admin-profile-panel-header !mb-6 !border-slate-100 !pb-4">
-                        <span className="admin-panel-icon admin-panel-icon-security !rounded-xl !bg-orange-50 !text-orange-600">
+                <div className="admin-profile-panel">
+                    <div className="admin-profile-panel-header">
+                        <span className="admin-panel-icon admin-panel-icon-security">
                             <i className="bi bi-shield-fill-check" />
                         </span>
                         <h3 className="!text-lg !font-bold !text-slate-900">Account Security</h3>
@@ -312,32 +311,25 @@ function AdminProfile({ user }) {
                     <div className="admin-profile-toggle-row">
                         <div>
                             <h4>Two-Factor Authentication</h4>
-                            <p>Add an extra layer of security to your account.</p>
+                            <p>Two-factor authentication is not configured for this account.</p>
                         </div>
-                        <button
-                            type="button"
-                            className={`admin-profile-toggle ${twoFactorEnabled ? "active" : ""}`}
-                            aria-label="Toggle two-factor authentication"
-                            onClick={() => setTwoFactorEnabled((current) => !current)}
-                        >
-                            <span className="admin-profile-toggle-thumb" />
-                        </button>
+                        <span className="admin-profile-security-status">Not enabled</span>
                     </div>
                     </div>
                 </div>
             </div>
 
-            <div className="admin-profile-actions !mt-0 !flex !justify-end !gap-3">
+            <div className="admin-profile-actions">
                 {saveMessage.text && (
                     <div className={`admin-profile-save-message ${saveMessage.type === "error" ? "error" : "success"}`}>
                     {saveMessage.text}
                     </div>
                 )}
-                <button type="button" className="admin-profile-primary-btn !rounded-xl !bg-orange-600 !px-5 !py-3 !font-semibold !text-white !shadow-lg !shadow-orange-600/20 hover:!bg-orange-700" onClick={handleSave} disabled={isSaving}>
+                <button type="button" className="admin-profile-primary-btn" onClick={handleSave} disabled={isSaving}>
                     <i className="bi bi-check2-square" />
                     {isSaving ? "Saving..." : "Save Changes"}
                 </button>
-                <button type="button" className="admin-profile-secondary-btn !rounded-xl !border !border-slate-200 !bg-white !px-5 !py-3 !font-semibold !text-slate-700 hover:!bg-slate-50" onClick={handleCancel}>
+                <button type="button" className="admin-profile-secondary-btn" onClick={handleCancel}>
                     <i className="bi bi-x-lg" />
                     Cancel
                 </button>

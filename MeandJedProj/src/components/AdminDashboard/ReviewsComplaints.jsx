@@ -2,21 +2,26 @@ import { useEffect, useState, useMemo } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./AdminDashboard.css";
-import { api } from "../../services/api";
+import { api, getAdminProviders } from "../../services/api";
 
 function ReviewsComplaints() {
     const [feedback, setFeedback] = useState([]);
+    const [providers, setProviders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState("");
+    const [providerLoadError, setProviderLoadError] = useState("");
     const [actionError, setActionError] = useState("");
 
     const [searchTerm, setSearchTerm] = useState("");
     const [typeFilter, setTypeFilter] = useState("All");
     const [statusFilter, setStatusFilter] = useState("All");
+    const [ratingFilter, setRatingFilter] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
 
     const [selectedFeedback, setSelectedFeedback] = useState(null);
     const [showViewModal, setShowViewModal] = useState(false);
+    const [selectedProviderId, setSelectedProviderId] = useState("");
+    const [providerRatingFilter, setProviderRatingFilter] = useState("All");
 
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [feedbackForStatus, setFeedbackForStatus] = useState(null);
@@ -38,6 +43,17 @@ function ReviewsComplaints() {
             })
             .finally(() => {
                 if (active) setLoading(false);
+            });
+        getAdminProviders()
+            .then((items) => {
+                if (active) setProviders(items);
+            })
+            .catch((error) => {
+                if (active) {
+                    setProviderLoadError(
+                        error.message || "Unable to load provider profiles."
+                    );
+                }
             });
         return () => {
             active = false;
@@ -72,28 +88,107 @@ function ReviewsComplaints() {
             const matchesStatus =
                 statusFilter === "All" ||
                 item.status === statusFilter;
+            const matchesRating =
+                ratingFilter === "All" ||
+                (item.type === "Review" && Number(item.rating) === Number(ratingFilter));
 
             return (
                 matchesSearch &&
                 matchesType &&
-                matchesStatus
+                matchesStatus &&
+                matchesRating
             );
         });
-    }, [
-        feedback,
-        searchTerm,
-        typeFilter,
-        statusFilter,
-    ]);
+    }, [feedback, searchTerm, typeFilter, statusFilter, ratingFilter]);
 
-    const totalPages = Math.ceil(
-        filteredFeedback.length / itemsPerPage
+    const providerSummaries = useMemo(() => {
+        const summaries = new Map(
+            providers.map((provider) => [
+                String(provider.id),
+                {
+                    ...provider,
+                    reviewCount: 0,
+                    averageRating: 0,
+                    ratingCounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+                    reviews: [],
+                },
+            ])
+        );
+
+        feedback.forEach((item) => {
+            if (item.type !== "Review" || item.providerId == null) return;
+            const summary = summaries.get(String(item.providerId));
+            if (!summary) return;
+
+            const rating = Number(item.rating);
+            if (!Number.isInteger(rating) || rating < 1 || rating > 5) return;
+            summary.reviewCount += 1;
+            summary.ratingCounts[rating] += 1;
+            summary.reviews.push(item);
+        });
+
+        summaries.forEach((summary) => {
+            summary.averageRating = summary.reviewCount
+                ? summary.reviews.reduce((total, item) => total + Number(item.rating), 0)
+                    / summary.reviewCount
+                : 0;
+        });
+
+        return summaries;
+    }, [providers, feedback]);
+
+    const sortedFeedback = useMemo(
+        () => [...filteredFeedback].sort((first, second) => {
+            const firstProvider = providerSummaries.get(String(first.providerId)) || {};
+            const secondProvider = providerSummaries.get(String(second.providerId)) || {};
+            const reviewCountDifference =
+                (secondProvider.reviewCount || 0) - (firstProvider.reviewCount || 0);
+            if (reviewCountDifference) return reviewCountDifference;
+
+            const averageDifference =
+                (secondProvider.averageRating || 0) - (firstProvider.averageRating || 0);
+            if (averageDifference) return averageDifference;
+
+            const ratingDifference = Number(second.rating || 0) - Number(first.rating || 0);
+            if (ratingDifference) return ratingDifference;
+            return String(second.date || "").localeCompare(String(first.date || ""));
+        }),
+        [filteredFeedback, providerSummaries]
     );
 
-    const paginatedFeedback = filteredFeedback.slice(
+    const totalPages = Math.ceil(
+        sortedFeedback.length / itemsPerPage
+    );
+
+    const paginatedFeedback = sortedFeedback.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    const sortedProviders = useMemo(
+        () => [...providerSummaries.values()]
+            .filter((provider) => provider.reviewCount > 0)
+            .sort((first, second) =>
+                second.reviewCount - first.reviewCount ||
+                second.averageRating - first.averageRating ||
+                String(first.fullName).localeCompare(String(second.fullName))
+            ),
+        [providerSummaries]
+    );
+
+    const selectedProvider = selectedProviderId
+        ? providerSummaries.get(String(selectedProviderId))
+        : null;
+    const selectedProviderReviews = selectedProvider
+        ? selectedProvider.reviews
+            .filter((item) => (
+                providerRatingFilter === "All" ||
+                Number(item.rating) === Number(providerRatingFilter)
+            ))
+            .sort((first, second) =>
+                String(second.date || "").localeCompare(String(first.date || ""))
+            )
+        : [];
 
     const reviewCount = feedback.filter(
         (item) => item.type === "Review"
@@ -114,6 +209,9 @@ function ReviewsComplaints() {
 
     const handleTypeFilter = (value) => {
         setTypeFilter(value);
+        if (value === "Complaint") {
+            setRatingFilter("All");
+        }
         setCurrentPage(1);
     };
 
@@ -121,6 +219,30 @@ function ReviewsComplaints() {
         setStatusFilter(value);
         setCurrentPage(1);
     };
+
+    const handleRatingFilter = (value) => {
+        setRatingFilter(value);
+        setCurrentPage(1);
+    };
+
+    const openProviderProfile = (providerId) => {
+        setSelectedProviderId(String(providerId));
+        setProviderRatingFilter("All");
+    };
+
+    const closeProviderProfile = () => {
+        setSelectedProviderId("");
+        setProviderRatingFilter("All");
+    };
+
+    const getProviderInitials = (provider) => (
+        (provider.businessName || provider.fullName || "Provider")
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0].toUpperCase())
+            .join("")
+    );
 
     const handleView = (item) => {
         setSelectedFeedback(item);
@@ -271,10 +393,10 @@ function ReviewsComplaints() {
 
         const end = Math.min(
             currentPage * itemsPerPage,
-            filteredFeedback.length
+            sortedFeedback.length
         );
 
-        return `Showing ${start} to ${end} of ${filteredFeedback.length}`;
+        return `Showing ${start} to ${end} of ${sortedFeedback.length}`;
     };
 
     return (
@@ -294,6 +416,7 @@ function ReviewsComplaints() {
                         and service-related complaints.
                     </p>
                     {loadError && <div className="alert alert-danger" role="alert">{loadError}</div>}
+                    {providerLoadError && <div className="alert alert-danger" role="alert">{providerLoadError}</div>}
                     {actionError && <div className="alert alert-danger" role="alert">{actionError}</div>}
                 </div>
             </div>
@@ -423,7 +546,72 @@ function ReviewsComplaints() {
                     </select>
                 </div>
 
+                <div className="reviews-filter-box">
+                    <label htmlFor="feedback-rating-filter">Rating</label>
+                    <select
+                        id="feedback-rating-filter"
+                        value={ratingFilter}
+                        onChange={(event) => handleRatingFilter(event.target.value)}
+                    >
+                        <option value="All">All Ratings</option>
+                        {[5, 4, 3, 2, 1].map((rating) => (
+                            <option value={rating} key={rating}>
+                                {rating} Stars ({feedback.filter(
+                                    (item) => item.type === "Review" && Number(item.rating) === rating
+                                ).length})
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
             </div>
+
+            {sortedProviders.length > 0 && (
+                <section className="provider-rating-leaderboard" aria-labelledby="provider-rating-heading">
+                    <div className="provider-rating-heading">
+                        <div>
+                            <span>PROVIDER RATINGS</span>
+                            <h3 id="provider-rating-heading">Most reviewed providers</h3>
+                            <p>Providers are ranked by review count. Select a profile to see ratings and feedback.</p>
+                        </div>
+                        <i className="bi bi-award" aria-hidden="true"></i>
+                    </div>
+                    <div className="provider-rating-list">
+                        {sortedProviders.slice(0, 4).map((provider, index) => (
+                            <button
+                                type="button"
+                                className="provider-rating-card"
+                                key={provider.id}
+                                onClick={() => openProviderProfile(provider.id)}
+                            >
+                                <span className="provider-rating-rank">#{index + 1}</span>
+                                {provider.profilePicture ? (
+                                    <img
+                                        className="provider-rating-avatar"
+                                        src={provider.profilePicture}
+                                        alt=""
+                                    />
+                                ) : (
+                                    <span className="provider-rating-avatar provider-rating-initials">
+                                        {getProviderInitials(provider)}
+                                    </span>
+                                )}
+                                <span className="provider-rating-copy">
+                                    <strong>{provider.businessName || provider.fullName}</strong>
+                                    <span>{provider.serviceCategory || "Service provider"}</span>
+                                    <span className="provider-rating-meta">
+                                        <i className="bi bi-star-fill"></i>
+                                        {provider.averageRating.toFixed(1)}
+                                        <span>·</span>
+                                        {provider.reviewCount} {provider.reviewCount === 1 ? "review" : "reviews"}
+                                    </span>
+                                </span>
+                                <i className="bi bi-chevron-right provider-rating-chevron"></i>
+                            </button>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* TABLE */}
             <div className="reviews-table-card">
@@ -435,7 +623,7 @@ function ReviewsComplaints() {
 
                         <p>
                             Review feedback and handle complaints
-                            submitted by homeowners.
+                            submitted by homeowners. Provider reviews are ordered by review count.
                         </p>
                     </div>
 
@@ -487,9 +675,31 @@ function ReviewsComplaints() {
                                         </td>
 
                                         <td>
-                                            <span className="feedback-person">
-                                                {item.providerName || "—"}
-                                            </span>
+                                            {item.providerId != null && providerSummaries.has(String(item.providerId)) ? (
+                                                <button
+                                                    type="button"
+                                                    className="feedback-provider-link"
+                                                    onClick={() => openProviderProfile(item.providerId)}
+                                                    aria-label={`View ${item.providerName || "provider"} profile and reviews`}
+                                                >
+                                                    {providerSummaries.get(String(item.providerId)).profilePicture ? (
+                                                        <img
+                                                            className="feedback-provider-avatar"
+                                                            src={providerSummaries.get(String(item.providerId)).profilePicture}
+                                                            alt=""
+                                                        />
+                                                    ) : (
+                                                        <span className="feedback-provider-avatar feedback-provider-initials">
+                                                            {getProviderInitials(providerSummaries.get(String(item.providerId)))}
+                                                        </span>
+                                                    )}
+                                                    <span>{item.providerName || "Provider"}</span>
+                                                </button>
+                                            ) : (
+                                                <span className="feedback-person">
+                                                    {item.providerName || "—"}
+                                                </span>
+                                            )}
                                         </td>
 
                                         <td>
@@ -684,6 +894,160 @@ function ReviewsComplaints() {
                 </div>
 
             </div>
+
+            {selectedProvider && (
+                <div
+                    className="reviews-modal-overlay"
+                    onClick={closeProviderProfile}
+                >
+                    <section
+                        className="reviews-modal provider-profile-modal"
+                        onClick={(event) => event.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="provider-profile-title"
+                    >
+                        <div className="reviews-modal-header">
+                            <div>
+                                <span>PROVIDER PROFILE</span>
+                                <h3 id="provider-profile-title">
+                                    {selectedProvider.businessName || selectedProvider.fullName}
+                                </h3>
+                            </div>
+                            <button type="button" onClick={closeProviderProfile} aria-label="Close provider profile">
+                                <i className="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <div className="reviews-modal-body provider-profile-modal-body">
+                            <div className="provider-profile-modal-hero">
+                                {selectedProvider.profilePicture ? (
+                                    <img
+                                        className="provider-profile-modal-avatar"
+                                        src={selectedProvider.profilePicture}
+                                        alt=""
+                                    />
+                                ) : (
+                                    <span className="provider-profile-modal-avatar provider-rating-initials">
+                                        {getProviderInitials(selectedProvider)}
+                                    </span>
+                                )}
+                                <div>
+                                    <h4>{selectedProvider.fullName}</h4>
+                                    <span>{selectedProvider.serviceCategory || "Service provider"}</span>
+                                    <div className="provider-profile-modal-rating">
+                                        <i className="bi bi-star-fill"></i>
+                                        <strong>{selectedProvider.averageRating.toFixed(1)}</strong>
+                                        <span>
+                                            {selectedProvider.reviewCount}{" "}
+                                            {selectedProvider.reviewCount === 1 ? "review" : "reviews"}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="provider-profile-detail-grid">
+                                <div>
+                                    <span>Contact</span>
+                                    <strong>{selectedProvider.contact || "Not provided"}</strong>
+                                </div>
+                                <div>
+                                    <span>Service location</span>
+                                    <strong>{selectedProvider.location || selectedProvider.serviceArea || "Not provided"}</strong>
+                                </div>
+                                <div>
+                                    <span>Experience</span>
+                                    <strong>
+                                        {Number(selectedProvider.experience || 0)}{" "}
+                                        {Number(selectedProvider.experience || 0) === 1 ? "year" : "years"}
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span>Verification</span>
+                                    <strong>{selectedProvider.verificationStatus || "Not verified"}</strong>
+                                </div>
+                            </div>
+
+                            {selectedProvider.qualifications && (
+                                <div className="provider-profile-qualification">
+                                    <span>Qualifications</span>
+                                    <p>{selectedProvider.qualifications}</p>
+                                </div>
+                            )}
+
+                            <div className="provider-profile-reviews-heading">
+                                <div>
+                                    <h4>Customer reviews</h4>
+                                    <p>Filter reviews by star rating.</p>
+                                </div>
+                                <label>
+                                    <span className="visually-hidden">Filter provider reviews by rating</span>
+                                    <select
+                                        value={providerRatingFilter}
+                                        onChange={(event) => setProviderRatingFilter(event.target.value)}
+                                    >
+                                        <option value="All">All Ratings ({selectedProvider.reviewCount})</option>
+                                        {[5, 4, 3, 2, 1].map((rating) => (
+                                            <option value={rating} key={rating}>
+                                                {rating} Stars ({selectedProvider.ratingCounts[rating]})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div className="provider-rating-breakdown">
+                                {[5, 4, 3, 2, 1].map((rating) => (
+                                    <button
+                                        type="button"
+                                        className={Number(providerRatingFilter) === rating ? "active" : ""}
+                                        key={rating}
+                                        onClick={() => setProviderRatingFilter(
+                                            Number(providerRatingFilter) === rating ? "All" : String(rating)
+                                        )}
+                                        aria-label={`Show ${rating}-star reviews`}
+                                    >
+                                        <span>{rating} <i className="bi bi-star-fill"></i></span>
+                                        <strong>{selectedProvider.ratingCounts[rating]}</strong>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="provider-review-list">
+                                {selectedProviderReviews.length ? selectedProviderReviews.map((review) => (
+                                    <article className="provider-review-card" key={review.id}>
+                                        <div className="provider-review-card-heading">
+                                            <div>
+                                                <strong>{review.homeownerName || "Homeowner"}</strong>
+                                                <span>{review.service || "Home service"}</span>
+                                            </div>
+                                            <div className="provider-review-card-rating">
+                                                {getRatingStars(review.rating)}
+                                                <time>{review.date || "Date unavailable"}</time>
+                                            </div>
+                                        </div>
+                                        <p>{review.message || "No written comment."}</p>
+                                    </article>
+                                )) : (
+                                    <p className="provider-review-empty">
+                                        No reviews match this rating.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="reviews-modal-footer">
+                            <button
+                                type="button"
+                                className="reviews-modal-cancel"
+                                onClick={closeProviderProfile}
+                            >
+                                Close Profile
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            )}
 
             {/* VIEW MODAL */}
             {showViewModal && selectedFeedback && (

@@ -169,7 +169,7 @@ export default function FindService() {
     return (
         <main className="find-services-page">
             <header className="find-services-topbar">
-                <button type="button" className="find-services-brand" onClick={() => navigate('/homeowner-dashboard')} aria-label="Go to homeowner dashboard" title="Dashboard">
+                <button type="button" className="find-services-brand" onClick={() => navigate('/homeowner-dashboard')} aria-label="Return to homeowner dashboard" title="Click to return to dashboard">
                     <img src={myLogo} alt="" />
                 </button>
                 <label className="find-services-global-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for services (e.g. cleaning, plumbing, electrical...)" /></label>

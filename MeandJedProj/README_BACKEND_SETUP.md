@@ -9,7 +9,8 @@ In PowerShell, use:
 ```powershell
 Get-Content database/schema.sql | mysql -u root -p
 ```
-For an existing database, apply the complaints table migration separately:
+The backend creates the complaints table on startup when it is missing. For manual
+provisioning, apply the migration to an existing database:
 ```powershell
 Get-Content database/migrations/20260603_create_complaints.sql | mysql -u root -p Smarthomes
 ```

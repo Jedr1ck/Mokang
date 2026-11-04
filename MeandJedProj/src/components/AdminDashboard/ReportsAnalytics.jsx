@@ -506,7 +506,7 @@ function ReportsAnalytics() {
                     </section>
 
                     <section className="booking-insights-grid !gap-5">
-                        <article className="booking-insights-panel !rounded-3xl !border !border-slate-200 !bg-white !p-0 !shadow-md !shadow-slate-900/5">
+                        <article className="booking-insights-panel !rounded-3xl !border !border-slate-200 !bg-slate-50 !p-0 !shadow-md !shadow-slate-900/5">
                             <div className="booking-insights-panel-heading !mb-0 !border-slate-100 !px-6 !pb-5 !pt-6 md:!px-8 md:!pt-8">
                                 <div>
                                     <span className="booking-insights-eyebrow">SEASONAL DEMAND</span>
@@ -584,7 +584,7 @@ function ReportsAnalytics() {
                             )}
                         </article>
 
-                        <article className="booking-insights-panel !rounded-3xl !border !border-slate-200 !bg-white !p-0 !shadow-md !shadow-slate-900/5">
+                        <article className="booking-insights-panel !rounded-3xl !border !border-slate-200 !bg-slate-50 !p-0 !shadow-md !shadow-slate-900/5">
                             <div className="booking-insights-panel-heading !mb-0 !border-slate-100 !px-6 !pb-5 !pt-6 md:!px-8 md:!pt-8">
                                 <div>
                                     <span className="booking-insights-eyebrow">HOMEOWNER DEMAND</span>
@@ -638,7 +638,7 @@ function ReportsAnalytics() {
                             )}
                         </article>
 
-                        <article className="booking-insights-panel booking-forecast-panel !rounded-3xl !border !border-slate-200 !bg-white !p-0 !shadow-md !shadow-slate-900/5">
+                        <article className="booking-insights-panel booking-forecast-panel !rounded-3xl !border !border-slate-200 !bg-slate-50 !p-0 !shadow-md !shadow-slate-900/5">
                             <div className="booking-insights-panel-heading !mb-0 !border-slate-100 !px-6 !pb-5 !pt-6 md:!px-8 md:!pt-8">
                                 <div>
                                     <span className="booking-insights-eyebrow">DEMAND FORECAST</span>
@@ -967,7 +967,7 @@ function ReportsAnalytics() {
                                         </article>
                                     </div>
 
-                                    <div className="booking-forecast-chart !h-[320px]">
+                                    <div className="booking-forecast-chart !h-[280px]">
                                         <h4 className="booking-forecast-section-title">
                                             ARIMA Forecast Chart · {analytics.forecastMethod}
                                         </h4>

@@ -64,6 +64,15 @@ def provider_location(provider):
     )
 
 
+def public_review_name(full_name):
+    name_parts = full_name.split() if full_name else []
+    if not name_parts:
+        return "Homeowner"
+    if len(name_parts) == 1:
+        return name_parts[0]
+    return f"{name_parts[0]} {name_parts[-1][0]}."
+
+
 @catalog_bp.get("/public/stats")
 def public_stats():
     with get_session() as session:
@@ -74,6 +83,56 @@ def public_stats():
             or 0
         )
         return jsonify(userCount=user_count)
+
+
+@catalog_bp.get("/public/reviews")
+def public_reviews():
+    with get_session() as session:
+        rows = (
+            session.query(
+                Review.id,
+                Review.rating,
+                Review.comment,
+                Review.created_at,
+                User.full_name,
+                Booking.service_name,
+                Category.name,
+            )
+            .join(Booking, Review.booking_id == Booking.id)
+            .join(User, User.id == Booking.homeowner_id)
+            .outerjoin(Category, Category.id == Booking.category_id)
+            .filter(
+                Booking.provider_id.isnot(None),
+                Review.rating >= 1,
+                Review.rating <= 5,
+                Review.comment.isnot(None),
+                func.trim(Review.comment) != "",
+            )
+            .order_by(Review.created_at.desc(), Review.id.desc())
+            .limit(6)
+            .all()
+        )
+        return jsonify(
+            [
+                {
+                    "id": review_id,
+                    "rating": rating,
+                    "comment": comment.strip(),
+                    "date": created_at.isoformat() if created_at else None,
+                    "homeownerName": public_review_name(full_name),
+                    "service": category_name or service_name or "Home service",
+                }
+                for (
+                    review_id,
+                    rating,
+                    comment,
+                    created_at,
+                    full_name,
+                    service_name,
+                    category_name,
+                ) in rows
+            ]
+        )
 
 
 @catalog_bp.get("/categories")

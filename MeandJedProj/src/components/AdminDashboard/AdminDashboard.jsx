@@ -154,6 +154,21 @@ function AdminDashboard() {
         setShowLogoutModal(false);
     };
 
+    useEffect(() => {
+        if (!showLogoutModal) {
+            return undefined;
+        }
+
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                cancelLogout();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [showLogoutModal]);
+
 
     /* =========================================================
        PAGE CHANGE
@@ -402,27 +417,35 @@ function AdminDashboard() {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="admin-logout-title"
+                        aria-describedby="admin-logout-description"
                     >
                         <div className="admin-logout-modal-content">
-                            <h3 id="admin-logout-title">Logout</h3>
-                            <p>Are you sure you want to log out?</p>
+                            <span className="admin-logout-modal-icon" aria-hidden="true">
+                                <i className="bi bi-box-arrow-right"></i>
+                            </span>
+                            <div>
+                                <h3 id="admin-logout-title">Log out of your account?</h3>
+                                <p id="admin-logout-description">
+                                    You will need to sign in again to access the admin dashboard.
+                                </p>
+                            </div>
                         </div>
 
                         <div className="admin-logout-modal-actions">
                             <button
                                 type="button"
-                                className="admin-logout-confirm-btn"
-                                onClick={confirmLogout}
+                                className="admin-logout-cancel-btn"
+                                onClick={cancelLogout}
                             >
-                                OK
+                                Stay logged in
                             </button>
 
                             <button
                                 type="button"
-                                className="admin-logout-cancel-btn"
-                                onClick={cancelLogout}
+                                className="admin-logout-confirm-btn"
+                                onClick={confirmLogout}
                             >
-                                Cancel
+                                Log out
                             </button>
                         </div>
                     </div>

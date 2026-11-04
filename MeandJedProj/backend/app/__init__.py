@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.exceptions import HTTPException
 
 from app.common import ApiError, api_error_handler
-from app.models import Category, SystemSetting
+from app.models import Category, Complaint, SystemSetting
 
 
 def create_app(test_config=None):
@@ -61,6 +61,7 @@ def create_app(test_config=None):
         pool_pre_ping=True,
     )
     SystemSetting.__table__.create(engine, checkfirst=True)
+    Complaint.__table__.create(engine, checkfirst=True)
     if inspect(engine).has_table("users"):
         user_columns = {
             column["name"]

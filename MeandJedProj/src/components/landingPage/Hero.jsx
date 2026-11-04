@@ -1,18 +1,33 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import background from "../../assets/images/hero-background.png";
-import { getPublicStats } from "../../services/api";
+import { getProviders, getPublicStats } from "../../services/api";
 
 function Hero() {
     const [showPanel, setShowPanel] = useState(false);
     const [userCount, setUserCount] = useState(null);
+    const [trustedProviders, setTrustedProviders] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         getPublicStats()
             .then(({ userCount: count }) => setUserCount(count))
-            .catch(() => setUserCount(0));
+            .catch((error) => {
+                console.error("Unable to load public user count:", error);
+                setUserCount(0);
+            });
+        getProviders()
+            .then((providers) => setTrustedProviders(providers.slice(0, 4)))
+            .catch((error) => {
+                console.error("Unable to load public provider profiles:", error);
+                setTrustedProviders([]);
+            });
     }, []);
+
+    const getProviderInitials = (name = "Provider") => (
+        name.split(/\s+/).filter(Boolean).slice(0, 2)
+            .map((part) => part[0].toUpperCase()).join("")
+    );
 
     return (
         <section
@@ -83,14 +98,23 @@ function Hero() {
 
                 <div className="trusted-users">
                     <div className="user-circles">
-                        <span>👩</span>
-                        <span>👨</span>
-                        <span>👩</span>
-                        <span>👩</span>
+                        {trustedProviders.map((provider) => (
+                            <span
+                                className="trusted-user-avatar"
+                                key={provider.id}
+                                title={provider.name}
+                            >
+                                {provider.image ? (
+                                    <img src={provider.image} alt={provider.name} />
+                                ) : (
+                                    getProviderInitials(provider.name)
+                                )}
+                            </span>
+                        ))}
                     </div>
 
                     <p>
-                        Trusted by {userCount ?? "..."} HomeOwners and ServiceProvider
+                        Trusted by {userCount ?? "..."} homeowners and service providers
                     </p>
                 </div>
             </div>

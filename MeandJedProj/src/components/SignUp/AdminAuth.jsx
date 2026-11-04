@@ -8,6 +8,37 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../index.css";
 import background from "../../assets/images/hero-background.png";
 
+const adminFeatures = [
+    {
+        id: "accounts",
+        icon: "bi-people-fill",
+        title: "Account Management",
+        summary: "Homeowner and provider accounts",
+        details: "Review account information and provider verification status, and manage platform users.",
+    },
+    {
+        id: "bookings",
+        icon: "bi-calendar-check-fill",
+        title: "Booking Management",
+        summary: "Service bookings and their status",
+        details: "View booking details and follow each service request through its current status.",
+    },
+    {
+        id: "services",
+        icon: "bi-tools",
+        title: "Services",
+        summary: "Categories and provider services",
+        details: "Review service categories and the services offered by providers on the platform.",
+    },
+    {
+        id: "reports",
+        icon: "bi-bar-chart-fill",
+        title: "Feedback & Analytics",
+        summary: "Reviews, complaints, and reports",
+        details: "Review customer feedback and complaints, and view platform activity through analytics.",
+    },
+];
+
 const AdminAuth = () => {
     const navigate = useNavigate();
 
@@ -17,6 +48,10 @@ const AdminAuth = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [formError, setFormError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [selectedFeatureId, setSelectedFeatureId] = useState(null);
+    const selectedFeature = adminFeatures.find(
+        (feature) => feature.id === selectedFeatureId
+    );
 
     // =========================================
     // ADMIN LOGIN
@@ -268,131 +303,55 @@ const AdminAuth = () => {
                                 </h2>
 
 
-                                {/* DESCRIPTION */}
-
                                 <p>
-                                    Manage and oversee the SmartHome
-                                    platform, users, service providers,
-                                    bookings, and system activities.
+                                    A quick overview of the main tools available to administrators.
                                 </p>
 
+                                <span className="admin-info-hint">
+                                    Select a topic to learn more. Information only.
+                                </span>
 
-                                {/* =================================================
-                                    ADMIN INFORMATION LIST
-                                ================================================== */}
+                                <div className="admin-info-list" aria-label="Administrator tools">
+                                    {adminFeatures.map((feature) => {
+                                        const isSelected = selectedFeatureId === feature.id;
 
-                                <div className="admin-info-list">
+                                        return (
+                                            <button
+                                                type="button"
+                                                className={`admin-info-item${isSelected ? " is-selected" : ""}`}
+                                                key={feature.id}
+                                                onClick={() => setSelectedFeatureId(
+                                                    isSelected ? null : feature.id
+                                                )}
+                                                aria-expanded={isSelected}
+                                                aria-controls="admin-feature-details"
+                                            >
+                                                <i className={`bi ${feature.icon}`} aria-hidden="true"></i>
+                                                <span className="admin-info-copy">
+                                                    <strong>{feature.title}</strong>
+                                                    <span>{feature.summary}</span>
+                                                </span>
+                                                <i
+                                                    className={`bi ${isSelected ? "bi-chevron-up" : "bi-chevron-down"} admin-info-chevron`}
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
 
-                                    {/* USER MANAGEMENT */}
-
-                                    <div className="admin-info-item">
-
-                                        <i className="bi bi-people-fill"></i>
-
-                                        <div>
-
-                                            <strong>
-                                                User Management
-                                            </strong>
-
-                                            <span>
-                                                Manage Homeowner and
-                                                Provider accounts.
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* BOOKING MANAGEMENT */}
-
-                                    <div className="admin-info-item">
-
-                                        <i className="bi bi-calendar-check-fill"></i>
-
-                                        <div>
-
-                                            <strong>
-                                                Booking Management
-                                            </strong>
-
-                                            <span>
-                                                Monitor and manage
-                                                service bookings.
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* SERVICE MANAGEMENT */}
-
-                                    <div className="admin-info-item">
-
-                                        <i className="bi bi-tools"></i>
-
-                                        <div>
-
-                                            <strong>
-                                                Service Management
-                                            </strong>
-
-                                            <span>
-                                                Manage services and
-                                                service providers.
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* REPORTS */}
-
-                                    <div className="admin-info-item">
-
-                                        <i className="bi bi-bar-chart-fill"></i>
-
-                                        <div>
-
-                                            <strong>
-                                                Reports & Monitoring
-                                            </strong>
-
-                                            <span>
-                                                Review system activities
-                                                and reports.
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* SECURITY */}
-
-                                    <div className="admin-info-item">
-
-                                        <i className="bi bi-shield-lock-fill"></i>
-
-                                        <div>
-
-                                            <strong>
-                                                Secure Access
-                                            </strong>
-
-                                            <span>
-                                                Administrator access is
-                                                restricted to authorized
-                                                personnel only.
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
+                                <div
+                                    className="admin-info-details"
+                                    id="admin-feature-details"
+                                    aria-live="polite"
+                                    hidden={!selectedFeature}
+                                >
+                                    {selectedFeature && (
+                                        <>
+                                        <strong>{selectedFeature.title}</strong>
+                                        <p>{selectedFeature.details}</p>
+                                        </>
+                                    )}
                                 </div>
 
                             </div>

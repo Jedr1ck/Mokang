@@ -1,22 +1,22 @@
 function Security() {
     const items = [
         {
-            icon: "🛡",
+            icon: "bi-shield-check",
             title: "Background Checked",
             text: "All providers are verified",
         },
         {
-            icon: "▣",
+            icon: "bi-credit-card",
             title: "Secure Payments",
             text: "Your Payments are safe",
         },
         {
-            icon: "▤",
+            icon: "bi-shield-lock",
             title: "Data Privacy",
             text: "Your Data is protected",
         },
         {
-            icon: "♧",
+            icon: "bi-headset",
             title: "24/7 Support",
             text: "We’re here to help",
         },
@@ -30,7 +30,7 @@ function Security() {
                 {items.map((item) => (
                     <div className="security-item" key={item.title}>
                         <div className="security-icon">
-                            {item.icon}
+                            <i className={`bi ${item.icon}`} aria-hidden="true"></i>
                         </div>
 
                         <h3>{item.title}</h3>

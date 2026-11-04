@@ -127,19 +127,26 @@ def admin_feedback():
         rows = []
         for review in session.query(Review).all():
             booking = review.booking
-            provider = booking.provider
+            provider = booking.provider if booking else None
+            homeowner = booking.homeowner if booking else None
             rows.append(
                 {
                     "id": f"R-{review.id}",
                     "recordId": review.id,
                     "type": "Review",
-                    "homeownerName": booking.homeowner.full_name,
+                    "providerId": booking.provider_id if booking else None,
+                    "homeownerName": homeowner.full_name if homeowner else "Homeowner",
                     "providerName": (
-                        provider.business_name or provider.user.full_name
+                        provider.business_name
+                        or (provider.user.full_name if provider.user else None)
                         if provider
                         else None
                     ),
-                    "service": booking.category.name if booking.category else None,
+                    "service": (
+                        booking.category.name
+                        if booking and booking.category
+                        else booking.service_name if booking else None
+                    ),
                     "rating": review.rating,
                     "date": review.created_at.isoformat() if review.created_at else None,
                     "status": "Published",
@@ -149,19 +156,29 @@ def admin_feedback():
             )
         for complaint in session.query(Complaint).all():
             booking = complaint.booking
-            provider = booking.provider
+            provider = booking.provider if booking else None
             rows.append(
                 {
                     "id": f"C-{complaint.id}",
                     "recordId": complaint.id,
                     "type": "Complaint",
-                    "homeownerName": complaint.homeowner.full_name,
+                    "providerId": booking.provider_id if booking else None,
+                    "homeownerName": (
+                        complaint.homeowner.full_name
+                        if complaint.homeowner
+                        else "Homeowner"
+                    ),
                     "providerName": (
-                        provider.business_name or provider.user.full_name
+                        provider.business_name
+                        or (provider.user.full_name if provider.user else None)
                         if provider
                         else None
                     ),
-                    "service": booking.category.name if booking.category else None,
+                    "service": (
+                        booking.category.name
+                        if booking and booking.category
+                        else booking.service_name if booking else None
+                    ),
                     "rating": None,
                     "date": complaint.created_at.isoformat() if complaint.created_at else None,
                     "status": complaint.status,

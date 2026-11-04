@@ -136,7 +136,7 @@ export default function ProviderJobs() {
     return (
         <section className="provider-my-jobs">
             <header className="my-jobs-topbar">
-                <button type="button" className="my-jobs-brand" aria-label="Go to Provider Dashboard" onClick={() => navigate('/provider-dashboard')}>
+                <button type="button" className="my-jobs-brand" aria-label="Return to provider dashboard" title="Click to return to dashboard" onClick={() => navigate('/provider-dashboard')}>
                     <img src={myLogo} alt="" />
                 </button>
                 <label className="my-jobs-topbar-search">

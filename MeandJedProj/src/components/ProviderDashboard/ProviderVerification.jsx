@@ -242,7 +242,14 @@ export default function ProviderVerification() {
                                     src={preview}
                                     alt={`${side} ID preview`}
                                     className="img-thumbnail mt-3"
-                                    style={{ maxHeight: 220, objectFit: 'contain' }}
+                                    style={{
+                                        display: 'block',
+                                        width: 360,
+                                        maxWidth: '100%',
+                                        height: 210,
+                                        objectFit: 'contain',
+                                        background: '#f8fafc',
+                                    }}
                                 />
                             )}
 

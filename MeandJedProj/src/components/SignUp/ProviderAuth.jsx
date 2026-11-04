@@ -343,43 +343,7 @@ const ProviderAuth = () => {
                             Provider Log in
                         </h1>
 
-                        {/* SOCIAL ICONS */}
-                        <div className="social-container mb-3">
-                            <a
-                                href="#facebook"
-                                className="social"
-                                onClick={(event) =>
-                                    event.preventDefault()
-                                }
-                                aria-label="Facebook"
-                            >
-                                <i className="bi bi-facebook"></i>
-                            </a>
-
-                            <a
-                                href="#google"
-                                className="social"
-                                onClick={(event) =>
-                                    event.preventDefault()
-                                }
-                                aria-label="Google"
-                            >
-                                <i className="bi bi-google"></i>
-                            </a>
-
-                            <a
-                                href="#linkedin"
-                                className="social"
-                                onClick={(event) =>
-                                    event.preventDefault()
-                                }
-                                aria-label="LinkedIn"
-                            >
-                                <i className="bi bi-linkedin"></i>
-                            </a>
-                        </div>
-
-                        <span className="small text-muted mb-3">
+                        <span className="small mb-3 text-dark provider-login-hint">
                             or use your provider account:
                         </span>
 

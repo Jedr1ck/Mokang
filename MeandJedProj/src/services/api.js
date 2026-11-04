@@ -9,6 +9,7 @@ export async function getProviders(params = {}) { const query = new URLSearchPar
 export async function getProvider(id) { return api(`/providers/${encodeURIComponent(id)}`); }
 export async function getCategories() { return api('/categories'); }
 export async function getPublicStats() { return api('/public/stats'); }
+export async function getPublicReviews() { return api('/public/reviews'); }
 export async function getMyBookings() { return api('/bookings/my'); }
 export async function updateBookingStatus(id, status) { return api(`/bookings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); }
 export async function rescheduleBooking(id, preferredDate, preferredTime) {

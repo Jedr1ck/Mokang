@@ -187,7 +187,8 @@ export default function ProviderBookingSystem() {
                 <button
                     type="button"
                     className="pbs-brand"
-                    aria-label="Go to Provider Dashboard"
+                    aria-label="Return to provider dashboard"
+                    title="Click to return to dashboard"
                     onClick={() => navigate('/provider-dashboard')}
                 >
                     <img src={myLogo} alt="" />
