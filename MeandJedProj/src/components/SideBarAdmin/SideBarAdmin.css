@@ -1,7 +1,7 @@
 /* =========================================================
    SIDE BAR ADMIN
    SmartHome Admin Panel
-   Green + Orange Theme
+   Orange, Charcoal + Cream Theme
    ========================================================= */
 
 
@@ -20,14 +20,14 @@
     display: flex;
     flex-direction: column;
 
-    background: #0d3827;
+    background: #303030;
 
-    color: #d1d5db;
+    color: #ffffff;
 
     z-index: 1000;
 
     box-shadow:
-        4px 0 18px rgba(0, 0, 0, 0.08);
+        4px 0 18px rgba(37, 37, 37, 0.08);
 
     transition:
         width 0.25s ease,
@@ -62,8 +62,8 @@
    ========================================================= */
 
 .admin-logo-icon {
-    width: 44px;
-    height: 44px;
+    width: 76px;
+    height: 58px;
 
     flex-shrink: 0;
 
@@ -72,19 +72,17 @@
     justify-content: center;
 
     border-radius: 12px;
-
-    background: transparent;
-
     overflow: hidden;
-
+    background: transparent;
     box-shadow: none;
 }
 
 .admin-logo-icon img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    display: block;
+    background: none;
 }
 
 
@@ -113,7 +111,7 @@
 .admin-logo-text span {
     margin-top: 5px;
 
-    color: #86efac;
+    color: #FF6900;
 
     font-size: 9px;
     font-weight: 800;
@@ -147,7 +145,7 @@
     margin:
         0 12px 12px;
 
-    color: #86efac;
+    color: #ffffff;
 
     font-size: 10px;
     font-weight: 800;
@@ -190,7 +188,7 @@
 
     background: transparent;
 
-    color: #d1d5db;
+    color: #ffffff;
 
     display: flex;
     align-items: center;
@@ -227,7 +225,7 @@
     align-items: center;
     justify-content: center;
 
-    color: #cbd5d1;
+    color: #ffffff;
 
     transition: color 0.2s ease;
 }
@@ -257,15 +255,15 @@
    ========================================================= */
 
 .admin-nav-item:hover {
-    background: #14532d;
+    background: #F5F5F5;
 
-    color: #ffffff;
+    color: #303030;
 
     transform: translateX(2px);
 }
 
 .admin-nav-item:hover .admin-nav-icon {
-    color: #86efac;
+    color: #303030;
 }
 
 
@@ -276,13 +274,13 @@
 .admin-nav-item.active {
     background:
         linear-gradient(90deg,
-            #16a34a,
-            #15803d);
+            #FF6900,
+            #F45B00);
 
     color: #ffffff;
 
     box-shadow:
-        0 5px 14px rgba(22, 163, 74, 0.22);
+        0 5px 14px rgba(255, 105, 0, 0.22);
 
     transform: none;
 }
@@ -306,7 +304,7 @@
 
     border-radius: 50px;
 
-    background: #f97316;
+    background: #FF6900;
 
     color: #ffffff;
 
@@ -348,14 +346,14 @@
     padding: 0 13px;
 
     border:
-        1px solid rgba(249, 115, 22, 0.25);
+        1px solid rgba(255, 105, 0, 0.25);
 
     border-radius: 9px;
 
     background:
-        rgba(249, 115, 22, 0.08);
+        rgba(255, 105, 0, 0.08);
 
-    color: #fdba74;
+    color: #303030;
 
     display: flex;
     align-items: center;
@@ -404,9 +402,9 @@
 /* LOGOUT HOVER */
 
 .admin-logout-button:hover {
-    background: #f97316;
+    background: #FF6900;
 
-    border-color: #f97316;
+    border-color: #ffffff;
 
     color: #ffffff;
 }
@@ -426,14 +424,14 @@
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb {
     background:
-        rgba(134, 239, 172, 0.25);
+        rgba(255, 105, 0, 0.25);
 
     border-radius: 10px;
 }
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
     background:
-        rgba(134, 239, 172, 0.4);
+        rgba(255, 105, 0, 0.4);
 }
 
 
@@ -511,7 +509,7 @@
 
     font-size: 8px;
 
-    border: 2px solid #0d3827;
+    border: 2px solid #6B6B6B;
 }
 
 
@@ -548,7 +546,7 @@
         transform: translateX(0);
 
         box-shadow:
-            8px 0 25px rgba(0, 0, 0, 0.15);
+            8px 0 25px rgba(37, 37, 37, 0.15);
     }
 
     .sidebar-collapsed .admin-sidebar {

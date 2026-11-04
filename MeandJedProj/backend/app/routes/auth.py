@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, jsonify
 from sqlalchemy import func, or_
 
@@ -72,6 +74,9 @@ def login_user(required_role):
             or (required_role and user.role != required_role)
         ):
             raise ApiError("Invalid email or password", 401)
+        user.last_login_at = datetime.utcnow()
+        session.commit()
+        session.refresh(user)
         return jsonify(
             access_token=create_token(user),
             token_type="bearer",
@@ -98,6 +103,9 @@ def login_admin():
         )
         if not user or not pwd.verify(data.password, user.password_hash):
             raise ApiError("Invalid admin username or password", 401)
+        user.last_login_at = datetime.utcnow()
+        session.commit()
+        session.refresh(user)
         return jsonify(
             access_token=create_token(user),
             token_type="bearer",

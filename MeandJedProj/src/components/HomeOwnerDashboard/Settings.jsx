@@ -1,274 +1,261 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
+import { getMyProfile, updateMySecurity } from '../../services/api';
+
+const SETTINGS_TABS = [
+    { id: 'General', label: 'General & Preferences', icon: 'bi-gear' },
+    { id: 'Notifications', label: 'Notifications', icon: 'bi-bell' },
+    { id: 'Privacy', label: 'Privacy & Security', icon: 'bi-shield-check' }
+];
+
+const loadPrivacySettings = () => {
+    try {
+        return {
+            showProfile: true,
+            showLocation: true,
+            ...JSON.parse(localStorage.getItem('homeowner-privacy-settings') || '{}')
+        };
+    } catch {
+        return { showProfile: true, showLocation: true };
+    }
+};
 
 const Settings = () => {
-    // --- State Settings ---
-    const [notifications, setNotifications] = useState({
-        emailAlerts: true,
-        smsAlerts: false,
-        bookingUpdates: true,
-        promotions: false
-    });
-
-    const [privacy, setPrivacy] = useState({
-        showProfile: true,
-        showLocation: true
-    });
-
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('General');
+    const [privacy, setPrivacy] = useState(loadPrivacySettings);
+    const [privacyMessage, setPrivacyMessage] = useState('');
+    const [email, setEmail] = useState('');
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newEmail, setNewEmail] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [securityError, setSecurityError] = useState('');
+    const [securitySuccess, setSecuritySuccess] = useState('');
+    const [securitySaving, setSecuritySaving] = useState(false);
 
-    const handleToggleNotification = (key) => {
-        setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
-    };
+    useEffect(() => {
+        let active = true;
+        getMyProfile()
+            .then((profile) => {
+                if (active) setEmail(profile.email || '');
+            })
+            .catch((error) => {
+                if (active) setSecurityError(error.message || 'Unable to load account details.');
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const handleTogglePrivacy = (key) => {
-        setPrivacy(prev => ({ ...prev, [key]: !prev[key] }));
+        setPrivacy((previous) => ({ ...previous, [key]: !previous[key] }));
+        setPrivacyMessage('');
     };
 
-    const handleSaveSettings = (e) => {
-        e.preventDefault();
-        alert('Settings updated successfully!');
+    const savePrivacySettings = () => {
+        localStorage.setItem('homeowner-privacy-settings', JSON.stringify(privacy));
+        setPrivacyMessage('Privacy preferences saved on this device.');
+    };
+
+    const handleSecuritySubmit = async (event) => {
+        event.preventDefault();
+        setSecurityError('');
+        setSecuritySuccess('');
+
+        if (!newEmail.trim() && !newPassword) {
+            setSecurityError('Enter a new email address or password.');
+            return;
+        }
+        if (newPassword && newPassword !== confirmPassword) {
+            setSecurityError('The new passwords do not match.');
+            return;
+        }
+
+        setSecuritySaving(true);
+        try {
+            const updatedUser = await updateMySecurity({
+                currentPassword,
+                ...(newEmail.trim() ? { newEmail: newEmail.trim() } : {}),
+                ...(newPassword ? { newPassword } : {})
+            });
+            setEmail(updatedUser.email || '');
+            setCurrentPassword('');
+            setNewEmail('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setSecuritySuccess('Account security details updated.');
+        } catch (error) {
+            setSecurityError(error.message || 'Unable to update account security.');
+        } finally {
+            setSecuritySaving(false);
+        }
     };
 
     return (
         <div className="profile-page-container">
-            {/* Sidebar */}
             <HomeownerSideBar />
-
-            {/* Main Content Area */}
             <main className="profile-main-content">
                 <header className="profile-header">
                     <h2>Account Settings</h2>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '20px', marginTop: '20px' }}>
+                <div className="homeowner-settings-layout">
+                    <nav className="dashboard-box homeowner-settings-nav" aria-label="Settings sections">
+                        {SETTINGS_TABS.map((tab) => (
+                            <button
+                                type="button"
+                                key={tab.id}
+                                className={`homeowner-settings-tab ${activeTab === tab.id ? 'active' : ''}`}
+                                aria-current={activeTab === tab.id ? 'page' : undefined}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                <i className={`bi ${tab.icon}`} />
+                                {tab.label}
+                            </button>
+                        ))}
+                    </nav>
 
-                    {/* Left Panel: Settings Tabs */}
-                    <div className="dashboard-box" style={{ padding: '15px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {[
-                                { id: 'General', label: 'General & Preferences', icon: 'bi-gear' },
-                                { id: 'Notifications', label: 'Notifications', icon: 'bi-bell' },
-                                { id: 'Privacy', label: 'Privacy & Security', icon: 'bi-shield-check' }
-                            ].map((tab) => (
+                    <section className="dashboard-box homeowner-settings-panel">
+                        {activeTab === 'General' && (
+                            <div>
+                                <h3>General Preferences</h3>
+                                <p className="homeowner-settings-description">
+                                    Regional settings used to display dates and times.
+                                </p>
+                                <label className="homeowner-settings-label" htmlFor="settings-timezone">Timezone</label>
+                                <input
+                                    id="settings-timezone"
+                                    className="form-control homeowner-settings-input"
+                                    value="Philippine Standard Time (GMT+8)"
+                                    readOnly
+                                />
+                            </div>
+                        )}
+
+                        {activeTab === 'Notifications' && (
+                            <div>
+                                <h3>In-app Notifications</h3>
+                                <p className="homeowner-settings-description">
+                                    Booking and message updates are available in your notifications center.
+                                </p>
+                                <div className="homeowner-settings-notice">
+                                    <i className="bi bi-bell-fill" aria-hidden="true" />
+                                    <span>Stay updated about new messages and booking activity in your notifications center.</span>
+                                </div>
                                 <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    style={{
-                                        ...navTabStyle,
-                                        backgroundColor: activeTab === tab.id ? '#10b981' : 'transparent',
-                                        color: activeTab === tab.id ? '#fff' : '#374151',
-                                        fontWeight: activeTab === tab.id ? 'bold' : 'normal'
-                                    }}
+                                    type="button"
+                                    className="btn btn-brand mt-3"
+                                    onClick={() => navigate('/notifications')}
                                 >
-                                    <i className={`bi ${tab.icon}`}></i> {tab.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Right Panel: Tab Content */}
-                    <div className="dashboard-box" style={{ padding: '24px' }}>
-                        <form onSubmit={handleSaveSettings}>
-
-                            {/* --- TAB 1: General Preferences --- */}
-                            {activeTab === 'General' && (
-                                <div>
-                                    <h3 style={sectionTitleStyle}>General Preferences</h3>
-                                    <p style={sectionSubStyle}>Manage language, theme, and region defaults.</p>
-
-                                    <div style={formGroupStyle}>
-                                        <label style={labelStyle}>Language</label>
-                                        <select style={selectStyle} defaultValue="English">
-                                            <option value="English">English</option>
-                                            <option value="Tagalog">Tagalog / Filipino</option>
-                                        </select>
-                                    </div>
-
-                                    <div style={formGroupStyle}>
-                                        <label style={labelStyle}>Timezone</label>
-                                        <select style={selectStyle} defaultValue="PST">
-                                            <option value="PST">Philippine Standard Time (GMT+8)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* --- TAB 2: Notifications --- */}
-                            {activeTab === 'Notifications' && (
-                                <div>
-                                    <h3 style={sectionTitleStyle}>Notification Preferences</h3>
-                                    <p style={sectionSubStyle}>Choose how and when you receive updates.</p>
-
-                                    <div style={toggleItemStyle}>
-                                        <div>
-                                            <strong style={{ color: '#111827' }}>Email Alerts</strong>
-                                            <p style={toggleSubStyle}>Receive emails for major updates and invoices.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={notifications.emailAlerts}
-                                            onChange={() => handleToggleNotification('emailAlerts')}
-                                            style={checkboxStyle}
-                                        />
-                                    </div>
-
-                                    <div style={toggleItemStyle}>
-                                        <div>
-                                            <strong style={{ color: '#111827' }}>SMS Notifications</strong>
-                                            <p style={toggleSubStyle}>Receive text messages when a service provider arrives.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={notifications.smsAlerts}
-                                            onChange={() => handleToggleNotification('smsAlerts')}
-                                            style={checkboxStyle}
-                                        />
-                                    </div>
-
-                                    <div style={toggleItemStyle}>
-                                        <div>
-                                            <strong style={{ color: '#111827' }}>Booking Updates</strong>
-                                            <p style={toggleSubStyle}>Real-time updates regarding your active service requests.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={notifications.bookingUpdates}
-                                            onChange={() => handleToggleNotification('bookingUpdates')}
-                                            style={checkboxStyle}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* --- TAB 3: Privacy & Security --- */}
-                            {activeTab === 'Privacy' && (
-                                <div>
-                                    <h3 style={sectionTitleStyle}>Privacy & Safety</h3>
-                                    <p style={sectionSubStyle}>Control who can view your information on the platform.</p>
-
-                                    <div style={toggleItemStyle}>
-                                        <div>
-                                            <strong style={{ color: '#111827' }}>Public Profile</strong>
-                                            <p style={toggleSubStyle}>Allow service providers to view basic profile info.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={privacy.showProfile}
-                                            onChange={() => handleTogglePrivacy('showProfile')}
-                                            style={checkboxStyle}
-                                        />
-                                    </div>
-
-                                    <div style={toggleItemStyle}>
-                                        <div>
-                                            <strong style={{ color: '#111827' }}>Share Location Automatically</strong>
-                                            <p style={toggleSubStyle}>Share pinned address with booked technicians.</p>
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={privacy.showLocation}
-                                            onChange={() => handleTogglePrivacy('showLocation')}
-                                            style={checkboxStyle}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Submit Button */}
-                            <div style={{ marginTop: '30px', borderTop: '1px solid #f3f4f6', paddingTop: '15px', textAlign: 'right' }}>
-                                <button type="submit" style={saveBtnStyle}>
-                                    Save Changes
+                                    <i className="bi bi-bell me-2" />
+                                    Open Notifications
                                 </button>
                             </div>
-                        </form>
-                    </div>
+                        )}
+
+                        {activeTab === 'Privacy' && (
+                            <div>
+                                <h3>Privacy & Security</h3>
+                                <p className="homeowner-settings-description">
+                                    Manage profile visibility and update your account email or password.
+                                </p>
+
+                                <div className="homeowner-settings-toggle">
+                                    <div>
+                                        <strong>Public Profile</strong>
+                                        <p>Allow service providers to view basic profile info.</p>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        checked={privacy.showProfile}
+                                        onChange={() => handleTogglePrivacy('showProfile')}
+                                        aria-label="Allow providers to view my profile"
+                                    />
+                                </div>
+                                <div className="homeowner-settings-toggle">
+                                    <div>
+                                        <strong>Share Location Automatically</strong>
+                                        <p>Share your pinned address with booked technicians.</p>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        checked={privacy.showLocation}
+                                        onChange={() => handleTogglePrivacy('showLocation')}
+                                        aria-label="Share my location with booked technicians"
+                                    />
+                                </div>
+                                <div className="homeowner-settings-actions">
+                                    {privacyMessage && <span role="status">{privacyMessage}</span>}
+                                    <button type="button" className="btn btn-brand" onClick={savePrivacySettings}>
+                                        Save Privacy Preferences
+                                    </button>
+                                </div>
+
+                                <form className="homeowner-security-form" onSubmit={handleSecuritySubmit}>
+                                    <h4>Account Email & Password</h4>
+                                    <label className="homeowner-settings-label" htmlFor="current-account-email">Current email</label>
+                                    <input
+                                        id="current-account-email"
+                                        className="form-control homeowner-settings-input"
+                                        value={email}
+                                        readOnly
+                                    />
+                                    <label className="homeowner-settings-label" htmlFor="new-account-email">New email</label>
+                                    <input
+                                        id="new-account-email"
+                                        className="form-control homeowner-settings-input"
+                                        type="email"
+                                        autoComplete="email"
+                                        value={newEmail}
+                                        onChange={(event) => setNewEmail(event.target.value)}
+                                    />
+                                    <label className="homeowner-settings-label" htmlFor="current-account-password">Current password</label>
+                                    <input
+                                        id="current-account-password"
+                                        className="form-control homeowner-settings-input"
+                                        type="password"
+                                        autoComplete="current-password"
+                                        value={currentPassword}
+                                        onChange={(event) => setCurrentPassword(event.target.value)}
+                                        required
+                                    />
+                                    <label className="homeowner-settings-label" htmlFor="new-account-password">New password</label>
+                                    <input
+                                        id="new-account-password"
+                                        className="form-control homeowner-settings-input"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        minLength={8}
+                                        value={newPassword}
+                                        onChange={(event) => setNewPassword(event.target.value)}
+                                    />
+                                    <label className="homeowner-settings-label" htmlFor="confirm-account-password">Confirm new password</label>
+                                    <input
+                                        id="confirm-account-password"
+                                        className="form-control homeowner-settings-input"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        minLength={8}
+                                        value={confirmPassword}
+                                        onChange={(event) => setConfirmPassword(event.target.value)}
+                                    />
+                                    {securityError && <p className="alert alert-danger mt-3 mb-0" role="alert">{securityError}</p>}
+                                    {securitySuccess && <p className="alert alert-success mt-3 mb-0" role="status">{securitySuccess}</p>}
+                                    <button type="submit" className="btn btn-brand mt-3" disabled={securitySaving}>
+                                        {securitySaving ? 'Updating…' : 'Update Account Security'}
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+                    </section>
                 </div>
             </main>
         </div>
     );
-};
-
-// Inline Styles
-const navTabStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '10px 14px',
-    borderRadius: '8px',
-    border: 'none',
-    width: '100%',
-    textAlign: 'left',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-    transition: 'all 0.15s ease'
-};
-
-const sectionTitleStyle = {
-    margin: '0 0 4px 0',
-    color: '#111827',
-    fontSize: '1.1rem'
-};
-
-const sectionSubStyle = {
-    margin: '0 0 20px 0',
-    color: '#6b7280',
-    fontSize: '0.85rem'
-};
-
-const formGroupStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-    marginBottom: '16px'
-};
-
-const labelStyle = {
-    fontSize: '0.85rem',
-    fontWeight: 'bold',
-    color: '#374151'
-};
-
-const selectStyle = {
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: '1px solid #d1d5db',
-    fontSize: '0.9rem',
-    backgroundColor: '#fff'
-};
-
-const toggleItemStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 0',
-    borderBottom: '1px solid #f3f4f6'
-};
-
-const toggleSubStyle = {
-    margin: '2px 0 0 0',
-    fontSize: '0.8rem',
-    color: '#6b7280'
-};
-
-const checkboxStyle = {
-    width: '18px',
-    height: '18px',
-    accentColor: '#10b981',
-    cursor: 'pointer'
-};
-
-const saveBtnStyle = {
-    backgroundColor: '#10b981',
-    color: '#fff',
-    border: 'none',
-    padding: '9px 20px',
-    borderRadius: '6px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    fontSize: '0.9rem'
 };
 
 export default Settings;

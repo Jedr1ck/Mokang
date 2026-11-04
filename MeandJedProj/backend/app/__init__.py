@@ -16,8 +16,10 @@ def create_app(test_config=None):
 
     app = Flask(__name__)
     default_cors_origins = (
-        "http://localhost:5173,http://127.0.0.1:5173,"
-        "http://localhost:5174,http://127.0.0.1:5174"
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "http://localhost:5174,http://127.0.0.1:5174,"
+    "http://localhost:62921,http://127.0.0.1:62921"
+
     )
     app.config.from_mapping(
         SECRET_KEY=os.getenv("SECRET_KEY", "CHANGE_ME"),
@@ -59,6 +61,16 @@ def create_app(test_config=None):
         pool_pre_ping=True,
     )
     SystemSetting.__table__.create(engine, checkfirst=True)
+    if inspect(engine).has_table("users"):
+        user_columns = {
+            column["name"]
+            for column in inspect(engine).get_columns("users")
+        }
+        if "last_login_at" not in user_columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE users ADD COLUMN last_login_at DATETIME")
+                )
     if inspect(engine).has_table(Category.__tablename__):
         category_columns = {
             column["name"]

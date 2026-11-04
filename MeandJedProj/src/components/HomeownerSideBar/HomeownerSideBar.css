@@ -1,8 +1,8 @@
 .green-wavy-sidebar {
     width: 64px;
     height: fit-content;
-    background-color: #00b176;
-    /* Emerald Green */
+    background-color: var(--theme-primary);
+    /* Primary navy */
     padding: 20px 0;
     display: flex;
     flex-direction: column;
@@ -17,7 +17,7 @@
 
     /* Shape ng sidebar container */
     border-radius: 0 32px 32px 0;
-    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 2px 4px 12px rgba(37, 37, 37, 0.08);
     overflow: visible !important;
     /* Siguradong makakalabas ang pill sa kanan */
 }
@@ -31,16 +31,15 @@
 }
 
 .top-brand-icon {
-    width: 40px;
-    height: 40px;
-    background-color: #ffffff;
-    color: #00b176;
-    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    background: none;
+    color: #ffffff;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     margin-left: 12px;
     margin-bottom: 4px;
     flex-shrink: 0;
@@ -91,30 +90,30 @@
     text-transform: uppercase;
 }
 
-/* HOVER EFFECT: Green background pill at Dark Green na text para kitang-kita */
+/* Hover expands the pill and reveals its label. */
 .sidebar-btn:hover {
     width: 150px;
     /* Lalabas at hahaba pakanan */
-    background-color: #e6f7f2;
-    /* Soft light-green pill background */
-    color: #005b3c;
-    /* Dark Green Text at Icon para malinaw basahin */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background-color: var(--theme-soft-blue);
+    /* Soft blue pill background */
+    color: var(--theme-charcoal);
+    /* Dark text and icon for readability */
+    box-shadow: 0 4px 12px rgba(37, 37, 37, 0.12);
     z-index: 10;
 }
 
 .sidebar-btn:hover .link-text {
     opacity: 1;
     transform: translateX(0);
-    color: #005b3c;
-    /* Siguradong Madilim na Green ang Sulat */
+    color: var(--theme-charcoal);
+    /* Keep the expanded label readable. */
 }
 
 /* ACTIVE STATE (Kapag na-click na): Puti na Background at Inset Curved Notch */
 .sidebar-btn.active {
     width: 40px;
-    background-color: #f8f9fa;
-    color: #00b176;
+    background-color: #FFFFFF;
+    color: var(--theme-primary);
     border-radius: 21px;
     font-weight: bold;
     z-index: 5;
@@ -128,15 +127,15 @@
 
 .sidebar-btn.active:hover {
     width: 150px;
-    background-color: #e6f7f2;
-    color: #005b3c;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background-color: var(--theme-soft-blue);
+    color: var(--theme-charcoal);
+    box-shadow: 0 4px 12px rgba(37, 37, 37, 0.12);
 }
 
 .sidebar-btn.active:hover .link-text {
     opacity: 1;
     transform: translateX(0);
-    color: #005b3c;
+    color: var(--theme-charcoal);
 }
 
 .sidebar-btn.active .badge-pill,
@@ -162,7 +161,7 @@
     width: 10px;
     height: 5px;
     border-radius: 3px;
-    background-color: #2ed573;
+    background-color: #ffffff;
 }
 
 .badge-dot-yellow {
@@ -172,7 +171,7 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background-color: #ffbe76;
+    background-color: var(--theme-gold);
 }
 
 .badge-dot-lightgreen {
@@ -182,38 +181,38 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background-color: #7bed9f;
+    background-color: #ffffff;
 }
 
 .top-brand-icon {
     width: 40px;
     height: 40px;
+    padding: 4px;
     background-color: #ffffff;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 10px rgba(37, 37, 37, 0.06);
     margin-left: 12px;
     margin-bottom: 4px;
     flex-shrink: 0;
     text-decoration: none;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .top-brand-icon:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 /* Style para sakto ang fit ng Logo Image sa loob ng box */
 .brand-logo-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* O puwedeng 'contain' kung ayaw mong mag-crop ang logo */
-    border-radius: 12px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #ffffff;
 }
 
 .homeowner-logout-btn {

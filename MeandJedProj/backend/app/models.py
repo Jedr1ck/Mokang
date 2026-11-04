@@ -29,6 +29,7 @@ class User(Base):
     role = Column(String(20), nullable=False, default="homeowner")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    last_login_at = Column(DateTime, nullable=True)
     last_seen_at = Column(DateTime, nullable=True)
     profile = relationship(
         "UserProfile",

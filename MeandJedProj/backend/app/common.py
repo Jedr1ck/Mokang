@@ -124,6 +124,8 @@ def user_out(user):
         "id": user.id,
         "fullName": user.full_name,
         "email": user.email,
+        "createdAt": user.created_at.isoformat() if user.created_at else None,
+        "lastLoginAt": user.last_login_at.isoformat() if user.last_login_at else None,
         "mobileNumber": profile.mobile_number if profile else None,
         "gender": profile.gender if profile else None,
         "address": profile.address if profile else None,

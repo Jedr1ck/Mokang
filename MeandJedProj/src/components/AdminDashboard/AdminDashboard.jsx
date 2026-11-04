@@ -207,7 +207,7 @@ function AdminDashboard() {
                 return <Notifications />;
 
             case "Admin Profile":
-                return <AdminProfile />;
+                return <AdminProfile user={user} />;
 
             case "System Setting":
                 return <SystemSettings />;
@@ -263,7 +263,7 @@ function AdminDashboard() {
         <>
             <div
                 className={`
-                    admin-dashboard-page
+                    admin-dashboard-page !bg-slate-50 !text-slate-900
                     ${sidebarOpen
                         ? "sidebar-open"
                         : "sidebar-collapsed"
@@ -279,8 +279,8 @@ function AdminDashboard() {
                     unreadNotificationCount={unreadNotificationCount}
                 />
 
-                <main className="admin-main-content">
-                    <header className="admin-topbar">
+                <main className="admin-main-content min-h-screen">
+                    <header className="admin-topbar !border-b !border-slate-200/80 !bg-white/90 !shadow-sm !backdrop-blur-xl">
                         <div className="admin-topbar-left">
                             <button
                                 type="button"
@@ -362,7 +362,7 @@ function AdminDashboard() {
                         </div>
                     </header>
 
-                    <section className="admin-content-container">
+                    <section className="admin-content-container !mx-auto !max-w-[1680px] !px-5 !py-7 sm:!px-8 xl:!px-10">
                         <div className="admin-breadcrumb">
                             <i className="bi bi-house-door-fill"></i>
                             <span>Admin</span>
@@ -370,7 +370,21 @@ function AdminDashboard() {
                             <span className="current">{activePage}</span>
                         </div>
 
-                        <div className="admin-page-content">
+                        <div className="admin-page-content !space-y-7
+                            [&_.admin-management-header]:!rounded-3xl [&_.admin-management-header]:!border [&_.admin-management-header]:!border-slate-800 [&_.admin-management-header]:!bg-gradient-to-r [&_.admin-management-header]:!from-slate-950 [&_.admin-management-header]:!to-slate-800 [&_.admin-management-header]:!px-7 [&_.admin-management-header]:!py-8 [&_.admin-management-header]:!shadow-lg [&_.admin-management-header]:!shadow-slate-900/10
+                            [&_.providers-page-header]:!rounded-3xl [&_.providers-page-header]:!border-slate-800 [&_.providers-page-header]:!bg-gradient-to-r [&_.providers-page-header]:!from-slate-950 [&_.providers-page-header]:!to-slate-800 [&_.providers-page-header]:!px-7 [&_.providers-page-header]:!py-8 [&_.providers-page-header]:!shadow-lg
+                            [&_.booking-page-header]:!rounded-3xl [&_.booking-page-header]:!border-slate-800 [&_.booking-page-header]:!bg-gradient-to-r [&_.booking-page-header]:!from-slate-950 [&_.booking-page-header]:!to-slate-800 [&_.booking-page-header]:!px-7 [&_.booking-page-header]:!py-8 [&_.booking-page-header]:!shadow-lg
+                            [&_.service-categories-header]:!rounded-3xl [&_.service-categories-header]:!border [&_.service-categories-header]:!border-slate-800 [&_.service-categories-header]:!bg-gradient-to-r [&_.service-categories-header]:!from-slate-950 [&_.service-categories-header]:!to-slate-800 [&_.service-categories-header]:!px-7 [&_.service-categories-header]:!py-8 [&_.service-categories-header]:!shadow-lg
+                            [&_.reviews-page-header]:!rounded-3xl [&_.reviews-page-header]:!border [&_.reviews-page-header]:!border-slate-800 [&_.reviews-page-header]:!bg-gradient-to-r [&_.reviews-page-header]:!from-slate-950 [&_.reviews-page-header]:!to-slate-800 [&_.reviews-page-header]:!px-7 [&_.reviews-page-header]:!py-8 [&_.reviews-page-header]:!shadow-lg
+                            [&_.admin-management-header_h2]:!text-white [&_.providers-page-header_h2]:!text-white [&_.booking-page-header_h2]:!text-white [&_.service-categories-header_h2]:!text-white [&_.reviews-page-header_h2]:!text-white
+                            [&_.admin-management-header_p]:!text-slate-300 [&_.providers-page-header_p]:!text-slate-300 [&_.booking-page-header_p]:!text-slate-300 [&_.service-categories-header_p]:!text-slate-300 [&_.reviews-page-header_p]:!text-slate-300
+                            [&_.admin-section-label]:!text-orange-300 [&_.providers-section-label]:!text-orange-300 [&_.booking-section-label]:!text-orange-300 [&_.service-categories-label]:!text-orange-300 [&_.reviews-section-label]:!text-orange-300
+                            [&_.admin-homeowner-summary_.card]:!rounded-2xl [&_.admin-homeowner-summary_.card]:!border-slate-200 [&_.admin-homeowner-summary_.card]:!shadow-md [&_.admin-homeowner-summary_.card]:!shadow-slate-900/5 [&_.providers-summary-card]:!rounded-2xl [&_.providers-summary-card]:!border-slate-200 [&_.providers-summary-card]:!shadow-md [&_.providers-summary-card]:!shadow-slate-900/5 [&_.booking-summary-card]:!rounded-2xl [&_.booking-summary-card]:!border-slate-200 [&_.booking-summary-card]:!shadow-md [&_.booking-summary-card]:!shadow-slate-900/5 [&_.service-summary-card]:!rounded-2xl [&_.service-summary-card]:!border-slate-200 [&_.service-summary-card]:!shadow-md [&_.service-summary-card]:!shadow-slate-900/5 [&_.reviews-summary-card]:!rounded-2xl [&_.reviews-summary-card]:!border-slate-200 [&_.reviews-summary-card]:!shadow-md [&_.reviews-summary-card]:!shadow-slate-900/5 [&_.admin-management-summary-card]:!rounded-2xl [&_.admin-management-summary-card]:!border-slate-200 [&_.admin-management-summary-card]:!shadow-md [&_.admin-management-summary-card]:!shadow-slate-900/5
+                            [&_.admin-management-toolbar]:!rounded-2xl [&_.admin-management-toolbar]:!border-slate-200 [&_.admin-management-toolbar]:!bg-white [&_.admin-management-toolbar]:!p-4 [&_.admin-management-toolbar]:!shadow-sm [&_.providers-filter-card]:!rounded-2xl [&_.providers-filter-card]:!border-slate-200 [&_.providers-filter-card]:!bg-white [&_.providers-filter-card]:!shadow-sm [&_.booking-filter-card]:!rounded-2xl [&_.booking-filter-card]:!border-slate-200 [&_.booking-filter-card]:!bg-white [&_.booking-filter-card]:!shadow-sm [&_.service-filter-card]:!rounded-2xl [&_.service-filter-card]:!border-slate-200 [&_.service-filter-card]:!bg-white [&_.service-filter-card]:!shadow-sm [&_.reviews-filter-card]:!rounded-2xl [&_.reviews-filter-card]:!border-slate-200 [&_.reviews-filter-card]:!bg-white [&_.reviews-filter-card]:!shadow-sm
+                            [&_.admin-management-card]:!overflow-hidden [&_.admin-management-card]:!rounded-2xl [&_.admin-management-card]:!border-slate-200 [&_.admin-management-card]:!shadow-md [&_.admin-management-card]:!shadow-slate-900/5 [&_.providers-table-card]:!overflow-hidden [&_.providers-table-card]:!rounded-2xl [&_.providers-table-card]:!border-slate-200 [&_.providers-table-card]:!shadow-md [&_.providers-table-card]:!shadow-slate-900/5 [&_.booking-table-card]:!overflow-hidden [&_.booking-table-card]:!rounded-2xl [&_.booking-table-card]:!border-slate-200 [&_.booking-table-card]:!shadow-md [&_.booking-table-card]:!shadow-slate-900/5 [&_.service-table-card]:!overflow-hidden [&_.service-table-card]:!rounded-2xl [&_.service-table-card]:!border-slate-200 [&_.service-table-card]:!shadow-md [&_.service-table-card]:!shadow-slate-900/5 [&_.reviews-table-card]:!overflow-hidden [&_.reviews-table-card]:!rounded-2xl [&_.reviews-table-card]:!border-slate-200 [&_.reviews-table-card]:!shadow-md [&_.reviews-table-card]:!shadow-slate-900/5 [&_.admin-table-card]:!overflow-hidden [&_.admin-table-card]:!rounded-2xl [&_.admin-table-card]:!border-slate-200 [&_.admin-table-card]:!shadow-md [&_.admin-table-card]:!shadow-slate-900/5
+                            [&_.admin-settings-card]:!overflow-hidden [&_.admin-settings-card]:!rounded-2xl [&_.admin-settings-card]:!border-slate-200 [&_.admin-settings-card]:!bg-white [&_.admin-settings-card]:!shadow-md [&_.admin-settings-card]:!shadow-slate-900/5
+                            [&_.admin-management-header_.btn]:!border-orange-500 [&_.admin-management-header_.btn]:!bg-orange-500 [&_.admin-management-header_.btn]:!text-white [&_.providers-page-header_.btn]:!border-orange-500 [&_.providers-page-header_.btn]:!bg-orange-500 [&_.providers-page-header_.btn]:!text-white [&_.service-add-button]:!rounded-xl [&_.service-add-button]:!bg-orange-500 [&_.service-add-button]:!text-white [&_.admin-add-button]:!rounded-xl [&_.admin-add-button]:!bg-orange-500 [&_.admin-add-button]:!text-white
+                        ">
                             {renderPageContent()}
                         </div>
                     </section>

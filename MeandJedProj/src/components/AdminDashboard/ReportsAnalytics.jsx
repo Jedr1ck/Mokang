@@ -415,24 +415,24 @@ function ReportsAnalytics() {
     }[frequency];
 
     return (
-        <div className="reports-analytics-page booking-insights-page">
-            <header className="reports-page-header">
+        <div className="reports-analytics-page booking-insights-page !space-y-6 [&_.booking-forecast-accuracy]:!text-xs [&_.booking-forecast-validation-table]:!text-xs [&_.booking-forecast-section-title]:!text-base [&_.booking-forecast-model-information]:!text-xs">
+            <header className="reports-page-header !rounded-3xl !border !border-slate-200 !bg-white !p-6 !shadow-sm md:!p-8">
                 <div>
-                    <span className="reports-section-label">BOOKING INSIGHTS</span>
-                    <h2>Peak Season &amp; Preferences</h2>
-                    <p>
+                    <span className="reports-section-label !font-semibold !tracking-[0.18em] !text-orange-600">BOOKING INSIGHTS</span>
+                    <h2 className="!mt-2 !text-2xl !font-bold !tracking-tight !text-slate-900 md:!text-3xl">Peak Season &amp; Preferences</h2>
+                    <p className="!mt-2 !max-w-3xl !text-sm !leading-6 !text-slate-500 md:!text-base">
                         Discover when homeowners schedule services, what they request,
                         and how booking demand may trend.
                     </p>
                 </div>
-                <span className="booking-insights-date-note">
+                <span className="booking-insights-date-note !rounded-full !bg-slate-50 !px-4 !py-2 !text-xs !font-medium !text-slate-600">
                     {analytics.forecastAvailable ? "Last forecast generated" : "Last analytics refresh"}{" "}
                     {analytics.analyticsRefreshedAt
                         ? new Date(analytics.analyticsRefreshedAt).toLocaleString()
                         : "—"}
                 </span>
             </header>
-            <p className="booking-insights-scope-note">
+            <p className="booking-insights-scope-note !rounded-2xl !border !border-slate-200 !bg-slate-100/70 !px-5 !py-4 !text-xs !leading-6 !text-slate-600">
                 Date-based insights use the selected complete-period range ({analytics.startDate || dateRange.startDate} to {analytics.endDate || dateRange.endDate}), include bookings of all statuses, and group bookings by scheduled appointment date. Bookings without a scheduled date are reported separately and excluded.
             </p>
 
@@ -450,47 +450,47 @@ function ReportsAnalytics() {
                 </div>
             ) : !error ? (
                 <>
-                    <section className="booking-insights-summary">
-                        <article className="booking-insights-kpi">
+                    <section className="booking-insights-summary !gap-4">
+                        <article className="booking-insights-kpi !min-h-[138px] !rounded-2xl !border-slate-200 !p-5 !shadow-md !shadow-slate-900/5">
                             <span className="booking-insights-kpi-icon green">
                                 <i className="bi bi-calendar2-check"></i>
                             </span>
                             <div>
-                                <span>Booking requests in selected range</span>
-                                <strong>{analytics.totalBookings.toLocaleString()}</strong>
+                                <span className="!text-xs">Booking requests in selected range</span>
+                                <strong className="!text-2xl">{analytics.totalBookings.toLocaleString()}</strong>
                                 <small>All statuses · scheduled dates</small>
                             </div>
                         </article>
-                        <article className="booking-insights-kpi">
+                        <article className="booking-insights-kpi !min-h-[138px] !rounded-2xl !border-slate-200 !p-5 !shadow-md !shadow-slate-900/5">
                             <span className="booking-insights-kpi-icon orange">
                                 <i className="bi bi-sun"></i>
                             </span>
                             <div>
-                                <span>Peak season</span>
-                                <strong>{analytics.peakSeason.name}</strong>
+                                <span className="!text-xs">Peak season</span>
+                                <strong className="!text-2xl">{analytics.peakSeason.name}</strong>
                                 <small>{analytics.peakSeason.bookings.toLocaleString()} bookings</small>
                                 <small>{analytics.peakSeason.months.join(", ")}</small>
                             </div>
                         </article>
-                        <article className="booking-insights-kpi">
+                        <article className="booking-insights-kpi !min-h-[138px] !rounded-2xl !border-slate-200 !p-5 !shadow-md !shadow-slate-900/5">
                             <span className="booking-insights-kpi-icon blue">
                                 <i className="bi bi-grid"></i>
                             </span>
                             <div>
-                                <span>Most requested service</span>
-                                <strong>{preferences[0]?.name || "No data yet"}</strong>
+                                <span className="!text-xs">Most requested service</span>
+                                <strong className="!text-2xl">{preferences[0]?.name || "No data yet"}</strong>
                                 {preferences[0] && (
                                     <small>{preferences[0].bookings.toLocaleString()} bookings</small>
                                 )}
                             </div>
                         </article>
-                        <article className="booking-insights-kpi">
+                        <article className="booking-insights-kpi !min-h-[138px] !rounded-2xl !border-slate-200 !p-5 !shadow-md !shadow-slate-900/5">
                             <span className="booking-insights-kpi-icon blue">
                                 <i className="bi bi-database-check"></i>
                             </span>
                             <div>
-                                <span>Total recorded bookings</span>
-                                <strong>{analytics.historyBookingCount.toLocaleString()}</strong>
+                                <span className="!text-xs">Total recorded bookings</span>
+                                <strong className="!text-2xl">{analytics.historyBookingCount.toLocaleString()}</strong>
                                 <small>All statuses · scheduled dates</small>
                                 <small>
                                     {analytics.periodsWithRecordedBookings} {periodName}s with recorded bookings
@@ -505,13 +505,13 @@ function ReportsAnalytics() {
                         </article>
                     </section>
 
-                    <section className="booking-insights-grid">
-                        <article className="booking-insights-panel">
-                            <div className="booking-insights-panel-heading">
+                    <section className="booking-insights-grid !gap-5">
+                        <article className="booking-insights-panel !rounded-3xl !border !border-slate-200 !bg-white !p-0 !shadow-md !shadow-slate-900/5">
+                            <div className="booking-insights-panel-heading !mb-0 !border-slate-100 !px-6 !pb-5 !pt-6 md:!px-8 md:!pt-8">
                                 <div>
                                     <span className="booking-insights-eyebrow">SEASONAL DEMAND</span>
-                                    <h3>Peak Season</h3>
-                                    <p>
+                                    <h3 className="!text-lg">Peak Season</h3>
+                                    <p className="!text-xs">
                                         All booking statuses grouped by scheduled appointment month in the selected range.
                                     </p>
                                 </div>
@@ -584,12 +584,12 @@ function ReportsAnalytics() {
                             )}
                         </article>
 
-                        <article className="booking-insights-panel">
-                            <div className="booking-insights-panel-heading">
+                        <article className="booking-insights-panel !rounded-3xl !border !border-slate-200 !bg-white !p-0 !shadow-md !shadow-slate-900/5">
+                            <div className="booking-insights-panel-heading !mb-0 !border-slate-100 !px-6 !pb-5 !pt-6 md:!px-8 md:!pt-8">
                                 <div>
                                     <span className="booking-insights-eyebrow">HOMEOWNER DEMAND</span>
-                                    <h3>Service Preferences</h3>
-                                    <p>Most requested services in the selected date range.</p>
+                                    <h3 className="!text-lg">Service Preferences</h3>
+                                    <p className="!text-xs">Most requested services in the selected date range.</p>
                                 </div>
                                 <span className="booking-insights-panel-icon green">
                                     <i className="bi bi-heart"></i>
@@ -638,12 +638,12 @@ function ReportsAnalytics() {
                             )}
                         </article>
 
-                        <article className="booking-insights-panel booking-forecast-panel">
-                            <div className="booking-insights-panel-heading">
+                        <article className="booking-insights-panel booking-forecast-panel !rounded-3xl !border !border-slate-200 !bg-white !p-0 !shadow-md !shadow-slate-900/5">
+                            <div className="booking-insights-panel-heading !mb-0 !border-slate-100 !px-6 !pb-5 !pt-6 md:!px-8 md:!pt-8">
                                 <div>
                                     <span className="booking-insights-eyebrow">DEMAND FORECAST</span>
-                                    <h3>Booking Demand Forecast</h3>
-                                    <p>
+                                    <h3 className="!text-lg">Booking Demand Forecast</h3>
+                                    <p className="!text-xs">
                                         Actual and projected bookings with an approximate 95% prediction interval.
                                     </p>
                                 </div>
@@ -838,7 +838,7 @@ function ReportsAnalytics() {
                                     <span>Weekly</span>
                                 </div>
                                 <svg
-                                    className="booking-weekly-activity-svg"
+                                    className="booking-weekly-activity-svg !h-[230px]"
                                     viewBox="0 0 800 205"
                                     role="img"
                                     aria-label="Weekly appointment counts for the last eight complete weeks"
@@ -948,7 +948,7 @@ function ReportsAnalytics() {
                                     <div className="booking-forecast-summary">
                                         <article>
                                             <span>Expected next {periodUnit}</span>
-                                            <strong>{formatCount(expectedNextMonth)}</strong>
+                                            <strong className="!text-xl">{formatCount(expectedNextMonth)}</strong>
                                             <small>
                                                 {selectedForecast[0]
                                                     ? `Approx. ${formatCount(selectedForecast[0].lower)}–${formatCount(selectedForecast[0].upper)} bookings`
@@ -957,17 +957,17 @@ function ReportsAnalytics() {
                                         </article>
                                         <article>
                                             <span>Forecast period</span>
-                                            <strong>{forecastHorizon} {periodUnit}{forecastHorizon === 1 ? "" : "s"}</strong>
+                                            <strong className="!text-xl">{forecastHorizon} {periodUnit}{forecastHorizon === 1 ? "" : "s"}</strong>
                                             <small>{formatCount(expectedPeriodTotal)} expected bookings in total</small>
                                         </article>
                                         <article>
                                             <span>Model</span>
-                                            <strong>{analytics.forecastMethod}</strong>
+                                            <strong className="!text-xl">{analytics.forecastMethod}</strong>
                                             <small>Approx. 95% prediction interval</small>
                                         </article>
                                     </div>
 
-                                    <div className="booking-forecast-chart">
+                                    <div className="booking-forecast-chart !h-[320px]">
                                         <h4 className="booking-forecast-section-title">
                                             ARIMA Forecast Chart · {analytics.forecastMethod}
                                         </h4>

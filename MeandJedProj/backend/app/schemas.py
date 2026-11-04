@@ -134,6 +134,25 @@ class ProfileUpdate(BaseModel):
         return value
 
 
+class ProfileSecurityUpdate(BaseModel):
+    currentPassword: str = Field(min_length=1, max_length=128)
+    newEmail: EmailStr | None = None
+    newPassword: str | None = Field(default=None, min_length=8, max_length=128)
+
+    @field_validator("newPassword")
+    @classmethod
+    def strong_new_password(cls, value):
+        if value is not None and (
+            not any(char.isupper() for char in value)
+            or not any(char.islower() for char in value)
+            or not any(char.isdigit() for char in value)
+        ):
+            raise ValueError(
+                "Password must include uppercase, lowercase, and a number"
+            )
+        return value
+
+
 class StatusIn(BaseModel):
     status: str
 

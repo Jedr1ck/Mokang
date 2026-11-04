@@ -134,6 +134,7 @@ CREATE TABLE `users` (
   `role` enum('homeowner','provider','admin') NOT NULL DEFAULT 'homeowner',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `last_login_at` datetime DEFAULT NULL,
   `last_seen_at` datetime DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

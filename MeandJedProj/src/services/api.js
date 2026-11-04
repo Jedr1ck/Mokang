@@ -53,6 +53,16 @@ export async function updateMyProfile(profileData) {
     return updatedUser;
 }
 
+export async function updateMySecurity(securityData) {
+    const updatedUser = await api('/profile/security', {
+        method: 'PUT',
+        body: JSON.stringify(securityData),
+    });
+
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return updatedUser;
+}
+
 // PROVIDER VERIFICATION API
 
 export async function uploadProviderId(idSide, file) {
