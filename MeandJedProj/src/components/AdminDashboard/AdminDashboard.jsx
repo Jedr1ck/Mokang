@@ -9,6 +9,7 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+import logo from "../../assets/images/logo.png";
 import "./AdminDashboard.css";
 
 import SideBarAdmin from "../SideBarAdmin/SideBarAdmin";
@@ -232,9 +233,7 @@ function AdminDashboard() {
                 <div className="admin-loading-card">
 
                     <div className="admin-loading-logo">
-
-                        <i className="bi bi-house-heart-fill"></i>
-
+                        <img src={logo} alt="SmartHome logo" className="admin-loading-logo-image" />
                     </div>
 
                     <div className="admin-loading-spinner"></div>

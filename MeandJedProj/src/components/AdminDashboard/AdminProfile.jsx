@@ -1,720 +1,226 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import 'bootstrap-icons/font/bootstrap-icons.css';
-
-import "./AdminDashboard.css";
+const defaultProfile = {
+    firstName: "Jedrick",
+    lastName: "Revilla",
+    contactNumber: "+63 912 345 6789",
+    address: "123 Main Street, Manila, Philippines",
+    displayName: "Admin",
+    role: "Administrator",
+    email: "admin@appointment.com",
+    createdAt: "Jan 15, 2025",
+    lastLogin: "Nov 3, 2026 · 7:24 PM",
+};
 
 function AdminProfile() {
-    const [profile, setProfile] = useState(null);
-
     const [isEditing, setIsEditing] = useState(false);
+    const [profile, setProfile] = useState(defaultProfile);
+    const [draft, setDraft] = useState(defaultProfile);
+    const [passwords, setPasswords] = useState({
+        newPassword: "",
+        confirmPassword: "",
+    });
 
-    const [fullName, setFullName] = useState("");
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [contact, setContact] = useState("");
-
-    const [showPasswordModal, setShowPasswordModal] =
-        useState(false);
-
-    const [currentPassword, setCurrentPassword] =
-        useState("");
-    const [newPassword, setNewPassword] =
-        useState("");
-    const [confirmPassword, setConfirmPassword] =
-        useState("");
-
-    const [showCurrentPassword, setShowCurrentPassword] =
-        useState(false);
-    const [showNewPassword, setShowNewPassword] =
-        useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] =
-        useState(false);
-
-    /*
-     * Backend-ready.
-     *
-     * The profile will be populated from the authenticated
-     * administrator account once the backend is connected.
-     *
-     * No sample administrator information is included.
-     */
-
-    const handleEdit = () => {
-        if (!profile) {
-            return;
-        }
-
-        setFullName(profile.fullName || "");
-        setUsername(profile.username || "");
-        setEmail(profile.email || "");
-        setContact(profile.contact || "");
-
-        setIsEditing(true);
-    };
-
-    const handleCancelEdit = () => {
-        setIsEditing(false);
-
-        setFullName("");
-        setUsername("");
-        setEmail("");
-        setContact("");
-    };
-
-    const handleSaveProfile = (event) => {
-        event.preventDefault();
-
-        /*
-         * Frontend-only update for now.
-         * This will be replaced by the backend API request.
-         */
-
-        setProfile((previousProfile) => ({
-            ...previousProfile,
-            fullName: fullName.trim(),
-            username: username.trim(),
-            email: email.trim(),
-            contact: contact.trim(),
+    const handleInputChange = (field, value) => {
+        setDraft((current) => ({
+            ...current,
+            [field]: value,
         }));
+    };
 
+    const handleSave = () => {
+        setProfile(draft);
         setIsEditing(false);
     };
 
-    const handleChangePassword = (event) => {
-        event.preventDefault();
+    const handleCancel = () => {
+        setDraft(profile);
+        setPasswords({ newPassword: "", confirmPassword: "" });
+        setIsEditing(false);
+    };
 
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            return;
-        }
-
-        /*
-         * Password update will be connected to the
-         * authentication backend later.
-         */
-
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-
-        setShowPasswordModal(false);
+    const handlePasswordChange = (field, value) => {
+        setPasswords((current) => ({
+            ...current,
+            [field]: value,
+        }));
     };
 
     return (
         <div className="admin-profile-page">
-
-            {/* PROFILE HEADER */}
-            <div className="admin-profile-page-header">
-
+            <div className="admin-profile-header-wrap">
                 <div>
-                    <span className="admin-section-label">
-                        ACCOUNT MANAGEMENT
-                    </span>
-
-                    <h2>Admin Profile</h2>
-
-                    <p>
-                        Manage your administrator account
-                        information and security settings.
-                    </p>
+                    <h1>Admin Profile</h1>
+                    <p>Manage your profile information and account settings.</p>
                 </div>
-
-                {!isEditing && profile && (
-                    <button
-                        type="button"
-                        className="admin-add-button"
-                        onClick={handleEdit}
-                    >
-                        <i className="bi bi-pencil"></i>
-                        Edit Profile
-                    </button>
-                )}
-
             </div>
 
-            {/* PROFILE CONTENT */}
-            {profile ? (
-                <div className="admin-profile-grid">
-
-                    {/* PERSONAL INFORMATION */}
-                    <section className="admin-profile-card">
-
-                        <div className="admin-profile-card-header">
-
-                            <div className="admin-profile-card-icon">
-                                <i className="bi bi-person-fill"></i>
-                            </div>
-
-                            <div>
-                                <h3>Personal Information</h3>
-
-                                <p>
-                                    Your administrator account
-                                    information.
-                                </p>
-                            </div>
-
+            <div className="admin-profile-hero-card">
+                <div className="admin-profile-avatar-shell">
+                    <div className="admin-profile-avatar">
+                        <div className="admin-avatar-face">
+                            <span className="admin-avatar-hair" />
+                            <span className="admin-avatar-head" />
+                            <span className="admin-avatar-neck" />
+                            <span className="admin-avatar-shirt" />
                         </div>
-
-                        {isEditing ? (
-
-                            <form
-                                className="admin-profile-form"
-                                onSubmit={handleSaveProfile}
-                            >
-
-                                <div className="admin-profile-form-grid">
-
-                                    <div className="admin-form-group">
-
-                                        <label htmlFor="admin-full-name">
-                                            Full Name
-                                        </label>
-
-                                        <input
-                                            id="admin-full-name"
-                                            type="text"
-                                            value={fullName}
-                                            onChange={(event) =>
-                                                setFullName(
-                                                    event.target.value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                    </div>
-
-                                    <div className="admin-form-group">
-
-                                        <label htmlFor="admin-username">
-                                            Username
-                                        </label>
-
-                                        <input
-                                            id="admin-username"
-                                            type="text"
-                                            value={username}
-                                            onChange={(event) =>
-                                                setUsername(
-                                                    event.target.value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                    </div>
-
-                                    <div className="admin-form-group">
-
-                                        <label htmlFor="admin-email">
-                                            Email Address
-                                        </label>
-
-                                        <input
-                                            id="admin-email"
-                                            type="email"
-                                            value={email}
-                                            onChange={(event) =>
-                                                setEmail(
-                                                    event.target.value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                    </div>
-
-                                    <div className="admin-form-group">
-
-                                        <label htmlFor="admin-contact">
-                                            Contact Number
-                                        </label>
-
-                                        <input
-                                            id="admin-contact"
-                                            type="text"
-                                            value={contact}
-                                            onChange={(event) =>
-                                                setContact(
-                                                    event.target.value
-                                                )
-                                            }
-                                        />
-
-                                    </div>
-
-                                </div>
-
-                                <div className="admin-profile-form-actions">
-
-                                    <button
-                                        type="button"
-                                        className="admin-modal-secondary-button"
-                                        onClick={
-                                            handleCancelEdit
-                                        }
-                                    >
-                                        Cancel
-                                    </button>
-
-                                    <button
-                                        type="submit"
-                                        className="admin-modal-primary-button"
-                                    >
-                                        <i className="bi bi-check-lg"></i>
-                                        Save Changes
-                                    </button>
-
-                                </div>
-
-                            </form>
-
-                        ) : (
-
-                            <div className="admin-profile-details">
-
-                                <div className="admin-profile-detail">
-
-                                    <span>Full Name</span>
-
-                                    <strong>
-                                        {profile.fullName ||
-                                            "—"}
-                                    </strong>
-
-                                </div>
-
-                                <div className="admin-profile-detail">
-
-                                    <span>Username</span>
-
-                                    <strong>
-                                        {profile.username ||
-                                            "—"}
-                                    </strong>
-
-                                </div>
-
-                                <div className="admin-profile-detail">
-
-                                    <span>Email Address</span>
-
-                                    <strong>
-                                        {profile.email ||
-                                            "—"}
-                                    </strong>
-
-                                </div>
-
-                                <div className="admin-profile-detail">
-
-                                    <span>Contact Number</span>
-
-                                    <strong>
-                                        {profile.contact ||
-                                            "—"}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        )}
-
-                    </section>
-
-                    {/* ACCOUNT INFORMATION */}
-                    <section className="admin-profile-card">
-
-                        <div className="admin-profile-card-header">
-
-                            <div className="admin-profile-card-icon">
-                                <i className="bi bi-shield-check"></i>
-                            </div>
-
-                            <div>
-                                <h3>Account Information</h3>
-
-                                <p>
-                                    Administrator account status
-                                    and access information.
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div className="admin-profile-account-info">
-
-                            <div className="admin-profile-account-row">
-
-                                <div>
-                                    <span>Account Role</span>
-
-                                    <strong>
-                                        Administrator
-                                    </strong>
-                                </div>
-
-                                <i className="bi bi-person-badge"></i>
-
-                            </div>
-
-                            <div className="admin-profile-account-row">
-
-                                <div>
-                                    <span>Account Status</span>
-
-                                    <strong className="admin-profile-active">
-                                        Active
-                                    </strong>
-                                </div>
-
-                                <i className="bi bi-check-circle-fill"></i>
-
-                            </div>
-
-                            <div className="admin-profile-account-row">
-
-                                <div>
-                                    <span>Authentication</span>
-
-                                    <strong>
-                                        Protected Account
-                                    </strong>
-                                </div>
-
-                                <i className="bi bi-lock-fill"></i>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                    {/* SECURITY */}
-                    <section className="admin-profile-card">
-
-                        <div className="admin-profile-card-header">
-
-                            <div className="admin-profile-card-icon">
-                                <i className="bi bi-lock-fill"></i>
-                            </div>
-
-                            <div>
-                                <h3>Security</h3>
-
-                                <p>
-                                    Manage your administrator
-                                    account security.
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div className="admin-security-content">
-
-                            <div>
-                                <strong>
-                                    Password
-                                </strong>
-
-                                <span>
-                                    Keep your administrator
-                                    password secure and updated.
-                                </span>
-                            </div>
-
-                            <button
-                                type="button"
-                                className="admin-security-button"
-                                onClick={() =>
-                                    setShowPasswordModal(true)
-                                }
-                            >
-                                <i className="bi bi-key-fill"></i>
-                                Change Password
-                            </button>
-
-                        </div>
-
-                    </section>
-
+                    </div>
+                    <button type="button" className="admin-avatar-camera" aria-label="Upload profile picture">
+                        <i className="bi bi-camera-fill" />
+                    </button>
                 </div>
-            ) : (
 
-                /* EMPTY STATE */
-                <div className="admin-profile-empty">
+                <div className="admin-profile-identity">
+                    <h2>{profile.displayName}</h2>
+                    <div className="admin-profile-role">{profile.role}</div>
+                    <div className="admin-profile-email">
+                        <span className="admin-profile-email-icon">
+                            <i className="bi bi-envelope-fill" />
+                        </span>
+                        <span>{profile.email}</span>
+                    </div>
+                </div>
 
-                    <div className="admin-profile-empty-icon">
-                        <i className="bi bi-person-circle"></i>
+                <div className="admin-profile-account-card">
+                    <h3>Account Details</h3>
+
+                    <div className="admin-profile-detail-row">
+                        <div className="admin-profile-detail-icon">
+                            <i className="bi bi-calendar3" />
+                        </div>
+                        <div className="admin-profile-detail-copy">
+                            <span>Account Created</span>
+                            <strong>{profile.createdAt}</strong>
+                        </div>
                     </div>
 
-                    <h3>
-                        Administrator Profile
-                    </h3>
-
-                    <p>
-                        Administrator account information will
-                        appear here once the account data is
-                        connected.
-                    </p>
-
-                    <span>
-                        No profile data is currently available.
-                    </span>
-
-                </div>
-
-            )}
-
-            {/* CHANGE PASSWORD MODAL */}
-            {showPasswordModal && (
-                <div
-                    className="admin-modal-overlay"
-                    onClick={() =>
-                        setShowPasswordModal(false)
-                    }
-                >
-
-                    <div
-                        className="admin-modal admin-small-modal"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-
-                        <div className="admin-modal-header">
-
-                            <div>
-                                <span>
-                                    ACCOUNT SECURITY
-                                </span>
-
-                                <h3>
-                                    Change Password
-                                </h3>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setShowPasswordModal(
-                                        false
-                                    )
-                                }
-                            >
-                                <i className="bi bi-x-lg"></i>
-                            </button>
-
+                    <div className="admin-profile-detail-row">
+                        <div className="admin-profile-detail-icon">
+                            <i className="bi bi-clock-history" />
                         </div>
+                        <div className="admin-profile-detail-copy">
+                            <span>Last Login</span>
+                            <strong>{profile.lastLogin}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <form
-                            onSubmit={
-                                handleChangePassword
-                            }
-                        >
-
-                            <div className="admin-modal-body">
-
-                                <div className="admin-form-group">
-
-                                    <label htmlFor="current-password">
-                                        Current Password
-                                    </label>
-
-                                    <div className="admin-password-input">
-
-                                        <input
-                                            id="current-password"
-                                            type={
-                                                showCurrentPassword
-                                                    ? "text"
-                                                    : "password"
-                                            }
-                                            value={
-                                                currentPassword
-                                            }
-                                            onChange={(
-                                                event
-                                            ) =>
-                                                setCurrentPassword(
-                                                    event
-                                                        .target
-                                                        .value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setShowCurrentPassword(
-                                                    (
-                                                        value
-                                                    ) =>
-                                                        !value
-                                                )
-                                            }
-                                        >
-                                            <i
-                                                className={`bi ${showCurrentPassword
-                                                    ? "bi-eye-slash"
-                                                    : "bi-eye"
-                                                    }`}
-                                            ></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                                <div className="admin-form-group">
-
-                                    <label htmlFor="new-password">
-                                        New Password
-                                    </label>
-
-                                    <div className="admin-password-input">
-
-                                        <input
-                                            id="new-password"
-                                            type={
-                                                showNewPassword
-                                                    ? "text"
-                                                    : "password"
-                                            }
-                                            value={
-                                                newPassword
-                                            }
-                                            onChange={(
-                                                event
-                                            ) =>
-                                                setNewPassword(
-                                                    event
-                                                        .target
-                                                        .value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setShowNewPassword(
-                                                    (
-                                                        value
-                                                    ) =>
-                                                        !value
-                                                )
-                                            }
-                                        >
-                                            <i
-                                                className={`bi ${showNewPassword
-                                                    ? "bi-eye-slash"
-                                                    : "bi-eye"
-                                                    }`}
-                                            ></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                                <div className="admin-form-group">
-
-                                    <label htmlFor="confirm-password">
-                                        Confirm New Password
-                                    </label>
-
-                                    <div className="admin-password-input">
-
-                                        <input
-                                            id="confirm-password"
-                                            type={
-                                                showConfirmPassword
-                                                    ? "text"
-                                                    : "password"
-                                            }
-                                            value={
-                                                confirmPassword
-                                            }
-                                            onChange={(
-                                                event
-                                            ) =>
-                                                setConfirmPassword(
-                                                    event
-                                                        .target
-                                                        .value
-                                                )
-                                            }
-                                            required
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setShowConfirmPassword(
-                                                    (
-                                                        value
-                                                    ) =>
-                                                        !value
-                                                )
-                                            }
-                                        >
-                                            <i
-                                                className={`bi ${showConfirmPassword
-                                                    ? "bi-eye-slash"
-                                                    : "bi-eye"
-                                                    }`}
-                                            ></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div className="admin-modal-footer">
-
-                                <button
-                                    type="button"
-                                    className="admin-modal-secondary-button"
-                                    onClick={() =>
-                                        setShowPasswordModal(
-                                            false
-                                        )
-                                    }
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    className="admin-modal-primary-button"
-                                >
-                                    Update Password
-                                </button>
-
-                            </div>
-
-                        </form>
-
+            <div className="admin-profile-lower-grid">
+                <div className="admin-profile-panel">
+                    <div className="admin-profile-panel-header">
+                        <span className="admin-panel-icon admin-panel-icon-person">
+                            <i className="bi bi-person-fill" />
+                        </span>
+                        <h3>Personal Information</h3>
                     </div>
 
-                </div>
-            )}
+                    <div className="admin-profile-fields">
+                        <div className="admin-profile-field">
+                            <label>First Name</label>
+                            <input
+                                type="text"
+                                value={draft.firstName}
+                                onChange={(event) => handleInputChange("firstName", event.target.value)}
+                                readOnly={!isEditing}
+                            />
+                        </div>
 
+                        <div className="admin-profile-field">
+                            <label>Last Name</label>
+                            <input
+                                type="text"
+                                value={draft.lastName}
+                                onChange={(event) => handleInputChange("lastName", event.target.value)}
+                                readOnly={!isEditing}
+                            />
+                        </div>
+
+                        <div className="admin-profile-field">
+                            <label>Contact Number</label>
+                            <div className="admin-profile-input-with-icon">
+                                <i className="bi bi-telephone-fill" />
+                                <input
+                                    type="text"
+                                    value={draft.contactNumber}
+                                    onChange={(event) => handleInputChange("contactNumber", event.target.value)}
+                                    readOnly={!isEditing}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="admin-profile-field">
+                            <label>Address</label>
+                            <div className="admin-profile-input-with-icon">
+                                <i className="bi bi-geo-alt-fill" />
+                                <input
+                                    type="text"
+                                    value={draft.address}
+                                    onChange={(event) => handleInputChange("address", event.target.value)}
+                                    readOnly={!isEditing}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="admin-profile-panel">
+                    <div className="admin-profile-panel-header">
+                        <span className="admin-panel-icon admin-panel-icon-security">
+                            <i className="bi bi-shield-fill-check" />
+                        </span>
+                        <h3>Account Security</h3>
+                    </div>
+
+                    <div className="admin-profile-security-box">
+                        <h4>Change Password</h4>
+                        <div className="admin-profile-security-row">
+                            <div className="admin-profile-password-field">
+                                <i className="bi bi-lock-fill" />
+                                <input
+                                    type="password"
+                                    placeholder="New Password"
+                                    value={passwords.newPassword}
+                                    onChange={(event) => handlePasswordChange("newPassword", event.target.value)}
+                                />
+                            </div>
+                            <div className="admin-profile-password-field">
+                                <i className="bi bi-lock-fill" />
+                                <input
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    value={passwords.confirmPassword}
+                                    onChange={(event) => handlePasswordChange("confirmPassword", event.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="admin-profile-toggle-row">
+                            <div>
+                                <h4>Two-Factor Authentication</h4>
+                                <p>Add an extra layer of security to your account.</p>
+                            </div>
+                            <button type="button" className="admin-profile-toggle active" aria-label="Toggle two-factor authentication">
+                                <span className="admin-profile-toggle-thumb" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="admin-profile-actions">
+                <button type="button" className="admin-profile-primary-btn" onClick={handleSave}>
+                    <i className="bi bi-check2-square" />
+                    Save Changes
+                </button>
+                <button type="button" className="admin-profile-secondary-btn" onClick={handleCancel}>
+                    <i className="bi bi-x-lg" />
+                    Cancel
+                </button>
+            </div>
         </div>
     );
 }

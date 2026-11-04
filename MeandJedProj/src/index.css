@@ -1,3 +1,7 @@
+:root {
+  font-size: 16px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,13 +14,42 @@ html {
 
 body {
   font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
   color: #245b39;
   background: white;
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
+  font-size: 1rem;
+}
+
+button {
   cursor: pointer;
+}
+
+p,
+li,
+span,
+label,
+a,
+strong,
+small {
+  font-size: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 
