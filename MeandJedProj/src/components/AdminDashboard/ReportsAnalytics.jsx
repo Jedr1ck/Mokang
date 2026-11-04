@@ -27,6 +27,8 @@ const EMPTY_ANALYTICS = {
         dateBasis: "scheduled_date",
     },
     forecast: [],
+    sampleData: false,
+    dataSourceLabel: "Recorded bookings",
     forecastAccuracy: {
         mae: null,
         rmse: null,
@@ -122,7 +124,7 @@ const toLocalDateInputValue = (value) => {
     return `${year}-${month}-${day}`;
 };
 
-const getDefaultDateRange = (selectedFrequency) => {
+const getDefaultDateRange = (selectedFrequency, monthlyPeriods = 36) => {
     const end = new Date();
     const start = new Date(end);
     if (selectedFrequency === "daily") {
@@ -135,7 +137,7 @@ const getDefaultDateRange = (selectedFrequency) => {
     } else {
         end.setDate(1);
         end.setDate(0);
-        start.setFullYear(end.getFullYear(), end.getMonth() - 35, 1);
+        start.setFullYear(end.getFullYear(), end.getMonth() - (monthlyPeriods - 1), 1);
     }
     return {
         startDate: toLocalDateInputValue(start),
@@ -149,6 +151,7 @@ function ReportsAnalytics() {
     const [error, setError] = useState("");
     const [forecastHorizon, setForecastHorizon] = useState(3);
     const [frequency, setFrequency] = useState("monthly");
+    const [useSampleData, setUseSampleData] = useState(false);
     const [dateRange, setDateRange] = useState(() => getDefaultDateRange("monthly"));
 
     useEffect(() => {
@@ -157,6 +160,7 @@ function ReportsAnalytics() {
         getAdminBookingAnalytics({
             frequency,
             horizon: String(forecastHorizon),
+            sampleData: String(useSampleData),
             ...dateRange,
         })
             .then((data) => {
@@ -177,7 +181,7 @@ function ReportsAnalytics() {
         return () => {
             active = false;
         };
-    }, [frequency, forecastHorizon, dateRange]);
+    }, [frequency, forecastHorizon, useSampleData, dateRange]);
 
     const historicalForecastSeries = useMemo(
         () => analytics.trainingHistory,
@@ -294,6 +298,7 @@ function ReportsAnalytics() {
         const rows = [
             ["Forecast frequency", frequency],
             ["Forecast horizon", forecastHorizon],
+            ["Data source", analytics.dataSourceLabel],
             ["Start date", analytics.startDate],
             ["End date", analytics.endDate],
             ["Reliability", analytics.reliability.label],
@@ -436,6 +441,15 @@ function ReportsAnalytics() {
                 Date-based insights use the selected complete-period range ({analytics.startDate || dateRange.startDate} to {analytics.endDate || dateRange.endDate}), include bookings of all statuses, and group bookings by scheduled appointment date. Bookings without a scheduled date are reported separately and excluded.
             </p>
 
+            {(useSampleData || analytics.sampleData) && (
+                <div className="booking-coverage-range-warning" role="status">
+                    <i className="bi bi-info-circle"></i>
+                    <span>
+                        Demo mode is on. All displayed booking insights and forecasts use fixed synthetic sample data, not real bookings.
+                    </span>
+                </div>
+            )}
+
             {error && (
                 <div className="booking-insights-error" role="alert">
                     <i className="bi bi-exclamation-circle"></i>
@@ -456,7 +470,9 @@ function ReportsAnalytics() {
                                 <i className="bi bi-calendar2-check"></i>
                             </span>
                             <div>
-                                <span className="!text-xs">Booking requests in selected range</span>
+                                <span className="!text-xs">
+                                    {analytics.sampleData ? "Sample booking requests" : "Booking requests in selected range"}
+                                </span>
                                 <strong className="!text-2xl">{analytics.totalBookings.toLocaleString()}</strong>
                                 <small>All statuses · scheduled dates</small>
                             </div>
@@ -489,17 +505,19 @@ function ReportsAnalytics() {
                                 <i className="bi bi-database-check"></i>
                             </span>
                             <div>
-                                <span className="!text-xs">Total recorded bookings</span>
+                                <span className="!text-xs">
+                                    {analytics.sampleData ? "Sample bookings" : "Total recorded bookings"}
+                                </span>
                                 <strong className="!text-2xl">{analytics.historyBookingCount.toLocaleString()}</strong>
-                                <small>All statuses · scheduled dates</small>
+                                <small>{analytics.sampleData ? "Synthetic scheduled dates" : "All statuses · scheduled dates"}</small>
                                 <small>
-                                    {analytics.periodsWithRecordedBookings} {periodName}s with recorded bookings
+                                    {analytics.periodsWithRecordedBookings} {periodName}s with {analytics.sampleData ? "sample" : "recorded"} bookings
                                 </small>
                                 <small>
-                                    Verified {periodName}s: {analytics.verifiedPeriodCount} / {analytics.historicalPeriodCount}
+                                    {analytics.sampleData ? "Sample" : "Verified"} {periodName}s: {analytics.verifiedPeriodCount} / {analytics.historicalPeriodCount}
                                 </small>
                                 <small>
-                                    {analytics.historyObservationCount} verified active {periodName}s with bookings
+                                    {analytics.historyObservationCount} {analytics.sampleData ? "sample" : "verified active"} {periodName}s with bookings
                                 </small>
                             </div>
                         </article>
@@ -664,10 +682,26 @@ function ReportsAnalytics() {
                                             setDateRange(getDefaultDateRange(selectedFrequency));
                                         }}
                                     >
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
+                                        <option value="daily" disabled={useSampleData}>Daily</option>
+                                        <option value="weekly" disabled={useSampleData}>Weekly</option>
                                         <option value="monthly">Monthly</option>
                                     </select>
+                                    <label className="flex items-center gap-2 !text-xs !font-medium !text-slate-600">
+                                        <input
+                                            type="checkbox"
+                                            checked={useSampleData}
+                                            onChange={(event) => {
+                                                const enabled = event.target.checked;
+                                                setLoading(true);
+                                                setUseSampleData(enabled);
+                                                setFrequency("monthly");
+                                                setDateRange(
+                                                    getDefaultDateRange("monthly", enabled ? 60 : 36)
+                                                );
+                                            }}
+                                        />
+                                        Use demo data
+                                    </label>
                                     <label htmlFor="booking-forecast-start-date">From</label>
                                     <input
                                         id="booking-forecast-start-date"
@@ -726,10 +760,10 @@ function ReportsAnalytics() {
                                 <strong>Data Quality &amp; Availability</strong>
                                 <div>
                                     <span>Historical periods <b>{analytics.historicalPeriodCount}</b></span>
-                                    <span>Verified periods <b>{analytics.verifiedPeriodCount} / {analytics.historicalPeriodCount}</b></span>
-                                    <span>Periods with recorded bookings <b>{analytics.periodsWithRecordedBookings}</b></span>
-                                    <span>Covered active periods <b>{analytics.periodsWithBookings}</b></span>
-                                    <span>Consecutive verified periods <b>{analytics.validConsecutiveObservationCount}</b></span>
+                                    <span>{analytics.sampleData ? "Sample periods" : "Verified periods"} <b>{analytics.verifiedPeriodCount} / {analytics.historicalPeriodCount}</b></span>
+                                    <span>Periods with {analytics.sampleData ? "sample" : "recorded"} bookings <b>{analytics.periodsWithRecordedBookings}</b></span>
+                                    <span>{analytics.sampleData ? "Sample active periods" : "Covered active periods"} <b>{analytics.periodsWithBookings}</b></span>
+                                    <span>Consecutive {analytics.sampleData ? "sample" : "verified"} periods <b>{analytics.validConsecutiveObservationCount}</b></span>
                                     <span>Confirmed zero-booking periods <b>{analytics.zeroBookingPeriodCount}</b></span>
                                     <span>Missing / unverified periods <b>{analytics.missingPeriodCount}</b></span>
                                     {analytics.undatedBookingCount > 0 && (
@@ -737,7 +771,9 @@ function ReportsAnalytics() {
                                     )}
                                 </div>
                                 <small>
-                                    Selected range: {analytics.startDate} to {analytics.endDate}; only complete periods are counted. Booking totals include all statuses and use scheduled appointment dates; undated bookings are excluded and shown separately. Complete coverage start: {analytics.coverageStartDate || "not configured"}. Empty periods count as zero only after the configured coverage date; earlier periods remain unverified.
+                                    {analytics.sampleData
+                                        ? `Sample range: ${analytics.startDate} to ${analytics.endDate}. Periods and counts are synthetic and do not represent verified booking coverage.`
+                                        : `Selected range: ${analytics.startDate} to ${analytics.endDate}; only complete periods are counted. Booking totals include all statuses and use scheduled appointment dates; undated bookings are excluded and shown separately. Complete coverage start: ${analytics.coverageStartDate || "not configured"}. Empty periods count as zero only after the configured coverage date; earlier periods remain unverified.`}
                                 </small>
                                 {analytics.coverageStartDate
                                     && analytics.endDate

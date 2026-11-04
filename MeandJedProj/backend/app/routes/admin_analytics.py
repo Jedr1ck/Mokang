@@ -42,6 +42,13 @@ BOOKING_STATUS_NAMES = {
     **{status.casefold(): status for status in BOOKING_STATUS_ORDER},
     "canceled": "Cancelled",
 }
+SAMPLE_MONTHLY_BOOKING_COUNTS = (
+    42, 47, 53, 52, 48, 47, 50, 57, 64, 68, 65, 63,
+    66, 71, 77, 76, 72, 71, 74, 81, 88, 92, 89, 87,
+    90, 95, 101, 100, 96, 95, 98, 105, 112, 116, 113, 111,
+    114, 119, 125, 124, 120, 119, 122, 129, 136, 140, 137, 135,
+    138, 143, 149, 148, 144, 143, 146, 153, 160, 164, 161, 159,
+)
 
 
 def parse_iso_date(value):
@@ -97,6 +104,44 @@ def period_label(day, frequency):
     if frequency == "weekly":
         return f"Week of {day.strftime('%b %d')}"
     return f"{MONTH_NAMES[day.month - 1]} {str(day.year)[-2:]}"
+
+
+def sample_monthly_booking_rows(periods):
+    sample_counts = (
+        SAMPLE_MONTHLY_BOOKING_COUNTS[-len(periods):]
+        if periods
+        else ()
+    )
+    rows = []
+    demand_rows = []
+    for period, count in zip(periods, sample_counts):
+        weekly_counts = [
+            count // 4 + (1 if index < count % 4 else 0)
+            for index in range(4)
+        ]
+        for week_index, weekly_count in enumerate(weekly_counts):
+            booking_date = period + timedelta(days=3 + week_index * 7)
+            cancelled_count = max(1, weekly_count // 10)
+            rows.append((booking_date, "Home Services", weekly_count))
+            demand_rows.extend(
+                (
+                    (
+                        booking_date,
+                        "Completed",
+                        "Home Services",
+                        "General repairs",
+                        weekly_count - cancelled_count,
+                    ),
+                    (
+                        booking_date,
+                        "Cancelled",
+                        "Home Services",
+                        "General repairs",
+                        cancelled_count,
+                    ),
+                )
+            )
+    return rows, demand_rows
 
 
 def arima_111_forecast(values, horizon=12):
@@ -555,6 +600,9 @@ def booking_analytics():
     frequency = request.args.get("frequency", "monthly").lower()
     if frequency not in {"daily", "weekly", "monthly"}:
         raise ApiError("Frequency must be daily, weekly, or monthly.", 422)
+    sample_data = request.args.get("sampleData", "").lower() == "true"
+    if sample_data and frequency != "monthly":
+        raise ApiError("Sample data is available for monthly forecasts only.", 422)
 
     baseline_min_periods = max(
         1,
@@ -585,7 +633,9 @@ def booking_analytics():
         raise ApiError("Forecast horizon must be 3, 6, or 12.", 422)
 
     today = date.today()
-    period_count_limit = {"daily": 365, "weekly": 156, "monthly": 36}[frequency]
+    period_count_limit = (
+        60 if sample_data else {"daily": 365, "weekly": 156, "monthly": 36}[frequency]
+    )
     default_end_date = today - timedelta(days=1)
     if frequency in {"weekly", "monthly"}:
         default_end_date = period_start(today, frequency) - timedelta(days=1)
@@ -630,7 +680,9 @@ def booking_analytics():
 
     with get_session() as session:
         admin_user_or_error(session)
-        coverage_start_value = stored_coverage_start(session)
+        coverage_start_value = (
+            "" if sample_data else stored_coverage_start(session)
+        )
         try:
             coverage_start_date = (
                 parse_iso_date(coverage_start_value)
@@ -673,6 +725,10 @@ def booking_analytics():
             )
             .all()
         )
+
+    if sample_data:
+        rows, demand_rows = sample_monthly_booking_rows(selected_periods)
+        coverage_start_date = selected_periods[0] if selected_periods else None
 
     latest_complete_week = period_start(today, "weekly") - timedelta(weeks=1)
     weekly_activity_periods = [
@@ -1048,6 +1104,13 @@ def booking_analytics():
             "description": "The series has recurring activity and backtest errors are within a more useful range.",
         }
 
+    if sample_data:
+        reliability = {
+            "level": "limited",
+            "label": "Demo data only",
+            "description": "This forecast and the displayed booking insights use fixed synthetic sample data, not real bookings.",
+        }
+
     if not coverage_start_date:
         model_status = "coverage_unconfigured"
         model_status_label = "Historical Coverage Not Configured"
@@ -1143,11 +1206,23 @@ def booking_analytics():
             f"ARIMA did not pass the model-selection checks ({'; '.join(failed_checks) or 'too few successful validation folds'}). "
             f"The {selected_baseline_method or 'available baseline'} is used instead."
         )
+    if sample_data:
+        model_status_label = f"Demo: {model_status_label}"
+        forecast_message = f"Synthetic sample data only. {forecast_message}"
+        accuracy_interpretation = (
+            f"Synthetic sample data only. {accuracy_interpretation}"
+        )
     peak_month_index = max(range(12), key=month_totals.__getitem__)
     peak_quarter_index = max(range(4), key=quarter_totals.__getitem__)
     peak_season = max(season_totals, key=season_totals.__getitem__)
 
     return jsonify(
+        sampleData=sample_data,
+        dataSourceLabel=(
+            "Synthetic sample data (not real bookings)"
+            if sample_data
+            else "Recorded bookings"
+        ),
         totalBookings=sum(month_totals),
         peakSeason={
             "name": peak_season,

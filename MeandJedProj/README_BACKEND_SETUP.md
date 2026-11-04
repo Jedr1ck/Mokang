@@ -77,6 +77,12 @@ Optional `.env` in project root:
 - GET /admin/provider-verifications/{provider_id}/documents/{side}
 - POST /admin/provider-verifications/{provider_id}/approve
 - GET /admin/analytics (administrator-only booking seasonality, service preferences, and ARIMA(1,1,1) forecast)
+
+For a clearly labeled monthly forecasting demo, call
+`GET /admin/analytics?frequency=monthly&sampleData=true`. This uses fixed,
+five-year synthetic booking data to demonstrate the ARIMA forecast and backtest.
+It affects the report only and does not create or change database records.
+Normal analytics requests continue to use recorded bookings.
 - POST /bookings
 - GET /bookings/my
 - PATCH /bookings/{id}/cancel (homeowner cancellation before provider acceptance)
