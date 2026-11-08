@@ -32,7 +32,7 @@ function ServiceCategories() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-    const itemsPerPage = 5;
+    const itemsPerPage = 20;
 
     useEffect(() => {
         let active = true;

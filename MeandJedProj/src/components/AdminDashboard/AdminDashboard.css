@@ -16421,3 +16421,646 @@
         text-align: center;
     }
 }
+
+/* Dark, luminous booking analytics */
+.booking-insights-page {
+    --analytics-bg: #0b1220;
+    --analytics-surface: #111b2b;
+    --analytics-raised: #172438;
+    --analytics-border: rgba(148, 163, 184, 0.16);
+    --analytics-text: #eef4ff;
+    --analytics-muted: #bac8db;
+    --analytics-orange: #fb923c;
+    --analytics-green: #4ade80;
+    --analytics-blue: #67e8f9;
+    position: relative;
+    isolation: isolate;
+    padding: clamp(16px, 2.4vw, 32px);
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 28px;
+    background:
+        radial-gradient(ellipse at 2% 0%, rgba(249, 115, 22, 0.12), transparent 34%),
+        radial-gradient(ellipse at 96% 28%, rgba(34, 211, 238, 0.08), transparent 32%),
+        linear-gradient(145deg, #0b1220 0%, #0e1726 55%, #101a2b 100%);
+    color: var(--analytics-text);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.035), 0 24px 70px rgba(2, 6, 23, 0.32);
+}
+
+.booking-insights-page .reports-page-header {
+    position: relative;
+    overflow: hidden;
+    align-items: flex-start;
+    padding: clamp(22px, 3vw, 36px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    border-radius: 22px !important;
+    background:
+        radial-gradient(circle at 88% 18%, rgba(251, 146, 60, 0.16), transparent 30%),
+        linear-gradient(125deg, rgba(23, 36, 56, 0.98), rgba(15, 25, 41, 0.98)) !important;
+    box-shadow: 0 18px 48px rgba(2, 6, 23, 0.35), 0 0 32px rgba(249, 115, 22, 0.07) !important;
+}
+
+.booking-insights-page .reports-section-label {
+    color: #fdba74 !important;
+}
+
+.booking-insights-page .reports-page-header h2 {
+    color: var(--analytics-text) !important;
+}
+
+.booking-insights-page .reports-page-header p {
+    color: #adbbcf !important;
+}
+
+.booking-insights-page .booking-insights-date-note {
+    border-color: rgba(251, 146, 60, 0.26) !important;
+    background: rgba(249, 115, 22, 0.1) !important;
+    color: #fed7aa !important;
+    box-shadow: 0 0 22px rgba(249, 115, 22, 0.08);
+}
+
+.booking-insights-page .booking-insights-scope-note {
+    border-color: var(--analytics-border) !important;
+    background: rgba(17, 27, 43, 0.72) !important;
+    color: var(--analytics-muted) !important;
+}
+
+.booking-insights-page .booking-insights-kpi,
+.booking-insights-page .booking-insights-panel {
+    border-color: var(--analytics-border) !important;
+    background: linear-gradient(145deg, rgba(23, 36, 56, 0.96), rgba(15, 25, 41, 0.98)) !important;
+    box-shadow:
+        0 12px 30px rgba(2, 6, 23, 0.28),
+        inset 0 1px rgba(255, 255, 255, 0.045),
+        0 0 24px rgba(56, 189, 248, 0.025) !important;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.booking-insights-page .booking-insights-kpi {
+    position: relative;
+    overflow: hidden;
+}
+
+.booking-insights-page .booking-insights-kpi::after {
+    position: absolute;
+    top: 0;
+    right: 18px;
+    left: 18px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(251, 146, 60, 0.55), transparent);
+    content: "";
+}
+
+.booking-insights-page .booking-insights-kpi:hover,
+.booking-insights-page .booking-insights-panel:hover,
+.booking-insights-page .booking-demand-insights:hover,
+.booking-insights-page .booking-weekly-activity:hover {
+    transform: translateY(-2px);
+    border-color: rgba(251, 146, 60, 0.3) !important;
+    box-shadow:
+        0 18px 38px rgba(2, 6, 23, 0.38),
+        0 0 28px rgba(249, 115, 22, 0.09),
+        inset 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+.booking-insights-page .booking-insights-kpi > div > span,
+.booking-insights-page .booking-insights-kpi small,
+.booking-insights-page .booking-insights-panel-heading p,
+.booking-insights-page .booking-season-months,
+.booking-insights-page .booking-preference-share,
+.booking-insights-page .booking-season-method-note,
+.booking-insights-page .booking-preference-method-note,
+.booking-insights-page .booking-monthly-distribution-heading > span,
+.booking-insights-page .booking-demand-insights-header p,
+.booking-insights-page .booking-demand-insights-note,
+.booking-insights-page .booking-weekly-activity-header p,
+.booking-insights-page .booking-weekly-activity-note,
+.booking-insights-page .booking-forecast-policy,
+.booking-insights-page .booking-forecast-model-information > span,
+.booking-insights-page .booking-forecast-summary article > span,
+.booking-insights-page .booking-forecast-summary article small {
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-insights-kpi strong,
+.booking-insights-page .booking-insights-panel-heading h3,
+.booking-insights-page .booking-season-label,
+.booking-insights-page .booking-season-label strong,
+.booking-insights-page .booking-monthly-distribution-heading h4,
+.booking-insights-page .booking-monthly-distribution-row strong,
+.booking-insights-page .booking-demand-insights-header h4,
+.booking-insights-page .booking-demand-insights-grid article > strong,
+.booking-insights-page .booking-status-distribution-row > strong,
+.booking-insights-page .booking-forecast-section-title,
+.booking-insights-page .booking-forecast-policy strong,
+.booking-insights-page .booking-forecast-model-information strong,
+.booking-insights-page .booking-forecast-summary article > strong,
+.booking-insights-page .booking-weekly-activity-header h4,
+.booking-insights-page .booking-forecast-accuracy > div strong,
+.booking-insights-page .booking-forecast-accuracy > span strong,
+.booking-insights-page .booking-forecast-validation-heading strong {
+    color: var(--analytics-text);
+}
+
+.booking-insights-page .booking-insights-eyebrow {
+    color: #fdba74;
+}
+
+.booking-insights-page .booking-insights-panel-heading {
+    border-bottom-color: var(--analytics-border) !important;
+}
+
+.booking-insights-page .booking-insights-kpi-icon.green,
+.booking-insights-page .booking-insights-panel-icon.green {
+    background: rgba(74, 222, 128, 0.12) !important;
+    color: var(--analytics-green) !important;
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.1);
+}
+
+.booking-insights-page .booking-insights-kpi-icon.orange,
+.booking-insights-page .booking-insights-panel-icon.orange {
+    background: rgba(251, 146, 60, 0.13) !important;
+    color: var(--analytics-orange) !important;
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.11);
+}
+
+.booking-insights-page .booking-insights-kpi-icon.blue,
+.booking-insights-page .booking-insights-panel-icon.blue {
+    background: rgba(103, 232, 249, 0.11) !important;
+    color: var(--analytics-blue) !important;
+    box-shadow: 0 0 20px rgba(103, 232, 249, 0.09);
+}
+
+.booking-insights-page .booking-season-label,
+.booking-insights-page .booking-status-distribution-row {
+    color: #bdc9da;
+}
+
+.booking-insights-page .booking-insights-track,
+.booking-insights-page .booking-status-distribution-track,
+.booking-insights-page .booking-monthly-distribution-track,
+.booking-insights-page .booking-forecast-bar-area {
+    background: rgba(148, 163, 184, 0.14);
+}
+
+.booking-insights-page .booking-insights-fill.orange,
+.booking-insights-page .booking-monthly-distribution-track > span {
+    background: linear-gradient(90deg, #f97316, #fdba74);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+}
+
+.booking-insights-page .booking-insights-fill.green {
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.25);
+}
+
+.booking-insights-page .booking-season-highlights,
+.booking-insights-page .booking-monthly-distribution,
+.booking-insights-page .booking-status-distribution {
+    border-color: var(--analytics-border);
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-season-highlights i,
+.booking-insights-page .booking-season-highlights strong {
+    color: #fdba74;
+}
+
+.booking-insights-page .booking-preference-rank {
+    background: rgba(251, 146, 60, 0.12);
+    color: #fdba74;
+    box-shadow: inset 0 0 0 1px rgba(251, 146, 60, 0.1);
+}
+
+.booking-insights-page .booking-demand-insights,
+.booking-insights-page .booking-weekly-activity,
+.booking-insights-page .booking-forecast-data-availability,
+.booking-insights-page .booking-forecast-policy,
+.booking-insights-page .booking-forecast-model-information,
+.booking-insights-page .booking-status-distribution,
+.booking-insights-page .booking-monthly-distribution,
+.booking-insights-page .booking-forecast-summary article,
+.booking-insights-page .booking-forecast-accuracy,
+.booking-insights-page .booking-forecast-validation,
+.booking-insights-page .booking-demand-insights-grid article {
+    border-color: var(--analytics-border);
+    background: rgba(8, 15, 27, 0.55);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.025), 0 8px 20px rgba(2, 6, 23, 0.16);
+}
+
+.booking-insights-page .booking-demand-insights-grid article > span,
+.booking-insights-page .booking-demand-insights-grid article > small,
+.booking-insights-page .booking-status-distribution-row > small,
+.booking-insights-page .booking-status-distribution-empty {
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-demand-insights-header > span,
+.booking-insights-page .booking-weekly-activity-header > span {
+    background: rgba(103, 232, 249, 0.1);
+    color: #a5f3fc;
+}
+
+.booking-insights-page .booking-forecast-toolbar,
+.booking-insights-page .booking-forecast-controls label {
+    color: #c4d0e0 !important;
+}
+
+.booking-insights-page .booking-forecast-controls select,
+.booking-insights-page .booking-forecast-controls input[type="date"] {
+    border-color: rgba(148, 163, 184, 0.24);
+    background-color: #0c1625;
+    color: var(--analytics-text);
+    color-scheme: dark;
+}
+
+.booking-insights-page .booking-forecast-controls select:focus,
+.booking-insights-page .booking-forecast-controls input[type="date"]:focus {
+    border-color: rgba(251, 146, 60, 0.65);
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
+}
+
+.booking-insights-page .booking-forecast-download {
+    border-color: rgba(251, 146, 60, 0.28);
+    background: rgba(249, 115, 22, 0.11);
+    color: #fed7aa;
+    transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.booking-insights-page .booking-forecast-download:hover {
+    transform: translateY(-1px);
+    background: rgba(249, 115, 22, 0.2);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.12);
+}
+
+.booking-insights-page .booking-forecast-chart .booking-forecast-section-title {
+    color: var(--analytics-text);
+}
+
+.booking-insights-page .booking-forecast-axis,
+.booking-insights-page .booking-weekly-activity-axis {
+    stroke: rgba(148, 163, 184, 0.3);
+}
+
+.booking-insights-page .booking-forecast-gridline,
+.booking-insights-page .booking-weekly-activity-gridline {
+    stroke: rgba(148, 163, 184, 0.15);
+}
+
+.booking-insights-page .booking-forecast-axis-label,
+.booking-insights-page .booking-weekly-activity-axis-label,
+.booking-insights-page .booking-weekly-activity-week-label {
+    fill: #91a3bb;
+}
+
+.booking-insights-page .booking-forecast-line.actual {
+    stroke: #fb923c;
+    filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0.48));
+}
+
+.booking-insights-page .booking-forecast-line.forecast {
+    stroke: #67e8f9;
+    filter: drop-shadow(0 0 4px rgba(103, 232, 249, 0.4));
+}
+
+.booking-insights-page .booking-forecast-point {
+    stroke: #111b2b;
+}
+
+.booking-insights-page .booking-forecast-point.actual {
+    fill: #fb923c;
+}
+
+.booking-insights-page .booking-forecast-point.forecast {
+    fill: #67e8f9;
+}
+
+.booking-insights-page .booking-forecast-confidence-area {
+    fill: rgba(103, 232, 249, 0.12);
+}
+
+.booking-insights-page .booking-weekly-activity-bar,
+.booking-insights-page .booking-weekly-activity-zero {
+    fill: #fb923c;
+    filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0.35));
+}
+
+.booking-insights-page .booking-weekly-activity-bar.unverified {
+    fill: #64748b;
+    filter: none;
+}
+
+.booking-insights-page .booking-weekly-activity-unverified {
+    fill: rgba(148, 163, 184, 0.1);
+    stroke: #64748b;
+}
+
+.booking-insights-page .booking-forecast-legend,
+.booking-insights-page .booking-forecast-value,
+.booking-insights-page .booking-forecast-month,
+.booking-insights-page .booking-forecast-accuracy,
+.booking-insights-page .booking-forecast-accuracy > span,
+.booking-insights-page .booking-forecast-validation-heading span {
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-forecast-legend i.actual,
+.booking-insights-page .booking-forecast-legend i.forecast {
+    background: #fb923c;
+    box-shadow: 0 0 10px rgba(251, 146, 60, 0.3);
+}
+
+.booking-insights-page .booking-forecast-legend i.forecast {
+    background: #67e8f9;
+}
+
+.booking-insights-page .booking-forecast-legend i.confidence {
+    background: rgba(103, 232, 249, 0.32);
+}
+
+.booking-insights-page .booking-forecast-model-status,
+.booking-insights-page .booking-forecast-reliability,
+.booking-insights-page .booking-forecast-reliability small {
+    border-color: var(--analytics-border);
+    background: rgba(8, 15, 27, 0.65);
+    color: #d7e1ef;
+}
+
+.booking-insights-page .booking-forecast-model-status > span:last-child {
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-forecast-model-status.forecast_generated,
+.booking-insights-page .booking-forecast-reliability.sufficient {
+    border-color: rgba(74, 222, 128, 0.25);
+    background: rgba(22, 101, 52, 0.18);
+    color: #bbf7d0;
+}
+
+.booking-insights-page .booking-forecast-model-status.forecast_generated .booking-forecast-status-indicator {
+    background: #4ade80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+}
+
+.booking-insights-page .booking-forecast-model-status.insufficient_data,
+.booking-insights-page .booking-forecast-model-status.coverage_unconfigured,
+.booking-insights-page .booking-forecast-reliability.limited,
+.booking-insights-page .booking-forecast-reliability.moderate {
+    border-color: rgba(251, 191, 36, 0.26);
+    background: rgba(120, 74, 12, 0.18);
+    color: #fde68a;
+}
+
+.booking-insights-page .booking-forecast-reliability.limited small,
+.booking-insights-page .booking-forecast-reliability.moderate small {
+    color: #d6c69a;
+}
+
+.booking-insights-page .booking-forecast-validation {
+    background: rgba(8, 15, 27, 0.55);
+}
+
+.booking-insights-page .booking-forecast-validation-heading {
+    border-bottom-color: var(--analytics-border);
+    background: rgba(23, 36, 56, 0.9);
+}
+
+.booking-insights-page .booking-forecast-validation-table th,
+.booking-insights-page .booking-forecast-validation-table td {
+    border-bottom-color: rgba(148, 163, 184, 0.12);
+    color: #bdc9da;
+}
+
+.booking-insights-page .booking-forecast-validation-table th {
+    background: rgba(23, 36, 56, 0.72);
+    color: #9aabc2;
+}
+
+.booking-insights-page .booking-forecast-validation-table tr:hover td {
+    background: rgba(103, 232, 249, 0.035);
+}
+
+.booking-insights-page .booking-insights-empty,
+.booking-insights-page .booking-forecast-empty > i {
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-forecast-empty strong {
+    color: var(--analytics-text);
+}
+
+.booking-insights-page .booking-coverage-range-warning {
+    border-color: rgba(251, 191, 36, 0.28);
+    background: rgba(120, 74, 12, 0.18);
+    color: #fde68a;
+}
+
+.booking-insights-page .booking-insights-error {
+    border-color: rgba(248, 113, 113, 0.3);
+    background: rgba(127, 29, 29, 0.2);
+    color: #fecaca;
+}
+
+.booking-insights-page .booking-insights-state {
+    color: var(--analytics-muted);
+}
+
+.booking-insights-page .booking-insights-state .spinner-border {
+    color: #fb923c !important;
+}
+
+.booking-insights-page {
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.booking-insights-page .reports-section-label {
+    font-size: 12px !important;
+}
+
+.booking-insights-page .reports-page-header h2 {
+    font-size: clamp(29px, 3vw, 36px) !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.035em;
+}
+
+.booking-insights-page .reports-page-header p {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+}
+
+.booking-insights-page .booking-insights-date-note {
+    font-size: 12px;
+}
+
+.booking-insights-page .booking-insights-scope-note {
+    font-size: 13px !important;
+    line-height: 1.65 !important;
+}
+
+.booking-insights-page .booking-insights-kpi > div > span {
+    color: #c4d0e0;
+    font-size: 13px !important;
+    font-weight: 600;
+}
+
+.booking-insights-page .booking-insights-kpi strong {
+    font-size: clamp(22px, 2vw, 27px) !important;
+    font-weight: 800;
+}
+
+.booking-insights-page .booking-insights-kpi small,
+.booking-insights-page .booking-insights-panel-heading p {
+    color: #bac8db;
+    font-size: 12px !important;
+    line-height: 1.55;
+}
+
+.booking-insights-page .booking-insights-panel-heading h3 {
+    font-size: 20px !important;
+    font-weight: 750;
+}
+
+.booking-insights-page .booking-insights-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.booking-insights-page .booking-season-label,
+.booking-insights-page .booking-demand-insights-grid article > span,
+.booking-insights-page .booking-status-distribution-row {
+    font-size: 13px;
+}
+
+.booking-insights-page .booking-season-months,
+.booking-insights-page .booking-preference-share,
+.booking-insights-page .booking-season-method-note,
+.booking-insights-page .booking-preference-method-note,
+.booking-insights-page .booking-monthly-distribution-heading > span,
+.booking-insights-page .booking-demand-insights-header p,
+.booking-insights-page .booking-demand-insights-note,
+.booking-insights-page .booking-weekly-activity-header p,
+.booking-insights-page .booking-weekly-activity-note {
+    color: #bac8db;
+    font-size: 12px !important;
+    line-height: 1.6;
+}
+
+.booking-insights-page .booking-monthly-distribution-heading h4,
+.booking-insights-page .booking-demand-insights-header h4,
+.booking-insights-page .booking-weekly-activity-header h4 {
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.booking-insights-page .booking-monthly-distribution-row,
+.booking-insights-page .booking-monthly-distribution-row strong,
+.booking-insights-page .booking-status-distribution-row > strong,
+.booking-insights-page .booking-status-distribution-row > small {
+    font-size: 12px;
+}
+
+.booking-insights-page .booking-preference-rank {
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.booking-insights-page .booking-demand-insights-grid article > strong {
+    font-size: 20px;
+}
+
+.booking-insights-page .booking-demand-insights-grid article > small {
+    color: #bac8db;
+    font-size: 12px;
+}
+
+.booking-insights-page .booking-forecast-controls label,
+.booking-insights-page .booking-forecast-controls select,
+.booking-insights-page .booking-forecast-controls input[type="date"],
+.booking-insights-page .booking-forecast-download {
+    font-size: 13px !important;
+}
+
+.booking-insights-page .booking-forecast-section-title {
+    font-size: 16px !important;
+    font-weight: 750;
+}
+
+.booking-insights-page .booking-forecast-policy,
+.booking-insights-page .booking-forecast-model-information > span,
+.booking-insights-page .booking-forecast-summary article > span,
+.booking-insights-page .booking-forecast-summary article small,
+.booking-insights-page .booking-forecast-accuracy,
+.booking-insights-page .booking-forecast-accuracy > span,
+.booking-insights-page .booking-forecast-accuracy > small,
+.booking-insights-page .booking-forecast-validation-heading span {
+    color: #bac8db;
+    font-size: 12px !important;
+    line-height: 1.6;
+}
+
+.booking-insights-page .booking-forecast-policy strong,
+.booking-insights-page .booking-forecast-model-information strong,
+.booking-insights-page .booking-forecast-summary article > strong,
+.booking-insights-page .booking-forecast-accuracy > div strong,
+.booking-insights-page .booking-forecast-accuracy > span strong,
+.booking-insights-page .booking-forecast-validation-heading strong {
+    font-size: 13px;
+}
+
+.booking-insights-page .booking-forecast-model-information {
+    font-size: 12px !important;
+}
+
+.booking-insights-page .booking-forecast-validation-table th,
+.booking-insights-page .booking-forecast-validation-table td {
+    font-size: 12px !important;
+    line-height: 1.5;
+}
+
+.booking-insights-page .booking-forecast-validation-table th {
+    color: #bac8db;
+    font-weight: 750;
+}
+
+.booking-insights-page .booking-forecast-legend,
+.booking-insights-page .booking-forecast-value,
+.booking-insights-page .booking-forecast-month {
+    color: #bac8db;
+    font-size: 12px;
+}
+
+.booking-insights-page .booking-forecast-axis-label,
+.booking-insights-page .booking-weekly-activity-axis-label,
+.booking-insights-page .booking-weekly-activity-week-label {
+    font-size: 10px;
+}
+
+.booking-insights-page .booking-insights-empty,
+.booking-insights-page .booking-forecast-empty > i {
+    color: #bac8db;
+    font-size: 14px;
+}
+
+.booking-insights-page .booking-forecast-empty strong {
+    font-size: 15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .booking-insights-page .booking-insights-kpi,
+    .booking-insights-page .booking-insights-panel,
+    .booking-insights-page .booking-forecast-download {
+        transition: none;
+    }
+
+    .booking-insights-page .booking-insights-kpi:hover,
+    .booking-insights-page .booking-insights-panel:hover,
+    .booking-insights-page .booking-demand-insights:hover,
+    .booking-insights-page .booking-weekly-activity:hover,
+    .booking-insights-page .booking-forecast-download:hover {
+        transform: none;
+    }
+}

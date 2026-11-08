@@ -423,9 +423,9 @@ function ReportsAnalytics() {
         <div className="reports-analytics-page booking-insights-page !space-y-6 [&_.booking-forecast-accuracy]:!text-xs [&_.booking-forecast-validation-table]:!text-xs [&_.booking-forecast-section-title]:!text-base [&_.booking-forecast-model-information]:!text-xs">
             <header className="reports-page-header !rounded-3xl !border !border-slate-200 !bg-white !p-6 !shadow-sm md:!p-8">
                 <div>
-                    <span className="reports-section-label !font-semibold !tracking-[0.18em] !text-orange-600">BOOKING INSIGHTS</span>
-                    <h2 className="!mt-2 !text-2xl !font-bold !tracking-tight !text-slate-900 md:!text-3xl">Peak Season &amp; Preferences</h2>
-                    <p className="!mt-2 !max-w-3xl !text-sm !leading-6 !text-slate-500 md:!text-base">
+                    <span className="reports-section-label !font-semibold !tracking-[0.18em] !text-orange-300">BOOKING INSIGHTS</span>
+                    <h2 className="!mt-2 !text-2xl !font-bold !tracking-tight !text-white md:!text-3xl">Peak Season &amp; Preferences</h2>
+                    <p className="!mt-2 !max-w-3xl !text-sm !leading-6 !text-slate-300 md:!text-base">
                         Discover when homeowners schedule services, what they request,
                         and how booking demand may trend.
                     </p>

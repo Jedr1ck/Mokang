@@ -41,7 +41,9 @@ python app.py
 Edit `backend/.env` with your MariaDB credentials. The default template
 connects to the `Smarthomes` database used by the current backend, and it now
 accepts Vite requests from both `localhost` and `127.0.0.1` on the default
-frontend ports.
+frontend ports. On startup, the backend adds the platform's built-in service
+categories to an existing `service_categories` table once, preserving any
+categories already configured.
 
 The Flask backend is organized into feature blueprints under `backend/app/routes`,
 with shared SQLAlchemy models, request schemas, and database/authentication

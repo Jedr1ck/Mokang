@@ -10,6 +10,26 @@ from werkzeug.exceptions import HTTPException
 from app.common import ApiError, api_error_handler
 from app.models import Category, Complaint, SystemSetting
 
+DEFAULT_SERVICE_CATEGORIES = (
+    "Electrician",
+    "Plumber",
+    "Aircon Technician",
+    "Carpenter",
+    "Pest Control Technician",
+    "Painter",
+    "Appliance Repair Technician",
+    "Locksmith",
+    "Deep Cleaner",
+    "Massage Therapist",
+    "Hair Stylist / Barber",
+    "Nail Technician (Manicurist/Pedicurist)",
+    "Makeup Artist",
+    "Private Nurse / Caregiver",
+    "Physical Therapist",
+    "Computer / CCTV Technician",
+    "Private Tutor / Personal Fitness Trainer",
+)
+
 
 def create_app(test_config=None):
     load_dotenv(Path(__file__).resolve().parents[1] / ".env")
@@ -86,11 +106,37 @@ def create_app(test_config=None):
                     )
                 )
     app.extensions["database_engine"] = engine
-    app.extensions["session_factory"] = sessionmaker(
+    session_factory = sessionmaker(
         bind=engine,
         autocommit=False,
         autoflush=False,
     )
+    app.extensions["session_factory"] = session_factory
+
+    if inspect(engine).has_table(Category.__tablename__):
+        with session_factory.begin() as session:
+            seed_setting = session.get(
+                SystemSetting,
+                "default_service_categories_seeded",
+            )
+            if seed_setting is None:
+                existing_names = {
+                    name.casefold()
+                    for (name,) in session.query(Category.name).all()
+                    if name
+                }
+                session.add_all(
+                    Category(name=name, description="")
+                    for name in DEFAULT_SERVICE_CATEGORIES
+                    if name.casefold() not in existing_names
+                )
+                session.add(
+                    SystemSetting(
+                        key="default_service_categories_seeded",
+                        value="true",
+                    )
+                )
+
     app.register_error_handler(ApiError, api_error_handler)
 
     from app.routes.auth import auth_bp
