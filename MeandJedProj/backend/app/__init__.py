@@ -1,3 +1,4 @@
+
 import os
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from werkzeug.exceptions import HTTPException
 
 from app.common import ApiError, api_error_handler
 from app.models import Category, Complaint, SystemSetting
+
 
 DEFAULT_SERVICE_CATEGORIES = (
     "Electrician",
@@ -35,83 +37,127 @@ def create_app(test_config=None):
     load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
     app = Flask(__name__)
-    default_cors_origins = (
-    "http://localhost:5173,http://127.0.0.1:5173,"
-    "http://localhost:5174,http://127.0.0.1:5174,"
-    "http://localhost:62921,http://127.0.0.1:62921"
 
+    # CORS configuration
+    default_cors_origins = (
+        "http://localhost:5173,"
+        "http://127.0.0.1:5173,"
+        "http://localhost:5174,"
+        "http://127.0.0.1:5174,"
+        "http://localhost:62921,"
+        "http://127.0.0.1:62921,"
+        "http://localhost:52914,"
+        "http://127.0.0.1:52914,"
+        "http://localhost:50754,"
+        "http://127.0.0.1:50754"
     )
+
     app.config.from_mapping(
         SECRET_KEY=os.getenv("SECRET_KEY", "CHANGE_ME"),
+
         DATABASE_URL=os.getenv(
             "DATABASE_URL",
             "mysql+pymysql://root@localhost:3306/Smarthomes",
         ),
+
         ANALYTICS_COVERAGE_START_DATE=os.getenv(
             "ANALYTICS_COVERAGE_START_DATE",
             "",
         ).strip(),
+
         ANALYTICS_BASELINE_MIN_PERIODS=int(
             os.getenv("ANALYTICS_BASELINE_MIN_PERIODS", "12")
         ),
+
         ANALYTICS_ARIMA_MIN_TRAINING_PERIODS=int(
             os.getenv("ANALYTICS_ARIMA_MIN_TRAINING_PERIODS", "24")
         ),
+
         ANALYTICS_ARIMA_MIN_VALIDATION_FOLDS=int(
             os.getenv("ANALYTICS_ARIMA_MIN_VALIDATION_FOLDS", "3")
         ),
+
         ANALYTICS_ARIMA_MIN_MAE_IMPROVEMENT_PERCENT=float(
             os.getenv("ANALYTICS_ARIMA_MIN_MAE_IMPROVEMENT_PERCENT", "5")
         ),
+
         ANALYTICS_ARIMA_MAX_WAPE_PERCENT=float(
             os.getenv("ANALYTICS_ARIMA_MAX_WAPE_PERCENT", "100")
         ),
+
         CORS_ORIGINS=[
             origin.strip()
-            for origin in os.getenv("CORS_ORIGINS", default_cors_origins).split(",")
+            for origin in os.getenv(
+                "CORS_ORIGINS",
+                default_cors_origins,
+            ).split(",")
             if origin.strip()
         ],
+
         MAX_CONTENT_LENGTH=6 * 1024 * 1024,
     )
+
     if test_config:
         app.config.update(test_config)
+
+    # --------------------------------------------------
+    # DATABASE CONNECTION
+    # --------------------------------------------------
 
     engine = create_engine(
         app.config["DATABASE_URL"],
         pool_pre_ping=True,
     )
+
     SystemSetting.__table__.create(engine, checkfirst=True)
     Complaint.__table__.create(engine, checkfirst=True)
+
     if inspect(engine).has_table("users"):
         user_columns = {
             column["name"]
             for column in inspect(engine).get_columns("users")
         }
+
         if "last_login_at" not in user_columns:
             with engine.begin() as connection:
                 connection.execute(
-                    text("ALTER TABLE users ADD COLUMN last_login_at DATETIME")
+                    text(
+                        "ALTER TABLE users "
+                        "ADD COLUMN last_login_at DATETIME"
+                    )
                 )
+
     if inspect(engine).has_table(Category.__tablename__):
         category_columns = {
             column["name"]
-            for column in inspect(engine).get_columns(Category.__tablename__)
+            for column in inspect(engine).get_columns(
+                Category.__tablename__
+            )
         }
+
         if "is_active" not in category_columns:
             with engine.begin() as connection:
                 connection.execute(
                     text(
                         "ALTER TABLE service_categories "
-                        "ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE"
+                        "ADD COLUMN is_active "
+                        "BOOLEAN NOT NULL DEFAULT TRUE"
                     )
                 )
+
     app.extensions["database_engine"] = engine
+
     session_factory = sessionmaker(
         bind=engine,
         autocommit=False,
         autoflush=False,
     )
+
     app.extensions["session_factory"] = session_factory
+
+    # --------------------------------------------------
+    # DEFAULT SERVICE CATEGORY SEEDING
+    # --------------------------------------------------
 
     if inspect(engine).has_table(Category.__tablename__):
         with session_factory.begin() as session:
@@ -119,17 +165,20 @@ def create_app(test_config=None):
                 SystemSetting,
                 "default_service_categories_seeded",
             )
+
             if seed_setting is None:
                 existing_names = {
                     name.casefold()
                     for (name,) in session.query(Category.name).all()
                     if name
                 }
+
                 session.add_all(
                     Category(name=name, description="")
                     for name in DEFAULT_SERVICE_CATEGORIES
                     if name.casefold() not in existing_names
                 )
+
                 session.add(
                     SystemSetting(
                         key="default_service_categories_seeded",
@@ -137,7 +186,18 @@ def create_app(test_config=None):
                     )
                 )
 
-    app.register_error_handler(ApiError, api_error_handler)
+    # --------------------------------------------------
+    # ERROR HANDLER
+    # --------------------------------------------------
+
+    app.register_error_handler(
+        ApiError,
+        api_error_handler,
+    )
+
+    # --------------------------------------------------
+    # REGISTER API BLUEPRINTS
+    # --------------------------------------------------
 
     from app.routes.auth import auth_bp
     from app.routes.bookings import bookings_bp
@@ -167,40 +227,91 @@ def create_app(test_config=None):
     app.register_blueprint(admin_dashboard_bp)
     app.register_blueprint(feedback_bp)
 
+    # --------------------------------------------------
+    # CORS PREFLIGHT HANDLING
+    # --------------------------------------------------
+
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            return "", 204
+
+    # --------------------------------------------------
+    # CORS RESPONSE HEADERS
+    # --------------------------------------------------
+
     @app.after_request
     def add_cors_headers(response):
-        origin = (request.headers.get("Origin") or "").strip()
+        origin = (
+            request.headers.get("Origin") or ""
+        ).strip()
+
         allowed_origins = app.config["CORS_ORIGINS"]
-        if origin and (origin in allowed_origins or "*" in allowed_origins):
-            response.headers["Access-Control-Allow-Origin"] = (
-                "*" if "*" in allowed_origins else origin
-            )
+
+        # Allow localhost ports during local development.
+        is_localhost = (
+            origin.startswith("http://localhost:")
+            or origin.startswith("http://127.0.0.1:")
+        )
+
+        if origin and (
+            origin in allowed_origins
+            or is_localhost
+        ):
+            response.headers["Access-Control-Allow-Origin"] = origin
+
             response.headers["Access-Control-Allow-Credentials"] = "true"
+
             response.headers["Access-Control-Allow-Headers"] = (
                 "Authorization, Content-Type"
             )
+
             response.headers["Access-Control-Allow-Methods"] = (
                 "GET, POST, PUT, PATCH, DELETE, OPTIONS"
             )
+
+            response.headers["Access-Control-Max-Age"] = "600"
+
             response.headers.add("Vary", "Origin")
+
         return response
+
+    # --------------------------------------------------
+    # HTTP ERROR HANDLERS
+    # --------------------------------------------------
 
     @app.errorhandler(413)
     def file_too_large(_error):
-        return jsonify(detail="Maximum ID image size is 5 MB."), 413
+        return jsonify(
+            detail="Maximum ID image size is 5 MB."
+        ), 413
 
     @app.errorhandler(404)
     def not_found(_error):
-        return jsonify(detail="Not found"), 404
+        return jsonify(
+            detail="Not found"
+        ), 404
 
     @app.errorhandler(HTTPException)
     def http_error(error):
-        return jsonify(detail=error.description), error.code
+        return jsonify(
+            detail=error.description
+        ), error.code
 
     @app.errorhandler(Exception)
     def internal_server_error(error):
-        app.logger.exception("Unhandled API error", exc_info=error)
-        return jsonify(detail="Internal server error"), 500
+        app.logger.exception(
+            "Unhandled API error",
+            exc_info=error,
+        )
+
+        return jsonify(
+            detail="Internal server error"
+        ), 500
+
+    # --------------------------------------------------
+    # HEALTH CHECK
+    # --------------------------------------------------
 
     @app.get("/health")
     def health():
