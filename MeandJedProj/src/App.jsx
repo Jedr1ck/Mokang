@@ -269,6 +269,12 @@ function App() {
           element={<RoleProtectedRoute role="provider"><ProviderDashboard /></RoleProtectedRoute>}
         />
 
+        {/* Provider Service Coverage Map */}
+        <Route
+          path="/provider-map"
+          element={<RoleProtectedRoute role="provider"><ProviderDashboard /></RoleProtectedRoute>}
+        />
+
         {/* Provider Booking Requests */}
         <Route
           path="/provider-bookings"

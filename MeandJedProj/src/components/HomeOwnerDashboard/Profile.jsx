@@ -7,6 +7,7 @@ import '../../HomeownerDashboard.css';
 import { api, getMyBookings } from '../../services/api';
 import HomeAddressMap from './HomeAddressMap';
 import { reverseGeocodeLocation } from './addressGeocoding';
+import { isWithinEchague } from '../../services/echagueLocation';
 
 const EMPTY_PROFILE = {
     fullName: '',
@@ -239,6 +240,9 @@ export default function Profile() {
             if (draft.address.trim().length < 10) {
                 validationErrors.address = 'Enter a home address of at least 10 characters.';
             }
+            if (!coords || !isWithinEchague(coords.lat, coords.lng)) {
+                validationErrors.address = 'Select your service location on the map within Echague, Isabela.';
+            }
         } else {
             if (draft.fullName.trim().length < 2) validationErrors.fullName = 'Enter your full name.';
             if (!draft.birthday) validationErrors.birthday = 'Enter your birthday.';
@@ -316,6 +320,12 @@ export default function Profile() {
         navigator.geolocation.getCurrentPosition(
             async ({ coords: location }) => {
                 const nextCoords = { lat: location.latitude, lng: location.longitude };
+                if (!isWithinEchague(nextCoords.lat, nextCoords.lng)) {
+                    setLocating(false);
+                    setCoords(null);
+                    setError('Your current location is outside Echague, Isabela. Select a service location within Echague.');
+                    return;
+                }
                 setCoords(nextCoords);
                 try {
                     const address = await reverseGeocodeLocation(nextCoords.lat, nextCoords.lng);
@@ -358,6 +368,7 @@ export default function Profile() {
 
     const startEdit = (addressOnly = false) => {
         setDraft(profile);
+        setCoords(null);
         setEditing(!addressOnly);
         setEditingAddress(addressOnly);
         setError('');
@@ -366,6 +377,7 @@ export default function Profile() {
 
     const cancelEdit = () => {
         setDraft(profile);
+        setCoords(null);
         setEditing(false);
         setEditingAddress(false);
         setError('');
@@ -684,10 +696,13 @@ export default function Profile() {
                                             value={editingAddress ? draft.address : profile.address}
                                             coords={coords}
                                             disabled={!editingAddress}
-                                            onAddressChange={(address) => updateDraft('address', address)}
+                                            onAddressChange={(address) => {
+                                                setCoords(null);
+                                                updateDraft('address', address);
+                                            }}
                                             onLocationChange={({ address, lat, lng }) => {
                                                 setCoords({ lat, lng });
-                                                if (address) updateDraft('address', address);
+                                                updateDraft('address', address || '');
                                             }}
                                         />
 

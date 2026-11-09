@@ -61,6 +61,7 @@
 .find-services-tools { display: flex; align-items: center; gap: 8px; }
 .find-services-sort, .find-services-inline-search { height: 30px; display: flex; align-items: center; gap: 5px; padding: 0 8px; border: 1px solid var(--theme-soft-blue); border-radius: 6px; color: #52636b; font-size: 9px; }
 .find-services-sort select, .find-services-inline-search input { min-width: 0; border: 0; outline: 0; background: transparent; color: var(--theme-text); font-size: 9px; }
+.find-services-barangay-filter select { max-width: 150px; }
 .find-services-inline-search { width: 150px; }
 .find-services-inline-search input { width: 100%; }
 .find-services-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
@@ -155,9 +156,10 @@
     .category-icon { width: 36px; height: 36px; font-size: 16px; }
     .find-services-categories small { font-size: 10px; }
     .find-services-results-heading { align-items: flex-start; flex-direction: column; }
-    .find-services-tools { width: 100%; }
+    .find-services-tools { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .find-services-sort { flex: 1; justify-content: space-between; }
-    .find-services-inline-search { width: 48%; }
+    .find-services-barangay-filter select { max-width: 115px; }
+    .find-services-inline-search { grid-column: 1 / -1; width: 100%; }
     .find-services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .find-service-details { display: block; }
     .find-service-detail-image { height: 115px; min-height: 0; }

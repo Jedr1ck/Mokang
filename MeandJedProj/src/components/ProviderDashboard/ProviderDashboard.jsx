@@ -17,6 +17,7 @@ import {
 import Messages from '../HomeOwnerDashboard/Messages';
 import ProviderNotifications from './ProviderNotifications';
 import ProviderAccountProfile from './ProviderAccountProfile';
+import ProviderServiceMap from './ProviderServiceMap';
 import ProviderJobs from './ProviderJobs';
 
 
@@ -48,6 +49,7 @@ const ProviderDashboard = () => {
 
     const activeSection = {
         '/provider-dashboard': 'dashboard',
+        '/provider-map': 'serviceMap',
         '/provider-bookings': 'bookings',
         '/provider-jobs': 'myjobs',
         '/provider-schedule': 'schedule',
@@ -795,6 +797,8 @@ const ProviderDashboard = () => {
                         onProfileUpdated={handleProfileUpdated}
                     />
                 )}
+
+                {activeSection === 'serviceMap' && <ProviderServiceMap />}
 
 
             </main>

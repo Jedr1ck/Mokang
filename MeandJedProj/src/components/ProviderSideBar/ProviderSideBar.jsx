@@ -72,6 +72,21 @@ const ProviderSideBar = () => {
                         </span>
                     </Link>
 
+                    {/* SERVICE MAP */}
+                    <Link
+                        to="/provider-map"
+                        className={`provider-sidebar-btn ${isActive("/provider-map")
+                                ? "active"
+                                : ""
+                            }`}
+                        title="Service Map"
+                    >
+                        <i className="bi bi-map"></i>
+                        <span className="provider-link-text">
+                            Service Map
+                        </span>
+                    </Link>
+
                     {/* BOOKING SYSTEM */}
                     <Link
                         to="/provider-bookings"

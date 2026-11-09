@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { api, getCategories, getMyProfile } from '../../services/api';
+import { isWithinEchague } from '../../services/echagueLocation';
 
 const EMPTY_PROVIDER_SERVICES = [];
 const profileFieldLabels = {
@@ -36,6 +37,8 @@ const BookingModal = ({
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isSearchingAddress, setIsSearchingAddress] = useState(false);
     const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+    const [addressSearchError, setAddressSearchError] = useState('');
+    const [selectedAddressCoords, setSelectedAddressCoords] = useState(null);
 
     const [formData, setFormData] = useState({
         category: '',
@@ -131,9 +134,11 @@ const BookingModal = ({
 
             try {
                 const params = new URLSearchParams({
-                    q: query,
+                    q: `${query}, Echague, Isabela, Philippines`,
                     limit: '5',
                     lang: 'en',
+                    lat: '16.7',
+                    lon: '121.7',
                 });
 
                 const response = await fetch(
@@ -149,6 +154,11 @@ const BookingModal = ({
 
                 const suggestions = (data.features || [])
                     .map((feature) => {
+                        const coordinates = feature?.geometry?.coordinates;
+                        if (
+                            coordinates?.length !== 2
+                            || !isWithinEchague(coordinates[1], coordinates[0])
+                        ) return null;
                         const properties = feature.properties || {};
 
                         const parts = [
@@ -163,15 +173,22 @@ const BookingModal = ({
                             properties.country,
                         ].filter(Boolean);
 
+                        const labelParts = parts.filter(
+                            (part, index) => parts.indexOf(part) === index
+                        );
+                        for (const coverageName of ['Echague', 'Isabela', 'Philippines']) {
+                            if (!labelParts.some((part) => String(part).toLowerCase() === coverageName.toLowerCase())) {
+                                labelParts.push(coverageName);
+                            }
+                        }
+
                         return {
-                            label: parts
-                                .filter(
-                                    (part, index) => parts.indexOf(part) === index
-                                )
-                                .join(', '),
+                            label: labelParts.join(', '),
+                            lat: coordinates[1],
+                            lng: coordinates[0],
                         };
                     })
-                    .filter((item) => item.label)
+                    .filter((item) => item?.label)
                     .filter(
                         (item, index, items) =>
                             items.findIndex(
@@ -180,9 +197,13 @@ const BookingModal = ({
                     );
 
                 setAddressSuggestions(suggestions);
+                setAddressSearchError(
+                    suggestions.length ? '' : 'No matching addresses were found within Echague. Try adding a barangay or street.'
+                );
             } catch (error) {
                 if (error.name !== 'AbortError') {
                     setAddressSuggestions([]);
+                    setAddressSearchError(error.message || 'Address suggestions are temporarily unavailable.');
                     console.error('Address search failed:', error);
                 }
             } finally {
@@ -202,6 +223,10 @@ const BookingModal = ({
         const { name, value } = e.target;
 
         setFieldErrors((previous) => ({ ...previous, [name]: '' }));
+        if (name === 'address') {
+            setSelectedAddressCoords(null);
+            setAddressSearchError('');
+        }
         if (name === 'address' && value.trim().length < 3) {
             setAddressSuggestions([]);
             setIsSearchingAddress(false);
@@ -252,6 +277,9 @@ const BookingModal = ({
         else if (formData.preferredDate < today) errors.preferredDate = 'Date cannot be in the past.';
         if (!formData.preferredTime) errors.preferredTime = 'Choose a service time.';
         if (formData.address.trim().length < 10) errors.address = 'Enter a complete address (at least 10 characters).';
+        if (!selectedAddressCoords || !isWithinEchague(selectedAddressCoords.lat, selectedAddressCoords.lng)) {
+            errors.address = 'Choose an address suggestion within Echague, Isabela.';
+        }
         if (formData.description.trim().length < 10) errors.description = 'Describe the work needed (at least 10 characters).';
         setFieldErrors(errors);
         if (Object.keys(errors).length) {
@@ -330,6 +358,8 @@ const BookingModal = ({
         setAddressSuggestions([]);
         setIsSearchingAddress(false);
         setShowAddressSuggestions(false);
+        setAddressSearchError('');
+        setSelectedAddressCoords(null);
         handleClose();
     };
 
@@ -530,6 +560,11 @@ const BookingModal = ({
                                                                                     address: suggestion.label,
                                                                                 })
                                                                             );
+                                                                            setSelectedAddressCoords({
+                                                                                lat: suggestion.lat,
+                                                                                lng: suggestion.lng,
+                                                                            });
+                                                                            setAddressSearchError('');
 
                                                                             setAddressSuggestions([]);
                                                                             setShowAddressSuggestions(false);
@@ -544,9 +579,7 @@ const BookingModal = ({
                                                         {!isSearchingAddress &&
                                                             addressSuggestions.length === 0 && (
                                                                 <div className="list-group-item small text-muted">
-                                                                    No matching addresses found.
-                                                                    You can still enter your
-                                                                    complete address manually.
+                                                                    {addressSearchError || 'No matching addresses found within Echague.'}
                                                                 </div>
                                                             )}
                                                     </div>
@@ -554,10 +587,11 @@ const BookingModal = ({
                                         </div>
 
                                         <small className="text-muted">
-                                            Type at least 3 characters and choose a
-                                            suggested address, or enter the complete
-                                            address manually.
+                                            Type at least 3 characters and choose an address suggestion within Echague, Isabela.
                                         </small>
+                                        {addressSearchError && !showAddressSuggestions && (
+                                            <div className="form-text text-danger" role="status">{addressSearchError}</div>
+                                        )}
                                         {fieldErrors.address && <div className="invalid-feedback d-block">{fieldErrors.address}</div>}
                                     </div>
 

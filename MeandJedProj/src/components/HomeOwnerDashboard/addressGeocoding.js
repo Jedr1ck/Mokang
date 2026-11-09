@@ -9,7 +9,10 @@ function formatPlace(feature) {
         properties.city,
         properties.state,
         properties.country,
-    ];
+    ].filter((part, index, array) => part && array.indexOf(part) === index);
+    for (const coverageName of ['Echague', 'Isabela', 'Philippines']) {
+        if (!parts.some((part) => String(part).toLowerCase() === coverageName.toLowerCase())) parts.push(coverageName);
+    }
     return parts.filter((part, index) => part && parts.indexOf(part) === index).join(', ');
 }
 

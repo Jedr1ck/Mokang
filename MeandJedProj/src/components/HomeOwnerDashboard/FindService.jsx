@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyProfile, getNotifications, getProviders, getProvider } from '../../services/api';
+import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
 import BookingModal from './BookingModal';
 import './FindService.css';
 import myLogo from '../../assets/images/logo.png';
@@ -69,12 +70,23 @@ const categoryMatchesProvider = (category, provider) => {
     ].filter(Boolean).join(' ').toLowerCase();
     return category.matches.some((term) => searchable.includes(term));
 };
+const normalizedLocationPart = (value = '') => value
+    .replace(/^(?:barangay|brgy\.?)\s*/i, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+const providerMatchesEchague = (provider, barangay) => {
+    const [providerBarangay, municipality] = (provider.location || '').split(',').map(normalizedLocationPart);
+    return municipality === 'echague'
+        && (barangay === 'all' || providerBarangay === normalizedLocationPart(barangay));
+};
 
 export default function FindService() {
     const navigate = useNavigate();
     const categoriesRef = useRef(null);
     const [providers, setProviders] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All Services');
+    const [selectedBarangay, setSelectedBarangay] = useState('all');
     const [query, setQuery] = useState('');
     const [sort, setSort] = useState('recommended');
     const [selectedProviderId, setSelectedProviderId] = useState(null);
@@ -123,12 +135,12 @@ export default function FindService() {
                 || (selectedCategory === 'Other'
                     ? !matchesKnownCategory
                     : selectedService && categoryMatchesProvider(selectedService, provider));
-            return matchesCategory && matchesQuery;
+            return matchesCategory && matchesQuery && providerMatchesEchague(provider, selectedBarangay);
         });
         if (sort === 'price-low') rows.sort((a, b) => (a.rate ?? Number.MAX_VALUE) - (b.rate ?? Number.MAX_VALUE));
         if (sort === 'price-high') rows.sort((a, b) => (b.rate ?? -1) - (a.rate ?? -1));
         return rows;
-    }, [providers, selectedCategory, query, sort]);
+    }, [providers, selectedCategory, selectedBarangay, query, sort]);
 
     const filteredSelection = filteredProviders.find((provider) => provider.id === selectedProviderId);
     const effectiveProviderId = selectedProviderId === null
@@ -203,8 +215,8 @@ export default function FindService() {
 
                 <div className="find-services-workspace">
                     <section className="find-services-results">
-                        <div className="find-services-results-heading"><div><h2>{selectedCategory}</h2><p>Browse verified providers and book the service you need.</p></div>
-                            <div className="find-services-tools"><label className="find-services-sort"><span>Sort by:</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label><label className="find-services-inline-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search services..." /></label></div>
+                        <div className="find-services-results-heading"><div><h2>{selectedCategory}</h2><p>Verified providers serving Echague, Isabela.</p></div>
+                            <div className="find-services-tools"><label className="find-services-sort"><span>Sort by:</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label><label className="find-services-sort find-services-barangay-filter"><span>Barangay:</span><select value={selectedBarangay} onChange={(event) => setSelectedBarangay(event.target.value)} aria-label="Filter providers by Echague barangay"><option value="all">All Echague</option>{ECHAGUE_BARANGAYS.map((barangay) => <option key={barangay} value={barangay}>{barangay}</option>)}</select></label><label className="find-services-inline-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search services..." /></label></div>
                         </div>
 
                         {loading ? <div className="find-services-state"><span className="spinner-border text-success" /><p>Loading verified providers...</p></div> : error ? <div className="find-services-state"><i className="bi bi-exclamation-circle" /><p>{error}</p></div> : filteredProviders.length ? <div className="find-services-grid">
@@ -222,7 +234,7 @@ export default function FindService() {
                                     </div>
                                 </article>;
                             })}
-                        </div> : <div className="find-services-state"><i className="bi bi-search" /><h3>No providers found</h3><p>Try another category or search term.</p></div>}
+                        </div> : <div className="find-services-state"><i className="bi bi-search" /><h3>No providers found</h3><p>Try another category, search term, or barangay.</p></div>}
                     </section>
 
                     <aside className="find-service-details">

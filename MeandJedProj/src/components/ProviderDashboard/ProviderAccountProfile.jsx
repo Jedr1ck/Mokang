@@ -9,9 +9,12 @@ import {
     submitProviderVerification,
     updateVerifiedProviderServices,
 } from '../../services/api';
+import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
+import { isWithinEchague } from '../../services/echagueLocation';
 import './ProviderAccountProfile.css';
 
 const PSGC_API = 'https://psgc.cloud/api/v2';
+const ADDRESS_SEARCH_URL = 'https://photon.komoot.io/api/';
 
 const steps = [
     'Personal Information',
@@ -53,6 +56,32 @@ const initialProfile = {
     address: '',
     profilePicture: '',
 };
+
+function normalizeProfileData(account = {}) {
+    const fullName = account.fullName
+        ?? account.full_name
+        ?? account.fullname
+        ?? account.displayName
+        ?? [account.first_name, account.last_name].filter(Boolean).join(' ');
+    return {
+        fullName: fullName || account.name || '',
+        email: account.email ?? '',
+        mobileNumber: account.mobileNumber ?? account.mobile_number ?? account.phone ?? '',
+        gender: account.gender ?? '',
+        birthday: account.birthday ?? '',
+        address: account.address ?? '',
+        profilePicture: account.profilePicture ?? account.profile_picture ?? '',
+    };
+}
+
+function getStoredProfile() {
+    try {
+        const account = JSON.parse(localStorage.getItem('user') || '{}');
+        return normalizeProfileData(account && typeof account === 'object' ? account : {});
+    } catch {
+        return initialProfile;
+    }
+}
 
 const initialVerification = {
     business_name: '',
@@ -273,13 +302,76 @@ function findLocationByName(items, name) {
     );
 }
 
+function normalizeLocationName(value = '') {
+    return String(value)
+        .replace(/^(?:barangay|brgy\.?)\s*/i, '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+}
+
+function barangayForPlace(properties) {
+    const placeNames = [
+        properties.locality,
+        properties.district,
+        properties.suburb,
+        properties.neighbourhood,
+        properties.city,
+        properties.name,
+    ].filter(Boolean).map(normalizeLocationName);
+
+    return ECHAGUE_BARANGAYS.find((barangay) =>
+        placeNames.includes(normalizeLocationName(barangay))
+    );
+}
+
+function formatPlaceSuggestion(feature) {
+    const properties = feature.properties || {};
+    const barangay = barangayForPlace(properties);
+    if (!barangay) return null;
+
+    const name = properties.name?.trim();
+    const street = properties.street?.trim();
+    const houseNumber = properties.housenumber?.trim();
+    const details = [];
+
+    if (name && normalizeLocationName(name) !== normalizeLocationName(barangay)) {
+        details.push(name);
+    }
+    if (houseNumber && street) details.push(`${houseNumber} ${street}`);
+    else if (street && normalizeLocationName(street) !== normalizeLocationName(name || '')) details.push(street);
+
+    return {
+        label: [...new Set([...details, barangay, 'Echague', 'Isabela'])].join(', '),
+        lat: feature.geometry.coordinates[1],
+        lng: feature.geometry.coordinates[0],
+        source: 'place',
+    };
+}
+
+function addressBarangaySuggestions(address) {
+    const query = normalizeLocationName(address.replace(/^purok\s*[^,]*,?\s*/i, ''));
+    if (!query) return [];
+
+    return ECHAGUE_BARANGAYS
+        .filter((barangay) => normalizeLocationName(barangay).includes(query))
+        .slice(0, 6)
+        .map((barangay) => ({
+            label: `${barangay}, Echague, Isabela`,
+            source: 'barangay',
+        }));
+}
+
 function getLocationCode(item) {
     return item?.code ?? item?.psgcCode ?? item?.psgc_code ?? '';
 }
 
 export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [step, setStep] = useState(0);
-    const [profile, setProfile] = useState(initialProfile);
+    const [profile, setProfile] = useState(() => ({
+        ...initialProfile,
+        ...getStoredProfile(),
+    }));
     const [verification, setVerification] = useState(initialVerification);
 
     const [selectedServicesByCategory, setSelectedServicesByCategory] = useState({});
@@ -321,98 +413,122 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [barangays, setBarangays] = useState([]);
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationError, setLocationError] = useState('');
+    const [placeAddressSuggestions, setPlaceAddressSuggestions] = useState([]);
+    const [addressSearching, setAddressSearching] = useState(false);
+    const [addressSearchError, setAddressSearchError] = useState('');
+    const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
 
     useEffect(() => {
         let active = true;
 
         async function loadData() {
             try {
-                const [profileData, verificationData] = await Promise.all([
+                const [profileResult, verificationResult] = await Promise.allSettled([
                     getMyProfile(),
                     getProviderVerification(),
                 ]);
 
                 if (!active) return;
 
-                setProfile((previous) => ({
-                    ...previous,
-                    ...profileData,
-                    birthday: profileData.birthday
-                        ? String(profileData.birthday).slice(0, 10)
-                        : '',
-                }));
-
-                setVerification((previous) => ({
-                    ...previous,
-                    ...Object.fromEntries(
-                        Object.keys(initialVerification).map((key) => [
-                            key,
-                            verificationData?.[key] ??
-                            ({
-                                region: verificationData?.region_name,
-                                province: verificationData?.province_name,
-                                city: verificationData?.city_municipality_name,
-                                barangay: verificationData?.barangay_name,
-                                street: verificationData?.street_address,
-                            }[key]) ??
-                            previous[key],
-                        ])
-                    ),
-                }));
-
-                setExperience(
-                    verificationData?.experience_years == null
-                        ? ''
-                        : String(verificationData.experience_years)
-                );
-
-                const savedServices = verificationData?.services || [];
-                if (savedServices.length) {
-                    setSelectedServicesByCategory(
-                        Object.fromEntries(
-                            savedServices.map((service) => [
-                                service.category,
-                                service.capabilities || [],
-                            ])
-                        )
-                    );
-                    setServiceRatesByCategory(
-                        Object.fromEntries(
-                            savedServices.map((service) => [
-                                service.category,
-                                Object.fromEntries(
-                                    (service.capabilities || []).map((title) => [
-                                        title,
-                                        service.service_rates?.[title] ??
-                                            service.rate ??
-                                            verificationData?.hourly_rate ??
-                                            '',
-                                    ])
-                                ),
-                            ])
-                        )
-                    );
-                } else if (verificationData?.service_category) {
-                    setSelectedServicesByCategory({
-                        [verificationData.service_category]:
-                            verificationData.service_titles || [],
-                    });
-                    setServiceRatesByCategory({
-                        [verificationData.service_category]: Object.fromEntries(
-                            (verificationData.service_titles || []).map((title) => [
-                                title,
-                                verificationData.hourly_rate ?? '',
-                            ])
-                        ),
-                    });
+                const loadErrors = [];
+                if (profileResult.status === 'fulfilled') {
+                    const profileData = normalizeProfileData(profileResult.value || {});
+                    setProfile((previous) => ({
+                        ...previous,
+                        ...profileData,
+                        fullName: profileData.fullName || previous.fullName,
+                        email: profileData.email || previous.email,
+                        birthday: profileData.birthday
+                            ? String(profileData.birthday).slice(0, 10)
+                            : previous.birthday,
+                    }));
+                    localStorage.setItem('user', JSON.stringify(profileResult.value));
                 } else {
-                    setSelectedServicesByCategory({});
-                    setServiceRatesByCategory({});
+                    loadErrors.push(
+                        profileResult.reason?.message || 'Unable to load your profile.'
+                    );
                 }
 
-                setStatus(
-                    verificationData?.verification_status || 'incomplete'
-                );
+                if (verificationResult.status === 'fulfilled') {
+                    const verificationData = verificationResult.value;
+                    setVerification((previous) => ({
+                        ...previous,
+                        ...Object.fromEntries(
+                            Object.keys(initialVerification).map((key) => [
+                                key,
+                                verificationData?.[key] ??
+                                ({
+                                    region: verificationData?.region_name,
+                                    province: verificationData?.province_name,
+                                    city: verificationData?.city_municipality_name,
+                                    barangay: verificationData?.barangay_name,
+                                    street: verificationData?.street_address,
+                                }[key]) ??
+                                previous[key],
+                            ])
+                        ),
+                    }));
+
+                    setExperience(
+                        verificationData?.experience_years == null
+                            ? ''
+                            : String(verificationData.experience_years)
+                    );
+
+                    const savedServices = verificationData?.services || [];
+                    if (savedServices.length) {
+                        setSelectedServicesByCategory(
+                            Object.fromEntries(
+                                savedServices.map((service) => [
+                                    service.category,
+                                    service.capabilities || [],
+                                ])
+                            )
+                        );
+                        setServiceRatesByCategory(
+                            Object.fromEntries(
+                                savedServices.map((service) => [
+                                    service.category,
+                                    Object.fromEntries(
+                                        (service.capabilities || []).map((title) => [
+                                            title,
+                                            service.service_rates?.[title] ??
+                                                service.rate ??
+                                                verificationData?.hourly_rate ??
+                                                '',
+                                        ])
+                                    ),
+                                ])
+                            )
+                        );
+                    } else if (verificationData?.service_category) {
+                        setSelectedServicesByCategory({
+                            [verificationData.service_category]:
+                                verificationData.service_titles || [],
+                        });
+                        setServiceRatesByCategory({
+                            [verificationData.service_category]: Object.fromEntries(
+                                (verificationData.service_titles || []).map((title) => [
+                                    title,
+                                    verificationData.hourly_rate ?? '',
+                                ])
+                            ),
+                        });
+                    } else {
+                        setSelectedServicesByCategory({});
+                        setServiceRatesByCategory({});
+                    }
+
+                    setStatus(
+                        verificationData?.verification_status || 'incomplete'
+                    );
+                } else {
+                    loadErrors.push(
+                        verificationResult.reason?.message || 'Unable to load your application.'
+                    );
+                }
+
+                if (loadErrors.length) setError(loadErrors.join(' '));
             } catch (err) {
                 if (active) {
                     setError(
@@ -430,6 +546,68 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
             active = false;
         };
     }, []);
+
+    useEffect(() => {
+        let active = true;
+        const query = profile.address.trim();
+        if (!isEditingProfile || query.length < 3) {
+            return undefined;
+        }
+
+        const controller = new AbortController();
+        const timeout = window.setTimeout(async () => {
+            setAddressSearching(true);
+            setAddressSearchError('');
+
+            try {
+                const params = new URLSearchParams({
+                    q: `${query}, Echague, Isabela, Philippines`,
+                    limit: '8',
+                    lang: 'en',
+                    lat: '16.7',
+                    lon: '121.7',
+                });
+                const response = await fetch(`${ADDRESS_SEARCH_URL}?${params}`, {
+                    signal: controller.signal,
+                    headers: { Accept: 'application/json' },
+                });
+                if (!response.ok) throw new Error('Address suggestions are temporarily unavailable.');
+
+                const data = await response.json();
+                const suggestions = (data.features || [])
+                    .filter((feature) => {
+                        const coordinates = feature?.geometry?.coordinates;
+                        return coordinates?.length === 2
+                            && isWithinEchague(coordinates[1], coordinates[0]);
+                    })
+                    .map(formatPlaceSuggestion)
+                    .filter(Boolean)
+                    .filter((suggestion, index, items) =>
+                        items.findIndex((item) => item.label === suggestion.label) === index
+                    );
+
+                if (active) {
+                    setPlaceAddressSuggestions(suggestions);
+                    if (!suggestions.length && !addressBarangaySuggestions(query).length) {
+                        setAddressSearchError('No matching places found. Try a barangay name or enter the Purok/street manually.');
+                    }
+                }
+            } catch (searchError) {
+                if (active && searchError.name !== 'AbortError') {
+                    setPlaceAddressSuggestions([]);
+                    setAddressSearchError(searchError.message || 'Unable to load address suggestions.');
+                }
+            } finally {
+                if (active) setAddressSearching(false);
+            }
+        }, 400);
+
+        return () => {
+            active = false;
+            window.clearTimeout(timeout);
+            controller.abort();
+        };
+    }, [isEditingProfile, profile.address]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -460,6 +638,25 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
         return () => controller.abort();
     }, []);
+
+    useEffect(() => {
+        if (!regions.length) return;
+
+        const echagueRegion = regions.find((item) =>
+            /region ii|cagayan valley/i.test(item.name)
+        );
+        if (!echagueRegion) {
+            setLocationError('Unable to identify Echague, Isabela in the location list.');
+            return;
+        }
+
+        setVerification((previous) => ({
+            ...previous,
+            region: echagueRegion.name,
+            province: 'Isabela',
+            city: 'Echague',
+        }));
+    }, [regions]);
 
     useEffect(() => {
         const region = findLocationByName(regions, verification.region);
@@ -618,12 +815,29 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const changeProfile = (event) => {
         const { name, value } = event.target;
 
+        if (name === 'address') {
+            setPlaceAddressSuggestions([]);
+            setAddressSearching(false);
+            setAddressSearchError('');
+            setShowAddressSuggestions(true);
+        }
+
         setProfile((previous) => ({
             ...previous,
             [name]: name === 'mobileNumber'
                 ? value.replace(/\D/g, '').slice(0, 11)
                 : value,
         }));
+    };
+
+    const chooseAddressSuggestion = (suggestion) => {
+        const purok = profile.address.match(/^\s*(purok\s*[^,]*)/i)?.[1]?.trim();
+        const address = [purok, suggestion.label].filter(Boolean).join(', ');
+
+        setProfile((previous) => ({ ...previous, address }));
+        setPlaceAddressSuggestions([]);
+        setAddressSearchError('');
+        setShowAddressSuggestions(false);
     };
 
     const changeVerification = (event) => {
@@ -1056,7 +1270,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                 verification.barangay,
                 verification.city,
                 verification.province,
-                verification.region,
                 verification.postal_code,
             ].filter(Boolean).join(', ');
 
@@ -1139,11 +1352,17 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
             verification.barangay,
             verification.city,
             verification.province,
-            verification.region,
             verification.postal_code,
         ].filter(Boolean).join(', ');
 
         const profilePhoto = photoPreview || profile.profilePicture || '';
+        const barangaySuggestions = addressBarangaySuggestions(profile.address);
+        const addressSuggestions = [
+            ...placeAddressSuggestions,
+            ...barangaySuggestions,
+        ].filter((suggestion, index, items) =>
+            items.findIndex((item) => item.label === suggestion.label) === index
+        );
 
         return (
             <section className="provider-profile-page verified-profile-page">
@@ -1311,13 +1530,61 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                     </div>
                                     <div>
                                         <label className="form-label" htmlFor="approved-address">Address <b>*</b></label>
-                                        <input
-                                            id="approved-address"
-                                            className="form-control"
-                                            name="address"
-                                            value={profile.address || ''}
-                                            onChange={changeProfile}
-                                        />
+                                        <div className="provider-address-autocomplete">
+                                            <input
+                                                id="approved-address"
+                                                className="form-control"
+                                                name="address"
+                                                value={profile.address || ''}
+                                                onChange={changeProfile}
+                                                onFocus={() => setShowAddressSuggestions(true)}
+                                                onBlur={() => window.setTimeout(() => setShowAddressSuggestions(false), 150)}
+                                                placeholder="Purok / street (if any), barangay, Echague, Isabela"
+                                                autoComplete="street-address"
+                                                aria-autocomplete="list"
+                                                aria-expanded={showAddressSuggestions && addressSuggestions.length > 0}
+                                                aria-controls="approved-address-suggestions"
+                                            />
+                                            {showAddressSuggestions && profile.address.trim().length >= 2 && (
+                                                <div
+                                                    id="approved-address-suggestions"
+                                                    className="provider-address-suggestions"
+                                                    role="listbox"
+                                                    aria-label="Echague address suggestions"
+                                                >
+                                                    {addressSearching && (
+                                                        <div className="provider-address-suggestion-status" role="status">
+                                                            Searching real places in Echague...
+                                                        </div>
+                                                    )}
+                                                    {addressSuggestions.map((suggestion) => (
+                                                        <button
+                                                            key={`${suggestion.source}-${suggestion.label}`}
+                                                            type="button"
+                                                            role="option"
+                                                            aria-selected="false"
+                                                            onMouseDown={(event) => event.preventDefault()}
+                                                            onClick={() => chooseAddressSuggestion(suggestion)}
+                                                        >
+                                                            <i className={`bi ${suggestion.source === 'place' ? 'bi-geo-alt-fill' : 'bi-geo-alt'}`} aria-hidden="true" />
+                                                            <span>{suggestion.label}</span>
+                                                            <small>{suggestion.source === 'place' ? 'OpenStreetMap place' : 'Echague barangay'}</small>
+                                                        </button>
+                                                    ))}
+                                                    {!addressSearching && addressSearchError && (
+                                                        <div className="provider-address-suggestion-status" role="status">{addressSearchError}</div>
+                                                    )}
+                                                    {!addressSearching && !addressSuggestions.length && (
+                                                        <div className="provider-address-suggestion-status">
+                                                            No matching place or barangay. Purok/street is optional.
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <small className="provider-field-hint">
+                                            Format: Purok/street (optional), barangay, Echague, Isabela. Choose a real place or barangay suggestion; leave Purok blank if none.
+                                        </small>
                                     </div>
                                     <div className="provider-profile-form-actions">
                                         <button
@@ -1644,12 +1911,22 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 <div className="row">
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label">Full Name</label>
-                                        <input className="form-control" value={profile.fullName || ''} readOnly />
+                                        <input
+                                            className="form-control"
+                                            value={profile.fullName || ''}
+                                            placeholder={profile.fullName ? '' : 'Name unavailable. Please sign in again.'}
+                                            readOnly
+                                        />
                                     </div>
 
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label">Email</label>
-                                        <input className="form-control" value={profile.email || ''} readOnly />
+                                        <input
+                                            className="form-control"
+                                            value={profile.email || ''}
+                                            placeholder={profile.email ? '' : 'Email unavailable. Please sign in again.'}
+                                            readOnly
+                                        />
                                     </div>
 
                                     <div className="col-md-6 mb-3">
@@ -1712,86 +1989,24 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 )}
 
                                 <div className="mb-3">
-                                    <label className="form-label">Region</label>
-                                    <select
-                                        className="form-select"
-                                        name="region"
-                                        value={verification.region}
-                                        onChange={(event) => {
-                                            changeVerification(event);
-                                            setAddressError('');
-                                            setVerification((previous) => ({
-                                                ...previous,
-                                                region: event.target.value,
-                                                province: '',
-                                                city: '',
-                                                barangay: '',
-                                                postal_code: '',
-                                            }));
-                                        }}
-                                    >
-                                        <option value="">Select region</option>
-                                        {regions.map((item) => (
-                                            <option key={getLocationCode(item)} value={item.name}>
-                                                {item.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="mb-3">
                                     <label className="form-label">Province</label>
-                                    <select
-                                        className="form-select"
-                                        name="province"
-                                        value={verification.province}
-                                        onChange={(event) => {
-                                            const value = event.target.value;
-                                            setAddressError('');
-                                            setVerification((previous) => ({
-                                                ...previous,
-                                                province: value,
-                                                city: '',
-                                                barangay: '',
-                                                postal_code: '',
-                                            }));
-                                        }}
-                                        disabled={!verification.region || locationLoading}
-                                    >
-                                        <option value="">Select province</option>
-                                        {provinces.map((item) => (
-                                            <option key={getLocationCode(item)} value={item.name}>
-                                                {item.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <input
+                                        className="form-control"
+                                        value={verification.province || 'Isabela'}
+                                        readOnly
+                                    />
                                 </div>
 
                                 <div className="mb-3">
                                     <label className="form-label">City / Municipality</label>
-                                    <select
-                                        className="form-select"
-                                        name="city"
-                                        value={verification.city}
-                                        onChange={(event) => {
-                                            const value = event.target.value;
-                                            setAddressError('');
-                                            setVerification((previous) => ({
-                                                ...previous,
-                                                city: value,
-                                                barangay: '',
-                                                postal_code: '',
-                                            }));
-                                        }}
-                                        disabled={!verification.province || locationLoading}
-                                    >
-                                        <option value="">Select city / municipality</option>
-                                        {cities.map((item) => (
-                                            <option key={getLocationCode(item)} value={item.name}>
-                                                {item.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <input
+                                        className="form-control"
+                                        value={verification.city || 'Echague'}
+                                        readOnly
+                                    />
+                                    <small className="provider-field-hint">
+                                        Service locations are limited to Echague, Isabela.
+                                    </small>
                                 </div>
 
                                 <div className="mb-3">
@@ -2066,7 +2281,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                     verification.barangay,
                                     verification.city,
                                     verification.province,
-                                    verification.region,
                                     verification.postal_code,
                                 ].filter(Boolean).join(', ') || 'Not provided'}</p>
 
