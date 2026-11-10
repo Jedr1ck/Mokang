@@ -34,6 +34,7 @@ BOOKING_STATUS_ORDER = (
     "Accepted",
     "On the Way",
     "In Progress",
+    "Awaiting Confirmation",
     "Completed",
     "Cancelled",
     "Rejected",

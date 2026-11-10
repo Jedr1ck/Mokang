@@ -39,6 +39,7 @@ const BookingModal = ({
     const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
     const [addressSearchError, setAddressSearchError] = useState('');
     const [selectedAddressCoords, setSelectedAddressCoords] = useState(null);
+    const [savedHomeAddress, setSavedHomeAddress] = useState('');
 
     const [formData, setFormData] = useState({
         category: '',
@@ -105,6 +106,13 @@ const BookingModal = ({
                 const profile = await getMyProfile();
                 if (active) {
                     setMissingProfileFields(profile.missingProfileFields || []);
+                    const homeAddress = String(profile.address || profile.homeAddress || '').trim();
+                    setSavedHomeAddress(homeAddress);
+                    setFormData((previous) => ({
+                        ...previous,
+                        address: homeAddress,
+                    }));
+                    setSelectedAddressCoords(null);
                 }
             } catch (error) {
                 if (active) setProfileCheckError(error.message || 'Unable to verify your profile.');
@@ -276,8 +284,9 @@ const BookingModal = ({
         if (!formData.preferredDate) errors.preferredDate = 'Choose a service date.';
         else if (formData.preferredDate < today) errors.preferredDate = 'Date cannot be in the past.';
         if (!formData.preferredTime) errors.preferredTime = 'Choose a service time.';
-        if (formData.address.trim().length < 10) errors.address = 'Enter a complete address (at least 10 characters).';
-        if (!selectedAddressCoords || !isWithinEchague(selectedAddressCoords.lat, selectedAddressCoords.lng)) {
+        if (formData.address.trim().length < 10) errors.address = 'Add a complete home address to your profile before booking.';
+        const unchangedSavedAddress = formData.address.trim() === savedHomeAddress;
+        if (!unchangedSavedAddress && (!selectedAddressCoords || !isWithinEchague(selectedAddressCoords.lat, selectedAddressCoords.lng))) {
             errors.address = 'Choose an address suggestion within Echague, Isabela.';
         }
         if (formData.description.trim().length < 10) errors.description = 'Describe the work needed (at least 10 characters).';
@@ -493,7 +502,7 @@ const BookingModal = ({
                                         {fieldErrors.preferredTime && <div className="invalid-feedback">{fieldErrors.preferredTime}</div>}
                                     </div>
 
-                                    {/* Complete Address with autocomplete */}
+                                    {/* Complete Address from homeowner profile */}
                                     <div className="col-12">
                                         <label className="form-label fw-semibold small">
                                             Complete Address
@@ -506,22 +515,9 @@ const BookingModal = ({
                                                 name="address"
                                                 placeholder="House No., Street, Barangay, City"
                                                 value={formData.address}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setShowAddressSuggestions(true);
-                                                }}
-                                                onFocus={() =>
-                                                    setShowAddressSuggestions(true)
-                                                }
-                                                onBlur={() => {
-                                                    setTimeout(() => {
-                                                        setShowAddressSuggestions(false);
-                                                    }, 150);
-                                                }}
-                                                minLength="10"
+                                                readOnly
+                                                aria-readonly="true"
                                                 maxLength="2000"
-                                                autoComplete="street-address"
-                                                required
                                             />
 
                                             {showAddressSuggestions &&
@@ -587,7 +583,7 @@ const BookingModal = ({
                                         </div>
 
                                         <small className="text-muted">
-                                            Type at least 3 characters and choose an address suggestion within Echague, Isabela.
+                                            This is your saved home address. Update it from your profile if it needs correction.
                                         </small>
                                         {addressSearchError && !showAddressSuggestions && (
                                             <div className="form-text text-danger" role="status">{addressSearchError}</div>

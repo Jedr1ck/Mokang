@@ -10,6 +10,7 @@ BOOKING_STATUSES = {
     "Accepted",
     "On the Way",
     "In Progress",
+    "Awaiting Confirmation",
     "Completed",
     "Cancelled",
     "Rejected",

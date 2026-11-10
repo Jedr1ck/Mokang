@@ -22,7 +22,8 @@ const ACTIVE_STATUSES = new Set([
     'Matched',
     'Accepted',
     'On the Way',
-    'In Progress'
+    'In Progress',
+    'Awaiting Confirmation'
 ]);
 
 const formatBookingDate = (value) => {

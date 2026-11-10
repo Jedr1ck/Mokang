@@ -62,6 +62,7 @@ const History = () => {
                 return 'badge text-bg-info rounded-pill px-3 py-2';
             case 'In Progress':
             case 'On the Way':
+            case 'Awaiting Confirmation':
                 return 'badge text-bg-primary rounded-pill px-3 py-2';
             case 'Cancelled':
             case 'Rejected':
@@ -132,7 +133,7 @@ const History = () => {
                 {/* Filter Bar */}
                 <div style={filterContainerStyle}>
                     <div className="homeowner-history-filters">
-                        {['All', 'Pending', 'Accepted', 'In Progress', 'Completed', 'Cancelled', 'Rejected'].map((type) => (
+                        {['All', 'Pending', 'Accepted', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled', 'Rejected'].map((type) => (
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type)}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
-import { api, getMyBookings } from '../../services/api';
+import { api, confirmBookingCompletion, getMyBookings } from '../../services/api';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import ConfirmDialog from '../ConfirmDialog';
 
@@ -12,6 +12,7 @@ const BOOKING_FILTERS = [
     { label: 'Pending', matches: (status) => status === 'Pending' },
     { label: 'Confirmed', matches: (status) => ['Matched', 'Accepted'].includes(status) },
     { label: 'In Progress', matches: (status) => ['On the Way', 'In Progress'].includes(status) },
+    { label: 'Awaiting Confirmation', matches: (status) => status === 'Awaiting Confirmation' },
     { label: 'Completed', matches: (status) => status === 'Completed' },
     { label: 'Cancelled', matches: (status) => ['Cancelled', 'Rejected'].includes(status) },
 ];
@@ -25,6 +26,8 @@ const BookingsTab = () => {
     const [actionError, setActionError] = useState('');
     const [cancellingId, setCancellingId] = useState(null);
     const [bookingToCancel, setBookingToCancel] = useState(null);
+    const [bookingToConfirm, setBookingToConfirm] = useState(null);
+    const [confirmingId, setConfirmingId] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -52,6 +55,8 @@ const BookingsTab = () => {
                 return <span className="badge text-bg-warning rounded-pill px-3 py-2 fw-semibold">On the Way</span>;
             case 'In Progress':
                 return <span className="badge text-bg-primary rounded-pill px-3 py-2 fw-semibold">In Progress</span>;
+            case 'Awaiting Confirmation':
+                return <span className="badge text-bg-warning rounded-pill px-3 py-2 fw-semibold">Awaiting Your Confirmation</span>;
             case 'Completed':
                 return <span className="badge text-bg-success rounded-pill px-3 py-2 fw-semibold">Completed</span>;
             case 'Cancelled':
@@ -78,6 +83,21 @@ const BookingsTab = () => {
             setActionError(error.message || 'Unable to cancel this booking.');
         } finally {
             setCancellingId(null);
+        }
+    };
+
+    const handleConfirmCompletion = async () => {
+        if (!bookingToConfirm) return;
+        setActionError('');
+        setConfirmingId(bookingToConfirm.id);
+        try {
+            const updatedBooking = await confirmBookingCompletion(bookingToConfirm.id);
+            setBookings((current) => current.map((item) => item.id === bookingToConfirm.id ? updatedBooking : item));
+            setBookingToConfirm(null);
+        } catch (error) {
+            setActionError(error.message || 'Unable to confirm service completion.');
+        } finally {
+            setConfirmingId(null);
         }
     };
 
@@ -152,6 +172,16 @@ const BookingsTab = () => {
                                             </div>
                                             <div className="d-flex flex-wrap align-items-center gap-2 ms-auto">
                                                 {getStatusBadge(status)}
+                                                {status === 'Awaiting Confirmation' && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-success btn-sm rounded-pill px-3 fw-bold"
+                                                        disabled={confirmingId === booking.id}
+                                                        onClick={() => setBookingToConfirm(booking)}
+                                                    >
+                                                        Confirm Completed
+                                                    </button>
+                                                )}
                                                 {!isClosed && (
                                                     <button
                                                         type="button"
@@ -180,6 +210,16 @@ const BookingsTab = () => {
                     </div>
                 )}
             </main>
+            <ConfirmDialog
+                open={Boolean(bookingToConfirm)}
+                title="Confirm service completion?"
+                message="Confirm only if the provider has finished the work. This will mark the booking as completed."
+                confirmLabel="Yes, confirm"
+                icon="bi-check-circle"
+                busy={confirmingId !== null}
+                onConfirm={handleConfirmCompletion}
+                onCancel={() => setBookingToConfirm(null)}
+            />
             <ConfirmDialog
                 open={Boolean(bookingToCancel)}
                 title="Cancel booking?"

@@ -9,12 +9,13 @@ import ConfirmDialog from '../ConfirmDialog';
 import myLogo from '../../assets/images/logo.png';
 import './ProviderBookingSystem.css';
 
-const filters = ['All Bookings', 'Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'];
+const filters = ['All Bookings', 'Pending', 'Confirmed', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'];
 
 function getDisplayStatus(status) {
     if (status === 'Pending') return 'Pending';
     if (['Accepted', 'Matched'].includes(status)) return 'Confirmed';
     if (['On the Way', 'In Progress'].includes(status)) return 'In Progress';
+    if (status === 'Awaiting Confirmation') return 'Awaiting Confirmation';
     if (status === 'Completed') return 'Completed';
     if (['Cancelled', 'Rejected'].includes(status)) return 'Cancelled';
     return status || 'Pending';
@@ -175,11 +176,13 @@ export default function ProviderBookingSystem() {
             ? 1
             : selectedStatus === 'In Progress'
                 ? 2
-                : selectedStatus === 'Completed'
-                    ? 3
-                    : selectedStatus === 'Cancelled'
-                        ? 4
-                        : 0;
+                    : selectedStatus === 'Awaiting Confirmation'
+                        ? 3
+                        : selectedStatus === 'Completed'
+                            ? 4
+                            : selectedStatus === 'Cancelled'
+                                ? 5
+                                : 0;
 
     return (
         <main className="provider-booking-system">
@@ -356,11 +359,11 @@ export default function ProviderBookingSystem() {
                                 </div>
                                 <div className="pbs-status-content">
                                     <ol className="pbs-status-timeline">
-                                        {['Request Sent', 'Accepted', 'In Progress', 'Completed', 'Cancelled'].map((step, index) => {
+                                        {['Request Sent', 'Accepted', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'].map((step, index) => {
                                             const cancelled = selectedStatus === 'Cancelled';
-                                            const isCurrent = cancelled ? index === 4 : index === statusStep;
+                                            const isCurrent = cancelled ? index === 5 : index === statusStep;
                                             const isDone = !cancelled && index < statusStep;
-                                            const isFutureCancelled = index === 4 && !cancelled;
+                                            const isFutureCancelled = index === 5 && !cancelled;
                                             if (isFutureCancelled) return null;
                                             return (
                                                 <li className={`${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''} ${cancelled && index < 4 ? 'cancelled-before' : ''}`} key={step}>
@@ -389,7 +392,7 @@ export default function ProviderBookingSystem() {
                                                 <i className="bi bi-check-lg" /> Mark as Completed
                                             </button>
                                         )}
-                                        {!['Completed', 'Cancelled'].includes(selectedStatus) && (
+                                        {!['In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'].includes(selectedStatus) && (
                                             <>
                                                 <button type="button" className="secondary" onClick={startReschedule} disabled={busy}>
                                                     <i className="bi bi-calendar-event" /> Reschedule

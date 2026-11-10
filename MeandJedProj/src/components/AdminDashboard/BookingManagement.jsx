@@ -693,6 +693,9 @@ function BookingManagement() {
                                 <option value="In Progress">
                                     In Progress
                                 </option>
+                                <option value="Awaiting Confirmation">
+                                    Awaiting Confirmation
+                                </option>
 
                                 <option value="Completed">
                                     Completed
@@ -1506,6 +1509,9 @@ function BookingManagement() {
 
                                             <option value="In Progress">
                                                 In Progress
+                                            </option>
+                                            <option value="Awaiting Confirmation">
+                                                Awaiting Confirmation
                                             </option>
 
                                             <option value="Completed">

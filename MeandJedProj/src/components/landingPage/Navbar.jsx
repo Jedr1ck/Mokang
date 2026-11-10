@@ -36,14 +36,6 @@ function Navbar() {
                 <li><a href="#contact">Contact</a></li>
             </ul>
 
-            <div className="navbar-buttons">
-                <button
-                    className="btn btn-brand"
-                    onClick={() => navigate('/admin-login')}
-                >
-                    Admin
-                </button>
-            </div>
         </nav>
     );
 }

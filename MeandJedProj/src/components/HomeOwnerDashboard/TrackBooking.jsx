@@ -2,7 +2,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { getMyBookings } from '../../services/api';
+import { confirmBookingCompletion, getMyBookings } from '../../services/api';
+import ConfirmDialog from '../ConfirmDialog';
 import './TrackBooking.css';
 
 const TrackBooking = () => {
@@ -11,6 +12,9 @@ const TrackBooking = () => {
     const [bookingData, setBookingData] = useState(location.state?.booking || null);
     const [loading, setLoading] = useState(!location.state?.booking);
     const [loadError, setLoadError] = useState('');
+    const [showConfirmCompletion, setShowConfirmCompletion] = useState(false);
+    const [confirmingCompletion, setConfirmingCompletion] = useState(false);
+    const [completionError, setCompletionError] = useState('');
 
     useEffect(() => {
         let active = true;
@@ -46,10 +50,10 @@ const TrackBooking = () => {
     // Listahan ng lahat ng steps
     const steps = [
         { label: 'Pending', icon: 'bi-clock-history' },
-        { label: 'Matched', icon: 'bi-person-check-fill' },
         { label: 'Accepted', icon: 'bi-person-badge-fill' },
         { label: 'On the Way', icon: 'bi-truck' },
         { label: 'In Progress', icon: 'bi-tools' },
+        { label: 'Awaiting Confirmation', icon: 'bi-clipboard-check' },
         { label: 'Completed', icon: 'bi-check-circle-fill' }
     ];
 
@@ -65,7 +69,7 @@ const TrackBooking = () => {
         ? 'closed'
         : isCompleted
             ? 'completed'
-            : ['on the way', 'in progress'].includes(status)
+            : ['on the way', 'in progress', 'awaiting confirmation'].includes(status)
                 ? 'in-progress'
                 : ['matched', 'accepted'].includes(status)
                     ? 'confirmed'
@@ -76,17 +80,32 @@ const TrackBooking = () => {
             case 0:
                 return { title: "Waiting for Provider", desc: "Your booking request is currently pending review." };
             case 1:
-                return { title: "Provider Matched", desc: "A service provider has been assigned to your request." };
-            case 2:
                 return { title: "Request Accepted", desc: "Provider has accepted your booking request." };
-            case 3:
+            case 2:
                 return { title: "Provider On the Way", desc: "The provider is traveling to your location." };
-            case 4:
+            case 3:
                 return { title: "Service In Progress", desc: "The provider is currently working on your request." };
+            case 4:
+                return { title: "Confirm Service Completion", desc: "The provider marked the work as finished. Please confirm once you have verified the service is complete." };
             case 5:
                 return { title: "Service Completed", desc: "Job has been completed successfully." };
             default:
                 return { title: "", desc: "" };
+        }
+    };
+
+    const handleConfirmCompletion = async () => {
+        if (!bookingData || confirmingCompletion) return;
+        setConfirmingCompletion(true);
+        setCompletionError('');
+        try {
+            const updated = await confirmBookingCompletion(bookingData.id);
+            setBookingData(updated);
+            setShowConfirmCompletion(false);
+        } catch (error) {
+            setCompletionError(error.message || 'Unable to confirm service completion.');
+        } finally {
+            setConfirmingCompletion(false);
         }
     };
 
@@ -144,7 +163,7 @@ const TrackBooking = () => {
                         let bgColor = '#F5F5F5';
                         let textColor = '#adb5bd';
 
-                        if (isCurrent && index === 5) {
+                        if (isCurrent && index === steps.length - 1) {
                             bgColor = '#198754';
                             textColor = '#ffffff';
                         } else if (isCurrent || isPassed) {
@@ -194,9 +213,27 @@ const TrackBooking = () => {
                         {isClosed ? 'This booking is no longer active.' : getStatusText(activeIndex).desc}
                     </p>
                 </div>
+                {bookingData.status === 'Awaiting Confirmation' && (
+                    <div className="mt-4 text-center">
+                        <button type="button" className="btn btn-success rounded-pill px-4 fw-bold" onClick={() => setShowConfirmCompletion(true)}>
+                            Confirm Service Completed
+                        </button>
+                        {completionError && <p className="text-danger small mt-2" role="alert">{completionError}</p>}
+                    </div>
+                )}
                 {loadError && <p className="tracking-refresh-note" role="status">Live status refresh unavailable: {loadError}</p>}
                 <p className="tracking-refresh-note">Booking status refreshes automatically.</p>
             </section>
+            <ConfirmDialog
+                open={showConfirmCompletion}
+                title="Confirm service completion?"
+                message="Confirm only if the provider has finished the work. This will mark the booking as completed."
+                confirmLabel="Yes, confirm"
+                icon="bi-check-circle"
+                busy={confirmingCompletion}
+                onConfirm={handleConfirmCompletion}
+                onCancel={() => setShowConfirmCompletion(false)}
+            />
         </main>
     );
 };

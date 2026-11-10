@@ -12,6 +12,7 @@ export async function getPublicStats() { return api('/public/stats'); }
 export async function getPublicReviews() { return api('/public/reviews'); }
 export async function getMyBookings() { return api('/bookings/my'); }
 export async function updateBookingStatus(id, status) { return api(`/bookings/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); }
+export async function confirmBookingCompletion(id) { return api(`/bookings/${id}/confirm-completion`, { method: 'PATCH' }); }
 export async function rescheduleBooking(id, preferredDate, preferredTime) {
     return api(`/bookings/${id}/reschedule`, {
         method: 'PATCH',

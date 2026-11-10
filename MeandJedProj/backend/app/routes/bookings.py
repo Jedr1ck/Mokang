@@ -247,6 +247,7 @@ def admin_change_booking_status(booking_id):
         "Accepted",
         "On the Way",
         "In Progress",
+        "Awaiting Confirmation",
         "Completed",
         "Cancelled",
         "Rejected",
@@ -274,8 +275,8 @@ def admin_change_booking_status(booking_id):
             )
             notify_admins(
                 session,
-                "Provider updated booking",
-                f"Provider {provider_name} changed {category_name} booking to {data.status}.",
+                "Administrator updated booking",
+                f"Administrator {user.full_name} changed {category_name} booking to {data.status}.",
                 "booking",
             )
             session.commit()
@@ -356,6 +357,10 @@ def change_status(booking_id):
             )
         if booking.provider_id and booking.provider_id != provider.id:
             raise ApiError("Not your booking", 403)
+        if booking.status == "Awaiting Confirmation" and data.status != booking.status:
+            raise ApiError("Only the homeowner can confirm this service as completed.", 400)
+        if data.status == "Cancelled" and booking.status in {"On the Way", "In Progress"}:
+            raise ApiError("A booking cannot be cancelled after the provider starts traveling to the service location.", 400)
         claimed_booking = booking.provider_id is None
         if claimed_booking:
             matching_category = (
@@ -370,10 +375,15 @@ def change_status(booking_id):
                 raise ApiError("This booking is not available to your service profile.", 403)
             booking.provider_id = provider.id
         previous_status = booking.status
-        if previous_status == data.status and not claimed_booking:
+        next_status = data.status
+        if next_status == "Completed":
+            if previous_status != "In Progress":
+                raise ApiError("A service must be in progress before it can be marked complete.", 400)
+            next_status = "Awaiting Confirmation"
+        if previous_status == next_status and not claimed_booking:
             return jsonify(booking_out(booking))
 
-        booking.status = data.status
+        booking.status = next_status
         category_name = booking.category.name if booking.category else "Your service"
         provider_name = provider.business_name or user.full_name
         if data.status == "Accepted":
@@ -385,12 +395,12 @@ def change_status(booking_id):
         elif data.status == "Cancelled":
             title = "Booking cancelled"
             body = f"Your {category_name} booking was cancelled by the provider."
-        elif data.status == "Completed":
-            title = "Service completed"
-            body = f"{provider_name} marked your {category_name} booking as completed."
+        elif next_status == "Awaiting Confirmation":
+            title = "Please confirm service completion"
+            body = f"{provider_name} marked your {category_name} service as finished. Confirm it in your bookings when the work is complete."
         else:
             title = "Booking status updated"
-            body = f"Your {category_name} booking is now {data.status}."
+            body = f"Your {category_name} booking is now {next_status}."
         session.add(
             Notification(
                 user_id=booking.homeowner_id,
@@ -402,7 +412,41 @@ def change_status(booking_id):
         notify_admins(
             session,
             "Provider updated booking",
-            f"Provider {provider_name} changed a {category_name} booking to {data.status}.",
+            f"Provider {provider_name} changed a {category_name} booking to {next_status}.",
+            "booking",
+        )
+        session.commit()
+        return jsonify(booking_out(booking))
+
+
+@bookings_bp.patch("/bookings/<int:booking_id>/confirm-completion")
+@require_auth
+def confirm_booking_completion(booking_id):
+    with get_session() as session:
+        user = current_user(session)
+        if user.role != "homeowner":
+            raise ApiError("Homeowners only", 403)
+        booking = session.get(Booking, booking_id)
+        if not booking:
+            raise ApiError("Booking not found", 404)
+        if booking.homeowner_id != user.id:
+            raise ApiError("Not your booking", 403)
+        if booking.status != "Awaiting Confirmation":
+            raise ApiError("This booking is not waiting for completion confirmation.", 400)
+
+        booking.status = "Completed"
+        category_name = booking.category.name if booking.category else "service"
+        if booking.provider:
+            session.add(Notification(
+                user_id=booking.provider.user_id,
+                title="Service completion confirmed",
+                body=f"The homeowner confirmed that the {category_name} service is complete.",
+                type="booking",
+            ))
+        notify_admins(
+            session,
+            "Service completion confirmed",
+            f"The homeowner confirmed completion of a {category_name} booking.",
             "booking",
         )
         session.commit()
@@ -431,8 +475,8 @@ def reschedule_booking(booking_id):
             raise ApiError("Booking not found", 404)
         if booking.provider_id != provider.id:
             raise ApiError("Not your booking", 403)
-        if booking.status in {"Completed", "Cancelled", "Rejected"}:
-            raise ApiError("This booking can no longer be rescheduled.", 400)
+        if booking.status in {"On the Way", "In Progress", "Awaiting Confirmation", "Completed", "Cancelled", "Rejected"}:
+            raise ApiError("A booking can no longer be rescheduled after the provider starts traveling to the service location.", 400)
 
         booking.preferred_date = data.preferred_date
         booking.preferred_time = data.preferred_time

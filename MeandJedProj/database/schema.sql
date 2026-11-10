@@ -1,7 +1,3 @@
--- Consolidated STRUCTURE-ONLY schema for the smarthomes database
--- Generated from the uploaded phpMyAdmin export.
--- Contains CREATE TABLE definitions, indexes, AUTO_INCREMENT settings, and foreign keys.
--- INSERT/data statements and personal records have been excluded.
 
 CREATE DATABASE IF NOT EXISTS `smarthomes` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `smarthomes`;
@@ -22,7 +18,7 @@ CREATE TABLE `bookings` (
   `preferred_time` time NOT NULL,
   `address` text NOT NULL,
   `description` text NOT NULL,
-  `status` enum('Pending','Matched','Accepted','On the Way','In Progress','Completed','Cancelled','Rejected') NOT NULL DEFAULT 'Pending',
+  `status` enum('Pending','Matched','Accepted','On the Way','In Progress','Awaiting Confirmation','Completed','Cancelled','Rejected') NOT NULL DEFAULT 'Pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -107,7 +103,6 @@ CREATE TABLE `reviews` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Complaint reports are separate from reviews so admins can track resolution.
 CREATE TABLE `complaints` (
   `id` bigint(20) NOT NULL,
   `booking_id` bigint(20) NOT NULL,
@@ -149,14 +144,7 @@ CREATE TABLE `user_profiles` (
   `profile_picture` longtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Indexes, AUTO_INCREMENT values, and foreign-key constraints
---
--- Indexes for dumped tables
---
 
---
--- Indexes for table `bookings`
---
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `booking_code` (`booking_code`),

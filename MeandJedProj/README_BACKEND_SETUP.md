@@ -26,6 +26,10 @@ To store the selected provider service on bookings in an existing database, appl
 ```powershell
 Get-Content database/migrations/20261028_add_booking_service_name.sql | mysql -u root -p Smarthomes
 ```
+To let providers request homeowner confirmation before a booking is completed, apply:
+```powershell
+Get-Content database/migrations/20261110_add_awaiting_confirmation_booking_status.sql | mysql -u root -p Smarthomes
+```
 
 ## 2. Backend
 ```bash
