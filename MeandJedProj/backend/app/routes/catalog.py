@@ -9,7 +9,6 @@ from app.models import (
     ProviderService,
     Review,
     User,
-    UserProfile,
 )
 
 catalog_bp = Blueprint("catalog", __name__)
@@ -19,7 +18,6 @@ def verified_provider_query(session):
     return (
         session.query(ProviderProfile)
         .join(User)
-        .join(UserProfile, UserProfile.user_id == User.id)
         .filter(
             User.role == "provider",
             User.is_active.is_(True),
@@ -27,20 +25,8 @@ def verified_provider_query(session):
             ProviderProfile.verification_status == "verified",
             ProviderProfile.verification_reviewed_by.isnot(None),
             ProviderProfile.verification_reviewed_at.isnot(None),
-            func.trim(ProviderProfile.business_name) != "",
-            func.trim(ProviderProfile.region_name) != "",
-            func.trim(ProviderProfile.province_name) != "",
             func.trim(ProviderProfile.city_municipality_name) != "",
             func.trim(ProviderProfile.barangay_name) != "",
-            func.trim(ProviderProfile.street_address) != "",
-            func.trim(ProviderProfile.id_type) != "",
-            func.trim(ProviderProfile.id_front_path) != "",
-            func.trim(ProviderProfile.id_back_path) != "",
-            func.trim(ProviderProfile.service_area) != "",
-            func.trim(UserProfile.mobile_number) != "",
-            func.trim(UserProfile.gender) != "",
-            func.trim(UserProfile.address) != "",
-            UserProfile.birthday.isnot(None),
             ProviderProfile.id.in_(
                 session.query(ProviderService.provider_id).filter(
                     ProviderService.title.isnot(None),
@@ -259,6 +245,8 @@ def providers():
                     "capabilities": capability_names,
                     "qualifications": provider.qualifications or "",
                     "location": location_name,
+                    "barangay": provider.barangay_name,
+                    "municipality": provider.city_municipality_name,
                     "rate": min(service_prices) if service_prices else None,
                     "servicePrices": {
                         service.title: float(service.rate)

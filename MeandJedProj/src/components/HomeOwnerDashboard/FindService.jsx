@@ -76,7 +76,13 @@ const normalizedLocationPart = (value = '') => value
     .toLowerCase()
     .replace(/\s+/g, ' ');
 const providerMatchesEchague = (provider, barangay) => {
-    const [providerBarangay, municipality] = (provider.location || '').split(',').map(normalizedLocationPart);
+    const [locationBarangay, locationMunicipality] = (provider.location || '')
+        .split(',')
+        .map(normalizedLocationPart);
+    const providerBarangay = normalizedLocationPart(provider.barangay || locationBarangay);
+    const municipality = normalizedLocationPart(
+        (provider.municipality || locationMunicipality).split(',')[0]
+    );
     return municipality === 'echague'
         && (barangay === 'all' || providerBarangay === normalizedLocationPart(barangay));
 };
