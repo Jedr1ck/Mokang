@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./ProviderSideBar.css";
 
-import myLogo from "../../assets/images/logo.png";
+import myLogo from "../../assets/images/handyman-mark.svg";
 
 const ProviderSideBar = () => {
     const location = useLocation();
@@ -49,7 +49,7 @@ const ProviderSideBar = () => {
                 >
                     <img
                         src={myLogo}
-                        alt="Provider Logo"
+                        alt="HandyMan Logo"
                         className="provider-brand-logo-img"
                     />
                 </Link>

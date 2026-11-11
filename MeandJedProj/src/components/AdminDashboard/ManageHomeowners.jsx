@@ -444,7 +444,7 @@ function ManageHomeowners() {
                         <h3>Homeowner Accounts</h3>
 
                         <p>
-                            Registered customers in the SmartHome system
+                            Registered customers in the HandyMan system
                         </p>
                     </div>
 

@@ -164,45 +164,6 @@ const HomeownerDashboard = () => {
             .slice(0, 3);
     }, [providers, searchQuery]);
 
-    const quickActions = [
-        {
-            label: 'Find a Service',
-            detail: 'Browse providers',
-            icon: 'bi-search',
-            onClick: () => navigate('/services')
-        },
-        {
-            label: 'Book a Service',
-            detail: 'Schedule now',
-            icon: 'bi-calendar-plus',
-            onClick: () => navigate('/services')
-        },
-        {
-            label: 'My Bookings',
-            detail: 'Track your requests',
-            icon: 'bi-calendar-check',
-            onClick: () => navigate('/bookings')
-        },
-        {
-            label: 'Messages',
-            detail: 'Chat with providers',
-            icon: 'bi-chat-dots',
-            onClick: () => navigate('/messages')
-        },
-        {
-            label: 'My Calendar',
-            detail: 'View your schedule',
-            icon: 'bi-calendar3',
-            onClick: () => navigate('/calendar')
-        },
-        {
-            label: 'Home Profile',
-            detail: 'Manage your details',
-            icon: 'bi-house-heart',
-            onClick: () => navigate('/profile')
-        }
-    ];
-
     const viewBooking = (booking) =>
         navigate('/track-booking', { state: { booking } });
     const unreadNotifications = notifications.filter((item) => !item.isRead);
@@ -478,28 +439,6 @@ const HomeownerDashboard = () => {
                     )}
                 </article>
 
-                <article className="homeowner-dashboard-panel">
-                    <div className="homeowner-dashboard-panel-heading">
-                        <h2>
-                            <i className="bi bi-lightning-charge-fill" />
-                            Quick Actions
-                        </h2>
-                    </div>
-                    <div className="homeowner-dashboard-actions-grid">
-                        {quickActions.map((action) => (
-                            <button
-                                type="button"
-                                className="homeowner-dashboard-action"
-                                key={action.label}
-                                onClick={action.onClick}
-                            >
-                                <i className={`bi ${action.icon}`} />
-                                <strong>{action.label}</strong>
-                                <small>{action.detail}</small>
-                            </button>
-                        ))}
-                    </div>
-                </article>
             </section>
 
             <section className="homeowner-dashboard-bottom-grid">

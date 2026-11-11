@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getMyProfile, getNotifications, getProviders, getProvider } from '../../services/api';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getMyProfile, getNotifications, getProviders, getProvider, token } from '../../services/api';
+import { SERVICE_CATALOG } from '../../data/serviceCatalog';
 import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
-import BookingModal from './BookingModal';
 import './FindService.css';
-import myLogo from '../../assets/images/logo.png';
+import myLogo from '../../assets/images/handyman-mark.svg';
 import heroBackground from '../../assets/images/hero-background.png';
 import cleaningImage from '../../assets/services/deep-cleaner.jpg';
 import plumbingImage from '../../assets/services/plumber.jpg';
@@ -61,6 +61,20 @@ const servicesForProvider = (provider) => {
         ? [{ name: provider.category, category: provider.category, price: provider.rate ?? null }]
         : [];
 };
+const normalizeServiceName = (value = '') => String(value)
+    .toLowerCase()
+    .replace(/trouble\s*shooting/g, 'troubleshooting')
+    .replace(/clearing/g, 'cleaning')
+    .replace(/installation/g, 'install')
+    .replace(/move\s*in\s*\/\s*move\s*out/g, 'move')
+    .replace(/full\s*body/g, 'fullbody')
+    .replace(/blow\s*dry/g, 'blowdry')
+    .replace(/[^a-z0-9]/g, '');
+const providerOffersService = (provider, requestedService) => servicesForProvider(provider).some((service) => {
+    const advertised = normalizeServiceName(service.name);
+    const requested = normalizeServiceName(requestedService);
+    return advertised === requested || advertised.includes(requested) || requested.includes(advertised);
+});
 const categoryMatchesProvider = (category, provider) => {
     const searchable = [
         provider.name,
@@ -89,9 +103,11 @@ const providerMatchesEchague = (provider, barangay) => {
 
 export default function FindService() {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const categoriesRef = useRef(null);
     const [providers, setProviders] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All Services');
+    const [selectedServiceName, setSelectedServiceName] = useState('');
     const [selectedBarangay, setSelectedBarangay] = useState('all');
     const [query, setQuery] = useState('');
     const [sort, setSort] = useState('recommended');
@@ -101,9 +117,15 @@ export default function FindService() {
     const [user, setUser] = useState({ fullName: 'Homeowner', profilePicture: '' });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [showBooking, setShowBooking] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [detailTab, setDetailTab] = useState('Details');
+    const [isHomeowner, setIsHomeowner] = useState(() => {
+        try {
+            return Boolean(token()) && JSON.parse(localStorage.getItem('user') || '{}').role === 'homeowner';
+        } catch {
+            return false;
+        }
+    });
 
     useEffect(() => {
         getNotifications().then((items) => setUnreadCount(items.filter((item) => !item.isRead).length)).catch(() => {});
@@ -115,19 +137,55 @@ export default function FindService() {
             .then(([providerRows, profile]) => {
                 if (!active) return;
                 setProviders(providerRows);
-                if (profile) setUser({ fullName: profile.fullName || 'Homeowner', profilePicture: profile.profilePicture || '' });
+                if (profile) {
+                    setUser({ fullName: profile.fullName || 'Homeowner', profilePicture: profile.profilePicture || '' });
+                    setIsHomeowner(profile.role === 'homeowner');
+                }
                 else {
+                    setIsHomeowner(false);
                     try {
                         const cached = JSON.parse(localStorage.getItem('user') || '{}');
                         setUser({ fullName: cached.fullName || 'Homeowner', profilePicture: cached.profilePicture || '' });
                     } catch { /* Use the neutral account fallback. */ }
                 }
-                setSelectedProviderId(providerRows[0]?.id ?? null);
             })
             .catch((loadError) => { if (active) setError(loadError.message || 'Unable to load service providers.'); })
             .finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
     }, []);
+
+    useEffect(() => {
+        const requestedCategory = searchParams.get('category');
+        const normalized = requestedCategory?.trim().toLowerCase() || '';
+        const matchingCategory = requestedCategory && SERVICE_CATEGORIES.find((category) =>
+            category.name.toLowerCase() === normalized
+            || category.matches.some((term) => normalized.includes(term) || term.includes(normalized))
+        );
+        setSelectedProviderId(null);
+        setSelectedCategory(matchingCategory?.name || 'All Services');
+        setSelectedServiceName(searchParams.get('service') || '');
+    }, [searchParams]);
+
+    const selectCategory = (categoryName) => {
+        setSelectedProviderId(null);
+        setSearchParams(categoryName === 'All Services' ? {} : { category: categoryName });
+    };
+
+    const selectService = (serviceName) => {
+        setSelectedProviderId(null);
+        const params = {};
+        if (selectedCategory !== 'All Services') params.category = selectedCategory;
+        params.service = serviceName;
+        setSearchParams(params);
+    };
+
+    const openProviderProfile = (providerId) => {
+        const profileParams = new URLSearchParams();
+        if (selectedCategory !== 'All Services') profileParams.set('category', selectedCategory);
+        if (selectedServiceName) profileParams.set('service', selectedServiceName);
+        const profileQuery = profileParams.toString();
+        navigate(`/provider/${providerId}${profileQuery ? `?${profileQuery}` : ''}`);
+    };
 
     const filteredProviders = useMemo(() => {
         const term = query.trim().toLowerCase();
@@ -141,17 +199,43 @@ export default function FindService() {
                 || (selectedCategory === 'Other'
                     ? !matchesKnownCategory
                     : selectedService && categoryMatchesProvider(selectedService, provider));
-            return matchesCategory && matchesQuery && providerMatchesEchague(provider, selectedBarangay);
+            const matchesService = !selectedServiceName || providerOffersService(provider, selectedServiceName);
+            return matchesCategory && matchesQuery && matchesService && providerMatchesEchague(provider, selectedBarangay);
         });
         if (sort === 'price-low') rows.sort((a, b) => (a.rate ?? Number.MAX_VALUE) - (b.rate ?? Number.MAX_VALUE));
         if (sort === 'price-high') rows.sort((a, b) => (b.rate ?? -1) - (a.rate ?? -1));
         return rows;
-    }, [providers, selectedCategory, selectedBarangay, query, sort]);
+    }, [providers, selectedCategory, selectedServiceName, selectedBarangay, query, sort]);
+
+    const serviceOffers = useMemo(() => {
+        const catalogEntries = selectedCategory === 'All Services'
+            ? SERVICE_CATALOG
+            : SERVICE_CATALOG.filter((entry) => entry.category === selectedCategory);
+        const normalizedQuery = query.trim().toLowerCase();
+        return catalogEntries.flatMap((entry) => entry.services.map((name) => {
+            const matchingProviders = providers
+                .filter((provider) => providerMatchesEchague(provider, selectedBarangay))
+                .filter((provider) => providerOffersService(provider, name));
+            const matchesSearch = !normalizedQuery
+                || name.toLowerCase().includes(normalizedQuery)
+                || matchingProviders.some((provider) => provider.name?.toLowerCase().includes(normalizedQuery));
+            if (!matchesSearch) return null;
+            const prices = matchingProviders.flatMap((provider) => servicesForProvider(provider)
+                .filter((service) => normalizeServiceName(service.name) === normalizeServiceName(name))
+                .filter((service) => service.price != null)
+                .map((service) => Number(service.price))
+                .filter(Number.isFinite));
+            return {
+                name,
+                category: entry.category,
+                providerCount: matchingProviders.length,
+                startingPrice: prices.length ? Math.min(...prices) : null,
+            };
+        })).filter(Boolean);
+    }, [providers, selectedCategory, selectedBarangay, query]);
 
     const filteredSelection = filteredProviders.find((provider) => provider.id === selectedProviderId);
-    const effectiveProviderId = selectedProviderId === null
-        ? null
-        : filteredSelection?.id ?? filteredProviders[0]?.id ?? null;
+    const effectiveProviderId = filteredSelection?.id ?? null;
     const detailsLoading = Boolean(
         effectiveProviderId && providerDetails?.id !== effectiveProviderId
     );
@@ -187,16 +271,18 @@ export default function FindService() {
     return (
         <main className="find-services-page">
             <header className="find-services-topbar">
-                <button type="button" className="find-services-brand" onClick={() => navigate('/homeowner-dashboard')} aria-label="Return to homeowner dashboard" title="Click to return to dashboard">
+                <button type="button" className="find-services-brand" onClick={() => navigate(isHomeowner ? '/homeowner-dashboard' : '/')} aria-label={isHomeowner ? 'Return to homeowner dashboard' : 'Return to home page'} title={isHomeowner ? 'Click to return to dashboard' : 'Return home'}>
                     <img src={myLogo} alt="" />
                 </button>
                 <label className="find-services-global-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for services (e.g. cleaning, plumbing, electrical...)" /></label>
                 <div className="find-services-account">
-                <button type="button" className="find-services-bell" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} onClick={() => navigate('/notifications')}><i className="bi bi-bell" />{unreadCount > 0 && <span />}</button>
-                    <button type="button" className="find-services-user" onClick={() => navigate('/profile')}>
-                        {user.profilePicture ? <img src={user.profilePicture} alt="" /> : <span className="find-services-user-fallback">{user.fullName.charAt(0).toUpperCase()}</span>}
-                        <span><strong>{user.fullName}</strong><small>Homeowner</small></span><i className="bi bi-chevron-down" />
-                    </button>
+                    {isHomeowner ? <>
+                        <button type="button" className="find-services-bell" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} onClick={() => navigate('/notifications')}><i className="bi bi-bell" />{unreadCount > 0 && <span />}</button>
+                        <button type="button" className="find-services-user" onClick={() => navigate('/profile')}>
+                            {user.profilePicture ? <img src={user.profilePicture} alt="" /> : <span className="find-services-user-fallback">{user.fullName.charAt(0).toUpperCase()}</span>}
+                            <span><strong>{user.fullName}</strong><small>Homeowner</small></span><i className="bi bi-chevron-down" />
+                        </button>
+                    </> : <button type="button" className="btn btn-success rounded-pill px-3" onClick={() => navigate('/auth/homeowner', { state: { from: { pathname: '/services', search: window.location.search } } })}>Homeowner Login / Sign Up</button>}
                 </div>
             </header>
 
@@ -210,42 +296,54 @@ export default function FindService() {
                 <div className="find-services-category-bar">
                     <button type="button" className="find-services-category-arrow" aria-label="Scroll categories left" onClick={() => categoriesRef.current?.scrollBy({ left: -260, behavior: 'smooth' })}><i className="bi bi-chevron-left" /></button>
                     <nav className="find-services-categories" aria-label="Service categories" ref={categoriesRef}>
-                        <button type="button" className={selectedCategory === 'All Services' ? 'selected' : ''} onClick={() => setSelectedCategory('All Services')}><span className="category-icon mint"><i className="bi bi-grid-fill" /></span><small>All Services</small></button>
+                        <button type="button" className={selectedCategory === 'All Services' ? 'selected' : ''} onClick={() => selectCategory('All Services')}><span className="category-icon mint"><i className="bi bi-grid-fill" /></span><small>All Services</small></button>
                         {SERVICE_CATEGORIES.map((category) => {
-                            return <button type="button" key={category.name} className={selectedCategory === category.name ? 'selected' : ''} onClick={() => setSelectedCategory(category.name)}><span className={`category-icon ${category.color}`}><i className={`bi ${category.icon}`} /></span><small>{category.name}</small></button>;
+                            return <button type="button" key={category.name} className={selectedCategory === category.name ? 'selected' : ''} onClick={() => selectCategory(category.name)}><span className={`category-icon ${category.color}`}><i className={`bi ${category.icon}`} /></span><small>{category.name}</small></button>;
                         })}
-                        <button type="button" className={selectedCategory === 'Other' ? 'selected' : ''} onClick={() => setSelectedCategory('Other')}><span className="category-icon neutral"><i className="bi bi-three-dots" /></span><small>Other</small></button>
+                        <button type="button" className={selectedCategory === 'Other' ? 'selected' : ''} onClick={() => selectCategory('Other')}><span className="category-icon neutral"><i className="bi bi-three-dots" /></span><small>Other</small></button>
                     </nav>
                     <button type="button" className="find-services-category-arrow" aria-label="Scroll categories right" onClick={() => categoriesRef.current?.scrollBy({ left: 260, behavior: 'smooth' })}><i className="bi bi-chevron-right" /></button>
                 </div>
 
-                <div className="find-services-workspace">
+                <div className={`find-services-workspace ${effectiveProviderId ? 'has-selected-provider' : ''}`}>
                     <section className="find-services-results">
-                        <div className="find-services-results-heading"><div><h2>{selectedCategory}</h2><p>Verified providers serving Echague, Isabela.</p></div>
-                            <div className="find-services-tools"><label className="find-services-sort"><span>Sort by:</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label><label className="find-services-sort find-services-barangay-filter"><span>Barangay:</span><select value={selectedBarangay} onChange={(event) => setSelectedBarangay(event.target.value)} aria-label="Filter providers by Echague barangay"><option value="all">All Echague</option>{ECHAGUE_BARANGAYS.map((barangay) => <option key={barangay} value={barangay}>{barangay}</option>)}</select></label><label className="find-services-inline-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search services..." /></label></div>
+                        <div className="find-services-results-heading"><div><h2>{selectedServiceName || selectedCategory}</h2><p>{selectedServiceName ? 'Providers offering this service in Echague, Isabela.' : 'Available services from verified providers in Echague, Isabela.'}</p></div>
+                            <div className="find-services-tools">{selectedServiceName && <label className="find-services-sort"><span>Sort by:</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>}<label className="find-services-sort find-services-barangay-filter"><span>Barangay:</span><select value={selectedBarangay} onChange={(event) => setSelectedBarangay(event.target.value)} aria-label="Filter providers by Echague barangay"><option value="all">All Echague</option>{ECHAGUE_BARANGAYS.map((barangay) => <option key={barangay} value={barangay}>{barangay}</option>)}</select></label><label className="find-services-inline-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={selectedServiceName ? 'Search providers...' : 'Search services...'} /></label></div>
                         </div>
 
-                        {loading ? <div className="find-services-state"><span className="spinner-border text-success" /><p>Loading verified providers...</p></div> : error ? <div className="find-services-state"><i className="bi bi-exclamation-circle" /><p>{error}</p></div> : filteredProviders.length ? <div className="find-services-grid">
+                        {selectedServiceName && <button type="button" className="find-services-back-link" onClick={() => selectCategory(selectedCategory)}><i className="bi bi-arrow-left" /> Back to {selectedCategory} services</button>}
+                        {loading ? <div className="find-services-state"><span className="spinner-border text-success" /><p>Loading available services...</p></div> : error ? <div className="find-services-state"><i className="bi bi-exclamation-circle" /><p>{error}</p></div> : !selectedServiceName ? serviceOffers.length ? <div className="find-services-grid find-service-offers-grid">
+                            {serviceOffers.map((offer) => <article className="find-service-offer-card" key={`${offer.category}-${offer.name}`}>
+                                <div className="find-service-offer-image" style={{ backgroundImage: `url("${visualFor(offer.category || offer.name).image}")` }} />
+                                <div className="find-service-offer-body">
+                                    <span className="find-service-offer-kicker"><i className="bi bi-tools" /> Service option</span>
+                                    <h3>{offer.name}</h3>
+                                    <p>{offer.providerCount} provider{offer.providerCount === 1 ? '' : 's'} available</p>
+                                    <strong>{offer.startingPrice == null ? 'Ask for price' : `From ${formatPrice(offer.startingPrice)}`}</strong>
+                                    <button type="button" className="find-service-book" disabled={offer.providerCount === 0} onClick={() => selectService(offer.name)}>{offer.providerCount ? 'View Providers' : 'No Providers Yet'} {offer.providerCount > 0 && <i className="bi bi-arrow-right" />}</button>
+                                </div>
+                            </article>)}
+                        </div> : <div className="find-services-state"><i className="bi bi-search" /><h3>No services found</h3><p>Try another category, search term, or barangay.</p></div> : filteredProviders.length ? <div className="find-services-grid">
                             {filteredProviders.map((provider) => {
                                 const providerServices = servicesForProvider(provider);
                                 const serviceName = providerServices[0]?.name || provider.category || 'Home service';
-                                const visual = visualFor(serviceName);
+                                const visual = visualFor(selectedCategory !== 'All Services' ? selectedCategory : provider.category || serviceName);
                                 const selectProvider = () => { setSelectedProviderId(provider.id); setDetailTab('Details'); };
                                 return <article key={provider.id} className={`find-service-card ${effectiveProviderId === provider.id ? 'active' : ''}`} onClick={selectProvider}>
                                     <button type="button" className="find-service-card-image" aria-label={`View ${provider.name}`} style={{ backgroundImage: `url("${visual.image}")` }} onClick={selectProvider}><span className="find-service-verified"><i className="bi bi-patch-check-fill" /> Verified</span></button>
                                     <div className="find-service-card-body"><div className="find-service-card-title"><div><h3>{serviceName}</h3><p>{provider.name}</p></div><button type="button" className="find-service-open" aria-label={`View ${provider.name} details`} onClick={() => setSelectedProviderId(provider.id)}><i className="bi bi-arrow-up-right" /></button></div>
                                         <div className="find-service-card-meta"><span><i className="bi bi-star-fill" /> {provider.reviews > 0 ? `${provider.rating} (${provider.reviews} reviews)` : 'No reviews yet'}</span><span>{formatPrice(provider.rate)}</span></div>
                                         <p className="find-service-location"><i className="bi bi-geo-alt" /> {provider.location || 'Location not provided'}</p>
-                                        <button type="button" className="find-service-book" onClick={(event) => { event.stopPropagation(); selectProvider(); setShowBooking(true); }}>Book Now <i className="bi bi-arrow-right" /></button>
+                                        <button type="button" className="find-service-book" onClick={(event) => { event.stopPropagation(); openProviderProfile(provider.id); }}><i className="bi bi-calendar-check" /> Book Now</button>
                                     </div>
                                 </article>;
                             })}
-                        </div> : <div className="find-services-state"><i className="bi bi-search" /><h3>No providers found</h3><p>Try another category, search term, or barangay.</p></div>}
+                        </div> : <div className="find-services-state"><i className="bi bi-search" /><h3>No providers found</h3><p>Try another service, search term, or barangay.</p></div>}
                     </section>
 
-                    <aside className="find-service-details">
+                    {effectiveProviderId && <aside className="find-service-details">
                         {detailsLoading ? <div className="find-services-state"><span className="spinner-border spinner-border-sm text-success" /></div> : activeProviderDetails ? <>
-                            <div className="find-service-detail-image" style={{ backgroundImage: `url("${visualFor(bookingServices[0]?.name || activeProviderDetails.category).image}")` }}><button type="button" aria-label="Close service details" onClick={() => setSelectedProviderId(null)}><i className="bi bi-x-lg" /></button></div>
+                            <div className="find-service-detail-image" style={{ backgroundImage: `url("${visualFor(selectedCategory !== 'All Services' ? selectedCategory : activeProviderDetails.category).image}")` }}><button type="button" aria-label="Close service details" onClick={() => setSelectedProviderId(null)}><i className="bi bi-x-lg" /></button></div>
                             <div className="find-service-detail-body">
                                 <div className="find-service-provider-heading">
                                     {activeProviderDetails.image
@@ -256,14 +354,13 @@ export default function FindService() {
                                 <p className="find-service-detail-rating"><i className="bi bi-star-fill" /> {activeProviderDetails.rating > 0 ? Number(activeProviderDetails.rating).toFixed(1) : 'No reviews yet'} {activeProviderDetails.reviews > 0 && `(${activeProviderDetails.reviews} reviews)`}</p>
                                 <div className="find-service-detail-tabs">{['Details', 'Services', 'Reviews'].map((tab) => <button type="button" key={tab} className={detailTab === tab ? 'active' : ''} onClick={() => setDetailTab(tab)}>{tab}{tab === 'Reviews' && activeProviderDetails.reviews > 0 ? ` (${activeProviderDetails.reviews})` : ''}</button>)}</div>
                                 {detailTab === 'Details' ? <dl className="find-service-detail-list"><div><dt><i className="bi bi-person-badge" /> Provider</dt><dd>{activeProviderDetails.fullName || activeProviderDetails.name}</dd></div><div><dt><i className="bi bi-card-text" /> About</dt><dd>{activeProviderDetails.bio || activeProviderDetails.qualifications || 'Verified service provider.'}</dd></div><div><dt><i className="bi bi-geo-alt" /> Service Area</dt><dd>{activeProviderDetails.serviceArea || activeProviderDetails.location || 'Not provided'}</dd></div><div><dt><i className="bi bi-cash-coin" /> Starting Price</dt><dd>{formatPrice(activeProviderDetails.rate)}</dd></div></dl> : detailTab === 'Services' ? <div className="find-service-detail-list find-service-offerings">{bookingServices.length ? bookingServices.map((service, index) => <div key={`${service.name}-${index}`}><dt><i className="bi bi-check-circle" /> {service.name}</dt><dd>{formatPrice(service.price)}</dd></div>) : <p>Contact provider for service details.</p>}</div> : <div className="find-service-reviews">{activeProviderDetailsError ? <p className="find-service-no-reviews">{activeProviderDetailsError}</p> : activeProviderDetails.reviewDetails?.length ? activeProviderDetails.reviewDetails.map((review) => <article className="find-service-review" key={review.id}><div className="find-service-review-heading"><strong><i className="bi bi-person-circle" /> Homeowner</strong><span>{formatReviewDate(review.createdAt)}</span></div><p className="find-service-review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} <small>{review.rating}/5</small></p><p className="find-service-review-comment">{review.comment || 'No comment provided.'}</p>{review.service && <small className="find-service-review-service">{review.service}</small>}</article>) : <p className="find-service-no-reviews">{Array.isArray(activeProviderDetails.reviewDetails) ? 'Wala pang review para sa provider na ito.' : 'Naglo-load ang reviews...'}</p>}</div>}
-                                <button type="button" className="find-service-detail-book" onClick={() => setShowBooking(true)}><i className="bi bi-calendar-check" /> Book This Service</button>
+                                <button type="button" className="find-service-detail-book" onClick={() => openProviderProfile(activeProviderDetails.id)}><i className="bi bi-calendar-check" /> Book Now</button>
                             </div>
                         </> : <div className="find-service-detail-empty"><i className="bi bi-hand-index-thumb" /><h3>Select a provider</h3><p>Choose a service card to see provider details.</p></div>}
-                    </aside>
+                    </aside>}
                 </div>
             </div>
 
-            {activeProviderDetails && <BookingModal show={showBooking} handleClose={() => setShowBooking(false)} providerId={activeProviderDetails.id} initialCategory={bookingServices[0]?.category || activeProviderDetails.category?.split(',')[0]?.trim() || 'Home service'} providerServices={bookingServices} />}
         </main>
     );
 }

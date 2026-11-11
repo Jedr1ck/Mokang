@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title description">
+  <title id="title">HandyMan</title>
+  <desc id="description">A house roof above a hard hat and crossed tools, with a HandyMan wordmark in charcoal and orange.</desc>
+  <rect width="640" height="420" fill="#fff"/>
+
+  <g fill="none" stroke="#24272d" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M166 242V160L320 31l154 129v82" stroke-width="20"/>
+    <path d="M177 157 320 39l143 118" stroke-width="8" opacity=".2"/>
+  </g>
+
+  <g fill="#f36c00" stroke="#fff" stroke-width="5" stroke-linejoin="round">
+    <path d="M224 145c2-47 41-81 96-81s94 34 96 81l-18 25H242z"/>
+    <path d="M204 147c0-9 8-16 18-16h196c10 0 18 7 18 16v12c0 10-8 17-18 17H222c-10 0-18-7-18-17z"/>
+  </g>
+
+  <g stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m249 193 78 79" fill="none" stroke="#f36c00" stroke-width="22"/>
+    <path d="m321 194-78 79" fill="none" stroke="#f36c00" stroke-width="22"/>
+    <path d="m235 183 22 22-25 25-22-22c-9-9-9-23 0-32s23-9 32 0l-7 7z" fill="#24272d"/>
+    <path d="m335 181 23-23c12-12 31-12 43 0l-25 25 18 18 25-25c12 12 12 31 0 43l-23 23c-14 14-36 14-50 0l-11-11-12 12-21-21 12-12-11-11c-14-14-14-36 0-50l23-23" fill="#24272d"/>
+  </g>
+
+  <path d="M156 280c52 20 105 19 164-5 59 24 112 25 164 5-47 39-101 53-164 36-63 17-117 3-164-36z" fill="#f36c00" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+
+  <text x="320" y="382" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="91" font-style="italic" font-weight="800" letter-spacing="-5">
+    <tspan fill="#24272d">Handy</tspan><tspan fill="#f36c00">Man</tspan>
+  </text>
+</svg>

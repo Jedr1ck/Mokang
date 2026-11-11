@@ -1865,7 +1865,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     return (
         <section className="provider-profile-page">
             <div className="provider-application-heading">
-                <span>SMART HOME SERVICES</span>
+                <span>HANDYMAN SERVICES</span>
                 <h2>Provider Verification</h2>
                 <p>Complete your information to become a verified service provider.</p>
             </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../index.css';
@@ -8,6 +8,7 @@ import { loginWithRole, register } from '../../services/api';
 
 const HomeownerAuthSimple = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [isSignUp, setIsSignUp] = useState(false);
 
@@ -171,7 +172,7 @@ const HomeownerAuthSimple = () => {
             }
 
             // Navigate only after successful login.
-            navigate('/homeowner-dashboard');
+            navigate(location.state?.from || '/homeowner-dashboard', { replace: true });
         } catch {
             // Same message regardless of which credential is incorrect.
             setLoginError('Invalid email or password.');

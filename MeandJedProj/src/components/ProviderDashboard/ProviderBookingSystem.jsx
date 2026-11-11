@@ -6,7 +6,7 @@ import {
     updateBookingStatus,
 } from '../../services/api';
 import ConfirmDialog from '../ConfirmDialog';
-import myLogo from '../../assets/images/logo.png';
+import myLogo from '../../assets/images/handyman-mark.svg';
 import './ProviderBookingSystem.css';
 
 const filters = ['All Bookings', 'Pending', 'Confirmed', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'];

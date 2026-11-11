@@ -1429,6 +1429,11 @@ section h2 {
   gap: 10px;
 }
 
+.footer-logo-lockup > img {
+  width: 180px;
+  height: auto;
+}
+
 .footer-brand-copy {
   display: flex;
   flex-direction: column;

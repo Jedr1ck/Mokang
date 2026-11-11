@@ -9,7 +9,7 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/handyman-mark.svg";
 import "./AdminDashboard.css";
 
 import SideBarAdmin from "../SideBarAdmin/SideBarAdmin";
@@ -248,13 +248,13 @@ function AdminDashboard() {
                 <div className="admin-loading-card">
 
                     <div className="admin-loading-logo">
-                        <img src={logo} alt="SmartHome logo" className="admin-loading-logo-image" />
+                        <img src={logo} alt="HandyMan logo" className="admin-loading-logo-image" />
                     </div>
 
                     <div className="admin-loading-spinner"></div>
 
                     <h5>
-                        SmartHome Admin
+                        HandyMan Admin
                     </h5>
 
                     <p>

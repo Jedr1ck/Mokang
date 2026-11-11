@@ -1,5 +1,7 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { SERVICE_CATALOG } from "../../data/serviceCatalog";
 
 import electricianImage from "../../assets/services/electrician.jpg";
 import plumberImage from "../../assets/services/plumber.jpg";
@@ -20,7 +22,8 @@ import computerCctvImage from "../../assets/services/computer-cctv.jpg";
 import tutorFitnessImage from "../../assets/services/tutor-fitness.jpg";
 
 function Services() {
-    const services = [
+    const navigate = useNavigate();
+    const serviceCards = [
         {
             name: "Electrician",
             image: electricianImage,
@@ -209,11 +212,14 @@ function Services() {
             ],
         },
     ];
+    const services = serviceCards.map((service) => ({
+        ...service,
+        tasks: SERVICE_CATALOG.find((item) => item.category === service.name)?.services || service.tasks,
+    }));
 
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedService, setSelectedService] = useState("");
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [activeService, setActiveService] = useState(null);
 
     const visibleServices = services.filter((service) => {
         const query = searchTerm.trim().toLowerCase();
@@ -252,22 +258,6 @@ function Services() {
     useEffect(() => {
         setCurrentSlide(0);
     }, [searchTerm, selectedService]);
-
-    useEffect(() => {
-        if (!activeService) return;
-
-        const handleEscape = (event) => {
-            if (event.key === "Escape") {
-                setActiveService(null);
-            }
-        };
-
-        document.addEventListener("keydown", handleEscape);
-
-        return () => {
-            document.removeEventListener("keydown", handleEscape);
-        };
-    }, [activeService]);
 
     const handleNextSlide = () => {
         if (currentSlide < totalSlides - 1) {
@@ -353,10 +343,8 @@ function Services() {
                                                 type="button"
                                                 className="service-card service-card-clickable"
                                                 key={service.name}
-                                                onClick={() =>
-                                                    setActiveService(service)
-                                                }
-                                                aria-label={`View specific services for ${service.name}`}
+                                                onClick={() => navigate(`/services?category=${encodeURIComponent(service.name)}`)}
+                                                aria-label={`View available ${service.name} providers`}
                                             >
                                                 <div className="service-image">
                                                     <img
@@ -437,61 +425,6 @@ function Services() {
                 </button>
             )}
 
-            {/* Specific service details modal */}
-            {activeService && (
-                <div
-                    className="service-modal-overlay"
-                    onClick={() => setActiveService(null)}
-                >
-                    <div
-                        className="service-modal"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="service-modal-title"
-                        onClick={(event) => event.stopPropagation()}
-                    >
-                        <button
-                            type="button"
-                            className="service-modal-close"
-                            onClick={() => setActiveService(null)}
-                            aria-label="Close service details"
-                        >
-                            &times;
-                        </button>
-
-                        <img
-                            className="service-modal-image"
-                            src={activeService.image}
-                            alt={activeService.name}
-                        />
-
-                        <h3 id="service-modal-title">
-                            {activeService.name}
-                        </h3>
-
-                        <p className="service-modal-description">
-                            Types of work under this service
-                        </p>
-
-                        <ul className="service-modal-task-list">
-                            {activeService.tasks.map((task) => (
-                                <li key={task}>
-                                    <i className="bi bi-check-circle-fill"></i>
-                                    <span>{task}</span>
-                                </li>
-                            ))}
-                        </ul>
-
-                        <button
-                            type="button"
-                            className="service-modal-close-button"
-                            onClick={() => setActiveService(null)}
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
         </section>
     );
 }

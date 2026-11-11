@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/handyman-mark.svg";
 
 function Navbar() {
     const navigate = useNavigate();
@@ -19,12 +19,12 @@ function Navbar() {
                 type="button"
                 className="navbar-logo"
                 onClick={handleGoToHomeAndRegister}
-                aria-label="Go to SmartHome home page"
+                aria-label="Go to HandyMan home page"
             >
-                <img src={logo} alt="SmartHome Logo" />
+                <img src={logo} alt="HandyMan Logo" />
                 <div className="navbar-brand-copy">
-                    <strong>SMARTHOME</strong>
-                    <span>Service Matching</span>
+                    <strong>HANDYMAN</strong>
+                    <span>Home Services</span>
                 </div>
             </button>
 

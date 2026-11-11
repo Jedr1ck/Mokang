@@ -245,7 +245,7 @@ function ServiceCategories() {
 
                     <p>
                         Manage the service categories available on
-                        the SmartHome platform.
+                        the HandyMan platform.
                     </p>
                 </div>
 

@@ -267,7 +267,7 @@ const AdminAuth = () => {
                         <div className="admin-overlay-panel admin-overlay-left">
 
                             {/* =================================================
-                                SMART HOME BRAND
+                                    HANDYMAN BRAND
                             ================================================== */}
 
                             <div className="admin-brand">
@@ -275,7 +275,7 @@ const AdminAuth = () => {
                                 <i className="bi bi-house-door-fill"></i>
 
                                 <span>
-                                    SmartHome
+                                    HandyMan
                                 </span>
 
                             </div>

@@ -135,7 +135,7 @@ function SystemSettings() {
                     <h2>System Settings</h2>
 
                     <p>
-                        Manage SmartHome platform settings and
+                        Manage HandyMan platform settings and
                         administrator controls.
                     </p>
                 </div>
@@ -230,7 +230,7 @@ function SystemSettings() {
 
                             <p>
                                 Control the general behavior of
-                                the SmartHome platform.
+                                the HandyMan platform.
                             </p>
                         </div>
 
@@ -537,7 +537,7 @@ function SystemSettings() {
 
                             <p>
                                 Basic information about the
-                                SmartHome platform.
+                                HandyMan platform.
                             </p>
                         </div>
 
@@ -552,7 +552,7 @@ function SystemSettings() {
                             </span>
 
                             <strong>
-                                SmartHome
+                                HandyMan
                             </strong>
 
                         </div>

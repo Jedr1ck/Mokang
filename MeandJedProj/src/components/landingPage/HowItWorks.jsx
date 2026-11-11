@@ -28,7 +28,7 @@ function HowItWorks() {
 
     return (
         <section id="how-it-works" className="how-section">
-            <h2>How SmartHome Match Works</h2>
+            <h2>How HandyMan Works</h2>
 
             <div className="steps-container">
                 {steps.map((step, index) => (

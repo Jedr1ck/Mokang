@@ -1,6 +1,6 @@
-# React + Vite
+# HandyMan — Home Service Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HandyMan connects homeowners with verified home-service providers and supports browsing, booking, and service management.
 
 Currently, two official plugins are available:
 

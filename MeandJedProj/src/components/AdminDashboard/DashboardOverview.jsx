@@ -11,7 +11,7 @@ function DashboardOverview() {
                     <span className="admin-section-label !font-semibold !tracking-[0.2em] !text-orange-300">SYSTEM OVERVIEW</span>
                     <h2 className="!mt-3 !text-3xl !font-bold !tracking-tight !text-white md:!text-4xl">Dashboard Overview</h2>
                     <p className="!max-w-2xl !text-sm !leading-7 !text-slate-300 md:!text-base">
-                        Monitor your SmartHome platform and manage
+                        Monitor your HandyMan platform and manage
                         important system activities.
                     </p>
                 </div>

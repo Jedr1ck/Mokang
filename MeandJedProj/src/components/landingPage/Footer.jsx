@@ -1,15 +1,11 @@
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/handyman-logo.svg";
 
 function Footer() {
     return (
         <footer className="footer">
             <div className="footer-brand">
                 <div className="footer-logo-lockup">
-                    <img src={logo} alt="SmartHome" />
-                    <div className="footer-brand-copy">
-                        <strong>SmartHome</strong>
-                        <span>Service Matching</span>
-                    </div>
+                    <img src={logo} alt="HandyMan home services" />
                 </div>
 
                 <p>

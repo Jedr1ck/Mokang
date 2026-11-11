@@ -41,7 +41,7 @@ function Hero() {
             {/* LEFT HERO CONTENT */}
             <div className="hero-content">
                 <p className="hero-small-title">
-                    Smart Home Service Matching
+                    HandyMan Home Services
                 </p>
 
                 <h1>

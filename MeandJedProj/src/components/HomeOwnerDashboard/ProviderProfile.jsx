@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
@@ -14,6 +14,7 @@ const formatPrice = (amount) => (
 
 const ProviderProfile = () => {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
     const [provider, setProvider] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
@@ -52,6 +53,11 @@ const ProviderProfile = () => {
             ? provider.services
             : serviceCategories.map((category) => ({ name: category, category })),
         [provider?.services, serviceCategories]
+    );
+    const requestedCategory = searchParams.get('category')?.toLowerCase();
+    const requestedService = bookingServices.find((service) =>
+        service.name?.toLowerCase() === requestedCategory
+        || service.category?.toLowerCase() === requestedCategory
     );
 
     if (loading) {
@@ -227,7 +233,7 @@ const ProviderProfile = () => {
                 show={showBookingModal}
                 handleClose={() => setShowBookingModal(false)}
                 providerId={provider.id}
-                initialCategory={serviceCategories[0] || 'Service'}
+                initialCategory={requestedService?.category || requestedService?.name || serviceCategories[0] || 'Service'}
                 providerServices={bookingServices}
             />
         </div>

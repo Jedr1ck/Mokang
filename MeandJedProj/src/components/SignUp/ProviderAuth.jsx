@@ -437,7 +437,7 @@ const ProviderAuth = () => {
                             <div className="brand-logo mb-auto align-self-start d-flex align-items-center gap-2">
                                 <i className="bi bi-house-door-fill fs-4"></i>
                                 <span className="fw-bold fs-5">
-                                    SmartHome
+                                    HandyMan
                                 </span>
                             </div>
 
@@ -466,7 +466,7 @@ const ProviderAuth = () => {
                             <div className="brand-logo mb-auto align-self-start d-flex align-items-center gap-2">
                                 <i className="bi bi-house-door-fill fs-4"></i>
                                 <span className="fw-bold fs-5">
-                                    SmartHome
+                                    HandyMan
                                 </span>
                             </div>
 

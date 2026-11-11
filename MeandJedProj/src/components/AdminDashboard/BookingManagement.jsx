@@ -446,7 +446,7 @@ function BookingManagement() {
 
                     <p>
                         Monitor and manage all service bookings
-                        on the SmartHome platform.
+                        on the HandyMan platform.
                     </p>
 
                 </div>

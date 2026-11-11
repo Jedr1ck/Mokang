@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { getMyProfile, logout, token, updatePresence } from "./services/api";
 
 import LandingPage from "./pages/LandingPage";
@@ -47,6 +47,7 @@ import ProviderJobs from "./components/ProviderDashboard/ProviderJobs";
 // =====================================================
 
 function RoleProtectedRoute({ role, children }) {
+  const location = useLocation();
   const [userRole, setUserRole] = useState('');
   const [loading, setLoading] = useState(() => Boolean(token()));
   const [accessError, setAccessError] = useState('');
@@ -97,7 +98,7 @@ function RoleProtectedRoute({ role, children }) {
   if (userRole === 'provider') return <Navigate to="/provider-dashboard" replace />;
   if (userRole === 'homeowner') return <Navigate to="/homeowner-dashboard" replace />;
   if (userRole === 'admin') return <Navigate to="/admin-dashboard" replace />;
-  return <Navigate to={role === 'provider' ? '/auth/provider' : role === 'admin' ? '/admin-login' : '/auth/homeowner'} replace />;
+  return <Navigate to={role === 'provider' ? '/auth/provider' : role === 'admin' ? '/admin-login' : '/auth/homeowner'} state={{ from: location }} replace />;
 }
 
 function PresenceHeartbeat() {
@@ -201,7 +202,7 @@ function App() {
         {/* Find Service */}
         <Route
           path="/services"
-          element={<RoleProtectedRoute role="homeowner"><FindService /></RoleProtectedRoute>}
+          element={<FindService />}
         />
 
         {/* Provider Profile */}

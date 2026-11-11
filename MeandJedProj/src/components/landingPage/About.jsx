@@ -24,7 +24,7 @@ function About() {
 
     return (
         <section id="about" className="about-section">
-            <div className="section-eyebrow">The SmartHome standard</div>
+            <div className="section-eyebrow">The HandyMan standard</div>
             <h2>Confidence in every booking</h2>
             <p className="about-intro">
                 A simpler way to connect with skilled, trusted professionals for the work your home needs.

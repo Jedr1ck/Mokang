@@ -391,7 +391,7 @@ const HomeownerAuth = () => {
                         <div className="overlay-panel overlay-left d-flex flex-column align-items-center justify-content-center text-center p-5">
                             <div className="brand-logo mb-auto align-self-start d-flex align-items-center gap-2 text-white">
                                 <i className="bi bi-house-door-fill fs-4"></i>
-                                <span className="fw-bold fs-5">SmartHome</span>
+                                <span className="fw-bold fs-5">HandyMan</span>
                             </div>
                             <div className="my-auto">
                                 <h1 className="fw-bold text-white mb-3">Welcome Back!</h1>
@@ -406,7 +406,7 @@ const HomeownerAuth = () => {
                         <div className="overlay-panel overlay-right d-flex flex-column align-items-center justify-content-center text-center p-5">
                             <div className="brand-logo mb-auto align-self-start d-flex align-items-center gap-2 text-white">
                                 <i className="bi bi-house-door-fill fs-4"></i>
-                                <span className="fw-bold fs-5">SmartHome</span>
+                                <span className="fw-bold fs-5">HandyMan</span>
                             </div>
                             <div className="my-auto">
                                 <h1 className="fw-bold text-white mb-3">Hello, Friend!</h1>

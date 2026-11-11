@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyBookings, sendMessage, updateBookingStatus } from '../../services/api';
-import myLogo from '../../assets/images/logo.png';
+import myLogo from '../../assets/images/handyman-mark.svg';
 import airconImage from '../../assets/services/aircon.jpg';
 import applianceRepairImage from '../../assets/services/appliance-repair.jpg';
 import deepCleanerImage from '../../assets/services/deep-cleaner.jpg';

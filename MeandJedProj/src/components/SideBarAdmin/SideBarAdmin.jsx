@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/handyman-mark.svg";
 import "./SideBarAdmin.css";
 
 function SideBarAdmin({
@@ -71,12 +71,12 @@ function SideBarAdmin({
             <div className="admin-sidebar-logo !h-[88px] !gap-3 !border-white/10 !px-5">
 
                 <div className="admin-logo-icon !h-12 !w-12 !rounded-2xl !bg-white/10 !p-1.5">
-                    <img src={logo} alt="SmartHome logo" />
+                    <img src={logo} alt="HandyMan logo" />
                 </div>
 
                 {sidebarOpen && (
                     <div className="admin-logo-text !gap-1">
-                        <strong className="!text-lg !font-bold !tracking-tight !text-white">SmartHome</strong>
+                        <strong className="!text-lg !font-bold !tracking-tight !text-white">HandyMan</strong>
                         <span className="!mt-0 !text-[9px] !font-bold !tracking-[0.2em] !text-orange-400">ADMIN PANEL</span>
                     </div>
                 )}

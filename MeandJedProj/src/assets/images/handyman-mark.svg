@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">HandyMan home services</title>
+  <rect width="128" height="128" rx="22" fill="#fff"/>
+  <path d="M18 57 64 17l46 40M29 49v57h70V49" fill="none" stroke="#24272d" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M43 58c0-18 8-29 21-29s21 11 21 29M36 57h56v11H36z" fill="#f36c00" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m49 79 30 29M79 79l-30 29" fill="none" stroke="#f36c00" stroke-width="11" stroke-linecap="round"/>
+  <path d="m44 73 12 12-11 11-12-12c-5-5-5-13 0-18s13-5 18 0l-7 7m38-2 11-11c6-6 15-6 21 0L102 74l8 8 11-11c6 6 6 15 0 21l-11 11c-7 7-17 7-24 0l-5-5-8 8-11-11 8-8-5-5c-7-7-7-17 0-24l11-11" fill="#24272d" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
