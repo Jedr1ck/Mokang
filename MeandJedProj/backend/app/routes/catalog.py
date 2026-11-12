@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+import json
 from sqlalchemy import func
 
 from app.common import get_session
@@ -358,6 +359,7 @@ def provider_details(provider_id):
                 ),
                 "experienceYears": provider.experience_years or 0,
                 "availability": provider.availability_status or "Available",
+                "availabilitySlots": json.loads(provider.availability_slots or "[]"),
                 "bio": provider.bio or "",
                 "qualifications": provider.qualifications or "",
                 "image": (

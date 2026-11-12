@@ -1,4 +1,5 @@
 import uuid
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -314,6 +315,7 @@ def get_provider_verification():
                 "qualifications": provider.qualifications,
                 "portfolio_paths": provider.portfolio_paths,
                 "service_area": provider.service_area,
+                "availability_slots": json.loads(provider.availability_slots or "[]"),
                 "services": services,
                 "service_category": services[0]["category"] if services else "",
                 "service_titles": [
@@ -380,6 +382,35 @@ def update_provider_verification():
             message="Provider verification information saved successfully.",
             verification_status=provider.verification_status,
         )
+
+
+@profiles_bp.put("/provider-availability/me")
+@require_auth
+def update_provider_availability():
+    data = request.get_json(silent=True) or {}
+    slots = data.get("availability_slots")
+    if not isinstance(slots, list) or len(slots) > 100:
+        raise ApiError("Availability must be a list of up to 100 date and time slots.", 422)
+    normalized = []
+    for slot in slots:
+        date_value = str(slot.get("date", "")) if isinstance(slot, dict) else ""
+        time_value = str(slot.get("time", "")) if isinstance(slot, dict) else ""
+        try:
+            datetime.strptime(date_value, "%Y-%m-%d")
+            datetime.strptime(time_value, "%H:%M")
+        except ValueError as error:
+            raise ApiError("Each availability slot needs a valid date and time.", 422) from error
+        if date_value < datetime.utcnow().date().isoformat():
+            raise ApiError("Availability dates cannot be in the past.", 422)
+        item = {"date": date_value, "time": time_value}
+        if item not in normalized:
+            normalized.append(item)
+
+    with get_session() as session:
+        provider = get_current_provider(current_user(session), session)
+        provider.availability_slots = json.dumps(normalized)
+        session.commit()
+        return jsonify(availability_slots=normalized)
 
 
 @profiles_bp.put("/provider-verification/services")

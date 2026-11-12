@@ -1,4 +1,5 @@
 import uuid
+import json
 
 from flask import Blueprint, jsonify
 from app.common import (
@@ -72,6 +73,13 @@ def create_booking():
             )
             if not provider:
                 raise ApiError("Selected provider is not verified or available.", 400)
+            provider_slots = json.loads(provider.availability_slots or "[]")
+            requested_slot = {
+                "date": data.preferred_date.isoformat(),
+                "time": data.preferred_time.strftime("%H:%M"),
+            }
+            if requested_slot not in provider_slots:
+                raise ApiError("Selected date and time are no longer available from this provider.", 409)
             provider_category_ids = {
                 row.category_id
                 for row in session.query(ProviderService.category_id)

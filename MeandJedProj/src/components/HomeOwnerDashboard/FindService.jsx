@@ -282,7 +282,7 @@ export default function FindService() {
                             {user.profilePicture ? <img src={user.profilePicture} alt="" /> : <span className="find-services-user-fallback">{user.fullName.charAt(0).toUpperCase()}</span>}
                             <span><strong>{user.fullName}</strong><small>Homeowner</small></span><i className="bi bi-chevron-down" />
                         </button>
-                    </> : <button type="button" className="btn btn-success rounded-pill px-3" onClick={() => navigate('/auth/homeowner', { state: { from: { pathname: '/services', search: window.location.search } } })}>Homeowner Login / Sign Up</button>}
+                    </> : <button type="button" className="find-services-auth-button" onClick={() => navigate('/auth/homeowner', { state: { from: { pathname: '/services', search: window.location.search } } })}>Homeowner Login / Sign Up</button>}
                 </div>
             </header>
 

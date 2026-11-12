@@ -1,7 +1,21 @@
+@reference "../../index.css";
+
 .find-services-page {
     min-height: 100vh;
     background: var(--theme-background);
     color: var(--theme-text);
+}
+
+.find-services-auth-button {
+    @apply inline-flex min-h-11 items-center justify-center rounded-full border border-orange-700 bg-orange-700 px-5 text-sm font-semibold text-white shadow-md shadow-orange-900/15 transition duration-200;
+}
+
+.find-services-auth-button:hover {
+    @apply border-orange-800 bg-orange-800 shadow-lg shadow-orange-900/20;
+}
+
+.find-services-auth-button:focus-visible {
+    @apply outline-2 outline-offset-2 outline-orange-700;
 }
 
 .find-services-topbar {

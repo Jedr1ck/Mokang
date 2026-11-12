@@ -123,6 +123,13 @@ export async function updateVerifiedProviderServices(services) {
     });
 }
 
+export async function updateProviderAvailability(availabilitySlots) {
+    return api('/provider-availability/me', {
+        method: 'PUT',
+        body: JSON.stringify({ availability_slots: availabilitySlots }),
+    });
+}
+
 export async function getPendingProviderVerifications() {
     return api('/admin/provider-verifications');
 }

@@ -1,4 +1,16 @@
+@reference "../../index.css";
+
 .provider-booking-system {
+    --theme-primary: #c2410c;
+    --theme-secondary: #9a3412;
+    --theme-gold: #ea580c;
+    --theme-background: #f8fafc;
+    --theme-soft-blue: #f1f5f9;
+    --theme-surface: #ffffff;
+    --theme-border: #e2e8f0;
+    --theme-muted: #64748b;
+    --theme-text: #1e293b;
+    --theme-charcoal: #0f172a;
     min-height: 100vh;
     padding: 0 24px 32px;
     background: var(--theme-soft-blue);
@@ -914,4 +926,24 @@
         grid-template-columns: 80px minmax(0, 1fr);
         padding: 0 8px;
     }
+}
+
+.provider-booking-system {
+    @apply bg-slate-50 text-slate-800;
+}
+
+.provider-booking-system :is(.pbs-booking-list, .pbs-booking-detail, .pbs-booking-card, .pbs-filter-tabs) {
+    @apply border-slate-200 bg-white;
+}
+
+.provider-booking-system :is(.pbs-page-heading h1, .pbs-detail-heading h2, .pbs-list-state strong, .pbs-detail-empty h2) {
+    @apply text-slate-900;
+}
+
+.provider-booking-system :is(.pbs-page-heading > button, .pbs-booking-actions .primary) {
+    @apply bg-orange-700 text-white;
+}
+
+.provider-booking-system .pbs-booking-card.selected {
+    @apply border-orange-500 bg-orange-50;
 }

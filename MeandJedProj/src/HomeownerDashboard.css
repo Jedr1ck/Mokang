@@ -1,4 +1,17 @@
+@reference "./index.css";
+
 .dashboard-wrapper {
+    --theme-primary: #c2410c;
+    --theme-secondary: #9a3412;
+    --theme-gold: #ea580c;
+    --theme-background: #f8fafc;
+    --theme-soft-blue: #f1f5f9;
+    --theme-surface: #ffffff;
+    --theme-border: #e2e8f0;
+    --theme-muted: #64748b;
+    --theme-text: #1e293b;
+    --theme-charcoal: #0f172a;
+    --theme-primary-hover: #c2410c;
     background-color: var(--theme-background);
     min-height: 100vh;
 }
@@ -2696,4 +2709,67 @@
     .homeowner-settings-panel {
         padding: 18px;
     }
+}
+
+/* Tailwind slate surfaces and orange accents shared across homeowner sections. */
+.dashboard-wrapper {
+    @apply bg-slate-50 text-slate-800;
+}
+
+.dashboard-wrapper .sidebar-nav {
+    @apply bg-orange-800;
+}
+
+.dashboard-wrapper :is(.dashboard-card, .dashboard-box, .profile-card, .hp-panel, .homeowner-dashboard-panel, .homeowner-dashboard-provider) {
+    @apply border-slate-200 bg-white shadow-sm shadow-slate-900/5;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard, .homeowner-profile-v2) {
+    @apply bg-slate-50 text-slate-800;
+}
+
+.dashboard-wrapper :is(h1, h2, h3, h4, h5) {
+    @apply text-slate-900;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-panel-heading h2 i, .homeowner-dashboard-stat-icon, .homeowner-dashboard-booking-icon, .homeowner-dashboard-empty > i, .homeowner-dashboard-activity-dot) {
+    @apply text-orange-700;
+}
+
+.dashboard-wrapper .homeowner-dashboard-panel-heading > button,
+.dashboard-wrapper .homeowner-dashboard-provider-link {
+    @apply text-orange-700 transition;
+}
+
+.dashboard-wrapper .homeowner-dashboard-panel-heading > button:hover,
+.dashboard-wrapper .homeowner-dashboard-provider-link:hover {
+    @apply text-orange-800;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-search, .homeowner-dashboard-icon-button, .homeowner-dashboard-profile-button, .custom-select-dropdown, input, select, textarea) {
+    @apply border-slate-200 text-slate-800;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-search, .homeowner-dashboard-icon-button, .homeowner-dashboard-profile-button) {
+    @apply bg-white shadow-sm shadow-slate-900/5;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-hero-button, .btn-theme, .homeowner-dashboard-empty > button) {
+    @apply border-orange-700 bg-orange-700 text-white transition;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-hero-button, .btn-theme, .homeowner-dashboard-empty > button):hover {
+    @apply border-orange-800 bg-orange-800;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-booking, .homeowner-dashboard-activity) {
+    @apply border-slate-100;
+}
+
+.dashboard-wrapper :is(.homeowner-dashboard-booking:hover, .homeowner-dashboard-activity:hover) {
+    @apply bg-orange-50;
+}
+
+.dashboard-wrapper .homeowner-dashboard-provider:hover {
+    @apply border-orange-200 shadow-md shadow-orange-950/5;
 }

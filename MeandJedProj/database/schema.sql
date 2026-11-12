@@ -82,7 +82,8 @@ CREATE TABLE `provider_profiles` (
   `id_back_path` varchar(500) DEFAULT NULL,
   `qualifications` text DEFAULT NULL,
   `portfolio_paths` text DEFAULT NULL,
-  `service_area` varchar(255) DEFAULT NULL
+  `service_area` varchar(255) DEFAULT NULL,
+  `availability_slots` longtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Source: smarthomes_table_provider_services.sql

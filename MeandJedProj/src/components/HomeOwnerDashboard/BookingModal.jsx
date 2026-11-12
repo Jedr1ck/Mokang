@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { api, getCategories, getMyProfile } from '../../services/api';
+import { api, getCategories, getMyProfile, getProvider } from '../../services/api';
 import { isWithinEchague } from '../../services/echagueLocation';
 
 const EMPTY_PROVIDER_SERVICES = [];
@@ -31,6 +31,11 @@ const BookingModal = ({
     const [profileCheckError, setProfileCheckError] = useState('');
     const [serviceOptions, setServiceOptions] = useState([]);
     const [selectedServiceIndex, setSelectedServiceIndex] = useState('');
+    const [availabilitySlots, setAvailabilitySlots] = useState([]);
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const todayValue = today.toISOString().slice(0, 10);
+    const availableDates = [...new Set(availabilitySlots.map((slot) => slot.date))].filter((date) => date >= todayValue).sort();
     const selectedService = serviceOptions[Number(selectedServiceIndex)] || null;
 
     // Address autocomplete states
@@ -49,6 +54,9 @@ const BookingModal = ({
         description: '',
         photo: null,
     });
+    const availableTimes = availabilitySlots
+        .filter((slot) => slot.date === formData.preferredDate)
+        .map((slot) => slot.time);
 
     // Load service categories
     useEffect(() => {
@@ -94,6 +102,15 @@ const BookingModal = ({
 
         loadServices();
     }, [show, initialCategory, providerServices]);
+
+    useEffect(() => {
+        if (!show || !providerId) { setAvailabilitySlots([]); return undefined; }
+        let active = true;
+        getProvider(providerId)
+            .then((provider) => { if (active) setAvailabilitySlots(provider.availabilitySlots || []); })
+            .catch((error) => { if (active) setFormError(error.message || 'Unable to load provider availability.'); });
+        return () => { active = false; };
+    }, [show, providerId]);
 
     useEffect(() => {
         if (!show) return undefined;
@@ -242,6 +259,7 @@ const BookingModal = ({
         setFormData((previous) => ({
             ...previous,
             [name]: value,
+            ...(name === 'preferredDate' ? { preferredTime: '' } : {}),
         }));
     };
 
@@ -278,12 +296,12 @@ const BookingModal = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const today = new Date().toISOString().split('T')[0];
         const errors = {};
         if (!formData.category.trim()) errors.category = 'Choose a service category.';
         if (!formData.preferredDate) errors.preferredDate = 'Choose a service date.';
-        else if (formData.preferredDate < today) errors.preferredDate = 'Date cannot be in the past.';
+        else if (providerId && !availableDates.includes(formData.preferredDate)) errors.preferredDate = 'Choose a date offered by this provider.';
         if (!formData.preferredTime) errors.preferredTime = 'Choose a service time.';
+        else if (providerId && !availableTimes.includes(formData.preferredTime)) errors.preferredTime = 'Choose a time offered for the selected date.';
         if (formData.address.trim().length < 10) errors.address = 'Add a complete home address to your profile before booking.';
         const unchangedSavedAddress = formData.address.trim() === savedHomeAddress;
         if (!unchangedSavedAddress && (!selectedAddressCoords || !isWithinEchague(selectedAddressCoords.lat, selectedAddressCoords.lng))) {
@@ -471,16 +489,18 @@ const BookingModal = ({
                                             Preferred Date
                                         </label>
 
-                                        <input
-                                            type="date"
+                                        <select
                                             name="preferredDate"
                                             value={formData.preferredDate}
                                             onChange={handleChange}
-                                            min={new Date().toISOString().split('T')[0]}
                                             required
                                             aria-invalid={Boolean(fieldErrors.preferredDate)}
-                                            className={`form-control rounded-3 ${fieldErrors.preferredDate ? 'is-invalid' : ''}`}
-                                        />
+                                            className={`form-select rounded-3 ${fieldErrors.preferredDate ? 'is-invalid' : ''}`}
+                                            disabled={!availableDates.length}
+                                        >
+                                            <option value="">{availableDates.length ? 'Select an available date' : 'No dates available'}</option>
+                                            {availableDates.map((date) => <option key={date} value={date}>{new Date(`${date}T00:00:00`).toLocaleDateString()}</option>)}
+                                        </select>
                                         {fieldErrors.preferredDate && <div className="invalid-feedback">{fieldErrors.preferredDate}</div>}
                                     </div>
 
@@ -490,15 +510,18 @@ const BookingModal = ({
                                             Preferred Time
                                         </label>
 
-                                        <input
-                                            type="time"
+                                        <select
                                             name="preferredTime"
                                             value={formData.preferredTime}
                                             onChange={handleChange}
                                             required
                                             aria-invalid={Boolean(fieldErrors.preferredTime)}
-                                            className={`form-control rounded-3 ${fieldErrors.preferredTime ? 'is-invalid' : ''}`}
-                                        />
+                                            className={`form-select rounded-3 ${fieldErrors.preferredTime ? 'is-invalid' : ''}`}
+                                            disabled={!availableTimes.length}
+                                        >
+                                            <option value="">{availableTimes.length ? 'Select an available time' : 'Select a date first'}</option>
+                                            {availableTimes.map((time) => <option key={time} value={time}>{new Date(`2000-01-01T${time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</option>)}
+                                        </select>
                                         {fieldErrors.preferredTime && <div className="invalid-feedback">{fieldErrors.preferredTime}</div>}
                                     </div>
 

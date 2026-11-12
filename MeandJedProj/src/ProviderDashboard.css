@@ -1,3 +1,5 @@
+@reference "./index.css";
+
 /* =========================================
    PROVIDER DASHBOARD
    COMPACT SIZE - MATCH HOMEOWNER SCALE
@@ -1936,6 +1938,133 @@ button.provider-stat-card:hover {
 
 .provider-services-empty p {
     margin: 6px 0 0;
+}
+
+/* Provider dashboard color system: Tailwind slate neutrals with orange actions. */
+.provider-layout {
+    --theme-primary: #c2410c;
+    --theme-secondary: #9a3412;
+    --theme-gold: #ea580c;
+    --theme-background: #f8fafc;
+    --theme-soft-blue: #f1f5f9;
+    --theme-surface: #ffffff;
+    --theme-border: #e2e8f0;
+    --theme-muted: #64748b;
+    --theme-text: #1e293b;
+    --theme-charcoal: #0f172a;
+    --theme-primary-hover: #c2410c;
+    @apply bg-slate-50 text-slate-800;
+}
+
+.provider-welcome-card {
+    @apply border-orange-100 bg-linear-to-r from-orange-50 via-white to-amber-50 shadow-lg shadow-orange-950/5;
+}
+
+.provider-welcome-content h1 {
+    @apply text-slate-900;
+}
+
+.provider-welcome-content p {
+    @apply text-slate-600;
+}
+
+.provider-manage-services-button {
+    @apply bg-orange-600 text-white shadow-md shadow-orange-600/20 transition;
+}
+
+.provider-manage-services-button:hover {
+    @apply bg-orange-700;
+}
+
+.provider-stat-card {
+    @apply border-slate-200 bg-white shadow-sm shadow-slate-900/5;
+}
+
+.provider-stat-card .provider-stat-icon {
+    @apply bg-orange-50 text-orange-700;
+}
+
+.stat-green strong {
+    @apply text-orange-700;
+}
+
+.stat-orange .provider-stat-icon {
+    @apply bg-emerald-50 text-emerald-700;
+}
+
+.stat-orange strong {
+    @apply text-emerald-700;
+}
+
+.stat-yellow .provider-stat-icon {
+    @apply bg-amber-50 text-amber-700;
+}
+
+.stat-yellow strong {
+    @apply text-amber-700;
+}
+
+.provider-dashboard-card {
+    @apply border-slate-200 bg-white shadow-sm shadow-slate-900/5;
+}
+
+.provider-card-header h3,
+.provider-card-header h3 i {
+    @apply text-slate-900;
+}
+
+.provider-card-header p {
+    @apply text-slate-500;
+}
+
+.provider-card-header button {
+    @apply text-orange-700 transition;
+}
+
+.provider-card-header button:hover {
+    @apply text-orange-800;
+}
+
+.provider-service-card {
+    @apply border-slate-200 bg-slate-50;
+}
+
+.provider-service-card:hover {
+    @apply border-orange-200 shadow-md shadow-orange-950/5;
+}
+
+.provider-service-icon {
+    @apply bg-orange-100 text-orange-700;
+}
+
+.provider-service-card-heading h4 {
+    @apply text-slate-900;
+}
+
+.provider-service-card-heading small {
+    @apply text-slate-500;
+}
+
+.provider-service-capabilities span {
+    @apply bg-orange-50 text-slate-700;
+}
+
+.provider-service-edit,
+.provider-services-empty button {
+    @apply border-orange-200 bg-orange-50 text-orange-800 transition;
+}
+
+.provider-service-edit:hover,
+.provider-services-empty button:hover {
+    @apply border-orange-300 bg-orange-100;
+}
+
+.provider-services-empty {
+    @apply border-slate-300 bg-slate-50 text-slate-600;
+}
+
+.provider-services-empty > i {
+    @apply text-orange-600;
 }
 
 @media (max-width: 900px) {

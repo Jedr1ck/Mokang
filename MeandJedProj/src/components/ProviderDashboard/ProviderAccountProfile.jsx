@@ -8,6 +8,7 @@ import {
     uploadProviderId,
     submitProviderVerification,
     updateVerifiedProviderServices,
+    updateProviderAvailability,
 } from '../../services/api';
 import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
 import { isWithinEchague } from '../../services/echagueLocation';
@@ -15,6 +16,11 @@ import './ProviderAccountProfile.css';
 
 const PSGC_API = 'https://psgc.cloud/api/v2';
 const ADDRESS_SEARCH_URL = 'https://photon.komoot.io/api/';
+const localDateInputValue = () => {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 10);
+};
 
 const steps = [
     'Personal Information',
@@ -406,6 +412,11 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [photoPreview, setPhotoPreview] = useState('');
     const [photoFileName, setPhotoFileName] = useState('');
     const [savingProfile, setSavingProfile] = useState(false);
+    const [availabilitySlots, setAvailabilitySlots] = useState([]);
+    const [newAvailabilityDate, setNewAvailabilityDate] = useState('');
+    const [newAvailabilityTime, setNewAvailabilityTime] = useState('');
+    const [savingAvailability, setSavingAvailability] = useState(false);
+    const [availabilityMessage, setAvailabilityMessage] = useState('');
 
     const [regions, setRegions] = useState([]);
     const [provinces, setProvinces] = useState([]);
@@ -451,6 +462,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
                 if (verificationResult.status === 'fulfilled') {
                     const verificationData = verificationResult.value;
+                    setAvailabilitySlots(verificationData?.availability_slots || []);
                     setVerification((previous) => ({
                         ...previous,
                         ...Object.fromEntries(
@@ -1446,6 +1458,36 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                         <i className="bi bi-lock-fill" /> Account Security
                     </button>
                 </nav>
+
+                <section className="provider-profile-panel" aria-labelledby="provider-availability-heading">
+                    <div className="provider-panel-heading">
+                        <i className="bi bi-calendar-week provider-heading-icon" />
+                        <div>
+                            <h3 id="provider-availability-heading">Booking Availability</h3>
+                            <p>Add the date and time choices homeowners can book.</p>
+                        </div>
+                    </div>
+                    {availabilityMessage && <div className="alert alert-success" role="status">{availabilityMessage}</div>}
+                    <div className="row g-2 align-items-end mb-3">
+                        <div className="col-sm-5">
+                            <label className="form-label" htmlFor="availability-date">Date</label>
+                            <input id="availability-date" type="date" className="form-control" min={localDateInputValue()} value={newAvailabilityDate} onChange={(event) => setNewAvailabilityDate(event.target.value)} />
+                        </div>
+                        <div className="col-sm-4">
+                            <label className="form-label" htmlFor="availability-time">Time</label>
+                            <input id="availability-time" type="time" className="form-control" value={newAvailabilityTime} onChange={(event) => setNewAvailabilityTime(event.target.value)} />
+                        </div>
+                        <div className="col-sm-3">
+                            <button type="button" className="btn btn-outline-success w-100" disabled={!newAvailabilityDate || !newAvailabilityTime || availabilitySlots.some((slot) => slot.date === newAvailabilityDate && slot.time === newAvailabilityTime)} onClick={() => { setAvailabilitySlots((slots) => [...slots, { date: newAvailabilityDate, time: newAvailabilityTime }].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))); setNewAvailabilityTime(''); }}>Add slot</button>
+                        </div>
+                    </div>
+                    {availabilitySlots.length ? (
+                        <div className="d-flex flex-wrap gap-2 mb-3">
+                            {availabilitySlots.map((slot) => <span className="badge bg-light text-dark border p-2" key={`${slot.date}-${slot.time}`}>{new Date(`${slot.date}T00:00:00`).toLocaleDateString()} · {new Date(`2000-01-01T${slot.time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}<button type="button" className="btn-close ms-2" aria-label={`Remove ${slot.date} ${slot.time}`} onClick={() => setAvailabilitySlots((slots) => slots.filter((item) => item.date !== slot.date || item.time !== slot.time))} /></span>)}
+                        </div>
+                    ) : <p className="text-muted">No booking slots added yet.</p>}
+                    <button type="button" className="btn btn-success" disabled={savingAvailability} onClick={async () => { setSavingAvailability(true); setAvailabilityMessage(''); try { const result = await updateProviderAvailability(availabilitySlots); setAvailabilitySlots(result.availability_slots || []); setAvailabilityMessage('Availability saved. Homeowners can now book these slots.'); } catch (saveError) { setAvailabilityMessage(saveError.message || 'Unable to save availability.'); } finally { setSavingAvailability(false); } }}>{savingAvailability ? 'Saving...' : 'Save availability'}</button>
+                </section>
 
                 <div className="provider-profile-content-grid">
                     <div className="provider-profile-main-column">

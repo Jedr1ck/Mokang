@@ -1,8 +1,20 @@
+@reference "../../index.css";
+
 /* =========================================
    PROVIDER BOOKING REQUESTS
    ========================================= */
 
 .provider-bookings-layout {
+    --theme-primary: #c2410c;
+    --theme-secondary: #9a3412;
+    --theme-gold: #ea580c;
+    --theme-background: #f8fafc;
+    --theme-soft-blue: #f1f5f9;
+    --theme-surface: #ffffff;
+    --theme-border: #e2e8f0;
+    --theme-muted: #64748b;
+    --theme-text: #1e293b;
+    --theme-charcoal: #0f172a;
     min-height: 100vh;
     background: var(--theme-background);
     color: var(--theme-text);
@@ -1795,4 +1807,37 @@
     .pbc-full-width {
         grid-column: auto;
     }
+}
+
+/* Tailwind colors keep the booking workspace aligned with the provider dashboard. */
+.provider-bookings-layout {
+    @apply bg-slate-50 text-slate-800;
+}
+
+.provider-bookings-layout :is(.booking-summary-card, .booking-request-panel, .booking-details-modal) {
+    @apply border-slate-200 bg-white shadow-sm shadow-slate-900/5;
+}
+
+.provider-bookings-layout :is(.provider-bookings-header h1, .booking-panel-header h2, .booking-empty h3) {
+    @apply text-slate-900;
+}
+
+.provider-bookings-layout :is(.booking-header-button, .booking-search, .booking-filter-tabs, .booking-table-head) {
+    @apply border-slate-200 bg-slate-50 text-slate-700;
+}
+
+.provider-bookings-layout .booking-filter-tabs button.active {
+    @apply bg-orange-700 text-white;
+}
+
+.provider-bookings-layout .booking-summary-card.selected {
+    @apply border-orange-500 shadow-md shadow-orange-950/5;
+}
+
+.provider-bookings-layout .booking-actions button {
+    @apply border-orange-200 text-orange-700 transition;
+}
+
+.provider-bookings-layout .booking-actions button:hover {
+    @apply bg-orange-50;
 }
