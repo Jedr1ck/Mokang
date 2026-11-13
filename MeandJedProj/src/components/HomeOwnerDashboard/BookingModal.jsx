@@ -32,10 +32,34 @@ const BookingModal = ({
     const [serviceOptions, setServiceOptions] = useState([]);
     const [selectedServiceIndex, setSelectedServiceIndex] = useState('');
     const [availabilitySlots, setAvailabilitySlots] = useState([]);
+    const [bookedSlots, setBookedSlots] = useState([]);
+    const [workingSchedule, setWorkingSchedule] = useState([]);
+    const [providerOngoing, setProviderOngoing] = useState(false);
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     const todayValue = today.toISOString().slice(0, 10);
-    const availableDates = [...new Set(availabilitySlots.map((slot) => slot.date))].filter((date) => date >= todayValue).sort();
+    const scheduleSlots = [];
+    if (workingSchedule.length) {
+        for (let offset = 0; offset < 90; offset += 1) {
+            const date = new Date(`${todayValue}T12:00:00`);
+            date.setDate(date.getDate() + offset);
+            const dateValue = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+            const daySchedule = workingSchedule.find((item) => (item.day || item.weekday) === weekday);
+            if (!daySchedule) continue;
+            const startTime = daySchedule.start_time || daySchedule.startTime;
+            const endTime = daySchedule.end_time || daySchedule.endTime;
+            for (let minutes = Number(startTime.slice(0, 2)) * 60 + Number(startTime.slice(3, 5)); minutes + 60 <= Number(endTime.slice(0, 2)) * 60 + Number(endTime.slice(3, 5)); minutes += 60) {
+                const time = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+                if (dateValue > todayValue || time > new Date().toTimeString().slice(0, 5)) scheduleSlots.push({ date: dateValue, time });
+            }
+        }
+    }
+    const allAvailabilitySlots = workingSchedule.length ? scheduleSlots : availabilitySlots;
+    const effectiveAvailabilitySlots = allAvailabilitySlots.filter((slot) => !bookedSlots.some(
+        (booked) => booked.date === slot.date && booked.time === slot.time
+    ));
+    const availableDates = [...new Set(effectiveAvailabilitySlots.map((slot) => slot.date))].filter((date) => date >= todayValue).sort();
     const selectedService = serviceOptions[Number(selectedServiceIndex)] || null;
 
     // Address autocomplete states
@@ -54,7 +78,7 @@ const BookingModal = ({
         description: '',
         photo: null,
     });
-    const availableTimes = availabilitySlots
+    const availableTimes = effectiveAvailabilitySlots
         .filter((slot) => slot.date === formData.preferredDate)
         .map((slot) => slot.time);
 
@@ -104,10 +128,16 @@ const BookingModal = ({
     }, [show, initialCategory, providerServices]);
 
     useEffect(() => {
-        if (!show || !providerId) { setAvailabilitySlots([]); return undefined; }
+        if (!show || !providerId) return undefined;
         let active = true;
         getProvider(providerId)
-            .then((provider) => { if (active) setAvailabilitySlots(provider.availabilitySlots || []); })
+            .then((provider) => {
+                if (!active) return;
+                setAvailabilitySlots(provider.availabilitySlots || []);
+                setBookedSlots(provider.bookedSlots || []);
+                setWorkingSchedule(provider.workingSchedule || []);
+                setProviderOngoing(Boolean(provider.isOngoing));
+            })
             .catch((error) => { if (active) setFormError(error.message || 'Unable to load provider availability.'); });
         return () => { active = false; };
     }, [show, providerId]);
@@ -296,6 +326,11 @@ const BookingModal = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (providerOngoing) {
+            setFormError('This provider is currently working on another booking. Please check again later.');
+            return;
+        }
+
         const errors = {};
         if (!formData.category.trim()) errors.category = 'Choose a service category.';
         if (!formData.preferredDate) errors.preferredDate = 'Choose a service date.';
@@ -387,6 +422,10 @@ const BookingModal = ({
         setShowAddressSuggestions(false);
         setAddressSearchError('');
         setSelectedAddressCoords(null);
+        setAvailabilitySlots([]);
+        setBookedSlots([]);
+        setWorkingSchedule([]);
+        setProviderOngoing(false);
         handleClose();
     };
 
@@ -422,7 +461,9 @@ const BookingModal = ({
 
                     <div className="modal-body p-4">
                         {!bookingSubmitted ? (
-                            <form onSubmit={handleSubmit}>
+                            <>
+                                {providerOngoing && <div className="alert alert-warning" role="status">This provider is currently working on another booking. You can view their profile, but booking is temporarily unavailable.</div>}
+                                <form onSubmit={handleSubmit}>
                                 {missingProfileFields.length > 0 && (
                                     <div className="alert alert-warning" role="alert">
                                         <strong>Complete your profile before booking.</strong>
@@ -676,12 +717,13 @@ const BookingModal = ({
                                     <button
                                         type="submit"
                                         className="btn btn-warning text-white rounded-pill px-4 fw-bold"
-                                        disabled={checkingProfile || Boolean(profileCheckError) || missingProfileFields.length > 0}
+                                        disabled={providerOngoing || checkingProfile || Boolean(profileCheckError) || missingProfileFields.length > 0}
                                     >
                                         Confirm Booking
                                     </button>
                                 </div>
-                            </form>
+                                </form>
+                            </>
                         ) : (
                             /* Success Confirmation */
                             <div className="text-center py-4">

@@ -73,13 +73,46 @@ def create_booking():
             )
             if not provider:
                 raise ApiError("Selected provider is not verified or available.", 400)
+            ongoing_booking = session.query(Booking.id).filter(
+                Booking.provider_id == provider.id,
+                Booking.status.in_(["On the Way", "In Progress"]),
+            ).first()
+            if ongoing_booking:
+                raise ApiError(
+                    "This provider is currently working on another booking. Please try again later.",
+                    409,
+                )
             provider_slots = json.loads(provider.availability_slots or "[]")
+            working_schedule = json.loads(provider.working_schedule or "[]")
             requested_slot = {
                 "date": data.preferred_date.isoformat(),
                 "time": data.preferred_time.strftime("%H:%M"),
             }
-            if requested_slot not in provider_slots:
+            weekday = data.preferred_date.strftime("%A")
+            def matches_schedule(item):
+                if item.get("day", item.get("weekday")) != weekday:
+                    return False
+                start = item.get("start_time", item.get("startTime", ""))
+                end = item.get("end_time", item.get("endTime", ""))
+                try:
+                    requested_minutes = int(requested_slot["time"][:2]) * 60 + int(requested_slot["time"][3:5])
+                    start_minutes = int(start[:2]) * 60 + int(start[3:5])
+                    end_minutes = int(end[:2]) * 60 + int(end[3:5])
+                except (TypeError, ValueError, IndexError):
+                    return False
+                return start_minutes <= requested_minutes and requested_minutes + 60 <= end_minutes and (requested_minutes - start_minutes) % 60 == 0
+
+            weekly_match = any(matches_schedule(item) for item in working_schedule if isinstance(item, dict))
+            if requested_slot not in provider_slots and not weekly_match:
                 raise ApiError("Selected date and time are no longer available from this provider.", 409)
+            occupied_slot = session.query(Booking.id).filter(
+                Booking.provider_id == provider.id,
+                Booking.preferred_date == data.preferred_date,
+                Booking.preferred_time == data.preferred_time,
+                Booking.status.in_(["Pending", "Matched", "Accepted", "On the Way", "In Progress", "Awaiting Confirmation"]),
+            ).first()
+            if occupied_slot:
+                raise ApiError("This time has already been booked. Please choose another available time.", 409)
             provider_category_ids = {
                 row.category_id
                 for row in session.query(ProviderService.category_id)

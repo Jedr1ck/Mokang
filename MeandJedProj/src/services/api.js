@@ -123,10 +123,10 @@ export async function updateVerifiedProviderServices(services) {
     });
 }
 
-export async function updateProviderAvailability(availabilitySlots) {
+export async function updateProviderAvailability(workingSchedule) {
     return api('/provider-availability/me', {
         method: 'PUT',
-        body: JSON.stringify({ availability_slots: availabilitySlots }),
+        body: JSON.stringify({ working_schedule: workingSchedule }),
     });
 }
 

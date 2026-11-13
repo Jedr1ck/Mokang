@@ -150,6 +150,16 @@ def providers():
     service_filter = request.args.get("service")
     with get_session() as session:
         rows = verified_provider_query(session).all()
+        ongoing_provider_ids = {
+            provider_id
+            for (provider_id,) in session.query(Booking.provider_id)
+            .filter(
+                Booking.provider_id.isnot(None),
+                Booking.status.in_(["On the Way", "In Progress"]),
+            )
+            .distinct()
+            .all()
+        }
         review_summaries = {
             provider_id: {"rating": float(average_rating), "reviews": review_count}
             for provider_id, average_rating, review_count in (
@@ -206,6 +216,7 @@ def providers():
             review_summary = review_summaries.get(
                 provider.id, {"rating": 0.0, "reviews": 0}
             )
+            is_ongoing = provider.id in ongoing_provider_ids
             category_name = ", ".join(category_names) or "Service Provider"
             location_name = provider_location(provider)
             searchable = " ".join(
@@ -283,7 +294,9 @@ def providers():
                         }
                     ],
                     "experience": f"{provider.experience_years or 0} years exp",
-                    "availability": provider.availability_status or "Available",
+                    "availability": "Currently On-going" if is_ongoing else provider.availability_status or "Available",
+                    "isOngoing": is_ongoing,
+                    "workingSchedule": json.loads(provider.working_schedule or "[]"),
                     "availabilityType": "today",
                     "rating": round(review_summary["rating"], 1),
                     "reviews": review_summary["reviews"],
@@ -334,6 +347,19 @@ def provider_details(provider_id):
             .scalar()
             or 0
         )
+        is_ongoing = session.query(Booking.id).filter(
+            Booking.provider_id == provider.id,
+            Booking.status.in_(["On the Way", "In Progress"]),
+        ).first() is not None
+        booked_slots = [
+            {"date": booking.preferred_date.isoformat(), "time": booking.preferred_time.strftime("%H:%M")}
+            for booking in session.query(Booking.preferred_date, Booking.preferred_time)
+            .filter(
+                Booking.provider_id == provider.id,
+                Booking.status.in_(["Pending", "Matched", "Accepted", "On the Way", "In Progress", "Awaiting Confirmation"]),
+            )
+            .all()
+        ]
         return jsonify(
             {
                 "id": provider.id,
@@ -358,8 +384,11 @@ def provider_details(provider_id):
                     else None
                 ),
                 "experienceYears": provider.experience_years or 0,
-                "availability": provider.availability_status or "Available",
+                "availability": "Currently On-going" if is_ongoing else provider.availability_status or "Available",
+                "isOngoing": is_ongoing,
                 "availabilitySlots": json.loads(provider.availability_slots or "[]"),
+                "workingSchedule": json.loads(provider.working_schedule or "[]"),
+                "bookedSlots": booked_slots,
                 "bio": provider.bio or "",
                 "qualifications": provider.qualifications or "",
                 "image": (

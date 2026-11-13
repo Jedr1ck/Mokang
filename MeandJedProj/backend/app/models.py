@@ -101,6 +101,7 @@ class ProviderProfile(Base):
     portfolio_paths = Column(Text, nullable=True)
     service_area = Column(String(255), nullable=True)
     availability_slots = Column(Text, nullable=False, default="[]")
+    working_schedule = Column(Text, nullable=True, default="[]")
     user = relationship("User")
 
 

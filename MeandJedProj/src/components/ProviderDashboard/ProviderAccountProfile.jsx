@@ -16,11 +16,6 @@ import './ProviderAccountProfile.css';
 
 const PSGC_API = 'https://psgc.cloud/api/v2';
 const ADDRESS_SEARCH_URL = 'https://photon.komoot.io/api/';
-const localDateInputValue = () => {
-    const date = new Date();
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-    return date.toISOString().slice(0, 10);
-};
 
 const steps = [
     'Personal Information',
@@ -412,9 +407,8 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [photoPreview, setPhotoPreview] = useState('');
     const [photoFileName, setPhotoFileName] = useState('');
     const [savingProfile, setSavingProfile] = useState(false);
-    const [availabilitySlots, setAvailabilitySlots] = useState([]);
-    const [newAvailabilityDate, setNewAvailabilityDate] = useState('');
-    const [newAvailabilityTime, setNewAvailabilityTime] = useState('');
+    const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const [workingSchedule, setWorkingSchedule] = useState([]);
     const [savingAvailability, setSavingAvailability] = useState(false);
     const [availabilityMessage, setAvailabilityMessage] = useState('');
 
@@ -462,7 +456,11 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
                 if (verificationResult.status === 'fulfilled') {
                     const verificationData = verificationResult.value;
-                    setAvailabilitySlots(verificationData?.availability_slots || []);
+                    setWorkingSchedule((verificationData?.working_schedule || []).map((day) => ({
+                        day: day.day || day.weekday,
+                        start_time: day.start_time || day.startTime || '08:00',
+                        end_time: day.end_time || day.endTime || '18:00',
+                    })));
                     setVerification((previous) => ({
                         ...previous,
                         ...Object.fromEntries(
@@ -1464,29 +1462,43 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                         <i className="bi bi-calendar-week provider-heading-icon" />
                         <div>
                             <h3 id="provider-availability-heading">Booking Availability</h3>
-                            <p>Add the date and time choices homeowners can book.</p>
+                            <p>Choose your working days and the hours homeowners can book each day.</p>
                         </div>
                     </div>
                     {availabilityMessage && <div className="alert alert-success" role="status">{availabilityMessage}</div>}
-                    <div className="row g-2 align-items-end mb-3">
-                        <div className="col-sm-5">
-                            <label className="form-label" htmlFor="availability-date">Date</label>
-                            <input id="availability-date" type="date" className="form-control" min={localDateInputValue()} value={newAvailabilityDate} onChange={(event) => setNewAvailabilityDate(event.target.value)} />
-                        </div>
-                        <div className="col-sm-4">
-                            <label className="form-label" htmlFor="availability-time">Time</label>
-                            <input id="availability-time" type="time" className="form-control" value={newAvailabilityTime} onChange={(event) => setNewAvailabilityTime(event.target.value)} />
-                        </div>
-                        <div className="col-sm-3">
-                            <button type="button" className="btn btn-outline-success w-100" disabled={!newAvailabilityDate || !newAvailabilityTime || availabilitySlots.some((slot) => slot.date === newAvailabilityDate && slot.time === newAvailabilityTime)} onClick={() => { setAvailabilitySlots((slots) => [...slots, { date: newAvailabilityDate, time: newAvailabilityTime }].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))); setNewAvailabilityTime(''); }}>Add slot</button>
-                        </div>
+                    <div className="d-grid gap-2 mb-3">
+                        {WEEKDAYS.map((day) => {
+                            const daySchedule = workingSchedule.find((item) => item.day === day);
+                            return (
+                                <div className="row g-2 align-items-center border rounded-3 p-2 mx-0" key={day}>
+                                    <div className="col-4 col-md-3 form-check mb-0">
+                                        <input
+                                            id={`working-day-${day.toLowerCase()}`}
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            checked={Boolean(daySchedule)}
+                                            onChange={(event) => setWorkingSchedule((schedule) => event.target.checked
+                                                ? [...schedule, { day, start_time: '08:00', end_time: '18:00' }].sort((a, b) => WEEKDAYS.indexOf(a.day) - WEEKDAYS.indexOf(b.day))
+                                                : schedule.filter((item) => item.day !== day))}
+                                        />
+                                        <label className="form-check-label fw-semibold" htmlFor={`working-day-${day.toLowerCase()}`}>{day}</label>
+                                    </div>
+                                    {daySchedule ? <>
+                                        <div className="col-4 col-md-4">
+                                            <label className="visually-hidden" htmlFor={`start-${day}`}>Start time for {day}</label>
+                                            <input id={`start-${day}`} type="time" className="form-control" value={daySchedule.start_time} onChange={(event) => setWorkingSchedule((schedule) => schedule.map((item) => item.day === day ? { ...item, start_time: event.target.value } : item))} />
+                                        </div>
+                                        <div className="col-4 col-md-4">
+                                            <label className="visually-hidden" htmlFor={`end-${day}`}>End time for {day}</label>
+                                            <input id={`end-${day}`} type="time" className="form-control" value={daySchedule.end_time} onChange={(event) => setWorkingSchedule((schedule) => schedule.map((item) => item.day === day ? { ...item, end_time: event.target.value } : item))} />
+                                        </div>
+                                    </> : <div className="col-8 col-md-8 text-muted small">Day off</div>}
+                                </div>
+                            );
+                        })}
                     </div>
-                    {availabilitySlots.length ? (
-                        <div className="d-flex flex-wrap gap-2 mb-3">
-                            {availabilitySlots.map((slot) => <span className="badge bg-light text-dark border p-2" key={`${slot.date}-${slot.time}`}>{new Date(`${slot.date}T00:00:00`).toLocaleDateString()} · {new Date(`2000-01-01T${slot.time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}<button type="button" className="btn-close ms-2" aria-label={`Remove ${slot.date} ${slot.time}`} onClick={() => setAvailabilitySlots((slots) => slots.filter((item) => item.date !== slot.date || item.time !== slot.time))} /></span>)}
-                        </div>
-                    ) : <p className="text-muted">No booking slots added yet.</p>}
-                    <button type="button" className="btn btn-success" disabled={savingAvailability} onClick={async () => { setSavingAvailability(true); setAvailabilityMessage(''); try { const result = await updateProviderAvailability(availabilitySlots); setAvailabilitySlots(result.availability_slots || []); setAvailabilityMessage('Availability saved. Homeowners can now book these slots.'); } catch (saveError) { setAvailabilityMessage(saveError.message || 'Unable to save availability.'); } finally { setSavingAvailability(false); } }}>{savingAvailability ? 'Saving...' : 'Save availability'}</button>
+                    <p className="text-muted small">Appointments start every hour within your selected time range. For example, 8:00 AM–6:00 PM offers booking times from 8:00 AM through 5:00 PM.</p>
+                    <button type="button" className="btn btn-success" disabled={savingAvailability || workingSchedule.some((item) => !item.start_time || !item.end_time || item.start_time >= item.end_time)} onClick={async () => { setSavingAvailability(true); setAvailabilityMessage(''); try { const result = await updateProviderAvailability(workingSchedule); setWorkingSchedule(result.working_schedule || []); setAvailabilityMessage('Availability schedule saved.'); } catch (saveError) { setAvailabilityMessage(saveError.message || 'Unable to save availability.'); } finally { setSavingAvailability(false); } }}>{savingAvailability ? 'Saving...' : 'Save schedule'}</button>
                 </section>
 
                 <div className="provider-profile-content-grid">

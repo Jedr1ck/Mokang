@@ -316,6 +316,7 @@ def get_provider_verification():
                 "portfolio_paths": provider.portfolio_paths,
                 "service_area": provider.service_area,
                 "availability_slots": json.loads(provider.availability_slots or "[]"),
+                "working_schedule": json.loads(provider.working_schedule or "[]"),
                 "services": services,
                 "service_category": services[0]["category"] if services else "",
                 "service_titles": [
@@ -388,6 +389,38 @@ def update_provider_verification():
 @require_auth
 def update_provider_availability():
     data = request.get_json(silent=True) or {}
+    if "working_schedule" in data:
+        schedule = data["working_schedule"]
+        if not isinstance(schedule, list) or len(schedule) > 7:
+            raise ApiError("Working schedule must be a list with up to 7 weekdays.", 422)
+        day_names = {
+            "monday": "Monday", "tuesday": "Tuesday", "wednesday": "Wednesday",
+            "thursday": "Thursday", "friday": "Friday", "saturday": "Saturday",
+            "sunday": "Sunday",
+        }
+        normalized_schedule = []
+        seen_days = set()
+        for item in schedule:
+            if not isinstance(item, dict):
+                raise ApiError("Each working schedule entry must include a weekday and time range.", 422)
+            day = day_names.get(str(item.get("day", item.get("weekday", ""))).strip().lower())
+            start_value = str(item.get("start_time", item.get("startTime", "")))
+            end_value = str(item.get("end_time", item.get("endTime", "")))
+            try:
+                start = datetime.strptime(start_value, "%H:%M").strftime("%H:%M")
+                end = datetime.strptime(end_value, "%H:%M").strftime("%H:%M")
+            except ValueError as error:
+                raise ApiError("Working schedule times must use HH:MM format.", 422) from error
+            if not day or day in seen_days or start >= end:
+                raise ApiError("Each weekday must be unique and have a valid start and end time.", 422)
+            seen_days.add(day)
+            normalized_schedule.append({"day": day, "start_time": start, "end_time": end})
+        with get_session() as session:
+            provider = get_current_provider(current_user(session), session)
+            provider.working_schedule = json.dumps(normalized_schedule)
+            provider.availability_slots = "[]"
+            session.commit()
+            return jsonify(working_schedule=normalized_schedule)
     slots = data.get("availability_slots")
     if not isinstance(slots, list) or len(slots) > 100:
         raise ApiError("Availability must be a list of up to 100 date and time slots.", 422)
