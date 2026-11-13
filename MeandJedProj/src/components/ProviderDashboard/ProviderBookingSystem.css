@@ -15,6 +15,10 @@
     padding: 0 24px 32px;
     background: var(--theme-soft-blue);
     color: var(--theme-text);
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+.provider-booking-system :is(button, input, select, textarea, h1, h2, h3, h4, h5, h6, p, label, small, strong, span) {
     font-family: inherit;
 }
 

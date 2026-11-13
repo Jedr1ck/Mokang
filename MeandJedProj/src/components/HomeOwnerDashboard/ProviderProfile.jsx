@@ -133,7 +133,7 @@ const ProviderProfile = () => {
                             {provider.location || provider.serviceArea || 'Location not provided'}
                         </p>
                         <p className="text-muted small mb-0">
-                            <i className={`bi bi-circle-fill ${provider.isOngoing ? 'text-warning' : 'text-success'} me-2`} style={{ fontSize: 8 }}></i>
+                            <i className={`bi bi-circle-fill ${provider.isOngoing || provider.availability === 'Unavailable' ? 'text-warning' : 'text-success'} me-2`} style={{ fontSize: 8 }}></i>
                             {provider.isOngoing ? 'Currently On-going' : provider.availability}
                         </p>
                     </div>
@@ -141,11 +141,11 @@ const ProviderProfile = () => {
                         <button
                             className="btn btn-theme text-white rounded-pill fw-bold py-2"
                             onClick={() => setShowBookingModal(true)}
-                            disabled={provider.isOngoing}
+                            disabled={provider.isOngoing || provider.availability === 'Unavailable'}
                         >
-                            <i className="bi bi-calendar-check me-2"></i>{provider.isOngoing ? 'Currently On-going' : 'Book Now'}
+                            <i className="bi bi-calendar-check me-2"></i>{provider.isOngoing ? 'Currently On-going' : provider.availability === 'Unavailable' ? 'Unavailable' : 'Book Now'}
                         </button>
-                        {provider.isOngoing && <small className="text-muted text-center">This provider is currently working. You can still view their details and try booking later.</small>}
+                        {(provider.isOngoing || provider.availability === 'Unavailable') && <small className="text-muted text-center">This provider is not accepting bookings right now. You can still view their profile.</small>}
                         <button
                             onClick={() => setIsSaved((saved) => !saved)}
                             className={`btn rounded-pill fw-semibold py-2 ${isSaved ? 'btn-danger text-white' : 'btn-outline-secondary'}`}

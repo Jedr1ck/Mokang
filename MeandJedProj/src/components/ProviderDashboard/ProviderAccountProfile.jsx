@@ -8,7 +8,6 @@ import {
     uploadProviderId,
     submitProviderVerification,
     updateVerifiedProviderServices,
-    updateProviderAvailability,
 } from '../../services/api';
 import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
 import { isWithinEchague } from '../../services/echagueLocation';
@@ -407,10 +406,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [photoPreview, setPhotoPreview] = useState('');
     const [photoFileName, setPhotoFileName] = useState('');
     const [savingProfile, setSavingProfile] = useState(false);
-    const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const [workingSchedule, setWorkingSchedule] = useState([]);
-    const [savingAvailability, setSavingAvailability] = useState(false);
-    const [availabilityMessage, setAvailabilityMessage] = useState('');
 
     const [regions, setRegions] = useState([]);
     const [provinces, setProvinces] = useState([]);
@@ -456,11 +451,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
                 if (verificationResult.status === 'fulfilled') {
                     const verificationData = verificationResult.value;
-                    setWorkingSchedule((verificationData?.working_schedule || []).map((day) => ({
-                        day: day.day || day.weekday,
-                        start_time: day.start_time || day.startTime || '08:00',
-                        end_time: day.end_time || day.endTime || '18:00',
-                    })));
                     setVerification((previous) => ({
                         ...previous,
                         ...Object.fromEntries(
@@ -1382,7 +1372,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                 <header className="provider-profile-title-row">
                     <div>
                         <h1>My Profile</h1>
-                        <p>Manage your personal information, service details, and account settings.</p>
                     </div>
                     <div className="provider-profile-breadcrumb">
                         <span>Home</span><span>›</span><strong>Profile</strong>
@@ -1412,10 +1401,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                             <span className="provider-role-pill">Provider</span>
                         </div>
 
-                        <p className="provider-profile-tagline">
-                            Reliable home service provider ready to help you.
-                        </p>
-
                         <div className="provider-profile-contact-row">
                             {profile.mobileNumber && (
                                 <span><i className="bi bi-telephone-fill" /> {profile.mobileNumber}</span>
@@ -1424,14 +1409,13 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 <span><i className="bi bi-envelope-fill" /> {profile.email}</span>
                             )}
                             {(profile.address || serviceLocation) && (
-                                <span><i className="bi bi-geo-alt-fill" /> {profile.address || serviceLocation}</span>
+                                <span><i className="bi bi-geo-alt-fill" /> {serviceLocation || profile.address}</span>
                             )}
                         </div>
                     </div>
 
                     <div className="provider-profile-hero-status">
                         <span><i className="bi bi-patch-check-fill" /> Verified Provider</span>
-                        <small>Your account has been verified.</small>
                     </div>
                 </section>
 
@@ -1457,50 +1441,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                     </button>
                 </nav>
 
-                <section className="provider-profile-panel" aria-labelledby="provider-availability-heading">
-                    <div className="provider-panel-heading">
-                        <i className="bi bi-calendar-week provider-heading-icon" />
-                        <div>
-                            <h3 id="provider-availability-heading">Booking Availability</h3>
-                            <p>Choose your working days and the hours homeowners can book each day.</p>
-                        </div>
-                    </div>
-                    {availabilityMessage && <div className="alert alert-success" role="status">{availabilityMessage}</div>}
-                    <div className="d-grid gap-2 mb-3">
-                        {WEEKDAYS.map((day) => {
-                            const daySchedule = workingSchedule.find((item) => item.day === day);
-                            return (
-                                <div className="row g-2 align-items-center border rounded-3 p-2 mx-0" key={day}>
-                                    <div className="col-4 col-md-3 form-check mb-0">
-                                        <input
-                                            id={`working-day-${day.toLowerCase()}`}
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            checked={Boolean(daySchedule)}
-                                            onChange={(event) => setWorkingSchedule((schedule) => event.target.checked
-                                                ? [...schedule, { day, start_time: '08:00', end_time: '18:00' }].sort((a, b) => WEEKDAYS.indexOf(a.day) - WEEKDAYS.indexOf(b.day))
-                                                : schedule.filter((item) => item.day !== day))}
-                                        />
-                                        <label className="form-check-label fw-semibold" htmlFor={`working-day-${day.toLowerCase()}`}>{day}</label>
-                                    </div>
-                                    {daySchedule ? <>
-                                        <div className="col-4 col-md-4">
-                                            <label className="visually-hidden" htmlFor={`start-${day}`}>Start time for {day}</label>
-                                            <input id={`start-${day}`} type="time" className="form-control" value={daySchedule.start_time} onChange={(event) => setWorkingSchedule((schedule) => schedule.map((item) => item.day === day ? { ...item, start_time: event.target.value } : item))} />
-                                        </div>
-                                        <div className="col-4 col-md-4">
-                                            <label className="visually-hidden" htmlFor={`end-${day}`}>End time for {day}</label>
-                                            <input id={`end-${day}`} type="time" className="form-control" value={daySchedule.end_time} onChange={(event) => setWorkingSchedule((schedule) => schedule.map((item) => item.day === day ? { ...item, end_time: event.target.value } : item))} />
-                                        </div>
-                                    </> : <div className="col-8 col-md-8 text-muted small">Day off</div>}
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <p className="text-muted small">Appointments start every hour within your selected time range. For example, 8:00 AM–6:00 PM offers booking times from 8:00 AM through 5:00 PM.</p>
-                    <button type="button" className="btn btn-success" disabled={savingAvailability || workingSchedule.some((item) => !item.start_time || !item.end_time || item.start_time >= item.end_time)} onClick={async () => { setSavingAvailability(true); setAvailabilityMessage(''); try { const result = await updateProviderAvailability(workingSchedule); setWorkingSchedule(result.working_schedule || []); setAvailabilityMessage('Availability schedule saved.'); } catch (saveError) { setAvailabilityMessage(saveError.message || 'Unable to save availability.'); } finally { setSavingAvailability(false); } }}>{savingAvailability ? 'Saving...' : 'Save schedule'}</button>
-                </section>
-
                 <div className="provider-profile-content-grid">
                     <div className="provider-profile-main-column">
                         <section id="provider-personal-panel" className="provider-profile-panel">
@@ -1508,7 +1448,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 <i className="bi bi-person provider-heading-icon" />
                                 <div>
                                     <h3>Personal Information</h3>
-                                    <p>Update your personal details and contact information.</p>
                                 </div>
                                 <button
                                     type="button"
@@ -1677,7 +1616,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 <i className="bi bi-briefcase provider-heading-icon" />
                                 <div>
                                     <h3>Service Information</h3>
-                                    <p>Your business details, experience, and service area.</p>
                                 </div>
                                 <button
                                     type="button"
@@ -1845,7 +1783,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 <i className="bi bi-shield-lock provider-heading-icon" />
                                 <div>
                                     <h3>Account Security</h3>
-                                    <p>Your provider account verification status.</p>
                                 </div>
                             </div>
                             <div className="provider-security-status-box">

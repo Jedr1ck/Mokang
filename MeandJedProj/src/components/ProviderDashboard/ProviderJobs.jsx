@@ -158,7 +158,6 @@ export default function ProviderJobs() {
             <header className="my-jobs-heading">
                 <div>
                     <h1>My Jobs</h1>
-                    <p>View and manage all your service jobs in one place.</p>
                 </div>
                 <button type="button" className="my-jobs-availability" onClick={() => navigate('/provider-availability')}>
                     <i className="bi bi-calendar2-week" /> Set Availability <i className="bi bi-arrow-right" />

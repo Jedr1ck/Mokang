@@ -126,9 +126,7 @@ const ProviderNotifications = ({ onUnreadCountChange }) => {
         <section className="provider-notifications-page">
             <div className="notifications-heading">
                 <div>
-                    <span className="notifications-eyebrow">PROVIDER CENTER</span>
                     <h1>Notifications</h1>
-                    <p>Stay updated with booking requests, messages, and service activity.</p>
                 </div>
 
                 <button

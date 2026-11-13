@@ -1,5 +1,6 @@
 import uuid
 import json
+from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, jsonify
 from app.common import (
@@ -82,28 +83,24 @@ def create_booking():
                     "This provider is currently working on another booking. Please try again later.",
                     409,
                 )
+            if (provider.availability_status or "Available") != "Available":
+                raise ApiError(
+                    "This provider is not accepting bookings right now.",
+                    409,
+                )
             provider_slots = json.loads(provider.availability_slots or "[]")
-            working_schedule = json.loads(provider.working_schedule or "[]")
             requested_slot = {
                 "date": data.preferred_date.isoformat(),
                 "time": data.preferred_time.strftime("%H:%M"),
             }
-            weekday = data.preferred_date.strftime("%A")
-            def matches_schedule(item):
-                if item.get("day", item.get("weekday")) != weekday:
-                    return False
-                start = item.get("start_time", item.get("startTime", ""))
-                end = item.get("end_time", item.get("endTime", ""))
-                try:
-                    requested_minutes = int(requested_slot["time"][:2]) * 60 + int(requested_slot["time"][3:5])
-                    start_minutes = int(start[:2]) * 60 + int(start[3:5])
-                    end_minutes = int(end[:2]) * 60 + int(end[3:5])
-                except (TypeError, ValueError, IndexError):
-                    return False
-                return start_minutes <= requested_minutes and requested_minutes + 60 <= end_minutes and (requested_minutes - start_minutes) % 60 == 0
-
-            weekly_match = any(matches_schedule(item) for item in working_schedule if isinstance(item, dict))
-            if requested_slot not in provider_slots and not weekly_match:
+            local_now = datetime.now(timezone(timedelta(hours=8)))
+            week_start = local_now.date() - timedelta(days=local_now.weekday())
+            week_end = week_start + timedelta(days=6)
+            if data.preferred_date < local_now.date() or data.preferred_date > week_end:
+                raise ApiError("Bookings can only be made for available dates this week.", 409)
+            if data.preferred_date == local_now.date() and requested_slot["time"] <= local_now.strftime("%H:%M"):
+                raise ApiError("The selected time has already passed.", 409)
+            if requested_slot not in provider_slots:
                 raise ApiError("Selected date and time are no longer available from this provider.", 409)
             occupied_slot = session.query(Booking.id).filter(
                 Booking.provider_id == provider.id,

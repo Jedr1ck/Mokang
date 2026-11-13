@@ -234,6 +234,8 @@ export default function FindService() {
         })).filter(Boolean);
     }, [providers, selectedCategory, selectedBarangay, query]);
 
+    const showCategoryServices = selectedCategory !== 'All Services' && !selectedServiceName;
+
     const filteredSelection = filteredProviders.find((provider) => provider.id === selectedProviderId);
     const effectiveProviderId = filteredSelection?.id ?? null;
     const detailsLoading = Boolean(
@@ -305,9 +307,30 @@ export default function FindService() {
                     <button type="button" className="find-services-category-arrow" aria-label="Scroll categories right" onClick={() => categoriesRef.current?.scrollBy({ left: 260, behavior: 'smooth' })}><i className="bi bi-chevron-right" /></button>
                 </div>
 
-                <div className={`find-services-workspace ${effectiveProviderId ? 'has-selected-provider' : ''}`}>
+                {showCategoryServices && <section className="find-services-subservices" aria-label={`${selectedCategory} specific services`}>
+                    <h2>{selectedCategory} Services</h2>
+                    {loading ? <div className="find-services-subservices-loading">Loading services...</div> : error ? <div className="find-services-subservices-loading">{error}</div> : serviceOffers.length ? (
+                        <div className="find-services-subservice-list">
+                            {serviceOffers.map((offer) => (
+                                <button
+                                    type="button"
+                                    key={`${offer.category}-${offer.name}`}
+                                    className="find-services-subservice"
+                                    disabled={offer.providerCount === 0}
+                                    onClick={() => selectService(offer.name)}
+                                >
+                                    <span>{offer.name}</span>
+                                    <small>{offer.providerCount} {offer.providerCount === 1 ? 'provider' : 'providers'}</small>
+                                    <i className="bi bi-arrow-right" />
+                                </button>
+                            ))}
+                        </div>
+                    ) : <div className="find-services-subservices-loading">No matching specific services.</div>}
+                </section>}
+
+                {!showCategoryServices && <div className={`find-services-workspace ${effectiveProviderId ? 'has-selected-provider' : ''}`}>
                     <section className="find-services-results">
-                        <div className="find-services-results-heading"><div><h2>{selectedServiceName || selectedCategory}</h2><p>{selectedServiceName ? 'Providers offering this service in Echague, Isabela.' : 'Available services from verified providers in Echague, Isabela.'}</p></div>
+                        <div className="find-services-results-heading"><div><h2>{selectedServiceName || selectedCategory}</h2></div>
                             <div className="find-services-tools">{selectedServiceName && <label className="find-services-sort"><span>Sort by:</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>}<label className="find-services-sort find-services-barangay-filter"><span>Barangay:</span><select value={selectedBarangay} onChange={(event) => setSelectedBarangay(event.target.value)} aria-label="Filter providers by Echague barangay"><option value="all">All Echague</option>{ECHAGUE_BARANGAYS.map((barangay) => <option key={barangay} value={barangay}>{barangay}</option>)}</select></label><label className="find-services-inline-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={selectedServiceName ? 'Search providers...' : 'Search services...'} /></label></div>
                         </div>
 
@@ -328,13 +351,14 @@ export default function FindService() {
                                 const providerServices = servicesForProvider(provider);
                                 const serviceName = providerServices[0]?.name || provider.category || 'Home service';
                                 const visual = visualFor(selectedCategory !== 'All Services' ? selectedCategory : provider.category || serviceName);
+                                const cannotBook = provider.isOngoing || String(provider.availability || 'Available').toLowerCase() !== 'available';
                                 const selectProvider = () => { setSelectedProviderId(provider.id); setDetailTab('Details'); };
                                 return <article key={provider.id} className={`find-service-card ${effectiveProviderId === provider.id ? 'active' : ''}`} onClick={selectProvider}>
                                     <button type="button" className="find-service-card-image" aria-label={`View ${provider.name}`} style={{ backgroundImage: `url("${visual.image}")` }} onClick={selectProvider}><span className="find-service-verified"><i className="bi bi-patch-check-fill" /> Verified</span></button>
                                     <div className="find-service-card-body"><div className="find-service-card-title"><div><h3>{serviceName}</h3><p>{provider.name}</p></div><button type="button" className="find-service-open" aria-label={`View ${provider.name} details`} onClick={() => setSelectedProviderId(provider.id)}><i className="bi bi-arrow-up-right" /></button></div>
                                         <div className="find-service-card-meta"><span><i className="bi bi-star-fill" /> {provider.reviews > 0 ? `${provider.rating} (${provider.reviews} reviews)` : 'No reviews yet'}</span><span>{formatPrice(provider.rate)}</span></div>
                                         <p className="find-service-location"><i className="bi bi-geo-alt" /> {provider.location || 'Location not provided'}</p>
-                                        <button type="button" className="find-service-book" onClick={(event) => { event.stopPropagation(); openProviderProfile(provider.id); }}><i className="bi bi-calendar-check" /> Book Now</button>
+                                        <button type="button" className="find-service-book" disabled={cannotBook} onClick={(event) => { event.stopPropagation(); openProviderProfile(provider.id); }}><i className="bi bi-calendar-check" /> {provider.isOngoing ? 'At Work' : cannotBook ? 'Unavailable' : 'Book Now'}</button>
                                     </div>
                                 </article>;
                             })}
@@ -354,11 +378,11 @@ export default function FindService() {
                                 <p className="find-service-detail-rating"><i className="bi bi-star-fill" /> {activeProviderDetails.rating > 0 ? Number(activeProviderDetails.rating).toFixed(1) : 'No reviews yet'} {activeProviderDetails.reviews > 0 && `(${activeProviderDetails.reviews} reviews)`}</p>
                                 <div className="find-service-detail-tabs">{['Details', 'Services', 'Reviews'].map((tab) => <button type="button" key={tab} className={detailTab === tab ? 'active' : ''} onClick={() => setDetailTab(tab)}>{tab}{tab === 'Reviews' && activeProviderDetails.reviews > 0 ? ` (${activeProviderDetails.reviews})` : ''}</button>)}</div>
                                 {detailTab === 'Details' ? <dl className="find-service-detail-list"><div><dt><i className="bi bi-person-badge" /> Provider</dt><dd>{activeProviderDetails.fullName || activeProviderDetails.name}</dd></div><div><dt><i className="bi bi-card-text" /> About</dt><dd>{activeProviderDetails.bio || activeProviderDetails.qualifications || 'Verified service provider.'}</dd></div><div><dt><i className="bi bi-geo-alt" /> Service Area</dt><dd>{activeProviderDetails.serviceArea || activeProviderDetails.location || 'Not provided'}</dd></div><div><dt><i className="bi bi-cash-coin" /> Starting Price</dt><dd>{formatPrice(activeProviderDetails.rate)}</dd></div></dl> : detailTab === 'Services' ? <div className="find-service-detail-list find-service-offerings">{bookingServices.length ? bookingServices.map((service, index) => <div key={`${service.name}-${index}`}><dt><i className="bi bi-check-circle" /> {service.name}</dt><dd>{formatPrice(service.price)}</dd></div>) : <p>Contact provider for service details.</p>}</div> : <div className="find-service-reviews">{activeProviderDetailsError ? <p className="find-service-no-reviews">{activeProviderDetailsError}</p> : activeProviderDetails.reviewDetails?.length ? activeProviderDetails.reviewDetails.map((review) => <article className="find-service-review" key={review.id}><div className="find-service-review-heading"><strong><i className="bi bi-person-circle" /> Homeowner</strong><span>{formatReviewDate(review.createdAt)}</span></div><p className="find-service-review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} <small>{review.rating}/5</small></p><p className="find-service-review-comment">{review.comment || 'No comment provided.'}</p>{review.service && <small className="find-service-review-service">{review.service}</small>}</article>) : <p className="find-service-no-reviews">{Array.isArray(activeProviderDetails.reviewDetails) ? 'Wala pang review para sa provider na ito.' : 'Naglo-load ang reviews...'}</p>}</div>}
-                                <button type="button" className="find-service-detail-book" onClick={() => openProviderProfile(activeProviderDetails.id)}><i className="bi bi-calendar-check" /> Book Now</button>
+                                <button type="button" className="find-service-detail-book" disabled={activeProviderDetails.isOngoing || String(activeProviderDetails.availability || 'Available').toLowerCase() !== 'available'} onClick={() => openProviderProfile(activeProviderDetails.id)}><i className="bi bi-calendar-check" /> {activeProviderDetails.isOngoing ? 'At Work' : String(activeProviderDetails.availability || 'Available').toLowerCase() !== 'available' ? 'Unavailable' : 'Book Now'}</button>
                             </div>
                         </> : <div className="find-service-detail-empty"><i className="bi bi-hand-index-thumb" /><h3>Select a provider</h3><p>Choose a service card to see provider details.</p></div>}
                     </aside>}
-                </div>
+                </div>}
             </div>
 
         </main>

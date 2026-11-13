@@ -573,17 +573,9 @@ const ProviderBookings = () => {
 
                     <div>
 
-                        <span className="provider-page-label">
-                            PROVIDER PORTAL
-                        </span>
-
                         <h1>
                             Booking Requests
                         </h1>
-
-                        <p>
-                            Manage and respond to booking requests from homeowners.
-                        </p>
 
                     </div>
 

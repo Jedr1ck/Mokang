@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import func
 
 from app.common import get_session
@@ -13,6 +14,22 @@ from app.models import (
 )
 
 catalog_bp = Blueprint("catalog", __name__)
+
+
+def has_future_availability(provider):
+    now = datetime.now(timezone(timedelta(hours=8)))
+    today = now.date().isoformat()
+    current_time = now.strftime("%H:%M")
+    week_end = (now.date() + timedelta(days=6 - now.weekday())).isoformat()
+    slots = json.loads(provider.availability_slots or "[]")
+    return any(
+        isinstance(slot, dict)
+        and isinstance(slot.get("date"), str)
+        and isinstance(slot.get("time"), str)
+        and today <= slot.get("date", "") <= week_end
+        and (slot.get("date") > today or (slot.get("date") == today and slot.get("time", "") > current_time))
+        for slot in slots
+    )
 
 
 def verified_provider_query(session):
@@ -294,7 +311,7 @@ def providers():
                         }
                     ],
                     "experience": f"{provider.experience_years or 0} years exp",
-                    "availability": "Currently On-going" if is_ongoing else provider.availability_status or "Available",
+                    "availability": "Currently On-going" if is_ongoing else (provider.availability_status or "Available") if has_future_availability(provider) else "Unavailable",
                     "isOngoing": is_ongoing,
                     "workingSchedule": json.loads(provider.working_schedule or "[]"),
                     "availabilityType": "today",
@@ -384,7 +401,7 @@ def provider_details(provider_id):
                     else None
                 ),
                 "experienceYears": provider.experience_years or 0,
-                "availability": "Currently On-going" if is_ongoing else provider.availability_status or "Available",
+                "availability": "Currently On-going" if is_ongoing else (provider.availability_status or "Available") if has_future_availability(provider) else "Unavailable",
                 "isOngoing": is_ongoing,
                 "availabilitySlots": json.loads(provider.availability_slots or "[]"),
                 "workingSchedule": json.loads(provider.working_schedule or "[]"),

@@ -233,7 +233,6 @@ export default function ProviderBookingSystem() {
             <section className="pbs-page-heading">
                 <div>
                     <h1>My Bookings</h1>
-                    <p>Manage and track all your service bookings.</p>
                 </div>
                 <button type="button" onClick={() => navigate('/provider-schedule')}>
                     <i className="bi bi-calendar-event" />

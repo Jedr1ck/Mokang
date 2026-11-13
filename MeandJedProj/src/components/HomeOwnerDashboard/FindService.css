@@ -66,6 +66,71 @@
 .category-icon.mint, .category-icon.blue, .category-icon.orange, .category-icon.neutral { background: #fff0e6; color: #FF6900; }
 .find-services-categories small { max-width: 100px; overflow: hidden; color: var(--theme-text); font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 
+.find-services-subservices {
+    margin: -2px 0 14px;
+    padding: 11px 13px;
+    border: 1px solid #F5F5F5;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 8px #6B6B6B08;
+}
+
+.find-services-subservices h2 {
+    margin: 0 0 8px;
+    color: #718087;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.find-services-subservice-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.find-services-subservice {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    border: 1px solid #e7edf2;
+    border-radius: 7px;
+    background: #f8fafc;
+    color: var(--theme-text);
+    font-size: 11px;
+    font-weight: 650;
+    transition: border-color .16s ease, background-color .16s ease;
+}
+
+.find-services-subservice:hover:not(:disabled) {
+    border-color: #ffb27d;
+    background: #fff8f3;
+}
+
+.find-services-subservice small {
+    color: #87949c;
+    font-size: 9px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.find-services-subservice i {
+    color: var(--theme-gold);
+    font-size: 10px;
+}
+
+.find-services-subservice:disabled {
+    color: #97a2a8;
+    cursor: not-allowed;
+    opacity: .65;
+}
+
+.find-services-subservices-loading {
+    color: #87949c;
+    font-size: 11px;
+}
+
 .find-services-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 10px; align-items: stretch; }
 .find-services-workspace:not(.has-selected-provider) { grid-template-columns: minmax(0, 1fr); }
 .find-services-results, .find-service-details { min-width: 0; border: 1px solid #F5F5F5; border-radius: 9px; background: #fff; box-shadow: 0 3px 12px #6B6B6B08; }
@@ -109,7 +174,7 @@
 .find-service-location i { margin-right: 3px; }
 .find-service-book, .find-service-detail-book { width: 100%; min-height: 34px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 6px; background: var(--theme-gold); color: #ffffff !important; font-size: 11px; font-weight: 750; }
 .find-service-book:hover, .find-service-detail-book:hover { background: var(--theme-secondary); }
-.find-service-book:disabled { cursor: not-allowed; opacity: .55; }
+.find-service-book:disabled, .find-service-detail-book:disabled { cursor: not-allowed; opacity: .55; }
 
 .find-service-details { overflow: hidden; }
 .find-service-detail-image { position: relative; height: 78px; background-position: center; background-size: cover; }
@@ -187,6 +252,10 @@
     .find-services-categories > button { min-width: 92px; height: 78px; flex-basis: 92px; }
     .category-icon { width: 36px; height: 36px; font-size: 16px; }
     .find-services-categories small { font-size: 10px; }
+    .find-services-subservices { padding: 10px; }
+    .find-services-subservice-list { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .find-services-subservice-list::-webkit-scrollbar { display: none; }
+    .find-services-subservice { flex: 0 0 auto; min-height: 32px; padding: 0 9px; font-size: 10px; }
     .find-services-results-heading { align-items: flex-start; flex-direction: column; }
     .find-services-tools { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .find-services-sort { flex: 1; justify-content: space-between; }

@@ -224,7 +224,11 @@ h6 {
   text-align: center;
 }
 
-section h2 {
+.services-section h2,
+.how-section h2,
+.about-section h2,
+.reviews-section h2,
+.security-section h2 {
   font-size: 22px;
   margin-bottom: 40px;
   color: #303030;
@@ -1257,7 +1261,11 @@ body {
   padding: 96px 28px;
 }
 
-section h2 {
+.services-section h2,
+.how-section h2,
+.about-section h2,
+.reviews-section h2,
+.security-section h2 {
   color: var(--green-950);
   font-family: Georgia, serif;
   font-size: 34px;
@@ -1542,7 +1550,11 @@ section h2 {
     padding: 72px 20px;
   }
 
-  section h2 {
+  .services-section h2,
+  .how-section h2,
+  .about-section h2,
+  .reviews-section h2,
+  .security-section h2 {
     font-size: 29px;
     margin-bottom: 32px;
   }

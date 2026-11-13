@@ -13,12 +13,14 @@ import {
     getMyProviderReviews,
     getProviderVerification,
     getNotifications,
+    updateProviderAvailabilityStatus,
 } from '../../services/api';
 import Messages from '../HomeOwnerDashboard/Messages';
 import ProviderNotifications from './ProviderNotifications';
 import ProviderAccountProfile from './ProviderAccountProfile';
 import ProviderServiceMap from './ProviderServiceMap';
 import ProviderJobs from './ProviderJobs';
+import ProviderAvailability from './ProviderAvailability';
 
 
 const ProviderDashboard = () => {
@@ -53,13 +55,14 @@ const ProviderDashboard = () => {
         '/provider-bookings': 'bookings',
         '/provider-jobs': 'myjobs',
         '/provider-schedule': 'schedule',
-        '/provider-availability': 'schedule',
+        '/provider-availability': 'availability',
         '/provider-messages': 'messages',
         '/provider-reviews': 'reviews',
         '/provider-notifications': 'notifications',
         '/provider-profile': 'profile',
     }[location.pathname] || 'dashboard';
     const [bookings, setBookings] = useState([]);
+    const [bookingsLoading, setBookingsLoading] = useState(true);
     const [reviews, setReviews] = useState([]);
     const [reviewsLoading, setReviewsLoading] = useState(true);
     const [reviewsError, setReviewsError] = useState('');
@@ -67,6 +70,16 @@ const ProviderDashboard = () => {
     const [providerServicesLoading, setProviderServicesLoading] = useState(true);
     const [providerServicesError, setProviderServicesError] = useState('');
     const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+    const [availabilityStatus, setAvailabilityStatus] = useState('Available');
+    const [availabilityConfig, setAvailabilityConfig] = useState({ availability_slots: [] });
+    const [availabilitySaving, setAvailabilitySaving] = useState(false);
+    const [availabilityError, setAvailabilityError] = useState('');
+    const [availabilityClock, setAvailabilityClock] = useState(() => new Date());
+
+    useEffect(() => {
+        const intervalId = window.setInterval(() => setAvailabilityClock(new Date()), 30000);
+        return () => window.clearInterval(intervalId);
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
@@ -93,6 +106,23 @@ const ProviderDashboard = () => {
     }, []);
 
     useEffect(() => {
+        let isMounted = true;
+        const refreshBookings = () => {
+            getMyBookings()
+                .then((result) => { if (isMounted) setBookings(result); })
+                .catch((error) => console.error('Unable to refresh provider bookings:', error))
+                .finally(() => { if (isMounted) setBookingsLoading(false); });
+        };
+
+        refreshBookings();
+        const intervalId = window.setInterval(refreshBookings, 15000);
+        return () => {
+            isMounted = false;
+            window.clearInterval(intervalId);
+        };
+    }, []);
+
+    useEffect(() => {
         getMyProfile()
             .then((profile) => {
                 setUser({
@@ -105,15 +135,20 @@ const ProviderDashboard = () => {
     }, []);
 
     useEffect(() => {
-        getMyBookings().then(setBookings).catch((error) => console.error('Unable to load provider bookings:', error));
         getProviderVerification()
-            .then((profile) => setProviderServices(profile.services || []))
+            .then((profile) => {
+                setProviderServices(profile.services || []);
+                setAvailabilityStatus(profile.availability_status || 'Available');
+                setAvailabilityConfig({
+                    availability_slots: profile.availability_slots || [],
+                });
+            })
             .catch((error) => {
                 console.error('Unable to load provider services:', error);
                 setProviderServicesError(error.message || 'Unable to load your services.');
             })
             .finally(() => setProviderServicesLoading(false));
-    }, []);
+    }, [location.pathname]);
 
     useEffect(() => {
         getMyProviderReviews()
@@ -130,6 +165,7 @@ const ProviderDashboard = () => {
     const todaysBookings = bookings.filter((booking) => booking.preferredDate === today);
     const pendingBookings = bookings.filter((booking) => booking.status === 'Pending');
     const ongoingBookings = bookings.filter((booking) => ['Accepted', 'On the Way', 'In Progress'].includes(booking.status));
+    const isAtWork = bookings.some((booking) => ['On the Way', 'In Progress'].includes(booking.status));
     const completedBookings = bookings.filter((booking) => booking.status === 'Completed');
     const actionableBookings = bookings.filter((booking) => booking.status === 'Pending');
     const calendarBookings = [...bookings]
@@ -145,6 +181,17 @@ const ProviderDashboard = () => {
     const averageRating = reviews.length
         ? reviews.reduce((total, review) => total + Number(review.rating || 0), 0) / reviews.length
         : 0;
+    const localToday = new Date(availabilityClock);
+    localToday.setMinutes(localToday.getMinutes() - localToday.getTimezoneOffset());
+    const localTodayValue = localToday.toISOString().slice(0, 10);
+    const localWeekEnd = new Date(availabilityClock);
+    localWeekEnd.setDate(availabilityClock.getDate() + (6 - ((availabilityClock.getDay() + 6) % 7)));
+    const localWeekEndValue = `${localWeekEnd.getFullYear()}-${String(localWeekEnd.getMonth() + 1).padStart(2, '0')}-${String(localWeekEnd.getDate()).padStart(2, '0')}`;
+    const localTimeValue = availabilityClock.toTimeString().slice(0, 5);
+    const hasActiveAvailabilitySchedule = availabilityConfig.availability_slots.some((slot) => (
+        slot.date >= localTodayValue && slot.date <= localWeekEndValue && (slot.date > localTodayValue || slot.time > localTimeValue)
+    ));
+    const availabilityIsOn = !isAtWork && availabilityStatus === 'Available' && hasActiveAvailabilitySchedule;
 
     const handleProfileUpdated = (profile) => {
         setUser({
@@ -165,6 +212,29 @@ const ProviderDashboard = () => {
                     setProviderServicesError(error.message || 'Unable to refresh your services.');
                 });
         }
+    };
+
+    const toggleAvailability = async () => {
+        if (isAtWork || availabilitySaving || bookingsLoading) return;
+        const nextStatus = availabilityIsOn ? 'Unavailable' : 'Available';
+        if (nextStatus === 'Available' && !hasActiveAvailabilitySchedule) {
+            goToSection('availability', '/provider-availability');
+            return;
+        }
+        setAvailabilitySaving(true);
+        setAvailabilityError('');
+        try {
+            const result = await updateProviderAvailabilityStatus(nextStatus);
+            setAvailabilityStatus(result.availability_status || nextStatus);
+        } catch (error) {
+            setAvailabilityError(error.message || 'Unable to update your availability.');
+        } finally {
+            setAvailabilitySaving(false);
+        }
+    };
+
+    const handleAvailabilityScheduleSaved = (slots) => {
+        setAvailabilityConfig({ availability_slots: slots || [] });
     };
 
     const handleLogout = () => {
@@ -230,6 +300,31 @@ const ProviderDashboard = () => {
                     </div>
 
                     <div className="provider-header-actions">
+                        {availabilityError && <span className="provider-availability-error" role="status">{availabilityError}</span>}
+                        <button
+                            type="button"
+                            className={`provider-availability-toggle ${isAtWork ? 'is-busy' : availabilityIsOn ? 'is-on' : 'is-off'}`}
+                            onClick={toggleAvailability}
+                            disabled={availabilitySaving || isAtWork || bookingsLoading}
+                            aria-pressed={availabilityIsOn}
+                            aria-label={isAtWork ? 'Availability is paused while you are at work' : `Turn availability ${availabilityIsOn ? 'off' : 'on'}`}
+                            title={availabilityError || (isAtWork ? 'Availability pauses while a job is in progress' : !hasActiveAvailabilitySchedule ? 'Set this week’s schedule to turn availability on' : 'Toggle booking availability')}
+                        >
+                            <span className="provider-availability-label">Availability</span>
+                            <span className="provider-availability-switch" aria-hidden="true"><span /></span>
+                            <span>{availabilitySaving ? 'Saving' : availabilityIsOn ? 'ON' : 'OFF'}</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            className="provider-header-icon"
+                            onClick={() => goToSection('availability', '/provider-availability')}
+                            title="Booking availability"
+                            aria-label="Set booking availability"
+                        >
+                            <i className="bi bi-calendar-week fs-5"></i>
+                        </button>
+
                         <button
                             type="button"
                             className="provider-header-icon position-relative"
@@ -290,56 +385,6 @@ const ProviderDashboard = () => {
 
                     <>
                         {/* =================================
-                            WELCOME PROFILE CARD
-                        ================================== */}
-
-                        <section className="provider-welcome-card">
-
-                            <div className="provider-welcome-profile">
-
-                                {profileImage ? (
-                                    <img
-                                        src={profileImage}
-                                        alt={user.fullName}
-                                        className="provider-profile-avatar"
-                                    />
-                                ) : (
-                                    <div className="provider-profile-avatar-placeholder">
-                                        <i className="bi bi-person"></i>
-                                    </div>
-                                )}
-
-                            </div>
-
-
-                            <div className="provider-welcome-content">
-
-                                <span className="provider-welcome-label">
-                                    PROVIDER DASHBOARD
-                                </span>
-
-                                <h1>{user.fullName}!</h1>
-
-                                <p>
-                                    Keep up the great work! Provide quality service
-                                    and make more homes comfortable.
-                                </p>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                className="provider-manage-services-button"
-                                onClick={() => goToSection('profile', '/provider-profile')}
-                            >
-                                Manage My Services <i className="bi bi-arrow-right"></i>
-                            </button>
-
-                        </section>
-
-
-                        {/* =================================
                             STATISTICS
                         ================================== */}
 
@@ -384,9 +429,6 @@ const ProviderDashboard = () => {
                                             Booking Requests
                                         </h3>
 
-                                        <p>
-                                            New requests that match your services
-                                        </p>
                                     </div>
 
                                     <button
@@ -479,7 +521,6 @@ const ProviderDashboard = () => {
                             <div className="provider-card-header">
                                 <div>
                                     <h3><i className="bi bi-wrench-adjustable"></i>My Services</h3>
-                                    <p>These are the tasks you selected in your provider profile.</p>
                                 </div>
                                 <button type="button" onClick={() => goToSection('profile', '/provider-profile')}>
                                     Manage Services
@@ -497,7 +538,6 @@ const ProviderDashboard = () => {
                                                 <span className="provider-service-icon"><i className="bi bi-tools"></i></span>
                                                 <div>
                                                     <h4>{service.category}</h4>
-                                                    <small>{service.capabilities.length} types of work offered</small>
                                                 </div>
                                                 <button type="button" aria-label={`Edit ${service.category} services`} onClick={() => goToSection('profile', '/provider-profile')}>
                                                     <i className="bi bi-three-dots-vertical"></i>
@@ -542,9 +582,6 @@ const ProviderDashboard = () => {
                     <div className="provider-placeholder-page">
                         <i className="bi bi-calendar-check"></i>
                         <h2>Booking System</h2>
-                        <p>
-                            Manage incoming booking requests from homeowners.
-                        </p>
                     </div>
                 )}
 
@@ -558,9 +595,7 @@ const ProviderDashboard = () => {
                     <section className="provider-calendar-page">
                         <header className="provider-calendar-heading">
                             <div>
-                                <span>YOUR WORK PLAN</span>
                                 <h1>Calendar &amp; Schedule</h1>
-                                <p>Requested and confirmed appointments appear here in date order.</p>
                             </div>
                             <button
                                 type="button"
@@ -614,6 +649,10 @@ const ProviderDashboard = () => {
                     </section>
                 )}
 
+                {activeSection === 'availability' && (
+                    <ProviderAvailability onScheduleSaved={handleAvailabilityScheduleSaved} />
+                )}
+
 
                 {activeSection === 'messages' && (
                     <Messages embedded bookings={bookings} />
@@ -624,9 +663,7 @@ const ProviderDashboard = () => {
                     <section className="provider-reviews-page">
                         <header className="provider-calendar-heading">
                             <div>
-                                <span>HOMEOWNER FEEDBACK</span>
                                 <h1>Ratings &amp; Reviews</h1>
-                                <p>See feedback homeowners have left after completed services.</p>
                             </div>
                         </header>
                         {reviewsError && <div className="alert alert-danger" role="alert">{reviewsError}</div>}

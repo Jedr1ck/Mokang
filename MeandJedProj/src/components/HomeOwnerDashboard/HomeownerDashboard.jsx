@@ -360,14 +360,6 @@ const HomeownerDashboard = () => {
                 className="homeowner-dashboard-hero"
                 style={{ '--homeowner-hero-image': `url("${heroBackground}")` }}
             >
-                <div className="homeowner-dashboard-hero-copy">
-                    <h1>{user.fullName}!</h1>
-                    <span>
-                        Keep your home comfortable and well-maintained
-                        <br className="homeowner-dashboard-desktop-break" />
-                        with trusted service providers.
-                    </span>
-                </div>
                 <button
                     type="button"
                     className="homeowner-dashboard-hero-button"

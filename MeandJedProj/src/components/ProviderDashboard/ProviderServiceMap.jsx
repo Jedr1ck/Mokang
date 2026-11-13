@@ -100,9 +100,7 @@ export default function ProviderServiceMap() {
         <section className="provider-service-map-page">
             <header className="provider-service-map-heading">
                 <div>
-                    <span className="provider-service-map-eyebrow">SERVICE COVERAGE</span>
                     <h1>Service Map</h1>
-                    <p>View the Echague, Isabela service coverage area and your registered address.</p>
                 </div>
                 <span className="provider-service-map-area">
                     <i className="bi bi-geo-alt-fill" aria-hidden="true" />

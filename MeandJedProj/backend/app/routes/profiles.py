@@ -1,6 +1,6 @@
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from flask import Blueprint, jsonify, request
@@ -390,41 +390,14 @@ def update_provider_verification():
 def update_provider_availability():
     data = request.get_json(silent=True) or {}
     if "working_schedule" in data:
-        schedule = data["working_schedule"]
-        if not isinstance(schedule, list) or len(schedule) > 7:
-            raise ApiError("Working schedule must be a list with up to 7 weekdays.", 422)
-        day_names = {
-            "monday": "Monday", "tuesday": "Tuesday", "wednesday": "Wednesday",
-            "thursday": "Thursday", "friday": "Friday", "saturday": "Saturday",
-            "sunday": "Sunday",
-        }
-        normalized_schedule = []
-        seen_days = set()
-        for item in schedule:
-            if not isinstance(item, dict):
-                raise ApiError("Each working schedule entry must include a weekday and time range.", 422)
-            day = day_names.get(str(item.get("day", item.get("weekday", ""))).strip().lower())
-            start_value = str(item.get("start_time", item.get("startTime", "")))
-            end_value = str(item.get("end_time", item.get("endTime", "")))
-            try:
-                start = datetime.strptime(start_value, "%H:%M").strftime("%H:%M")
-                end = datetime.strptime(end_value, "%H:%M").strftime("%H:%M")
-            except ValueError as error:
-                raise ApiError("Working schedule times must use HH:MM format.", 422) from error
-            if not day or day in seen_days or start >= end:
-                raise ApiError("Each weekday must be unique and have a valid start and end time.", 422)
-            seen_days.add(day)
-            normalized_schedule.append({"day": day, "start_time": start, "end_time": end})
-        with get_session() as session:
-            provider = get_current_provider(current_user(session), session)
-            provider.working_schedule = json.dumps(normalized_schedule)
-            provider.availability_slots = "[]"
-            session.commit()
-            return jsonify(working_schedule=normalized_schedule)
+        raise ApiError("Set availability for specific dates from Monday through Sunday.", 422)
     slots = data.get("availability_slots")
-    if not isinstance(slots, list) or len(slots) > 100:
-        raise ApiError("Availability must be a list of up to 100 date and time slots.", 422)
+    if not isinstance(slots, list) or len(slots) > 168:
+        raise ApiError("Availability must be a list of up to 168 date and time slots.", 422)
     normalized = []
+    today = datetime.now(timezone(timedelta(hours=8))).date()
+    week_start = today - timedelta(days=today.weekday())
+    week_end = week_start + timedelta(days=6)
     for slot in slots:
         date_value = str(slot.get("date", "")) if isinstance(slot, dict) else ""
         time_value = str(slot.get("time", "")) if isinstance(slot, dict) else ""
@@ -433,8 +406,11 @@ def update_provider_availability():
             datetime.strptime(time_value, "%H:%M")
         except ValueError as error:
             raise ApiError("Each availability slot needs a valid date and time.", 422) from error
-        if date_value < datetime.utcnow().date().isoformat():
+        slot_date = datetime.strptime(date_value, "%Y-%m-%d").date()
+        if slot_date < today:
             raise ApiError("Availability dates cannot be in the past.", 422)
+        if slot_date > week_end:
+            raise ApiError("Availability can only be set through Sunday of this week.", 422)
         item = {"date": date_value, "time": time_value}
         if item not in normalized:
             normalized.append(item)
@@ -442,8 +418,26 @@ def update_provider_availability():
     with get_session() as session:
         provider = get_current_provider(current_user(session), session)
         provider.availability_slots = json.dumps(normalized)
+        provider.working_schedule = "[]"
         session.commit()
         return jsonify(availability_slots=normalized)
+
+
+@profiles_bp.put("/provider-availability/status")
+@require_auth
+def update_provider_availability_status():
+    data = request.get_json(silent=True) or {}
+    availability_status = data.get("availability_status")
+    if availability_status not in {"Available", "Unavailable"}:
+        raise ApiError("Availability must be Available or Unavailable.", 422)
+
+    with get_session() as session:
+        provider = get_current_provider(current_user(session), session)
+        if provider.verification_status != "verified":
+            raise ApiError("Only verified providers can change availability.", 403)
+        provider.availability_status = availability_status
+        session.commit()
+        return jsonify(availability_status=provider.availability_status)
 
 
 @profiles_bp.put("/provider-verification/services")
