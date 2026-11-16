@@ -127,6 +127,21 @@ def create_app(test_config=None):
                     )
                 )
 
+    if inspect(engine).has_table("provider_profiles"):
+        provider_columns = {
+            column["name"]
+            for column in inspect(engine).get_columns("provider_profiles")
+        }
+        with engine.begin() as connection:
+            if "clearance_type" not in provider_columns:
+                connection.execute(text(
+                    "ALTER TABLE provider_profiles ADD COLUMN clearance_type VARCHAR(30)"
+                ))
+            if "clearance_path" not in provider_columns:
+                connection.execute(text(
+                    "ALTER TABLE provider_profiles ADD COLUMN clearance_path VARCHAR(500)"
+                ))
+
     if inspect(engine).has_table(Category.__tablename__):
         category_columns = {
             column["name"]

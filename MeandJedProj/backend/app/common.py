@@ -68,6 +68,14 @@ def is_at_least_16(birthday, today=None):
     return age >= 16
 
 
+def is_at_least_21(birthday, today=None):
+    today = today or datetime.now(MANILA_TIMEZONE).date()
+    age = today.year - birthday.year
+    if (today.month, today.day) < (birthday.month, birthday.day):
+        age -= 1
+    return age >= 21
+
+
 def provider_has_future_availability(provider, now=None):
     now = now or datetime.now(MANILA_TIMEZONE)
     schedule = json.loads(provider.working_schedule or "{}")

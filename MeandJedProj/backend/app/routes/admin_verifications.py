@@ -91,7 +91,8 @@ def list_pending_verifications():
                     "documents": {
                         side: bool(getattr(provider, f"id_{side}_path"))
                         for side in ("front", "back")
-                    },
+                    } | {"clearance": bool(provider.clearance_path)},
+                    "clearanceType": provider.clearance_type,
                 }
             )
         return jsonify(reviews)
@@ -100,8 +101,8 @@ def list_pending_verifications():
 @admin_verifications_bp.get("/<int:provider_id>/documents/<side>")
 @require_auth
 def get_verification_document(provider_id, side):
-    if side not in ("front", "back"):
-        raise ApiError("Document side must be 'front' or 'back'.", 400)
+    if side not in ("front", "back", "clearance"):
+        raise ApiError("Document side must be front, back, or clearance.", 400)
 
     with get_session() as session:
         require_admin(current_user(session))
@@ -109,7 +110,7 @@ def get_verification_document(provider_id, side):
         if not provider:
             raise ApiError("Provider verification not found", 404)
 
-        stored_path = getattr(provider, f"id_{side}_path")
+        stored_path = provider.clearance_path if side == "clearance" else getattr(provider, f"id_{side}_path")
         if not stored_path:
             raise ApiError("Verification document not found", 404)
 
@@ -124,6 +125,7 @@ def get_verification_document(provider_id, side):
 
         suffix = document_path.suffix.lower()
         mimetype = {
+            ".pdf": "application/pdf",
             ".jpg": "image/jpeg",
             ".jpeg": "image/jpeg",
             ".png": "image/png",
@@ -157,9 +159,9 @@ def approve_verification(provider_id):
                 "This provider verification is no longer pending",
                 409,
             )
-        if not provider.id_front_path or not provider.id_back_path:
+        if not provider.id_front_path or not provider.id_back_path or not provider.clearance_path or provider.clearance_type not in ("nbi", "police"):
             raise ApiError(
-                "Both identity documents must be available before approval",
+                "Both identity documents and an NBI or police clearance must be available before approval",
                 409,
             )
 
@@ -167,14 +169,14 @@ def approve_verification(provider_id):
         provider_dir = (
             app_root / "private_uploads" / "provider_ids" / str(provider.user_id)
         ).resolve()
-        for side in ("front", "back"):
-            document_path = (app_root / getattr(provider, f"id_{side}_path")).resolve()
+        for stored_path in (provider.id_front_path, provider.id_back_path, provider.clearance_path):
+            document_path = (app_root / stored_path).resolve()
             if (
                 not document_path.is_relative_to(provider_dir)
                 or not document_path.is_file()
             ):
                 raise ApiError(
-                    "Both identity documents must be available before approval",
+                    "Both identity documents and the clearance file must be available before approval",
                     409,
                 )
 

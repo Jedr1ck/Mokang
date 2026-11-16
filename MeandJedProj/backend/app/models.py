@@ -98,6 +98,8 @@ class ProviderProfile(Base):
     id_type = Column(String(80), nullable=True)
     id_front_path = Column(String(500), nullable=True)
     id_back_path = Column(String(500), nullable=True)
+    clearance_type = Column(String(30), nullable=True)
+    clearance_path = Column(String(500), nullable=True)
     qualifications = Column(Text, nullable=True)
     portfolio_paths = Column(Text, nullable=True)
     service_area = Column(String(255), nullable=True)

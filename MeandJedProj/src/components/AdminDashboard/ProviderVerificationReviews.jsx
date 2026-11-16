@@ -10,6 +10,7 @@ import "./AdminVerificationReviews.css";
 function ProviderVerificationReviews({ onBack }) {
     const [requests, setRequests] = useState([]);
     const [documentUrls, setDocumentUrls] = useState({});
+    const [pdfDocuments, setPdfDocuments] = useState({});
     const [documentErrors, setDocumentErrors] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -45,10 +46,11 @@ function ProviderVerificationReviews({ onBack }) {
 
         const loadDocuments = async () => {
             const loaded = {};
+            const pdfs = {};
             const failures = {};
             await Promise.all(
                 requests.flatMap((request) =>
-                    ["front", "back"].map(async (side) => {
+                    ["front", "back", "clearance"].map(async (side) => {
                         if (!request.documents?.[side]) {
                             return;
                         }
@@ -61,6 +63,7 @@ function ProviderVerificationReviews({ onBack }) {
                             const url = URL.createObjectURL(blob);
                             urls.push(url);
                             loaded[key] = url;
+                            pdfs[key] = blob.type === "application/pdf";
                         } catch (documentError) {
                             failures[key] =
                                 documentError?.message ||
@@ -71,6 +74,7 @@ function ProviderVerificationReviews({ onBack }) {
             );
             if (active) {
                 setDocumentUrls(loaded);
+                setPdfDocuments(pdfs);
                 setDocumentErrors(failures);
             } else {
                 urls.forEach((url) => URL.revokeObjectURL(url));
@@ -176,8 +180,10 @@ function ProviderVerificationReviews({ onBack }) {
                         const documentsReady =
                             request.documents?.front &&
                             request.documents?.back &&
+                            request.documents?.clearance &&
                             documentUrls[`${request.providerId}-front`] &&
-                            documentUrls[`${request.providerId}-back`];
+                            documentUrls[`${request.providerId}-back`] &&
+                            documentUrls[`${request.providerId}-clearance`];
 
                         return (
                             <article
@@ -255,18 +261,14 @@ function ProviderVerificationReviews({ onBack }) {
                                         </span>
                                     </div>
                                     <div className="verification-document-grid">
-                                        {["front", "back"].map((side) => {
+                                        {[["front", "Front image"], ["back", "Back image"], ["clearance", `${request.clearanceType === "nbi" ? "NBI" : "Police"} clearance`]].map(([side, label]) => {
                                             const key = `${request.providerId}-${side}`;
                                             return (
                                                 <div
                                                     className="verification-document"
                                                     key={side}
                                                 >
-                                                    <strong>
-                                                        {side === "front"
-                                                            ? "Front image"
-                                                            : "Back image"}
-                                                    </strong>
+                                                    <strong>{label}</strong>
                                                     {documentUrls[key] ? (
                                                         <a
                                                             href={documentUrls[key]}
@@ -274,10 +276,11 @@ function ProviderVerificationReviews({ onBack }) {
                                                             rel="noreferrer"
                                                             aria-label={`Open ID ${side} image in new tab`}
                                                         >
-                                                            <img
-                                                                src={documentUrls[key]}
-                                                                alt={`Provider ID ${side}`}
-                                                            />
+                                                            {pdfDocuments[key] ? (
+                                                                <iframe title={`${label} document`} src={documentUrls[key]} style={{ width: "100%", height: 300 }} />
+                                                            ) : (
+                                                                <img src={documentUrls[key]} alt={`Provider ${label}`} />
+                                                            )}
                                                         </a>
                                                     ) : (
                                                         <span className="verification-document-placeholder">
@@ -295,8 +298,7 @@ function ProviderVerificationReviews({ onBack }) {
 
                                 <div className="verification-review-actions">
                                     <span>
-                                        Confirm the account details match the
-                                        submitted identity documents.
+                                        Review the submitted identity documents and clearance.
                                     </span>
                                     <button
                                         type="button"

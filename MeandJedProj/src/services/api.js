@@ -95,6 +95,21 @@ export async function uploadProviderId(idSide, file) {
     return data;
 }
 
+export async function uploadProviderClearance(clearanceType, file) {
+    const formData = new FormData();
+    formData.append('clearance_type', clearanceType);
+    formData.append('file', file);
+    const headers = token() ? { Authorization: `Bearer ${token()}` } : {};
+    const response = await fetch(`${API_URL}/provider-verification/upload-clearance`, {
+        method: 'POST',
+        headers,
+        body: formData,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.detail || 'Failed to upload clearance.');
+    return data;
+}
+
 export async function getProviderVerification() {
     return api('/provider-verification/me');
 }

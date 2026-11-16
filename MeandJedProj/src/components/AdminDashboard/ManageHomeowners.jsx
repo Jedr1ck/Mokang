@@ -6,7 +6,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import "./AdminDashboard.css";
 import { getAdminHomeowners } from "../../services/api";
-import CreateAccountModal from "./CreateAccountModal";
 
 function ManageHomeowners() {
     // =====================================================
@@ -16,7 +15,6 @@ function ManageHomeowners() {
     const [homeowners, setHomeowners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState("");
-    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
@@ -316,17 +314,6 @@ function ManageHomeowners() {
                     <p>
                         View and manage registered homeowner accounts.
                     </p>
-                </div>
-
-                <div className="admin-management-header-actions">
-                    <button
-                        type="button"
-                        className="btn btn-success"
-                        onClick={() => setShowCreateModal(true)}
-                    >
-                        <i className="bi bi-person-plus-fill me-2"></i>
-                        Add Homeowner
-                    </button>
                 </div>
 
             </div>
@@ -672,25 +659,7 @@ function ManageHomeowners() {
                         ) : (
                             "Showing 0 to 0 of 0"
                         )}
-
-                        {showCreateModal && (
-                        <CreateAccountModal
-                            role="homeowner"
-                            onClose={() => setShowCreateModal(false)}
-                            onCreated={async () => {
-                                const data = await getAdminHomeowners();
-                                setHomeowners(data.map((homeowner) => ({
-                                    ...homeowner,
-                                    contact: homeowner.contact || "—",
-                                    location: homeowner.location || "—",
-                                    status: homeowner.status || "Inactive",
-                                })));
-                                setLoadError("");
-                            }}
-                        />
-                        )}
-
-                    </div>
+</div>
 
                     <div className="admin-pagination-controls">
 

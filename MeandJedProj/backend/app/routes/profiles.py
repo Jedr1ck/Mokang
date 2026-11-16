@@ -16,6 +16,7 @@ from app.common import (
     get_current_provider,
     get_session,
     is_at_least_16,
+    is_at_least_21,
     notify_admins,
     pwd,
     provider_has_future_availability,
@@ -114,6 +115,12 @@ def update_my_profile():
             and not is_at_least_16(data.birthday)
         ):
             raise ApiError("Homeowners must be at least 16 years old.", 422)
+        if (
+            user.role == "provider"
+            and data.birthday is not None
+            and not is_at_least_21(data.birthday)
+        ):
+            raise ApiError("Providers must be at least 21 years old.", 422)
         profile = session.query(UserProfile).filter_by(user_id=user.id).first()
         if profile is None:
             profile = UserProfile(user_id=user.id)
@@ -256,6 +263,67 @@ def upload_provider_id():
         return jsonify(message=f"ID {id_side} uploaded successfully.", id_side=id_side)
 
 
+@profiles_bp.post("/provider-verification/upload-clearance")
+@require_auth
+def upload_provider_clearance():
+    uploaded_file = request.files.get("file")
+    clearance_type = request.form.get("clearance_type", "").strip().lower()
+    if not uploaded_file:
+        raise ApiError("Field required: file", 422)
+    if clearance_type not in ("nbi", "police"):
+        raise ApiError("Select an NBI or police clearance.", 400)
+
+    with get_session() as session:
+        user = current_user(session)
+        if user.role != "provider":
+            raise ApiError("Providers only.", 403)
+        provider = get_current_provider(user, session)
+        if provider.verification_status == "verified":
+            raise ApiError("Your provider profile is already verified.", 400)
+
+        content = uploaded_file.stream.read(MAX_ID_SIZE + 1)
+        if not content:
+            raise ApiError("The uploaded file is empty.", 400)
+        if len(content) > MAX_ID_SIZE:
+            raise ApiError("Maximum clearance file size is 5 MB.", 413)
+
+        if content.startswith(b"%PDF-"):
+            extension = ".pdf"
+        elif content.startswith(b"\xff\xd8\xff"):
+            extension = ".jpg"
+        elif content.startswith(b"\x89PNG\r\n\x1a\n"):
+            extension = ".png"
+        elif len(content) >= 12 and content[:4] == b"RIFF" and content[8:12] == b"WEBP":
+            extension = ".webp"
+        else:
+            raise ApiError("Upload a valid PDF, JPG, PNG, or WEBP file.", 400)
+
+        provider_dir = ID_UPLOAD_DIR / str(user.id)
+        provider_dir.mkdir(parents=True, exist_ok=True)
+        destination = provider_dir / f"clearance_{uuid.uuid4().hex}{extension}"
+        old_path_value = provider.clearance_path
+        try:
+            destination.write_bytes(content)
+            provider.clearance_path = destination.relative_to(
+                Path(__file__).resolve().parents[1]
+            ).as_posix()
+            provider.clearance_type = clearance_type
+            provider.verification_status = "incomplete"
+            provider.verification_submitted_at = None
+            session.commit()
+        except Exception as error:
+            session.rollback()
+            destination.unlink(missing_ok=True)
+            raise ApiError("Unable to save the clearance document.", 500) from error
+
+        if old_path_value:
+            app_root = Path(__file__).resolve().parents[1]
+            old_path = (app_root / old_path_value).resolve()
+            if old_path.is_relative_to(provider_dir.resolve()) and old_path != destination.resolve():
+                old_path.unlink(missing_ok=True)
+        return jsonify(message="Clearance document uploaded successfully.")
+
+
 @profiles_bp.get("/provider-verification/me")
 @require_auth
 def get_provider_verification():
@@ -340,6 +408,8 @@ def get_provider_verification():
                 "id_type": provider.id_type,
                 "id_front_path": provider.id_front_path,
                 "id_back_path": provider.id_back_path,
+                "clearance_type": provider.clearance_type,
+                "clearance_uploaded": bool(provider.clearance_path),
                 "qualifications": provider.qualifications,
                 "portfolio_paths": provider.portfolio_paths,
                 "service_area": provider.service_area,
@@ -562,6 +632,9 @@ def update_verified_provider_services():
 def submit_provider_verification():
     with get_session() as session:
         provider = get_current_provider(current_user(session), session)
+        birthday = provider.user.profile.birthday if provider.user.profile else None
+        if not birthday or not is_at_least_21(birthday):
+            raise ApiError("Providers must be at least 21 years old to apply.", 422)
         if provider.verification_status == "verified":
             raise ApiError("Your provider profile is already verified.", 400)
 
@@ -593,6 +666,8 @@ def submit_provider_verification():
                 "Please upload both the front and back of your valid ID first.",
                 400,
             )
+        if provider.clearance_type not in ("nbi", "police") or not provider.clearance_path:
+            raise ApiError("Please select and upload a valid NBI or police clearance first.", 400)
 
         provider.verification_status = "pending"
         provider.verification_submitted_at = datetime.utcnow()

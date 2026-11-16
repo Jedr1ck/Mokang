@@ -6,6 +6,7 @@ import {
     getProviderVerification,
     updateProviderVerification,
     uploadProviderId,
+    uploadProviderClearance,
     submitProviderVerification,
     updateVerifiedProviderServices,
 } from '../../services/api';
@@ -44,6 +45,13 @@ function todayDateInputValue() {
     const localDate = new Date(
         today.getTime() - today.getTimezoneOffset() * 60_000
     );
+    return localDate.toISOString().slice(0, 10);
+}
+
+function latestBirthdayForAge(age) {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - age);
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
     return localDate.toISOString().slice(0, 10);
 }
 
@@ -92,6 +100,7 @@ const initialVerification = {
     street: '',
     postal_code: '',
     id_type: '',
+    clearance_type: '',
     qualifications: '',
     service_area: '',
 };
@@ -385,6 +394,8 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [backPreview, setBackPreview] = useState('');
     const [frontUploaded, setFrontUploaded] = useState(false);
     const [backUploaded, setBackUploaded] = useState(false);
+    const [clearanceFile, setClearanceFile] = useState(null);
+    const [clearanceUploaded, setClearanceUploaded] = useState(false);
 
     const [status, setStatus] = useState('incomplete');
     const [loading, setLoading] = useState(true);
@@ -450,6 +461,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
                 if (verificationResult.status === 'fulfilled') {
                     const verificationData = verificationResult.value;
+                    setClearanceUploaded(Boolean(verificationData?.clearance_uploaded));
                     setVerification((previous) => ({
                         ...previous,
                         ...Object.fromEntries(
@@ -990,6 +1002,10 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                 setError('Please select your gender and birthday before continuing.');
                 return;
             }
+            if (calculateAge(profile.birthday) < 21) {
+                setError('Providers must be at least 21 years old to apply.');
+                return;
+            }
         }
 
         if (step === 1) {
@@ -1042,6 +1058,10 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
         if (step === 3 && !verification.id_type) {
             setError('Select the type of valid ID you will submit.');
+            return;
+        }
+        if (step === 3 && (!verification.clearance_type || !clearanceUploaded)) {
+            setError('Select and upload an NBI or police clearance.');
             return;
         }
 
@@ -1107,6 +1127,25 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
             setMessage(`${side === 'front' ? 'Front' : 'Back'} ID uploaded successfully.`);
         } catch (err) {
             setError(err.message || 'Unable to upload your ID.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    const uploadClearance = async () => {
+        if (!verification.clearance_type || !clearanceFile) {
+            setError('Select a clearance type and choose its document first.');
+            return;
+        }
+        setBusy(true);
+        setError('');
+        setMessage('');
+        try {
+            await uploadProviderClearance(verification.clearance_type, clearanceFile);
+            setClearanceUploaded(true);
+            setMessage('Clearance document uploaded for administrator review.');
+        } catch (err) {
+            setError(err.message || 'Unable to upload the clearance document.');
         } finally {
             setBusy(false);
         }
@@ -1495,7 +1534,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                             type="date"
                                             className="form-control"
                                             name="birthday"
-                                            max={todayDateInputValue()}
+                                            max={latestBirthdayForAge(21)}
                                             value={profile.birthday || ''}
                                             onChange={changeProfile}
                                         />
@@ -1956,14 +1995,14 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                             type="date"
                                             className="form-control"
                                             name="birthday"
-                                            max={todayDateInputValue()}
+                                            max={latestBirthdayForAge(21)}
                                             value={profile.birthday || ''}
                                             onChange={changeProfile}
                                         />
                                         <small className="provider-field-hint">
                                             {calculateAge(profile.birthday) === null
-                                                ? 'Your age will appear here after you select your birthday.'
-                                                : `Age: ${calculateAge(profile.birthday)} years old`}
+                                                ? 'Your age will appear here after you select your birthday. Providers must be 21 or older.'
+                                                : `Age: ${calculateAge(profile.birthday)} years old${calculateAge(profile.birthday) < 21 ? ' · Must be at least 21 to apply' : ''}`}
                                         </small>
                                     </div>
                                 </div>
@@ -2231,6 +2270,52 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                             {backUploaded ? 'Back ID Uploaded' : 'Upload Back ID'}
                                         </button>
                                     </div>
+                                </div>
+                                <div className="mt-4 p-3 border rounded">
+                                    <h5>Required clearance document</h5>
+                                    <p className="text-muted">
+                                        Submit a current NBI or police clearance. An administrator will review the document; uploading it does not guarantee approval or prove that a person is harmless.
+                                    </p>
+                                    <label className="form-label" htmlFor="provider-clearance-type">Clearance type</label>
+                                    <select
+                                        id="provider-clearance-type"
+                                        className="form-select mb-3"
+                                        value={verification.clearance_type || ''}
+                                        onChange={(event) => {
+                                            setVerification((current) => ({ ...current, clearance_type: event.target.value }));
+                                            setClearanceUploaded(false);
+                                        }}
+                                    >
+                                        <option value="">Select clearance type</option>
+                                        <option value="nbi">NBI Clearance</option>
+                                        <option value="police">Police Clearance</option>
+                                    </select>
+                                    <label className="form-label" htmlFor="provider-clearance-file">Clearance file (PDF, JPG, PNG, or WEBP; max 5 MB)</label>
+                                    <input
+                                        id="provider-clearance-file"
+                                        className="form-control"
+                                        type="file"
+                                        accept="application/pdf,image/jpeg,image/png,image/webp"
+                                        onChange={(event) => {
+                                            const file = event.target.files?.[0] || null;
+                                            if (file && file.size > 5 * 1024 * 1024) {
+                                                setError('Clearance files must be 5 MB or smaller.');
+                                                event.target.value = '';
+                                                return;
+                                            }
+                                            setError('');
+                                            setClearanceFile(file);
+                                            setClearanceUploaded(false);
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-success mt-3"
+                                        disabled={busy || !clearanceFile || !verification.clearance_type}
+                                        onClick={uploadClearance}
+                                    >
+                                        {clearanceUploaded ? 'Clearance Uploaded' : 'Upload Clearance'}
+                                    </button>
                                 </div>
                             </>
                         )}

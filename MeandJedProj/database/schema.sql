@@ -80,6 +80,8 @@ CREATE TABLE `provider_profiles` (
   `id_type` varchar(80) DEFAULT NULL,
   `id_front_path` varchar(500) DEFAULT NULL,
   `id_back_path` varchar(500) DEFAULT NULL,
+  `clearance_type` varchar(30) DEFAULT NULL,
+  `clearance_path` varchar(500) DEFAULT NULL,
   `qualifications` text DEFAULT NULL,
   `portfolio_paths` text DEFAULT NULL,
   `service_area` varchar(255) DEFAULT NULL,
