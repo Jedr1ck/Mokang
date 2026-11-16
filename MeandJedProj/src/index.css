@@ -3,17 +3,70 @@
 
 :root {
   font-size: 16px;
-  --theme-primary: #FF6900;
-  --theme-secondary: #F45B00;
-  --theme-gold: #FF6900;
-  --theme-background: #FFFFFF;
-  --theme-soft-blue: #F5F5F5;
-  --theme-surface: #FFFFFF;
-  --theme-border: #E5E5E5;
-  --theme-muted: #929292;
-  --theme-text: #303030;
-  --theme-charcoal: #303030;
-  --theme-primary-hover: #F45B00;
+  color-scheme: light;
+  --app-primary: #F47B20;
+  --app-primary-hover: #E96D16;
+  --app-background: #F7F5F0;
+  --app-surface: #FFFFFF;
+  --app-elevated: #FFFFFF;
+  --app-soft-surface: #F4F2ED;
+  --app-text: #252525;
+  --app-secondary-text: #6B7280;
+  --app-border: #E5E7EB;
+  --app-danger-surface: #FEF2F2;
+  --app-danger-text: #B42318;
+  --app-sidebar: #202020;
+  --theme-primary: var(--app-primary);
+  --theme-secondary: var(--app-primary-hover);
+  --theme-gold: var(--app-primary);
+  --theme-background: var(--app-background);
+  --theme-soft-blue: var(--app-soft-surface);
+  --theme-surface: var(--app-surface);
+  --theme-border: var(--app-border);
+  --theme-muted: var(--app-secondary-text);
+  --theme-text: var(--app-text);
+  --theme-charcoal: var(--app-text);
+  --theme-primary-hover: var(--app-primary-hover);
+  --bs-body-bg: var(--app-background);
+  --bs-body-color: var(--app-text);
+  --bs-secondary-color: var(--app-secondary-text);
+  --bs-border-color: var(--app-border);
+  --motion-fast: 160ms;
+  --motion-standard: 220ms;
+  --motion-enter: 280ms;
+  --motion-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --app-primary: #F47B20;
+  --app-primary-hover: #FF9140;
+  --app-background: #171717;
+  --app-surface: #262626;
+  --app-elevated: #303030;
+  --app-soft-surface: #303030;
+  --app-text: #F9FAFB;
+  --app-secondary-text: #D1D5DB;
+  --app-border: #404040;
+  --app-danger-surface: #3B1D1D;
+  --app-danger-text: #FECACA;
+  --theme-primary: var(--app-primary);
+  --theme-secondary: var(--app-primary-hover);
+  --theme-gold: var(--app-primary);
+  --theme-background: var(--app-background);
+  --theme-soft-blue: var(--app-soft-surface);
+  --theme-surface: var(--app-surface);
+  --theme-border: var(--app-border);
+  --theme-muted: var(--app-secondary-text);
+  --theme-text: var(--app-text);
+  --theme-charcoal: var(--app-text);
+  --theme-primary-hover: var(--app-primary-hover);
+  --bs-body-bg: var(--app-background);
+  --bs-body-color: var(--app-text);
+  --bs-secondary-color: var(--app-secondary-text);
+  --bs-border-color: var(--app-border);
+  --bs-secondary-bg: var(--app-elevated);
+  --bs-tertiary-bg: var(--app-surface);
 }
 
 * {
@@ -27,11 +80,11 @@ html {
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
-  color: #FF6900;
-  background: #F5F5F5;
+  color: var(--theme-charcoal);
+  background: var(--theme-background);
 }
 
 button,
@@ -64,6 +117,151 @@ h5,
 h6 {
   line-height: 1.2;
   letter-spacing: -0.02em;
+}
+
+/* Shared interaction and motion language across every portal. */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--motion-ease);
+}
+
+button:active,
+[role="button"]:active {
+  transform: translateY(1px);
+}
+
+:focus-visible {
+  outline: 3px solid rgba(244, 123, 32, 0.38);
+  outline-offset: 2px;
+}
+
+.app-route-transition {
+  min-height: 100vh;
+  animation: app-route-enter var(--motion-enter) var(--motion-ease);
+}
+
+@keyframes app-route-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card,
+.dashboard-box,
+.hp-panel,
+.quick-card,
+.service-card,
+.admin-stat-card,
+.provider-stat-card {
+  transition: transform var(--motion-standard) var(--motion-ease),
+    box-shadow var(--motion-standard) var(--motion-ease),
+    border-color var(--motion-standard) var(--motion-ease),
+    background-color var(--motion-standard) var(--motion-ease);
+}
+
+.card:hover,
+.dashboard-box:hover,
+.hp-panel:hover,
+.quick-card:hover,
+.service-card:hover,
+.admin-stat-card:hover,
+.provider-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(37, 37, 37, 0.08);
+}
+
+tbody tr {
+  transition: background-color var(--motion-fast) var(--motion-ease);
+}
+
+tbody tr:hover {
+  background-color: rgba(244, 123, 32, 0.045);
+}
+
+.dropdown-menu {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.985);
+  transform-origin: top center;
+  transition: opacity var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease),
+    display var(--motion-fast) allow-discrete;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@starting-style {
+  .dropdown-menu.show {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+}
+
+.modal.fade .modal-dialog {
+  transform: translateY(8px) scale(0.99);
+  transition: transform var(--motion-standard) var(--motion-ease);
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0) scale(1);
+}
+
+/* Bring key dashboard metrics in gently without animating every content row. */
+.homeowner-dashboard-stat,
+.provider-stat-grid > .provider-stat-card,
+.my-jobs-stats > .my-jobs-stat,
+.admin-overview-intro,
+.booking-insights-summary > *,
+.service-summary-card,
+.reviews-summary-card,
+.admin-management-summary-card {
+  animation: app-card-enter var(--motion-enter) var(--motion-ease) both;
+}
+
+@keyframes app-card-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Let real analytics render in with a short fade; preserve all chart values. */
+.booking-weekly-activity,
+.booking-forecast-chart {
+  animation: app-chart-enter 320ms var(--motion-ease) both;
+}
+
+@keyframes app-chart-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.homeowner-dashboard-status,
+.provider-status,
+.provider-calendar-status,
+.job-pill,
+.admin-status-badge,
+.status-badge,
+.booking-forecast-model-status {
+  transition: color var(--motion-standard) var(--motion-ease),
+    background-color var(--motion-standard) var(--motion-ease),
+    border-color var(--motion-standard) var(--motion-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 

@@ -8,6 +8,7 @@ import { api, getMyBookings } from '../../services/api';
 import HomeAddressMap from './HomeAddressMap';
 import { reverseGeocodeLocation } from './addressGeocoding';
 import { isWithinEchague } from '../../services/echagueLocation';
+import ConfirmDialog from '../ConfirmDialog';
 
 const EMPTY_PROFILE = {
     fullName: '',
@@ -86,6 +87,7 @@ export default function Profile() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [savingPhoto, setSavingPhoto] = useState(false);
+    const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
     const [error, setError] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
@@ -261,6 +263,12 @@ export default function Profile() {
             return;
         }
 
+        setShowSaveConfirm(true);
+    };
+
+    const confirmSaveProfile = async () => {
+        if (saving) return;
+        setShowSaveConfirm(false);
         setSaving(true);
 
         try {
@@ -817,6 +825,17 @@ export default function Profile() {
                     </div>
                 )}
             </main>
+            <ConfirmDialog
+                open={showSaveConfirm}
+                title="Are you sure you want to submit?"
+                message={editingAddress
+                    ? 'Save these changes to your home address and service location?'
+                    : 'Save the updated personal information to your profile?'}
+                confirmLabel="Yes, Submit"
+                busy={saving}
+                onConfirm={confirmSaveProfile}
+                onCancel={() => setShowSaveConfirm(false)}
+            />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import { updateMyProfile, updateMySecurity } from "../../services/api";
+import ConfirmDialog from "../ConfirmDialog";
 
 const defaultProfile = {
     firstName: "",
@@ -57,6 +58,7 @@ const buildInitialProfile = (user) => {
 function AdminProfile({ user }) {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [showSaveConfirm, setShowSaveConfirm] = useState(false);
     const [saveMessage, setSaveMessage] = useState({ type: "", text: "" });
     const [profile, setProfile] = useState(() => buildInitialProfile(user));
     const [draft, setDraft] = useState(() => buildInitialProfile(user));
@@ -74,6 +76,12 @@ function AdminProfile({ user }) {
 
     const handleSave = async () => {
         if (isSaving) return;
+        setShowSaveConfirm(true);
+    };
+
+    const confirmSave = async () => {
+        if (isSaving) return;
+        setShowSaveConfirm(false);
 
         setSaveMessage({ type: "", text: "" });
 
@@ -334,6 +342,15 @@ function AdminProfile({ user }) {
                     Cancel
                 </button>
             </div>
+            <ConfirmDialog
+                open={showSaveConfirm}
+                title="Are you sure you want to submit?"
+                message="Save your administrator profile and any password changes entered?"
+                confirmLabel="Yes, Submit"
+                busy={isSaving}
+                onConfirm={confirmSave}
+                onCancel={() => setShowSaveConfirm(false)}
+            />
         </div>
     );
 }

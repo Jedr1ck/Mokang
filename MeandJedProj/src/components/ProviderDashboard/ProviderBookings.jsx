@@ -1117,11 +1117,11 @@ const ProviderBookings = () => {
 
                         <ConfirmDialog
                         open={Boolean(confirmAction)}
-                        title={confirmAction?.status === 'Accepted' ? 'Accept booking?' : 'Decline booking?'}
+                        title={confirmAction?.status === 'Accepted' ? 'Are you sure you want to submit?' : 'Are you sure you want to remove this?'}
                         message={confirmAction
                             ? `${confirmAction.booking.requestNo} from ${confirmAction.booking.customerName}?`
                             : ''}
-                        confirmLabel={confirmAction?.status === 'Accepted' ? 'Accept booking' : 'Decline booking'}
+                        confirmLabel={confirmAction?.status === 'Accepted' ? 'Yes, Submit' : 'Yes, Remove'}
                         tone={confirmAction?.status === 'Accepted' ? 'primary' : 'danger'}
                         icon={confirmAction?.status === 'Accepted' ? 'bi-calendar-check' : 'bi-calendar-x'}
                         busy={actionBusy}

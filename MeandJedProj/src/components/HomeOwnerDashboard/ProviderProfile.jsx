@@ -141,11 +141,11 @@ const ProviderProfile = () => {
                         <button
                             className="btn btn-theme text-white rounded-pill fw-bold py-2"
                             onClick={() => setShowBookingModal(true)}
-                            disabled={provider.isOngoing || provider.availability === 'Unavailable'}
+                            disabled={provider.availability === 'Unavailable'}
                         >
-                            <i className="bi bi-calendar-check me-2"></i>{provider.isOngoing ? 'Currently On-going' : provider.availability === 'Unavailable' ? 'Unavailable' : 'Book Now'}
+                            <i className="bi bi-calendar-check me-2"></i>{provider.availability === 'Unavailable' ? 'Unavailable' : 'Book Now'}
                         </button>
-                        {(provider.isOngoing || provider.availability === 'Unavailable') && <small className="text-muted text-center">This provider is not accepting bookings right now. You can still view their profile.</small>}
+                        {provider.availability === 'Unavailable' && <small className="text-muted text-center">This provider is not accepting bookings right now. You can still view their profile.</small>}
                         <button
                             onClick={() => setIsSaved((saved) => !saved)}
                             className={`btn rounded-pill fw-semibold py-2 ${isSaved ? 'btn-danger text-white' : 'btn-outline-secondary'}`}

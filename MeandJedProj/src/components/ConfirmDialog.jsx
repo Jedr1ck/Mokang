@@ -1,12 +1,12 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './ConfirmDialog.css';
 
 const ConfirmDialog = ({
     open,
-    title,
+    title = 'Are you sure you want to submit?',
     message,
-    confirmLabel = 'Confirm',
+    confirmLabel = 'Yes, Submit',
     cancelLabel = 'Cancel',
     tone = 'primary',
     icon = 'bi-question-circle',
@@ -17,6 +17,18 @@ const ConfirmDialog = ({
     const cancelButtonRef = useRef(null);
     const cancelHandlerRef = useRef(onCancel);
     const dialogId = useId();
+    const [internalBusy, setInternalBusy] = useState(false);
+    const isBusy = busy || internalBusy;
+
+    const handleConfirm = async () => {
+        if (isBusy) return;
+        setInternalBusy(true);
+        try {
+            await onConfirm?.();
+        } finally {
+            setInternalBusy(false);
+        }
+    };
 
     useEffect(() => {
         cancelHandlerRef.current = onCancel;
@@ -27,7 +39,7 @@ const ConfirmDialog = ({
 
         const previousOverflow = document.body.style.overflow;
         const handleKeyDown = (event) => {
-            if (event.key === 'Escape' && !busy) cancelHandlerRef.current();
+            if (event.key === 'Escape' && !isBusy) cancelHandlerRef.current();
         };
         document.body.style.overflow = 'hidden';
         document.addEventListener('keydown', handleKeyDown);
@@ -37,7 +49,7 @@ const ConfirmDialog = ({
             document.body.style.overflow = previousOverflow;
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [busy, open]);
+    }, [isBusy, open]);
 
     if (!open) return null;
 
@@ -45,7 +57,7 @@ const ConfirmDialog = ({
         <div
             className="confirm-dialog-overlay"
             onMouseDown={(event) => {
-                if (event.target === event.currentTarget && !busy) onCancel();
+                if (event.target === event.currentTarget && !isBusy) onCancel();
             }}
         >
             <section
@@ -66,17 +78,22 @@ const ConfirmDialog = ({
                         type="button"
                         className="confirm-dialog-cancel"
                         onClick={onCancel}
-                        disabled={busy}
+                        disabled={isBusy}
                     >
                         {cancelLabel}
                     </button>
                     <button
                         type="button"
                         className="confirm-dialog-confirm"
-                        onClick={onConfirm}
-                        disabled={busy}
+                        onClick={handleConfirm}
+                        disabled={isBusy}
                     >
-                        {busy ? 'Please wait...' : confirmLabel}
+                        {isBusy ? (
+                            <span className="confirm-dialog-loading">
+                                <span className="confirm-dialog-spinner" aria-hidden="true" />
+                                Please wait...
+                            </span>
+                        ) : confirmLabel}
                     </button>
                 </div>
             </section>

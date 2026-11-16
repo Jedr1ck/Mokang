@@ -140,10 +140,11 @@ function PresenceHeartbeat() {
   return null;
 }
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
+
   return (
-    <Router>
-      <PresenceHeartbeat />
+    <div className="app-route-transition" key={location.pathname}>
       <Routes>
 
         {/* =================================================
@@ -346,6 +347,15 @@ function App() {
         />
 
       </Routes>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <PresenceHeartbeat />
+      <AppRoutes />
     </Router>
   );
 }

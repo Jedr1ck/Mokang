@@ -5,7 +5,6 @@ import { SERVICE_CATALOG } from '../../data/serviceCatalog';
 import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
 import './FindService.css';
 import myLogo from '../../assets/images/handyman-mark.svg';
-import heroBackground from '../../assets/images/hero-background.png';
 import cleaningImage from '../../assets/services/deep-cleaner.jpg';
 import plumbingImage from '../../assets/services/plumber.jpg';
 import airconImage from '../../assets/services/aircon.jpg';
@@ -15,14 +14,8 @@ import applianceImage from '../../assets/services/appliance-repair.jpg';
 import carpentryImage from '../../assets/services/carpenter.jpg';
 import pestImage from '../../assets/services/pest-control.jpg';
 import locksmithImage from '../../assets/services/locksmith.jpg';
-import massageImage from '../../assets/services/massage.jpg';
-import barberImage from '../../assets/services/barber.jpg';
-import nailImage from '../../assets/services/nail-technician.jpg';
-import makeupImage from '../../assets/services/makeup-artist.jpg';
-import caregiverImage from '../../assets/services/caregiver.jpg';
-import physicalTherapyImage from '../../assets/services/physical-therapist.jpg';
+
 import computerCctvImage from '../../assets/services/computer-cctv.jpg';
-import tutorFitnessImage from '../../assets/services/tutor-fitness.jpg';
 
 const CATEGORY_VISUALS = [
     { name: 'Deep Cleaner', matches: ['clean'], icon: 'bi-stars', color: 'mint', image: cleaningImage },
@@ -34,16 +27,10 @@ const CATEGORY_VISUALS = [
     { name: 'Carpenter', matches: ['carpent', 'wood'], icon: 'bi-hammer', color: 'orange', image: carpentryImage },
     { name: 'Pest Control Technician', matches: ['pest'], icon: 'bi-bug-fill', color: 'mint', image: pestImage },
     { name: 'Locksmith', matches: ['lock', 'key duplication'], icon: 'bi-key-fill', color: 'blue', image: locksmithImage },
-    { name: 'Massage Therapist', matches: ['massage'], icon: 'bi-heart-pulse', color: 'mint', image: massageImage },
-    { name: 'Hair Stylist / Barber', matches: ['hair', 'barber', 'haircut'], icon: 'bi-scissors', color: 'orange', image: barberImage },
-    { name: 'Nail Technician (Manicurist/Pedicurist)', matches: ['nail', 'manicure', 'pedicure'], icon: 'bi-hand-index-thumb', color: 'mint', image: nailImage },
-    { name: 'Makeup Artist', matches: ['makeup', 'make up'], icon: 'bi-brush', color: 'orange', image: makeupImage },
-    { name: 'Private Nurse / Caregiver', matches: ['nurse', 'caregiver', 'elderly assistance'], icon: 'bi-heart-pulse-fill', color: 'mint', image: caregiverImage },
-    { name: 'Physical Therapist', matches: ['physical therapist', 'rehabilitation', 'mobility exercises'], icon: 'bi-person-walking', color: 'blue', image: physicalTherapyImage },
     { name: 'Computer / CCTV Technician', matches: ['computer', 'cctv'], icon: 'bi-camera-video', color: 'blue', image: computerCctvImage },
-    { name: 'Private Tutor / Personal Fitness Trainer', matches: ['tutor', 'fitness', 'academic tutoring'], icon: 'bi-book', color: 'orange', image: tutorFitnessImage },
 ];
 const SERVICE_CATEGORIES = CATEGORY_VISUALS.filter((item) => item.name);
+const HIDDEN_BROWSE_CATEGORIES = new Set(['Massage Therapist', 'Hair Stylist / Barber', 'Nail Technician (Manicurist/Pedicurist)', 'Makeup Artist', 'Private Nurse / Caregiver', 'Physical Therapist', 'Private Tutor / Personal Fitness Trainer']);
 const visualFor = (label = '') => CATEGORY_VISUALS.find((item) => item.matches.some((word) => label.toLowerCase().includes(word))) || CATEGORY_VISUALS[0];
 const formatPrice = (price) => price == null ? 'Ask for price' : `₱${Number(price).toLocaleString()}`;
 const formatReviewDate = (date) => date ? new Date(date).toLocaleDateString() : '';
@@ -209,7 +196,7 @@ export default function FindService() {
 
     const serviceOffers = useMemo(() => {
         const catalogEntries = selectedCategory === 'All Services'
-            ? SERVICE_CATALOG
+            ? SERVICE_CATALOG.filter((entry) => !HIDDEN_BROWSE_CATEGORIES.has(entry.category))
             : SERVICE_CATALOG.filter((entry) => entry.category === selectedCategory);
         const normalizedQuery = query.trim().toLowerCase();
         return catalogEntries.flatMap((entry) => entry.services.map((name) => {
@@ -289,12 +276,6 @@ export default function FindService() {
             </header>
 
             <div className="find-services-content">
-                <section className="find-services-hero" style={{ backgroundImage: `url("${heroBackground}")` }}>
-                    <div className="find-services-hero-copy">
-                        <h1>Book the service <em>you want.</em></h1>
-                    </div>
-                </section>
-
                 <div className="find-services-category-bar">
                     <button type="button" className="find-services-category-arrow" aria-label="Scroll categories left" onClick={() => categoriesRef.current?.scrollBy({ left: -260, behavior: 'smooth' })}><i className="bi bi-chevron-left" /></button>
                     <nav className="find-services-categories" aria-label="Service categories" ref={categoriesRef}>
@@ -351,14 +332,14 @@ export default function FindService() {
                                 const providerServices = servicesForProvider(provider);
                                 const serviceName = providerServices[0]?.name || provider.category || 'Home service';
                                 const visual = visualFor(selectedCategory !== 'All Services' ? selectedCategory : provider.category || serviceName);
-                                const cannotBook = provider.isOngoing || String(provider.availability || 'Available').toLowerCase() !== 'available';
+                                const cannotBook = String(provider.availability || 'Available').toLowerCase() !== 'available';
                                 const selectProvider = () => { setSelectedProviderId(provider.id); setDetailTab('Details'); };
                                 return <article key={provider.id} className={`find-service-card ${effectiveProviderId === provider.id ? 'active' : ''}`} onClick={selectProvider}>
                                     <button type="button" className="find-service-card-image" aria-label={`View ${provider.name}`} style={{ backgroundImage: `url("${visual.image}")` }} onClick={selectProvider}><span className="find-service-verified"><i className="bi bi-patch-check-fill" /> Verified</span></button>
                                     <div className="find-service-card-body"><div className="find-service-card-title"><div><h3>{serviceName}</h3><p>{provider.name}</p></div><button type="button" className="find-service-open" aria-label={`View ${provider.name} details`} onClick={() => setSelectedProviderId(provider.id)}><i className="bi bi-arrow-up-right" /></button></div>
                                         <div className="find-service-card-meta"><span><i className="bi bi-star-fill" /> {provider.reviews > 0 ? `${provider.rating} (${provider.reviews} reviews)` : 'No reviews yet'}</span><span>{formatPrice(provider.rate)}</span></div>
                                         <p className="find-service-location"><i className="bi bi-geo-alt" /> {provider.location || 'Location not provided'}</p>
-                                        <button type="button" className="find-service-book" disabled={cannotBook} onClick={(event) => { event.stopPropagation(); openProviderProfile(provider.id); }}><i className="bi bi-calendar-check" /> {provider.isOngoing ? 'At Work' : cannotBook ? 'Unavailable' : 'Book Now'}</button>
+                                        <button type="button" className="find-service-book" disabled={cannotBook} onClick={(event) => { event.stopPropagation(); openProviderProfile(provider.id); }}><i className="bi bi-calendar-check" /> {cannotBook ? 'Unavailable' : 'Book Now'}</button>
                                     </div>
                                 </article>;
                             })}
@@ -378,7 +359,7 @@ export default function FindService() {
                                 <p className="find-service-detail-rating"><i className="bi bi-star-fill" /> {activeProviderDetails.rating > 0 ? Number(activeProviderDetails.rating).toFixed(1) : 'No reviews yet'} {activeProviderDetails.reviews > 0 && `(${activeProviderDetails.reviews} reviews)`}</p>
                                 <div className="find-service-detail-tabs">{['Details', 'Services', 'Reviews'].map((tab) => <button type="button" key={tab} className={detailTab === tab ? 'active' : ''} onClick={() => setDetailTab(tab)}>{tab}{tab === 'Reviews' && activeProviderDetails.reviews > 0 ? ` (${activeProviderDetails.reviews})` : ''}</button>)}</div>
                                 {detailTab === 'Details' ? <dl className="find-service-detail-list"><div><dt><i className="bi bi-person-badge" /> Provider</dt><dd>{activeProviderDetails.fullName || activeProviderDetails.name}</dd></div><div><dt><i className="bi bi-card-text" /> About</dt><dd>{activeProviderDetails.bio || activeProviderDetails.qualifications || 'Verified service provider.'}</dd></div><div><dt><i className="bi bi-geo-alt" /> Service Area</dt><dd>{activeProviderDetails.serviceArea || activeProviderDetails.location || 'Not provided'}</dd></div><div><dt><i className="bi bi-cash-coin" /> Starting Price</dt><dd>{formatPrice(activeProviderDetails.rate)}</dd></div></dl> : detailTab === 'Services' ? <div className="find-service-detail-list find-service-offerings">{bookingServices.length ? bookingServices.map((service, index) => <div key={`${service.name}-${index}`}><dt><i className="bi bi-check-circle" /> {service.name}</dt><dd>{formatPrice(service.price)}</dd></div>) : <p>Contact provider for service details.</p>}</div> : <div className="find-service-reviews">{activeProviderDetailsError ? <p className="find-service-no-reviews">{activeProviderDetailsError}</p> : activeProviderDetails.reviewDetails?.length ? activeProviderDetails.reviewDetails.map((review) => <article className="find-service-review" key={review.id}><div className="find-service-review-heading"><strong><i className="bi bi-person-circle" /> Homeowner</strong><span>{formatReviewDate(review.createdAt)}</span></div><p className="find-service-review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} <small>{review.rating}/5</small></p><p className="find-service-review-comment">{review.comment || 'No comment provided.'}</p>{review.service && <small className="find-service-review-service">{review.service}</small>}</article>) : <p className="find-service-no-reviews">{Array.isArray(activeProviderDetails.reviewDetails) ? 'Wala pang review para sa provider na ito.' : 'Naglo-load ang reviews...'}</p>}</div>}
-                                <button type="button" className="find-service-detail-book" disabled={activeProviderDetails.isOngoing || String(activeProviderDetails.availability || 'Available').toLowerCase() !== 'available'} onClick={() => openProviderProfile(activeProviderDetails.id)}><i className="bi bi-calendar-check" /> {activeProviderDetails.isOngoing ? 'At Work' : String(activeProviderDetails.availability || 'Available').toLowerCase() !== 'available' ? 'Unavailable' : 'Book Now'}</button>
+                                <button type="button" className="find-service-detail-book" disabled={String(activeProviderDetails.availability || 'Available').toLowerCase() !== 'available'} onClick={() => openProviderProfile(activeProviderDetails.id)}><i className="bi bi-calendar-check" /> {String(activeProviderDetails.availability || 'Available').toLowerCase() !== 'available' ? 'Unavailable' : 'Book Now'}</button>
                             </div>
                         </> : <div className="find-service-detail-empty"><i className="bi bi-hand-index-thumb" /><h3>Select a provider</h3><p>Choose a service card to see provider details.</p></div>}
                     </aside>}

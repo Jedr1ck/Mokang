@@ -6,6 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../index.css';
 
 import { loginWithRole, register } from '../../services/api';
+import ConfirmDialog from '../ConfirmDialog';
 
 const ProviderAuth = () => {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ const ProviderAuth = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showLoginPassword, setShowLoginPassword] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showRegisterConfirm, setShowRegisterConfirm] = useState(false);
+    const [registering, setRegistering] = useState(false);
 
     const [passwordError, setPasswordError] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -80,6 +83,13 @@ const ProviderAuth = () => {
             return;
         }
 
+        setShowRegisterConfirm(true);
+    };
+
+    const confirmRegister = async () => {
+        if (registering) return;
+        setRegistering(true);
+        setShowRegisterConfirm(false);
         try {
             setPasswordError('');
 
@@ -131,6 +141,8 @@ const ProviderAuth = () => {
                 error.message ||
                 'Registration failed. Please try again.'
             );
+        } finally {
+            setRegistering(false);
         }
     };
 
@@ -527,6 +539,15 @@ const ProviderAuth = () => {
                         </div>
                     </div>
                 )}
+            <ConfirmDialog
+                open={showRegisterConfirm}
+                title="Are you sure you want to submit?"
+                message={`Create a provider account for ${formData.fullName.trim()}?`}
+                confirmLabel="Yes, Submit"
+                busy={registering}
+                onConfirm={confirmRegister}
+                onCancel={() => setShowRegisterConfirm(false)}
+            />
             </div>
         </div>
     );

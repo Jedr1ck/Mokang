@@ -3,8 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { api, getCategories, getMyProfile, getProvider } from '../../services/api';
 import { isWithinEchague } from '../../services/echagueLocation';
+import ConfirmDialog from '../ConfirmDialog';
 
 const EMPTY_PROVIDER_SERVICES = [];
+const timeToMinutes = (time = '') => {
+    const [hour, minute] = String(time).split(':').map(Number);
+    return Number.isFinite(hour) && Number.isFinite(minute) ? hour * 60 + minute : 0;
+};
 const profileFieldLabels = {
     fullName: 'full name',
     mobileNumber: 'mobile number',
@@ -12,6 +17,36 @@ const profileFieldLabels = {
     address: 'address',
     birthday: 'birthday',
 };
+
+function slotsForWeeklySchedule(schedule) {
+    if (!schedule || Array.isArray(schedule) || typeof schedule !== 'object') return [];
+    const now = new Date();
+    const today = new Date(now);
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const todayValue = today.toISOString().slice(0, 10);
+    const weekStart = new Date(`${todayValue}T12:00:00`);
+    weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+    const weekStartValue = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
+    if (schedule._week_start !== weekStartValue) return [];
+    const currentTime = now.toTimeString().slice(0, 5);
+    const slots = [];
+
+    for (let offset = 0; offset < 7; offset += 1) {
+        const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12);
+        const dateValue = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const hours = schedule[date.toLocaleDateString('en-US', { weekday: 'long' })];
+        if (!hours || hours.enabled !== true || !/^\d{2}:\d{2}$/.test(hours.start || '') || !/^\d{2}:\d{2}$/.test(hours.end || '')) continue;
+        const [startHour, startMinute] = hours.start.split(':').map(Number);
+        const [endHour, endMinute] = hours.end.split(':').map(Number);
+        const start = startHour * 60 + startMinute;
+        const end = endHour * 60 + endMinute;
+        for (let minute = start; minute < end; minute += 30) {
+            const time = `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`;
+            if (dateValue > todayValue || time > currentTime) slots.push({ date: dateValue, time });
+        }
+    }
+    return slots;
+}
 
 const BookingModal = ({
     show,
@@ -23,6 +58,8 @@ const BookingModal = ({
     const navigate = useNavigate();
 
     const [bookingSubmitted, setBookingSubmitted] = useState(false);
+    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+    const [submittingBooking, setSubmittingBooking] = useState(false);
     const [createdBooking, setCreatedBooking] = useState(null);
     const [formError, setFormError] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
@@ -33,7 +70,7 @@ const BookingModal = ({
     const [selectedServiceIndex, setSelectedServiceIndex] = useState('');
     const [availabilitySlots, setAvailabilitySlots] = useState([]);
     const [bookedSlots, setBookedSlots] = useState([]);
-    const [providerOngoing, setProviderOngoing] = useState(false);
+    const [workingSchedule, setWorkingSchedule] = useState([]);
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     const todayValue = today.toISOString().slice(0, 10);
@@ -41,12 +78,24 @@ const BookingModal = ({
     weekEndDate.setDate(weekEndDate.getDate() + (6 - ((weekEndDate.getDay() + 6) % 7)));
     const weekEndValue = `${weekEndDate.getFullYear()}-${String(weekEndDate.getMonth() + 1).padStart(2, '0')}-${String(weekEndDate.getDate()).padStart(2, '0')}`;
     const currentTime = new Date().toTimeString().slice(0, 5);
-    const allAvailabilitySlots = availabilitySlots;
-    const effectiveAvailabilitySlots = allAvailabilitySlots.filter((slot) => !bookedSlots.some(
-        (booked) => booked.date === slot.date && booked.time === slot.time
-    ) && slot.date >= todayValue && slot.date <= weekEndValue && (slot.date > todayValue || slot.time > currentTime));
-    const availableDates = [...new Set(effectiveAvailabilitySlots.map((slot) => slot.date))].filter((date) => date >= todayValue).sort();
     const selectedService = serviceOptions[Number(selectedServiceIndex)] || null;
+    const requestedDuration = Math.max(1, Number(selectedService?.durationMinutes) || 60);
+    const allAvailabilitySlots = availabilitySlots;
+    const effectiveAvailabilitySlots = allAvailabilitySlots.filter((slot) => {
+        if (slot.date < todayValue || slot.date > weekEndValue || (slot.date === todayValue && slot.time <= currentTime)) return false;
+        const weekday = new Date(`${slot.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long' });
+        const workingHours = workingSchedule?.[weekday];
+        if (workingHours?.enabled === true && timeToMinutes(slot.time) + requestedDuration > timeToMinutes(workingHours.end)) return false;
+        const requestedStart = timeToMinutes(slot.time);
+        const requestedEnd = requestedStart + requestedDuration;
+        return !bookedSlots.some((booked) => {
+            if (booked.date !== slot.date) return false;
+            const bookedStart = timeToMinutes(booked.time);
+            const bookedEnd = bookedStart + Math.max(1, Number(booked.durationMinutes) || 60);
+            return requestedStart < bookedEnd && bookedStart < requestedEnd;
+        });
+    });
+    const availableDates = [...new Set(effectiveAvailabilitySlots.map((slot) => slot.date))].filter((date) => date >= todayValue).sort();
 
     // Address autocomplete states
     const [addressSuggestions, setAddressSuggestions] = useState([]);
@@ -119,9 +168,11 @@ const BookingModal = ({
         getProvider(providerId)
             .then((provider) => {
                 if (!active) return;
-                setAvailabilitySlots(provider.availabilitySlots || []);
+                const savedSlots = provider.availabilitySlots || [];
+                const schedule = provider.workingSchedule || [];
+                setWorkingSchedule(schedule);
+                setAvailabilitySlots(savedSlots.length ? savedSlots : slotsForWeeklySchedule(schedule));
                 setBookedSlots(provider.bookedSlots || []);
-                setProviderOngoing(Boolean(provider.isOngoing));
             })
             .catch((error) => { if (active) setFormError(error.message || 'Unable to load provider availability.'); });
         return () => { active = false; };
@@ -311,11 +362,6 @@ const BookingModal = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (providerOngoing) {
-            setFormError('This provider is currently working on another booking. Please check again later.');
-            return;
-        }
-
         const errors = {};
         if (!formData.category.trim()) errors.category = 'Choose a service category.';
         if (!formData.preferredDate) errors.preferredDate = 'Choose a service date.';
@@ -370,7 +416,12 @@ const BookingModal = ({
         }
 
         setFormError('');
+        setShowSubmitConfirm(true);
+    };
 
+    const submitBooking = async () => {
+        if (submittingBooking) return;
+        setSubmittingBooking(true);
         try {
             const booking = await api('/bookings', {
                 method: 'POST',
@@ -386,14 +437,17 @@ const BookingModal = ({
             });
             setCreatedBooking(booking);
             setBookingSubmitted(true);
+            setShowSubmitConfirm(false);
         } catch (error) {
             const message = error?.message || 'Request failed';
-
             setFormError(
                 message.includes('Homeowners only')
                     ? 'Only homeowners can create bookings. Please log in with a homeowner account.'
                     : message
             );
+            setShowSubmitConfirm(false);
+        } finally {
+            setSubmittingBooking(false);
         }
     };
 
@@ -409,7 +463,7 @@ const BookingModal = ({
         setSelectedAddressCoords(null);
         setAvailabilitySlots([]);
         setBookedSlots([]);
-        setProviderOngoing(false);
+        setWorkingSchedule([]);
         handleClose();
     };
 
@@ -446,7 +500,6 @@ const BookingModal = ({
                     <div className="modal-body p-4">
                         {!bookingSubmitted ? (
                             <>
-                                {providerOngoing && <div className="alert alert-warning" role="status">This provider is currently working on another booking. You can view their profile, but booking is temporarily unavailable.</div>}
                                 <form onSubmit={handleSubmit}>
                                 {missingProfileFields.length > 0 && (
                                     <div className="alert alert-warning" role="alert">
@@ -701,7 +754,7 @@ const BookingModal = ({
                                     <button
                                         type="submit"
                                         className="btn btn-warning text-white rounded-pill px-4 fw-bold"
-                                        disabled={providerOngoing || checkingProfile || Boolean(profileCheckError) || missingProfileFields.length > 0}
+                                        disabled={checkingProfile || Boolean(profileCheckError) || missingProfileFields.length > 0}
                                     >
                                         Confirm Booking
                                     </button>
@@ -745,6 +798,15 @@ const BookingModal = ({
                     </div>
                 </div>
             </div>
+            <ConfirmDialog
+                open={showSubmitConfirm}
+                title="Are you sure you want to submit?"
+                message={`Submit a ${selectedService?.name || formData.category} booking for ${formData.preferredDate} at ${formData.preferredTime}?`}
+                confirmLabel="Yes, Submit"
+                busy={submittingBooking}
+                onConfirm={submitBooking}
+                onCancel={() => setShowSubmitConfirm(false)}
+            />
         </div>
     );
 };

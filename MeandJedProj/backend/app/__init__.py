@@ -28,8 +28,8 @@ DEFAULT_SERVICE_CATEGORIES = (
     "Makeup Artist",
     "Private Nurse / Caregiver",
     "Physical Therapist",
-    "Computer / CCTV Technician",
     "Private Tutor / Personal Fitness Trainer",
+    "Computer / CCTV Technician",
 )
 
 

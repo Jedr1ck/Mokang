@@ -188,22 +188,12 @@ const serviceCategories = [
         ],
     },
     {
-        name: 'Deep Cleaner',
-        tasks: [
-            'Deep House Cleaning',
-            'Kitchen Cleaning',
-            'Bathroom Cleaning',
-            'Move-in / Move-out Cleaning',
-            'Upholstery Cleaning',
-        ],
-    },
-    {
         name: 'Massage Therapist',
         tasks: [
             'Relaxation Massage',
             'Swedish Massage',
             'Traditional Massage',
-            'Full-body Massage',
+            'Full-Body Massage',
             'Targeted Muscle Relaxation',
         ],
     },
@@ -213,7 +203,7 @@ const serviceCategories = [
             'Haircut',
             'Hair Styling',
             'Hair Coloring',
-            'Blow-dry',
+            'Blow-Dry',
             'Beard Trimming',
         ],
     },
@@ -242,7 +232,6 @@ const serviceCategories = [
         tasks: [
             'Elderly Assistance',
             'Personal Care Assistance',
-            'Companionship',
             'Daily Living Support',
             'Basic Patient Assistance',
         ],
@@ -258,6 +247,16 @@ const serviceCategories = [
         ],
     },
     {
+        name: 'Private Tutor / Personal Fitness Trainer',
+        tasks: [
+            'Academic Tutoring',
+            'Subject Review',
+            'Homework Assistance',
+            'Personal Fitness Training',
+            'Workout Guidance',
+        ],
+    },
+    {
         name: 'Computer / CCTV Technician',
         tasks: [
             'Computer Troubleshooting',
@@ -268,13 +267,13 @@ const serviceCategories = [
         ],
     },
     {
-        name: 'Private Tutor / Personal Fitness Trainer',
+        name: 'Deep Cleaner',
         tasks: [
-            'Academic Tutoring',
-            'Subject Review',
-            'Homework Assistance',
-            'Personal Fitness Training',
-            'Workout Guidance',
+            'Deep House Cleaning',
+            'Kitchen Cleaning',
+            'Bathroom Cleaning',
+            'Move-in / Move-out Cleaning',
+            'Upholstery Cleaning',
         ],
     },
 ];

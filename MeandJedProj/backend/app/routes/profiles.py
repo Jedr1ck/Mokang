@@ -9,16 +9,20 @@ from sqlalchemy.exc import IntegrityError
 
 from app.common import (
     ApiError,
+    current_week_start,
     ID_UPLOAD_DIR,
     MAX_ID_SIZE,
     current_user,
     get_current_provider,
     get_session,
+    is_at_least_16,
     notify_admins,
     pwd,
+    provider_has_future_availability,
     require_auth,
     user_out,
     validated,
+    weekly_schedule_has_future_window,
 )
 from app.models import Category, ProviderService, User, UserProfile
 from app.schemas import (
@@ -33,6 +37,14 @@ profiles_bp = Blueprint("profiles", __name__)
 
 
 def replace_provider_services(session, provider_id, service_selections, hourly_rate=None):
+    previous_durations = {}
+    for service in session.query(ProviderService).filter_by(provider_id=provider_id).all():
+        category_name = service.category.name.casefold() if service.category else ""
+        for title in (service.title or "").split(","):
+            if title.strip():
+                previous_durations[(category_name, title.strip().casefold())] = (
+                    service.duration_minutes or 60
+                )
     missing_prices = [
         title.strip()
         for selection in service_selections
@@ -75,6 +87,10 @@ def replace_provider_services(session, provider_id, service_selections, hourly_r
                     category_id=category.id,
                     title=service_title,
                     rate=selection.service_rates.get(title, hourly_rate),
+                    duration_minutes=previous_durations.get(
+                        (selection.category.strip().casefold(), service_title.casefold()),
+                        60,
+                    ),
                 )
             )
 
@@ -92,6 +108,12 @@ def update_my_profile():
     data = validated(ProfileUpdate)
     with get_session() as session:
         user = current_user(session)
+        if (
+            user.role == "homeowner"
+            and data.birthday is not None
+            and not is_at_least_16(data.birthday)
+        ):
+            raise ApiError("Homeowners must be at least 16 years old.", 422)
         profile = session.query(UserProfile).filter_by(user_id=user.id).first()
         if profile is None:
             profile = UserProfile(user_id=user.id)
@@ -279,6 +301,12 @@ def get_provider_verification():
             }
             for category_name, service_data in grouped_services.items()
         ]
+        effective_availability_status = provider.availability_status
+        if (
+            (provider.availability_status or "Available") == "Available"
+            and not provider_has_future_availability(provider)
+        ):
+            effective_availability_status = "Unavailable"
         return jsonify(
             {
                 "id": provider.id,
@@ -290,7 +318,7 @@ def get_provider_verification():
                     if provider.hourly_rate is not None
                     else None
                 ),
-                "availability_status": provider.availability_status,
+                "availability_status": effective_availability_status,
                 "verification_status": provider.verification_status,
                 "verification_submitted_at": (
                     provider.verification_submitted_at.isoformat()
@@ -390,7 +418,48 @@ def update_provider_verification():
 def update_provider_availability():
     data = request.get_json(silent=True) or {}
     if "working_schedule" in data:
-        raise ApiError("Set availability for specific dates from Monday through Sunday.", 422)
+        schedule = data.get("working_schedule")
+        days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        if not isinstance(schedule, dict):
+            raise ApiError("Working schedule must contain each weekday.", 422)
+        normalized = {}
+        for day in days:
+            row = schedule.get(day)
+            if not isinstance(row, dict):
+                raise ApiError(f"Missing working hours for {day}.", 422)
+            start = str(row.get("start", ""))
+            end = str(row.get("end", ""))
+            try:
+                start_time = datetime.strptime(start, "%H:%M").time()
+                end_time = datetime.strptime(end, "%H:%M").time()
+            except ValueError as error:
+                raise ApiError(f"Set valid 24-hour times for {day}.", 422) from error
+            enabled = row.get("enabled") is True
+            if enabled and end_time <= start_time:
+                raise ApiError(f"End time must be after start time for {day}.", 422)
+            normalized[day] = {
+                "enabled": enabled,
+                "start": start,
+                "end": end,
+            }
+        normalized["_week_start"] = current_week_start()
+
+        with get_session() as session:
+            provider = get_current_provider(current_user(session), session)
+            provider.working_schedule = json.dumps(normalized)
+            provider.availability_slots = "[]"
+            provider.availability_status = (
+                "Available"
+                if weekly_schedule_has_future_window(normalized)
+                else "Unavailable"
+            )
+            session.commit()
+            return jsonify(
+                working_schedule=normalized,
+                availability_slots=[],
+                availability_status=provider.availability_status,
+            )
+
     slots = data.get("availability_slots")
     if not isinstance(slots, list) or len(slots) > 168:
         raise ApiError("Availability must be a list of up to 168 date and time slots.", 422)
@@ -419,8 +488,15 @@ def update_provider_availability():
         provider = get_current_provider(current_user(session), session)
         provider.availability_slots = json.dumps(normalized)
         provider.working_schedule = "[]"
+        # Saving an open schedule means the provider is ready to receive
+        # requests for those time slots. The separate dashboard toggle can
+        # still pause availability after the schedule has been saved.
+        provider.availability_status = "Available" if normalized else "Unavailable"
         session.commit()
-        return jsonify(availability_slots=normalized)
+        return jsonify(
+            availability_slots=normalized,
+            availability_status=provider.availability_status,
+        )
 
 
 @profiles_bp.put("/provider-availability/status")
@@ -435,6 +511,12 @@ def update_provider_availability_status():
         provider = get_current_provider(current_user(session), session)
         if provider.verification_status != "verified":
             raise ApiError("Only verified providers can change availability.", 403)
+        if availability_status == "Available":
+            if not provider_has_future_availability(provider):
+                raise ApiError(
+                    "This week's availability has expired or has no remaining hours. Save a schedule with future hours before going online.",
+                    409,
+                )
         provider.availability_status = availability_status
         session.commit()
         return jsonify(availability_status=provider.availability_status)

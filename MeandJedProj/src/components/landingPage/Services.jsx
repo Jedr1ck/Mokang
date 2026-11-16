@@ -12,14 +12,7 @@ import painterImage from "../../assets/services/painter.jpg";
 import applianceRepairImage from "../../assets/services/appliance-repair.jpg";
 import locksmithImage from "../../assets/services/locksmith.jpg";
 import deepCleanerImage from "../../assets/services/deep-cleaner.jpg";
-import massageImage from "../../assets/services/massage.jpg";
-import barberImage from "../../assets/services/barber.jpg";
-import nailTechnicianImage from "../../assets/services/nail-technician.jpg";
-import makeupArtistImage from "../../assets/services/makeup-artist.jpg";
-import caregiverImage from "../../assets/services/caregiver.jpg";
-import physicalTherapistImage from "../../assets/services/physical-therapist.jpg";
 import computerCctvImage from "../../assets/services/computer-cctv.jpg";
-import tutorFitnessImage from "../../assets/services/tutor-fitness.jpg";
 
 function Services() {
     const navigate = useNavigate();
@@ -113,83 +106,6 @@ function Services() {
             ],
         },
         {
-            name: "Deep Cleaner",
-            image: deepCleanerImage,
-            tasks: [
-                "Deep House Cleaning",
-                "Kitchen Cleaning",
-                "Bathroom Cleaning",
-                "Move-in / Move-out Cleaning",
-                "Upholstery Cleaning",
-            ],
-        },
-        {
-            name: "Massage Therapist",
-            image: massageImage,
-            tasks: [
-                "Relaxation Massage",
-                "Swedish Massage",
-                "Traditional Massage",
-                "Full-body Massage",
-                "Targeted Muscle Relaxation",
-            ],
-        },
-        {
-            name: "Hair Stylist / Barber",
-            image: barberImage,
-            tasks: [
-                "Haircut",
-                "Hair Styling",
-                "Hair Coloring",
-                "Blow-dry",
-                "Beard Trimming",
-            ],
-        },
-        {
-            name: "Nail Technician (Manicurist/Pedicurist)",
-            image: nailTechnicianImage,
-            tasks: [
-                "Manicure",
-                "Pedicure",
-                "Nail Cleaning",
-                "Nail Polish Application",
-                "Basic Nail Art",
-            ],
-        },
-        {
-            name: "Makeup Artist",
-            image: makeupArtistImage,
-            tasks: [
-                "Everyday Makeup",
-                "Event Makeup",
-                "Debut Makeup",
-                "Bridal Makeup",
-                "Photoshoot Makeup",
-            ],
-        },
-        {
-            name: "Private Nurse / Caregiver",
-            image: caregiverImage,
-            tasks: [
-                "Elderly Assistance",
-                "Personal Care Assistance",
-                "Companionship",
-                "Daily Living Support",
-                "Basic Patient Assistance",
-            ],
-        },
-        {
-            name: "Physical Therapist",
-            image: physicalTherapistImage,
-            tasks: [
-                "Mobility Exercises",
-                "Rehabilitation Sessions",
-                "Movement Assessment",
-                "Therapeutic Exercise",
-                "Recovery Support",
-            ],
-        },
-        {
             name: "Computer / CCTV Technician",
             image: computerCctvImage,
             tasks: [
@@ -201,14 +117,14 @@ function Services() {
             ],
         },
         {
-            name: "Private Tutor / Personal Fitness Trainer",
-            image: tutorFitnessImage,
+            name: "Deep Cleaner",
+            image: deepCleanerImage,
             tasks: [
-                "Academic Tutoring",
-                "Subject Review",
-                "Homework Assistance",
-                "Personal Fitness Training",
-                "Workout Guidance",
+                "Deep House Cleaning",
+                "Kitchen Cleaning",
+                "Bathroom Cleaning",
+                "Move-in / Move-out Cleaning",
+                "Upholstery Cleaning",
             ],
         },
     ];

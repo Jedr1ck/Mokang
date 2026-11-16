@@ -30,7 +30,8 @@ const History = () => {
                 time: booking.preferredTime,
                 amount: '-',
                 status: booking.status,
-                provider: booking.providerName || 'Not assigned'
+                provider: booking.providerName || 'Not assigned',
+                hasReview: Boolean(booking.hasReview)
             }))))
             .catch((error) => setLoadError(error.message || 'Unable to load service history.'))
             .finally(() => setLoading(false));
@@ -89,10 +90,22 @@ const History = () => {
                 ? { rating: Number(rating), comment: message }
                 : { subject, message };
             await api(endpoint, { method: 'POST', body: JSON.stringify(payload) });
+            if (feedbackType === 'review') {
+                setHistoryData((items) => items.map((item) =>
+                    item.bookingId === feedbackBooking.bookingId ? { ...item, hasReview: true } : item
+                ));
+            }
             setFeedbackBooking(null);
             setSubject('');
             setMessage('');
         } catch (error) {
+            if (feedbackType === 'review' && /already been submitted|already submitted/i.test(error.message || '')) {
+                setHistoryData((items) => items.map((item) =>
+                    item.bookingId === feedbackBooking.bookingId ? { ...item, hasReview: true } : item
+                ));
+                setFeedbackBooking(null);
+                return;
+            }
             setFeedbackError(error.message || 'Unable to submit feedback.');
         } finally {
             setFeedbackSaving(false);
@@ -196,7 +209,7 @@ const History = () => {
                                         </td>
                                         <td style={tdStyle}>
                                             <div className="homeowner-history-feedback-actions">
-                                            {item.status === 'Completed' && (
+                                            {item.status === 'Completed' && !item.hasReview && (
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm btn-outline-warning"
@@ -209,6 +222,11 @@ const History = () => {
                                                 >
                                                     Review
                                                 </button>
+                                            )}
+                                            {item.status === 'Completed' && item.hasReview && (
+                                                <span className="badge text-bg-success rounded-pill px-3 py-2" aria-label="Review submitted">
+                                                    Reviewed
+                                                </span>
                                             )}
                                             <button
                                                 type="button"

@@ -71,7 +71,7 @@ const ProviderDashboard = () => {
     const [providerServicesError, setProviderServicesError] = useState('');
     const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
     const [availabilityStatus, setAvailabilityStatus] = useState('Available');
-    const [availabilityConfig, setAvailabilityConfig] = useState({ availability_slots: [] });
+    const [availabilityConfig, setAvailabilityConfig] = useState({ availability_slots: [], working_schedule: [] });
     const [availabilitySaving, setAvailabilitySaving] = useState(false);
     const [availabilityError, setAvailabilityError] = useState('');
     const [availabilityClock, setAvailabilityClock] = useState(() => new Date());
@@ -141,6 +141,7 @@ const ProviderDashboard = () => {
                 setAvailabilityStatus(profile.availability_status || 'Available');
                 setAvailabilityConfig({
                     availability_slots: profile.availability_slots || [],
+                    working_schedule: profile.working_schedule || [],
                 });
             })
             .catch((error) => {
@@ -165,7 +166,6 @@ const ProviderDashboard = () => {
     const todaysBookings = bookings.filter((booking) => booking.preferredDate === today);
     const pendingBookings = bookings.filter((booking) => booking.status === 'Pending');
     const ongoingBookings = bookings.filter((booking) => ['Accepted', 'On the Way', 'In Progress'].includes(booking.status));
-    const isAtWork = bookings.some((booking) => ['On the Way', 'In Progress'].includes(booking.status));
     const completedBookings = bookings.filter((booking) => booking.status === 'Completed');
     const actionableBookings = bookings.filter((booking) => booking.status === 'Pending');
     const calendarBookings = [...bookings]
@@ -184,14 +184,34 @@ const ProviderDashboard = () => {
     const localToday = new Date(availabilityClock);
     localToday.setMinutes(localToday.getMinutes() - localToday.getTimezoneOffset());
     const localTodayValue = localToday.toISOString().slice(0, 10);
+    const localWeekStart = new Date(availabilityClock);
+    localWeekStart.setDate(availabilityClock.getDate() - ((availabilityClock.getDay() + 6) % 7));
+    const localWeekStartValue = `${localWeekStart.getFullYear()}-${String(localWeekStart.getMonth() + 1).padStart(2, '0')}-${String(localWeekStart.getDate()).padStart(2, '0')}`;
     const localWeekEnd = new Date(availabilityClock);
     localWeekEnd.setDate(availabilityClock.getDate() + (6 - ((availabilityClock.getDay() + 6) % 7)));
     const localWeekEndValue = `${localWeekEnd.getFullYear()}-${String(localWeekEnd.getMonth() + 1).padStart(2, '0')}-${String(localWeekEnd.getDate()).padStart(2, '0')}`;
     const localTimeValue = availabilityClock.toTimeString().slice(0, 5);
-    const hasActiveAvailabilitySchedule = availabilityConfig.availability_slots.some((slot) => (
+    const hasDateSpecificAvailability = availabilityConfig.availability_slots.some((slot) => (
         slot.date >= localTodayValue && slot.date <= localWeekEndValue && (slot.date > localTodayValue || slot.time > localTimeValue)
     ));
-    const availabilityIsOn = !isAtWork && availabilityStatus === 'Available' && hasActiveAvailabilitySchedule;
+    const weekDayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const hasWeeklyAvailability = availabilityConfig.working_schedule
+        && !Array.isArray(availabilityConfig.working_schedule)
+        && availabilityConfig.working_schedule._week_start === localWeekStartValue
+        && weekDayNames.some((day, index) => {
+            const hours = availabilityConfig.working_schedule[day];
+            if (!hours || hours.enabled !== true
+                || !/^\d{2}:\d{2}$/.test(hours.start || '')
+                || !/^\d{2}:\d{2}$/.test(hours.end || '')
+                || hours.end <= hours.start) return false;
+            const workDate = new Date(localWeekStart);
+            workDate.setDate(localWeekStart.getDate() + index);
+            const workDateValue = `${workDate.getFullYear()}-${String(workDate.getMonth() + 1).padStart(2, '0')}-${String(workDate.getDate()).padStart(2, '0')}`;
+            return workDateValue > localTodayValue
+                || (workDateValue === localTodayValue && hours.end > localTimeValue);
+        });
+    const hasActiveAvailabilitySchedule = hasDateSpecificAvailability || hasWeeklyAvailability;
+    const availabilityIsOn = availabilityStatus === 'Available' && hasActiveAvailabilitySchedule;
 
     const handleProfileUpdated = (profile) => {
         setUser({
@@ -215,7 +235,7 @@ const ProviderDashboard = () => {
     };
 
     const toggleAvailability = async () => {
-        if (isAtWork || availabilitySaving || bookingsLoading) return;
+        if (availabilitySaving || bookingsLoading) return;
         const nextStatus = availabilityIsOn ? 'Unavailable' : 'Available';
         if (nextStatus === 'Available' && !hasActiveAvailabilitySchedule) {
             goToSection('availability', '/provider-availability');
@@ -233,8 +253,12 @@ const ProviderDashboard = () => {
         }
     };
 
-    const handleAvailabilityScheduleSaved = (slots) => {
-        setAvailabilityConfig({ availability_slots: slots || [] });
+    const handleAvailabilityScheduleSaved = (scheduleResult) => {
+        setAvailabilityConfig({
+            availability_slots: scheduleResult.availability_slots || [],
+            working_schedule: scheduleResult.working_schedule || [],
+        });
+        if (scheduleResult.availability_status) setAvailabilityStatus(scheduleResult.availability_status);
     };
 
     const handleLogout = () => {
@@ -303,12 +327,12 @@ const ProviderDashboard = () => {
                         {availabilityError && <span className="provider-availability-error" role="status">{availabilityError}</span>}
                         <button
                             type="button"
-                            className={`provider-availability-toggle ${isAtWork ? 'is-busy' : availabilityIsOn ? 'is-on' : 'is-off'}`}
+                            className={`provider-availability-toggle ${availabilityIsOn ? 'is-on' : 'is-off'}`}
                             onClick={toggleAvailability}
-                            disabled={availabilitySaving || isAtWork || bookingsLoading}
+                            disabled={availabilitySaving || bookingsLoading}
                             aria-pressed={availabilityIsOn}
-                            aria-label={isAtWork ? 'Availability is paused while you are at work' : `Turn availability ${availabilityIsOn ? 'off' : 'on'}`}
-                            title={availabilityError || (isAtWork ? 'Availability pauses while a job is in progress' : !hasActiveAvailabilitySchedule ? 'Set this week’s schedule to turn availability on' : 'Toggle booking availability')}
+                            aria-label={`Turn availability ${availabilityIsOn ? 'off' : 'on'}`}
+                            title={availabilityError || (!hasActiveAvailabilitySchedule ? 'Set this week’s schedule to turn availability on' : 'Toggle booking availability')}
                         >
                             <span className="provider-availability-label">Availability</span>
                             <span className="provider-availability-switch" aria-hidden="true"><span /></span>

@@ -7,6 +7,7 @@ import './HomeownerSideBar.css';
 
 import myLogo from '../../assets/images/handyman-mark.svg';
 import ConfirmDialog from '../ConfirmDialog';
+import ThemeToggle from '../ThemeToggle';
 
 const HomeownerSideBar = () => {
     const location = useLocation();
@@ -102,6 +103,8 @@ const HomeownerSideBar = () => {
                         <i className="bi bi-gear" />
                         <span className="link-text">Settings</span>
                     </Link>
+
+                    <ThemeToggle compact />
 
                     <button
                         type="button"

@@ -1,0 +1,548 @@
+/* Shared light/dark theme tokens and portal-wide component overrides. */
+html,
+body,
+#root,
+.app-route-transition {
+    min-height: 100%;
+    background-color: var(--app-background);
+    color: var(--app-text);
+    transition: background-color 240ms ease, color 240ms ease;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.card,
+[class$="-panel"],
+[class$="-card"],
+[class*="-summary-card"],
+[class*="-table-card"] {
+    transition-property: background-color, color, border-color, box-shadow, transform;
+    transition-duration: 240ms;
+    transition-timing-function: ease;
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .14);
+}
+
+.theme-toggle-button {
+    display: inline-flex;
+    min-width: 38px;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: rgba(255, 255, 255, .82);
+    font-size: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.theme-toggle-button:hover {
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+}
+
+.theme-toggle-button.active {
+    border-color: rgba(255, 255, 255, .5);
+    background: #fff;
+    color: #252525;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .16);
+}
+
+.theme-toggle-button i {
+    font-size: .9rem;
+}
+
+.theme-toggle-compact {
+    width: 40px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 3px;
+}
+
+.theme-toggle-compact .theme-toggle-button {
+    width: 32px;
+    min-width: 32px;
+    min-height: 31px;
+    padding: 4px;
+}
+
+.theme-toggle-compact .theme-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.admin-sidebar-bottom .theme-toggle {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-color: rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .06);
+}
+
+.admin-sidebar-bottom .theme-toggle-compact {
+    width: 40px;
+    margin-right: auto;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] #root,
+html[data-theme="dark"] .app-route-transition {
+    background-color: var(--app-background) !important;
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] :is(
+    .dashboard-wrapper,
+    .homeowner-dashboard,
+    .homeowner-profile-v2,
+    .find-services-page,
+    .provider-layout,
+    .provider-bookings-layout,
+    .provider-booking-system,
+    .admin-dashboard-page,
+    .admin-main-content,
+    .admin-page-content,
+    .admin-profile-page,
+    .admin-settings-page,
+    .reports-analytics-page,
+    .booking-insights-page,
+    .service-categories-page,
+    .reviews-complaints-page,
+    .admin-management-page
+) {
+    background-color: var(--app-background) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    [class$="-page"], [class$="-layout"],
+    .dashboard-wrapper, .homeowner-dashboard, .admin-main-content,
+    .admin-page-content, .provider-layout, .provider-bookings-layout,
+    .provider-booking-system
+) {
+    background-color: var(--app-background);
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] :is(
+    .card:not(.admin-overview-intro),
+    .homeowner-dashboard-panel,
+    .dashboard-box,
+    .profile-card,
+    .hp-panel,
+    .homeowner-dashboard-provider,
+    .homeowner-dashboard-booking:hover,
+    .homeowner-dashboard-activity:hover,
+    .find-services-categories > button,
+    .find-services-category-arrow,
+    .find-services-results,
+    .find-service-details,
+    .find-service-offer-card,
+    .find-service-card,
+    .find-service-open,
+    .find-services-subservice,
+    .find-service-review,
+    .find-service-detail-empty,
+    .find-services-state,
+    .provider-dashboard-card,
+    .provider-booking-card,
+    .provider-profile-panel,
+    .provider-application-card,
+    .provider-services-card,
+    .provider-jobs-panel,
+    .admin-profile-panel,
+    .admin-profile-account-card,
+    .admin-settings-card,
+    .admin-table-card,
+    .booking-table-card,
+    .booking-filter-card,
+    .booking-summary-card,
+    .providers-table-card,
+    .providers-filter-card,
+    .providers-summary-card,
+    .service-table-card,
+    .service-filter-card,
+    .service-summary-card,
+    .reviews-table-card,
+    .reviews-filter-card,
+    .reviews-summary-card,
+    .admin-management-summary-card,
+    .notifications-panel,
+    .booking-modal,
+    .pbc-modal,
+    .admin-modal,
+    .admin-create-account-modal,
+    .provider-logout-modal,
+    .confirm-dialog,
+    .hp-map-panel
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    [class$="-card"], [class$="-panel"], [class$="-box"],
+    [class$="-table-card"], [class$="-filter-card"],
+    [class$="-summary-card"], [class$="-modal"]
+):not(.admin-overview-intro) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    .admin-topbar,
+    .homeowner-dashboard-header,
+    .provider-dashboard-header,
+    .profile-header,
+    .find-services-topbar,
+    .modal-content,
+    .dropdown-menu,
+    .homeowner-dashboard-notification-menu,
+    .homeowner-dashboard-profile-menu,
+    .homeowner-dashboard-notification-heading,
+    .homeowner-dashboard-notification-item,
+    .find-services-global-search,
+    .find-services-subservices,
+    .booking-status-distribution,
+    .booking-forecast-summary article
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    h1, h2, h3, h4, h5, h6,
+    p, label, legend, th, td,
+    .text-dark, .text-body, .text-secondary,
+    .text-muted, .form-label,
+    .admin-page-heading h1,
+    .homeowner-dashboard-panel-heading h2,
+    .provider-dashboard-card h2,
+    .provider-dashboard-card h3
+) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    [class*="text-slate-900"], [class*="text-slate-800"], [class*="text-slate-700"],
+    [class*="text-gray-900"], [class*="text-gray-800"], [class*="text-gray-700"],
+    [class*="text-stone-900"], [class*="text-stone-800"], [class*="text-neutral-900"],
+    [class*="text-neutral-800"], [class*="text-black"]
+) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    .find-services-user small,
+    .find-services-user > i,
+    .find-services-subservices h2,
+    .find-services-subservice small,
+    .find-services-subservices-loading,
+    .find-services-results-heading p,
+    .find-services-sort,
+    .find-service-offer-kicker,
+    .find-service-offer-body p,
+    .find-service-card-title p,
+    .find-service-card-meta > span:first-child,
+    .find-service-location,
+    .find-service-detail-category,
+    .find-service-detail-rating,
+    .find-service-detail-tabs button,
+    .find-service-review-heading > span,
+    .find-service-review-rating small,
+    .find-service-review-service,
+    .find-service-detail-list dd,
+    .find-service-no-reviews,
+    .find-service-detail-empty,
+    .find-services-state,
+    .homeowner-dashboard-booking-copy small,
+    .homeowner-dashboard-activity small,
+    .homeowner-dashboard-provider small,
+    .homeowner-dashboard-stat-copy small,
+    .homeowner-dashboard-empty
+) {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .find-service-verified,
+html[data-theme="dark"] .find-service-detail-image > button {
+    border-color: var(--app-border);
+    background: var(--app-elevated);
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] .find-service-offer-kicker i,
+html[data-theme="dark"] .find-service-detail-rating i,
+html[data-theme="dark"] .find-service-card-meta i,
+html[data-theme="dark"] .find-service-detail-list dt i {
+    color: var(--app-primary);
+}
+
+html[data-theme="dark"] .find-service-detail-tabs button.active {
+    border-bottom-color: var(--app-primary);
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .find-services-categories > button:hover,
+html[data-theme="dark"] .find-services-categories > button.selected,
+html[data-theme="dark"] .find-service-card:hover,
+html[data-theme="dark"] .find-service-card.active {
+    border-color: var(--app-primary) !important;
+    background-color: var(--app-elevated) !important;
+}
+
+html[data-theme="dark"] .find-services-hero::before {
+    background: linear-gradient(90deg, #171717f2 0%, #171717dc 38%, #17171790 68%, #17171730 100%);
+}
+
+html[data-theme="dark"] :is(
+    input:not([type="checkbox"]):not([type="radio"]),
+    select, textarea,
+    .form-control, .form-select,
+    .custom-select-dropdown,
+    .find-services-global-search,
+    .homeowner-dashboard-search
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(input, textarea)::placeholder {
+    color: var(--app-secondary-text) !important;
+    opacity: .82;
+}
+
+html[data-theme="dark"] option {
+    background-color: var(--app-elevated);
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] :is(
+    table, .table,
+    .admin-table, .booking-table, .providers-table, .service-table,
+    .my-jobs-table, .booking-forecast-validation-table
+) {
+    --bs-table-bg: var(--app-surface);
+    --bs-table-color: var(--app-text);
+    --bs-table-border-color: var(--app-border);
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(th, td, .table > :not(caption) > * > *) {
+    border-color: var(--app-border) !important;
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] :is(thead, tbody, tr, .table-striped > tbody > tr:nth-of-type(odd)) {
+    --bs-table-bg: var(--app-surface);
+    --bs-table-color: var(--app-text);
+    --bs-table-striped-bg: var(--app-elevated);
+    --bs-table-striped-color: var(--app-text);
+    background-color: transparent;
+}
+
+html[data-theme="dark"] :is(.pagination, .page-link, .admin-page-number, .providers-page-number) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(.alert, [role="alert"]) {
+    border-color: var(--app-border);
+}
+
+html[data-theme="dark"] :is(.bg-light, .bg-white, .bg-body, .list-group-item) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper :is(
+    .homeowner-dashboard-booking:hover,
+    .homeowner-dashboard-activity:hover
+) {
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] [class*="-subtle"] {
+    border-color: var(--app-border);
+}
+
+html[data-theme="dark"] :is(.modal-header, .modal-body, .modal-footer) {
+    border-color: var(--app-border) !important;
+}
+
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar, .admin-sidebar) {
+    background-color: var(--app-sidebar) !important;
+}
+
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar, .admin-sidebar) a,
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar, .admin-sidebar) button {
+    transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+
+html[data-theme="dark"] :is(.admin-topbar, .homeowner-dashboard-header) {
+    box-shadow: 0 1px 0 var(--app-border) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper :is(
+    .homeowner-dashboard-icon-button,
+    .homeowner-dashboard-profile-button
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper :is(
+    .homeowner-dashboard-notification-item:hover,
+    .homeowner-dashboard-notification-item.unread
+) {
+    background-color: var(--app-surface) !important;
+}
+
+html[data-theme="dark"] .theme-toggle {
+    border-color: var(--app-border);
+    background: var(--app-elevated);
+}
+
+html[data-theme="dark"] .theme-toggle-button {
+    color: var(--app-secondary-text);
+}
+
+html[data-theme="dark"] .theme-toggle-button.active {
+    border-color: var(--app-primary);
+    background: var(--app-primary);
+    color: #171717;
+}
+
+html[data-theme="dark"] .booking-weekly-activity-gridline,
+html[data-theme="dark"] .booking-weekly-activity-axis {
+    stroke: var(--app-border);
+}
+
+html[data-theme="dark"] .booking-weekly-activity-axis-label,
+html[data-theme="dark"] .booking-weekly-activity-week-label {
+    fill: var(--app-secondary-text);
+}
+
+html[data-theme="dark"] .booking-weekly-activity-bar {
+    fill: var(--app-primary);
+}
+
+html[data-theme="dark"] .booking-weekly-activity-bar.unverified,
+html[data-theme="dark"] .booking-weekly-activity-unverified {
+    fill: #9CA3AF;
+    stroke: #9CA3AF;
+}
+
+/* Settings, messages, and address controls use the shared portal theme. */
+html[data-theme="dark"] .homeowner-settings-tab:not(.active),
+html[data-theme="dark"] .homeowner-settings-panel h3,
+html[data-theme="dark"] .homeowner-settings-label,
+html[data-theme="dark"] .homeowner-settings-toggle strong,
+html[data-theme="dark"] .homeowner-security-form h4 {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-settings-description,
+html[data-theme="dark"] .homeowner-settings-toggle p {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-settings-notice {
+    border-color: var(--app-border);
+    background: var(--app-elevated);
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] .homeowner-settings-toggle,
+html[data-theme="dark"] .homeowner-security-form {
+    border-color: var(--app-border);
+}
+
+html[data-theme="dark"] .homeowner-settings-actions {
+    color: #86EFAC;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields {
+    background: var(--app-elevated);
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-map-column {
+    padding: 12px;
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    background: var(--app-surface);
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-info-item small,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields small,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-profile-header p,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-member-since small,
+html[data-theme="dark"] .hp-map-search-help,
+html[data-theme="dark"] .hp-map-search-message,
+html[data-theme="dark"] .hp-map-coordinates,
+html[data-theme="dark"] .hp-map-attribution-note,
+html[data-theme="dark"] .hp-map-boundary-attribution,
+html[data-theme="dark"] .hp-map-suggestions button small {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .hp-map-search-input,
+html[data-theme="dark"] .hp-map-suggestions,
+html[data-theme="dark"] .hp-map-reset-button,
+html[data-theme="dark"] .hp-map-overlay-hint {
+    border-color: var(--app-border);
+    background: var(--app-elevated);
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] .hp-map-search-input:disabled {
+    background: var(--app-background);
+}
+
+html[data-theme="dark"] .hp-map-search-icon,
+html[data-theme="dark"] .hp-map-suggestions button i,
+html[data-theme="dark"] .hp-map-overlay-hint i {
+    color: var(--app-secondary-text);
+}
+
+html[data-theme="dark"] .hp-map-location-error {
+    color: #FCA5A5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html,
+    body,
+    *,
+    *::before,
+    *::after {
+        transition-duration: .01ms !important;
+    }
+}

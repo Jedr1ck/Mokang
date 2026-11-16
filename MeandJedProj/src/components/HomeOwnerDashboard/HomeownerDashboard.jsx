@@ -14,7 +14,6 @@ import {
     markAllNotificationsRead,
     markNotificationRead
 } from '../../services/api';
-import heroBackground from '../../assets/images/hero-background.png';
 
 const EMPTY_USER = { fullName: 'Homeowner', profilePicture: '' };
 const ACTIVE_STATUSES = new Set([
@@ -356,26 +355,69 @@ const HomeownerDashboard = () => {
                 </div>
             </header>
 
-            <section
-                className="homeowner-dashboard-hero"
-                style={{ '--homeowner-hero-image': `url("${heroBackground}")` }}
-            >
-                <button
-                    type="button"
-                    className="homeowner-dashboard-hero-button"
-                    onClick={() => navigate('/services')}
-                >
-                    <i className="bi bi-calendar-plus" />
-                    Book a Service
-                    <i className="bi bi-chevron-right" />
-                </button>
+            <section className="homeowner-dashboard-panel homeowner-dashboard-recommendations">
+                <div className="homeowner-dashboard-panel-heading">
+                    <h2>
+                        Recommended for You
+                    </h2>
+                    <div className="homeowner-dashboard-recommendation-actions">
+                        <button
+                            type="button"
+                            className="homeowner-dashboard-book-service"
+                            onClick={() => navigate('/services')}
+                        >
+                            <i className="bi bi-calendar-plus" />
+                            Book a Service
+                            <i className="bi bi-chevron-right" />
+                        </button>
+                    </div>
+                </div>
+                {providerError ? (
+                    <p className="homeowner-dashboard-empty">
+                        Unable to load providers: {providerError}
+                    </p>
+                ) : recommendedProviders.length ? (
+                    <div className="homeowner-dashboard-provider-grid">
+                        {recommendedProviders.map((provider) => (
+                            <button
+                                type="button"
+                                className="homeowner-dashboard-provider"
+                                key={provider.id}
+                                onClick={() => navigate(`/provider/${provider.id}`)}
+                            >
+                                {provider.image ? (
+                                    <img
+                                        className="homeowner-dashboard-provider-image"
+                                        src={provider.image}
+                                        alt={provider.name}
+                                    />
+                                ) : (
+                                    <span className="homeowner-dashboard-provider-fallback">
+                                        <i className="bi bi-person-gear" />
+                                    </span>
+                                )}
+                                <strong>{provider.name}</strong>
+                                <small>{provider.category || 'Verified Provider'}</small>
+                                <span className="homeowner-dashboard-provider-link">
+                                    View Provider
+                                    <i className="bi bi-arrow-up-right" />
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="homeowner-dashboard-empty">
+                        {searchQuery
+                            ? 'No providers match your search.'
+                            : 'Verified provider recommendations will appear here.'}
+                    </p>
+                )}
             </section>
 
             <section className="homeowner-dashboard-top-grid">
                 <article className="homeowner-dashboard-panel">
                     <div className="homeowner-dashboard-panel-heading">
                         <h2>
-                            <i className="bi bi-calendar2-week" />
                             Upcoming Bookings
                         </h2>
                         <button
@@ -431,13 +473,9 @@ const HomeownerDashboard = () => {
                     )}
                 </article>
 
-            </section>
-
-            <section className="homeowner-dashboard-bottom-grid">
-                <article className="homeowner-dashboard-panel">
+                <article className="homeowner-dashboard-panel homeowner-dashboard-recent-panel">
                     <div className="homeowner-dashboard-panel-heading">
                         <h2>
-                            <i className="bi bi-clock-history" />
                             Recent Activity
                         </h2>
                         <button
@@ -483,62 +521,7 @@ const HomeownerDashboard = () => {
                     )}
                 </article>
 
-                <article className="homeowner-dashboard-panel">
-                    <div className="homeowner-dashboard-panel-heading">
-                        <h2>
-                            <i className="bi bi-stars" />
-                            Recommended for You
-                        </h2>
-                        <button
-                            type="button"
-                            onClick={() => navigate('/services')}
-                        >
-                            View All
-                        </button>
-                    </div>
-                    {providerError ? (
-                        <p className="homeowner-dashboard-empty">
-                            Unable to load providers: {providerError}
-                        </p>
-                    ) : recommendedProviders.length ? (
-                        <div className="homeowner-dashboard-provider-grid">
-                            {recommendedProviders.map((provider) => (
-                                <button
-                                    type="button"
-                                    className="homeowner-dashboard-provider"
-                                    key={provider.id}
-                                    onClick={() => navigate(`/provider/${provider.id}`)}
-                                >
-                                    {provider.image ? (
-                                        <img
-                                            className="homeowner-dashboard-provider-image"
-                                            src={provider.image}
-                                            alt={provider.name}
-                                        />
-                                    ) : (
-                                        <span className="homeowner-dashboard-provider-fallback">
-                                            <i className="bi bi-person-gear" />
-                                        </span>
-                                    )}
-                                    <strong>{provider.name}</strong>
-                                    <small>{provider.category || 'Verified Provider'}</small>
-                                    <span className="homeowner-dashboard-provider-link">
-                                        View Provider
-                                        <i className="bi bi-arrow-up-right" />
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="homeowner-dashboard-empty">
-                            {searchQuery
-                                ? 'No providers match your search.'
-                                : 'Verified provider recommendations will appear here.'}
-                        </p>
-                    )}
-                </article>
             </section>
-
             </main>
         </div>
     );

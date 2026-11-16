@@ -212,9 +212,9 @@ const BookingsTab = () => {
             </main>
             <ConfirmDialog
                 open={Boolean(bookingToConfirm)}
-                title="Confirm service completion?"
+                title="Are you sure you want to submit?"
                 message="Confirm only if the provider has finished the work. This will mark the booking as completed."
-                confirmLabel="Yes, confirm"
+                confirmLabel="Yes, Submit"
                 icon="bi-check-circle"
                 busy={confirmingId !== null}
                 onConfirm={handleConfirmCompletion}
@@ -222,9 +222,9 @@ const BookingsTab = () => {
             />
             <ConfirmDialog
                 open={Boolean(bookingToCancel)}
-                title="Cancel booking?"
+                title="Are you sure you want to remove this?"
                 message={`Are you sure you want to cancel your ${bookingToCancel?.category || 'service'} booking request? The provider will be notified.`}
-                confirmLabel="Cancel booking"
+                confirmLabel="Yes, Remove"
                 icon="bi-calendar-x"
                 tone="danger"
                 busy={Boolean(cancellingId)}

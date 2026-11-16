@@ -358,3 +358,14 @@ ALTER TABLE `reviews`
 --
 ALTER TABLE `user_profiles`
   ADD CONSTRAINT `user_profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `provider_services`
+  ADD COLUMN `duration_minutes` SMALLINT UNSIGNED NOT NULL DEFAULT 60
+    COMMENT 'Configured service duration in minutes';
+
+ALTER TABLE `bookings`
+  ADD COLUMN `service_duration_minutes` SMALLINT UNSIGNED NULL DEFAULT NULL
+    COMMENT 'Duration snapshot for this booking in minutes',
+  ADD INDEX `idx_bookings_provider_date_status_time`
+    (`provider_id`, `preferred_date`, `status`, `preferred_time`);

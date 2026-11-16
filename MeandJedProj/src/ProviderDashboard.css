@@ -105,14 +105,14 @@
 
 .provider-availability-toggle.is-off {
     border-color: #dbe4ea;
-    background: #f8fafc;
-    color: #64748b;
+    background: #F7F5F0;
+    color: #929292;
 }
 
 .provider-availability-toggle.is-busy {
     border-color: #fed7aa;
     background: #fff7ed;
-    color: #c2410c;
+    color: #F47B20;
     cursor: not-allowed;
 }
 
@@ -132,7 +132,7 @@
 }
 
 .provider-availability-label {
-    color: #64748b;
+    color: #929292;
     font-size: 10px;
     font-weight: 600;
 }
@@ -2038,18 +2038,19 @@ button.provider-stat-card:hover {
 
 /* Provider dashboard color system: Tailwind slate neutrals with orange actions. */
 .provider-layout {
-    --theme-primary: #c2410c;
-    --theme-secondary: #9a3412;
-    --theme-gold: #ea580c;
-    --theme-background: #f8fafc;
-    --theme-soft-blue: #f1f5f9;
-    --theme-surface: #ffffff;
-    --theme-border: #e2e8f0;
-    --theme-muted: #64748b;
-    --theme-text: #1e293b;
-    --theme-charcoal: #0f172a;
-    --theme-primary-hover: #c2410c;
-    @apply bg-slate-50 text-slate-800;
+    --theme-primary: var(--app-primary);
+    --theme-secondary: var(--app-primary-hover);
+    --theme-gold: var(--app-primary);
+    --theme-background: var(--app-background);
+    --theme-soft-blue: var(--app-soft-surface);
+    --theme-surface: var(--app-surface);
+    --theme-border: var(--app-border);
+    --theme-muted: var(--app-secondary-text);
+    --theme-text: var(--app-text);
+    --theme-charcoal: var(--app-text);
+    --theme-primary-hover: var(--app-primary-hover);
+    background-color: var(--theme-background);
+    color: var(--theme-text);
 }
 
 .provider-welcome-card {

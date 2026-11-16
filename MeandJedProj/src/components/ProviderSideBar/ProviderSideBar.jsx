@@ -6,6 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./ProviderSideBar.css";
 
 import myLogo from "../../assets/images/handyman-mark.svg";
+import ThemeToggle from "../ThemeToggle";
 
 const ProviderSideBar = () => {
     const location = useLocation();
@@ -162,6 +163,8 @@ const ProviderSideBar = () => {
                             Ratings & Reviews
                         </span>
                     </Link>
+
+                    <ThemeToggle compact />
 
                     {/* LOGOUT */}
                     <button

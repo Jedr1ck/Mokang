@@ -80,16 +80,6 @@ export const SERVICE_CATALOG = [
         ],
     },
     {
-        category: 'Deep Cleaner',
-        services: [
-            'Deep House Cleaning',
-            'Kitchen Cleaning',
-            'Bathroom Cleaning',
-            'Move-In / Move-Out Cleaning',
-            'Upholstery Cleaning',
-        ],
-    },
-    {
         category: 'Massage Therapist',
         services: [
             'Relaxation Massage',
@@ -149,6 +139,16 @@ export const SERVICE_CATALOG = [
         ],
     },
     {
+        category: 'Private Tutor / Personal Fitness Trainer',
+        services: [
+            'Academic Tutoring',
+            'Subject Review',
+            'Homework Assistance',
+            'Personal Fitness Training',
+            'Workout Guidance',
+        ],
+    },
+    {
         category: 'Computer / CCTV Technician',
         services: [
             'Computer Troubleshooting',
@@ -159,13 +159,13 @@ export const SERVICE_CATALOG = [
         ],
     },
     {
-        category: 'Private Tutor / Personal Fitness Trainer',
+        category: 'Deep Cleaner',
         services: [
-            'Academic Tutoring',
-            'Subject Review',
-            'Homework Assistance',
-            'Personal Fitness Training',
-            'Workout Guidance',
+            'Deep House Cleaning',
+            'Kitchen Cleaning',
+            'Bathroom Cleaning',
+            'Move-In / Move-Out Cleaning',
+            'Upholstery Cleaning',
         ],
     },
 ];

@@ -223,7 +223,7 @@ const Messages = ({ embedded = false, bookings }) => {
 
                     {/* Left Panel: Contact List */}
                     <div style={sidebarListStyle}>
-                        <div style={{ padding: '15px', borderBottom: '1px solid #F5F5F5' }}>
+                        <div style={{ padding: '15px', borderBottom: '1px solid var(--app-border)' }}>
                             <input
                                 type="text"
                                 placeholder="Search messages..."
@@ -238,7 +238,7 @@ const Messages = ({ embedded = false, bookings }) => {
                                     onClick={() => setActiveChatId(item.id)}
                                     style={{
                                         ...contactItemStyle,
-                                        backgroundColor: item.id === activeChat?.id ? 'var(--theme-soft-blue)' : '#fff'
+                                        backgroundColor: item.id === activeChat?.id ? 'var(--app-elevated)' : 'var(--app-surface)'
                                     }}
                                 >
                                     <div style={{ position: 'relative' }}>
@@ -255,12 +255,12 @@ const Messages = ({ embedded = false, bookings }) => {
                                 </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <h5 style={{ margin: 0, fontSize: '0.9rem', color: '#303030', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                            <h5 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--app-text)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                                 {item.name}
                                             </h5>
-                                            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{item.time}</span>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--app-secondary-text)' }}>{item.time}</span>
                                         </div>
-                                        <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: item.unread ? '#6B6B6B' : '#6b7280', fontWeight: item.unread ? 'bold' : 'normal', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                        <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--app-secondary-text)', fontWeight: item.unread ? 'bold' : 'normal', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                             {item.lastMessage}
                                         </p>
                                     </div>
@@ -279,7 +279,7 @@ const Messages = ({ embedded = false, bookings }) => {
                     {/* Right Panel: Chat Area */}
                     <div style={chatAreaStyle}>
                         {messageError && (
-                            <p role="alert" style={{ margin: 0, padding: '8px 16px', color: '#dc2626', backgroundColor: '#fef2f2' }}>
+                            <p role="alert" style={{ margin: 0, padding: '8px 16px', color: 'var(--app-danger-text)', backgroundColor: 'var(--app-danger-surface)' }}>
                                 {messageError}
                             </p>
                         )}
@@ -298,8 +298,8 @@ const Messages = ({ embedded = false, bookings }) => {
                                             <div style={avatarStyle}>{activeChat.name.charAt(0)}</div>
                                         )}
                                         <div>
-                                            <h4 style={{ margin: 0, fontSize: '1rem', color: '#303030' }}>{activeChat.name}</h4>
-                                            <span style={{ fontSize: '0.75rem', color: activeChat.online ? '#FF6900' : '#9ca3af' }}>
+                                            <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--app-text)' }}>{activeChat.name}</h4>
+                                            <span style={{ fontSize: '0.75rem', color: activeChat.online ? 'var(--app-primary)' : 'var(--app-secondary-text)' }}>
                                                 {presenceError
                                                     ? 'Status unavailable'
                                                     : !presenceLoaded
@@ -342,8 +342,8 @@ const Messages = ({ embedded = false, bookings }) => {
                                         >
                                             <div style={{
                                                 ...messageBubbleStyle,
-                                                backgroundColor: msg.senderId === currentUserId ? 'var(--theme-primary)' : '#F5F5F5',
-                                                color: msg.senderId === currentUserId ? '#fff' : '#6B6B6B'
+                                                backgroundColor: msg.senderId === currentUserId ? 'var(--app-primary)' : 'var(--app-elevated)',
+                                                color: msg.senderId === currentUserId ? '#fff' : 'var(--app-text)'
                                             }}>
                                                 <p style={{ margin: 0, fontSize: '0.9rem' }}>{msg.text}</p>
                                                 <span style={{
@@ -351,7 +351,7 @@ const Messages = ({ embedded = false, bookings }) => {
                                                     display: 'block',
                                                     textAlign: 'right',
                                                     marginTop: '4px',
-                                                    color: msg.senderId === currentUserId ? 'var(--theme-soft-blue)' : '#9ca3af'
+                                                    color: msg.senderId === currentUserId ? 'rgba(255,255,255,.82)' : 'var(--app-secondary-text)'
                                                 }}>
                                                     {msg.time}
                                                 </span>
@@ -412,7 +412,7 @@ const Messages = ({ embedded = false, bookings }) => {
 const chatContainerStyle = {
     display: 'grid',
     gridTemplateColumns: '320px 1fr',
-    backgroundColor: '#fff',
+    backgroundColor: 'var(--app-surface)',
     borderRadius: '12px',
     boxShadow: '0 1px 3px rgba(37, 37, 37, 0.1)',
     marginTop: '20px',
@@ -422,7 +422,7 @@ const chatContainerStyle = {
 };
 
 const sidebarListStyle = {
-    borderRight: '1px solid #F5F5F5',
+    borderRight: '1px solid var(--app-border)',
     display: 'flex',
     flexDirection: 'column'
 };
@@ -431,7 +431,9 @@ const searchInputStyle = {
     width: '100%',
     padding: '8px 12px',
     borderRadius: '6px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--app-border)',
+    backgroundColor: 'var(--app-elevated)',
+    color: 'var(--app-text)',
     fontSize: '0.85rem'
 };
 
@@ -440,7 +442,7 @@ const contactItemStyle = {
     gap: '12px',
     padding: '12px 15px',
     cursor: 'pointer',
-    borderBottom: '1px solid #F5F5F5',
+    borderBottom: '1px solid var(--app-border)',
     alignItems: 'center'
 };
 
@@ -465,21 +467,21 @@ const onlineDotStyle = {
     position: 'absolute',
     bottom: '0',
     right: '0',
-    border: '2px solid #fff'
+    border: '2px solid var(--app-surface)'
 };
 
 const chatAreaStyle = {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#fafafa',
+    backgroundColor: 'var(--app-background)',
     minHeight: 0,
     height: '100%'
 };
 
 const chatHeaderStyle = {
     padding: '12px 20px',
-    borderBottom: '1px solid #F5F5F5',
-    backgroundColor: '#fff',
+    borderBottom: '1px solid var(--app-border)',
+    backgroundColor: 'var(--app-surface)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -490,7 +492,7 @@ const trackingButtonStyle = {
     border: '1px solid var(--theme-primary)',
     borderRadius: '6px',
     padding: '7px 12px',
-    backgroundColor: '#fff',
+    backgroundColor: 'var(--app-surface)',
     color: 'var(--theme-text)',
     fontSize: '0.8rem',
     fontWeight: 600,
@@ -522,8 +524,8 @@ const chatInputFormStyle = {
     display: 'flex',
     alignItems: 'center',
     padding: '15px',
-    backgroundColor: '#fff',
-    borderTop: '1px solid #F5F5F5',
+    backgroundColor: 'var(--app-elevated)',
+    borderTop: '1px solid var(--app-border)',
     gap: '10px',
     flexShrink: 0
 };
@@ -532,7 +534,9 @@ const messageInputStyle = {
     flex: 1,
     padding: '10px 14px',
     borderRadius: '8px',
-    border: '1px solid #d1d5db',
+    border: '1px solid var(--app-border)',
+    backgroundColor: 'var(--app-elevated)',
+    color: 'var(--app-text)',
     outline: 'none',
     fontSize: '0.9rem'
 };

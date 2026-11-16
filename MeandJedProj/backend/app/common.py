@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
+import json
 
 from flask import current_app, g, jsonify, request
 from jose import JWTError, jwt
@@ -20,6 +21,77 @@ pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 MAX_ID_SIZE = 5 * 1024 * 1024
 ID_UPLOAD_DIR = Path(__file__).resolve().parent / "private_uploads" / "provider_ids"
+MANILA_TIMEZONE = timezone(timedelta(hours=8))
+
+
+def current_week_start(today=None):
+    day = today or datetime.now(MANILA_TIMEZONE).date()
+    return (day - timedelta(days=day.weekday())).isoformat()
+
+
+def weekly_schedule_is_current(schedule, today=None):
+    return (
+        isinstance(schedule, dict)
+        and schedule.get("_week_start") == current_week_start(today)
+    )
+
+
+def weekly_schedule_has_future_window(schedule, now=None):
+    now = now or datetime.now(MANILA_TIMEZONE)
+    if not weekly_schedule_is_current(schedule, now.date()):
+        return False
+    week_start = now.date() - timedelta(days=now.weekday())
+    for offset, day_name in enumerate((
+        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+    )):
+        hours = schedule.get(day_name)
+        if not isinstance(hours, dict) or hours.get("enabled") is not True:
+            continue
+        try:
+            start = datetime.strptime(str(hours.get("start", "")), "%H:%M").time()
+            end = datetime.strptime(str(hours.get("end", "")), "%H:%M").time()
+        except ValueError:
+            continue
+        if end <= start:
+            continue
+        work_date = week_start + timedelta(days=offset)
+        if work_date > now.date() or (work_date == now.date() and end > now.time().replace(tzinfo=None)):
+            return True
+    return False
+
+
+def is_at_least_16(birthday, today=None):
+    today = today or datetime.now(MANILA_TIMEZONE).date()
+    age = today.year - birthday.year
+    if (today.month, today.day) < (birthday.month, birthday.day):
+        age -= 1
+    return age >= 16
+
+
+def provider_has_future_availability(provider, now=None):
+    now = now or datetime.now(MANILA_TIMEZONE)
+    schedule = json.loads(provider.working_schedule or "{}")
+    if isinstance(schedule, dict) and any(
+        isinstance(value, dict) for value in schedule.values()
+    ):
+        return weekly_schedule_has_future_window(schedule, now)
+
+    today = now.date()
+    today_value = today.isoformat()
+    week_end = today + timedelta(days=6 - today.weekday())
+    current_time = now.strftime("%H:%M")
+    slots = json.loads(provider.availability_slots or "[]")
+    return any(
+        isinstance(slot, dict)
+        and isinstance(slot.get("date"), str)
+        and isinstance(slot.get("time"), str)
+        and today_value <= slot["date"] <= week_end.isoformat()
+        and (
+            slot["date"] > today_value
+            or slot["time"] > current_time
+        )
+        for slot in slots
+    )
 
 
 class ApiError(Exception):
@@ -178,6 +250,7 @@ def booking_out(booking):
         "serviceName": booking.service_name,
         "preferredDate": str(booking.preferred_date),
         "preferredTime": str(booking.preferred_time),
+        "serviceDurationMinutes": booking.service_duration_minutes,
         "address": booking.address,
         "description": booking.description,
         "status": booking.status,

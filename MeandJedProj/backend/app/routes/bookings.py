@@ -6,14 +6,17 @@ from flask import Blueprint, jsonify
 from app.common import (
     ApiError,
     booking_out,
+    current_week_start,
     current_user,
     get_session,
+    is_at_least_16,
     normalize_category_name,
     notify_admins,
     profile_missing_fields,
     provider_booking_query,
     require_auth,
     validated,
+    weekly_schedule_is_current,
 )
 from app.models import (
     Booking,
@@ -22,10 +25,75 @@ from app.models import (
     Notification,
     ProviderProfile,
     ProviderService,
+    Review,
 )
 from app.schemas import BookingIn, BookingRescheduleIn, StatusIn
 
 bookings_bp = Blueprint("bookings", __name__)
+
+ACTIVE_BOOKING_STATUSES = [
+    "Pending", "Matched", "Accepted", "On the Way", "In Progress",
+    "Awaiting Confirmation",
+]
+DEFAULT_SERVICE_DURATION_MINUTES = 60
+
+
+def _duration_for_service(session, provider_id, category_id, service_name):
+    if not service_name:
+        return DEFAULT_SERVICE_DURATION_MINUTES
+    services = session.query(ProviderService).filter_by(
+        provider_id=provider_id,
+        category_id=category_id,
+    ).all()
+    for service in services:
+        titles = (service.title or "").split(",")
+        if any(title.strip().casefold() == service_name.strip().casefold() for title in titles):
+            duration = service.duration_minutes or DEFAULT_SERVICE_DURATION_MINUTES
+            return max(1, int(duration))
+    return DEFAULT_SERVICE_DURATION_MINUTES
+
+
+def _category_match_key(value):
+    normalized = normalize_category_name(value or "") or ""
+    key = normalized.strip().casefold()
+    equivalents = {
+        "plumber": "plumbing",
+        "plumbing": "plumbing",
+        "electrician": "electrical",
+        "electrical": "electrical",
+        "carpenter": "carpentry",
+        "carpentry": "carpentry",
+        "painter": "painting",
+        "painting": "painting",
+        "aircon technician": "appliance repair",
+        "appliance repair technician": "appliance repair",
+    }
+    return equivalents.get(key, key)
+
+
+def _ensure_no_overlap(
+    session, provider_id, preferred_date, preferred_time, duration_minutes,
+    exclude_booking_id=None,
+):
+    query = session.query(Booking).filter(
+        Booking.provider_id == provider_id,
+        Booking.preferred_date == preferred_date,
+        Booking.status.in_(ACTIVE_BOOKING_STATUSES),
+    )
+    if exclude_booking_id is not None:
+        query = query.filter(Booking.id != exclude_booking_id)
+    existing_bookings = query.with_for_update().all()
+    requested_start = preferred_time.hour * 60 + preferred_time.minute
+    requested_end = requested_start + duration_minutes
+    for existing in existing_bookings:
+        existing_start = existing.preferred_time.hour * 60 + existing.preferred_time.minute
+        existing_duration = existing.service_duration_minutes or DEFAULT_SERVICE_DURATION_MINUTES
+        existing_end = existing_start + max(1, int(existing_duration))
+        if requested_start < existing_end and existing_start < requested_end:
+            raise ApiError(
+                "This time overlaps another booking. Please choose an available time.",
+                409,
+            )
 
 
 @bookings_bp.post("/bookings")
@@ -45,22 +113,49 @@ def create_booking():
                 },
                 403,
             )
+        if user.profile and user.profile.birthday and not is_at_least_16(
+            user.profile.birthday
+        ):
+            raise ApiError("Homeowners must be at least 16 years old to book.", 403)
 
         category_name = normalize_category_name(data.category)
         category = None
         if category_name:
-            category = (
-                session.query(Category)
-                .filter(Category.name.ilike(category_name))
-                .first()
-            )
-            if not category:
-                category = Category(
-                    name=category_name,
-                    description=f"Auto-created category for {category_name}",
+            if data.provider_id:
+                offered_services = (
+                    session.query(ProviderService)
+                    .filter_by(provider_id=data.provider_id)
+                    .all()
                 )
-                session.add(category)
-                session.flush()
+                requested_category = _category_match_key(data.category)
+                category = next(
+                    (
+                        service.category
+                        for service in offered_services
+                        if service.category
+                        and _category_match_key(service.category.name)
+                        == requested_category
+                    ),
+                    None,
+                )
+                if category is None:
+                    raise ApiError(
+                        "Selected provider does not offer this service category.",
+                        400,
+                    )
+            else:
+                category = (
+                    session.query(Category)
+                    .filter(Category.name.ilike(category_name))
+                    .first()
+                )
+                if not category:
+                    category = Category(
+                        name=category_name,
+                        description=f"Auto-created category for {category_name}",
+                    )
+                    session.add(category)
+                    session.flush()
 
         if data.provider_id:
             provider = (
@@ -70,46 +165,81 @@ def create_booking():
                     ProviderProfile.is_verified.is_(True),
                     ProviderProfile.verification_status == "verified",
                 )
+                .with_for_update()
                 .first()
             )
             if not provider:
                 raise ApiError("Selected provider is not verified or available.", 400)
-            ongoing_booking = session.query(Booking.id).filter(
-                Booking.provider_id == provider.id,
-                Booking.status.in_(["On the Way", "In Progress"]),
-            ).first()
-            if ongoing_booking:
-                raise ApiError(
-                    "This provider is currently working on another booking. Please try again later.",
-                    409,
-                )
-            if (provider.availability_status or "Available") != "Available":
+            if (provider.availability_status or "Available").strip().casefold() != "available":
                 raise ApiError(
                     "This provider is not accepting bookings right now.",
                     409,
                 )
-            provider_slots = json.loads(provider.availability_slots or "[]")
             requested_slot = {
                 "date": data.preferred_date.isoformat(),
                 "time": data.preferred_time.strftime("%H:%M"),
             }
+            service_duration_minutes = _duration_for_service(
+                session, provider.id, category.id if category else None,
+                data.service_name,
+            )
             local_now = datetime.now(timezone(timedelta(hours=8)))
-            week_start = local_now.date() - timedelta(days=local_now.weekday())
-            week_end = week_start + timedelta(days=6)
-            if data.preferred_date < local_now.date() or data.preferred_date > week_end:
-                raise ApiError("Bookings can only be made for available dates this week.", 409)
-            if data.preferred_date == local_now.date() and requested_slot["time"] <= local_now.strftime("%H:%M"):
-                raise ApiError("The selected time has already passed.", 409)
-            if requested_slot not in provider_slots:
-                raise ApiError("Selected date and time are no longer available from this provider.", 409)
-            occupied_slot = session.query(Booking.id).filter(
-                Booking.provider_id == provider.id,
-                Booking.preferred_date == data.preferred_date,
-                Booking.preferred_time == data.preferred_time,
-                Booking.status.in_(["Pending", "Matched", "Accepted", "On the Way", "In Progress", "Awaiting Confirmation"]),
-            ).first()
-            if occupied_slot:
-                raise ApiError("This time has already been booked. Please choose another available time.", 409)
+            schedule = json.loads(provider.working_schedule or "{}")
+            has_weekly_schedule = (
+                isinstance(schedule, dict)
+                and any(isinstance(value, dict) for value in schedule.values())
+            )
+            if has_weekly_schedule:
+                if not weekly_schedule_is_current(schedule, local_now.date()):
+                    raise ApiError(
+                        "The provider's schedule ended Sunday at 11:59 PM. Ask them to set availability for this week.",
+                        409,
+                    )
+                week_start = datetime.strptime(
+                    current_week_start(local_now.date()), "%Y-%m-%d"
+                ).date()
+                week_end = week_start + timedelta(days=6)
+                if data.preferred_date < local_now.date() or data.preferred_date > week_end:
+                    raise ApiError("This provider's availability is set one week at a time.", 409)
+                weekday = data.preferred_date.strftime("%A")
+                hours = schedule.get(weekday)
+                if not isinstance(hours, dict) or hours.get("enabled") is not True:
+                    raise ApiError("This provider is not available on the selected day.", 409)
+                try:
+                    start_time = datetime.strptime(str(hours.get("start", "")), "%H:%M").time()
+                    end_time = datetime.strptime(str(hours.get("end", "")), "%H:%M").time()
+                except ValueError as error:
+                    raise ApiError("This provider's working schedule is invalid.", 409) from error
+                start_minutes = start_time.hour * 60 + start_time.minute
+                end_minutes = end_time.hour * 60 + end_time.minute
+                requested_minutes = (
+                    data.preferred_time.hour * 60 + data.preferred_time.minute
+                )
+                if (
+                    requested_minutes < start_minutes
+                    or requested_minutes + service_duration_minutes > end_minutes
+                    or (requested_minutes - start_minutes) % 30 != 0
+                ):
+                    raise ApiError("The selected time is outside this provider's working hours.", 409)
+                if (
+                    data.preferred_date == local_now.date()
+                    and requested_slot["time"] <= local_now.strftime("%H:%M")
+                ):
+                    raise ApiError("The selected time has already passed.", 409)
+            else:
+                provider_slots = json.loads(provider.availability_slots or "[]")
+                week_start = local_now.date() - timedelta(days=local_now.weekday())
+                week_end = week_start + timedelta(days=6)
+                if data.preferred_date < local_now.date() or data.preferred_date > week_end:
+                    raise ApiError("Bookings can only be made for available dates this week.", 409)
+                if data.preferred_date == local_now.date() and requested_slot["time"] <= local_now.strftime("%H:%M"):
+                    raise ApiError("The selected time has already passed.", 409)
+                if requested_slot not in provider_slots:
+                    raise ApiError("Selected date and time are no longer available from this provider.", 409)
+            _ensure_no_overlap(
+                session, provider.id, data.preferred_date, data.preferred_time,
+                service_duration_minutes,
+            )
             provider_category_ids = {
                 row.category_id
                 for row in session.query(ProviderService.category_id)
@@ -158,6 +288,9 @@ def create_booking():
             address=data.address,
             description=data.description,
             status="Pending",
+            service_duration_minutes=(
+                service_duration_minutes if provider else None
+            ),
         )
         session.add(booking)
         session.add(
@@ -214,7 +347,19 @@ def my_bookings():
         if query is None:
             return jsonify([])
         rows = query.order_by(Booking.created_at.desc()).all()
-        return jsonify([booking_out(booking) for booking in rows])
+        booking_ids = [booking.id for booking in rows]
+        reviewed_booking_ids = set()
+        if booking_ids:
+            reviewed_booking_ids = {
+                booking_id
+                for (booking_id,) in session.query(Review.booking_id)
+                .filter(Review.booking_id.in_(booking_ids))
+                .all()
+            }
+        return jsonify([
+            {**booking_out(booking), "hasReview": booking.id in reviewed_booking_ids}
+            for booking in rows
+        ])
 
 
 @bookings_bp.patch("/bookings/<int:booking_id>/cancel")
@@ -503,6 +648,7 @@ def reschedule_booking(booking_id):
         provider = (
             session.query(ProviderProfile)
             .filter_by(user_id=user.id)
+            .with_for_update()
             .first()
         )
         if not provider:
@@ -516,8 +662,65 @@ def reschedule_booking(booking_id):
         if booking.status in {"On the Way", "In Progress", "Awaiting Confirmation", "Completed", "Cancelled", "Rejected"}:
             raise ApiError("A booking can no longer be rescheduled after the provider starts traveling to the service location.", 400)
 
+        local_now = datetime.now(timezone(timedelta(hours=8)))
+        if data.preferred_date < local_now.date() or data.preferred_date > local_now.date() + timedelta(days=365):
+            raise ApiError("Bookings must be within the next 365 days.", 409)
+        if data.preferred_date == local_now.date() and data.preferred_time <= local_now.time().replace(tzinfo=None):
+            raise ApiError("The selected time has already passed.", 409)
+
+        schedule = json.loads(provider.working_schedule or "{}")
+        has_weekly_schedule = (
+            isinstance(schedule, dict)
+            and any(isinstance(value, dict) for value in schedule.values())
+        )
+        duration_minutes = booking.service_duration_minutes or _duration_for_service(
+            session, provider.id, booking.category_id, booking.service_name
+        )
+        requested_minutes = data.preferred_time.hour * 60 + data.preferred_time.minute
+        if has_weekly_schedule:
+            if not weekly_schedule_is_current(schedule, local_now.date()):
+                raise ApiError(
+                    "The provider's schedule ended Sunday at 11:59 PM. Ask them to set availability for this week.",
+                    409,
+                )
+            week_start = datetime.strptime(
+                current_week_start(local_now.date()), "%Y-%m-%d"
+            ).date()
+            week_end = week_start + timedelta(days=6)
+            if data.preferred_date > week_end:
+                raise ApiError("This provider's availability is set one week at a time.", 409)
+            hours = schedule.get(data.preferred_date.strftime("%A"))
+            if not isinstance(hours, dict) or hours.get("enabled") is not True:
+                raise ApiError("This provider is not available on the selected day.", 409)
+            try:
+                start_time = datetime.strptime(str(hours.get("start", "")), "%H:%M").time()
+                end_time = datetime.strptime(str(hours.get("end", "")), "%H:%M").time()
+            except ValueError as error:
+                raise ApiError("This provider's working schedule is invalid.", 409) from error
+            start_minutes = start_time.hour * 60 + start_time.minute
+            end_minutes = end_time.hour * 60 + end_time.minute
+            if (
+                requested_minutes < start_minutes
+                or requested_minutes + duration_minutes > end_minutes
+                or (requested_minutes - start_minutes) % 30 != 0
+            ):
+                raise ApiError("The selected time is outside this provider's working hours.", 409)
+        else:
+            requested_slot = {
+                "date": data.preferred_date.isoformat(),
+                "time": data.preferred_time.strftime("%H:%M"),
+            }
+            if requested_slot not in json.loads(provider.availability_slots or "[]"):
+                raise ApiError("Selected date and time are no longer available from this provider.", 409)
+
+        _ensure_no_overlap(
+            session, provider.id, data.preferred_date, data.preferred_time,
+            duration_minutes, exclude_booking_id=booking.id,
+        )
+
         booking.preferred_date = data.preferred_date
         booking.preferred_time = data.preferred_time
+        booking.service_duration_minutes = duration_minutes
         category_name = booking.category.name if booking.category else "service"
         session.add(
             Notification(

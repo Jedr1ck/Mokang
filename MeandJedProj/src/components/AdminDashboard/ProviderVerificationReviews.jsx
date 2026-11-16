@@ -150,9 +150,9 @@ function ProviderVerificationReviews({ onBack }) {
             )}
             <ConfirmDialog
                 open={Boolean(requestToApprove)}
-                title="Approve provider?"
+                title="Are you sure you want to submit?"
                 message={`Approve identity verification for ${requestToApprove?.fullName}?`}
-                confirmLabel="Approve"
+                confirmLabel="Yes, Submit"
                 icon="bi-shield-check"
                 busy={Boolean(approvingId)}
                 onConfirm={confirmApprove}

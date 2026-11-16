@@ -47,6 +47,7 @@ export default function ProviderBookingSystem() {
     const [actionError, setActionError] = useState('');
     const [busy, setBusy] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false);
     const [showReschedule, setShowReschedule] = useState(false);
     const [rescheduleDate, setRescheduleDate] = useState('');
     const [rescheduleTime, setRescheduleTime] = useState('');
@@ -137,6 +138,12 @@ export default function ProviderBookingSystem() {
     const saveReschedule = async (event) => {
         event.preventDefault();
         if (!selectedBooking || busy) return;
+        setShowRescheduleConfirm(true);
+    };
+
+    const confirmReschedule = async () => {
+        if (!selectedBooking || busy) return;
+        setShowRescheduleConfirm(false);
         setBusy(true);
         setActionError('');
         try {
@@ -440,9 +447,9 @@ export default function ProviderBookingSystem() {
             )}
             <ConfirmDialog
                 open={showCancelConfirm}
-                title="Cancel this booking?"
+                title="Are you sure you want to remove this?"
                 message={`The homeowner will be notified that the ${selectedBooking?.category || 'service'} booking was cancelled.`}
-                confirmLabel="Cancel booking"
+                confirmLabel="Yes, Remove"
                 tone="danger"
                 icon="bi-calendar-x"
                 busy={busy}
@@ -450,6 +457,15 @@ export default function ProviderBookingSystem() {
                     if (await changeStatus('Cancelled')) setShowCancelConfirm(false);
                 }}
                 onCancel={() => setShowCancelConfirm(false)}
+            />
+            <ConfirmDialog
+                open={showRescheduleConfirm}
+                title="Are you sure you want to submit?"
+                message={`Send a reschedule request for ${selectedBooking?.category || 'service'} on ${formatDate(rescheduleDate)} at ${rescheduleTime}?`}
+                confirmLabel="Yes, Submit"
+                busy={busy}
+                onConfirm={confirmReschedule}
+                onCancel={() => setShowRescheduleConfirm(false)}
             />
         </main>
     );

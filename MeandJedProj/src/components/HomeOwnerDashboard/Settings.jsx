@@ -4,6 +4,7 @@ import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 import { getMyProfile, updateMySecurity } from '../../services/api';
+import ConfirmDialog from '../ConfirmDialog';
 
 const SETTINGS_TABS = [
     { id: 'General', label: 'General & Preferences', icon: 'bi-gear' },
@@ -36,6 +37,7 @@ const Settings = () => {
     const [securityError, setSecurityError] = useState('');
     const [securitySuccess, setSecuritySuccess] = useState('');
     const [securitySaving, setSecuritySaving] = useState(false);
+    const [showSecurityConfirm, setShowSecurityConfirm] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -63,6 +65,7 @@ const Settings = () => {
 
     const handleSecuritySubmit = async (event) => {
         event.preventDefault();
+        if (securitySaving) return;
         setSecurityError('');
         setSecuritySuccess('');
 
@@ -75,7 +78,13 @@ const Settings = () => {
             return;
         }
 
+        setShowSecurityConfirm(true);
+    };
+
+    const submitSecurityUpdate = async () => {
+        if (securitySaving) return;
         setSecuritySaving(true);
+        setShowSecurityConfirm(false);
         try {
             const updatedUser = await updateMySecurity({
                 currentPassword,
@@ -254,6 +263,15 @@ const Settings = () => {
                     </section>
                 </div>
             </main>
+            <ConfirmDialog
+                open={showSecurityConfirm}
+                title="Are you sure you want to submit?"
+                message="Update the account email or password using the details you entered?"
+                confirmLabel="Yes, Submit"
+                busy={securitySaving}
+                onConfirm={submitSecurityUpdate}
+                onCancel={() => setShowSecurityConfirm(false)}
+            />
         </div>
     );
 };

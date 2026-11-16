@@ -1,16 +1,16 @@
 @reference "../../index.css";
 
 .provider-booking-system {
-    --theme-primary: #c2410c;
-    --theme-secondary: #9a3412;
-    --theme-gold: #ea580c;
-    --theme-background: #f8fafc;
-    --theme-soft-blue: #f1f5f9;
-    --theme-surface: #ffffff;
-    --theme-border: #e2e8f0;
-    --theme-muted: #64748b;
-    --theme-text: #1e293b;
-    --theme-charcoal: #0f172a;
+    --theme-primary: var(--app-primary);
+    --theme-secondary: var(--app-primary-hover);
+    --theme-gold: var(--app-primary);
+    --theme-background: var(--app-background);
+    --theme-soft-blue: var(--app-soft-surface);
+    --theme-surface: var(--app-surface);
+    --theme-border: var(--app-border);
+    --theme-muted: var(--app-secondary-text);
+    --theme-text: var(--app-text);
+    --theme-charcoal: var(--app-text);
     min-height: 100vh;
     padding: 0 24px 32px;
     background: var(--theme-soft-blue);

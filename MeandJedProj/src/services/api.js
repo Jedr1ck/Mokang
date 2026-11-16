@@ -137,6 +137,13 @@ export async function updateProviderAvailabilitySlots(availabilitySlots) {
     });
 }
 
+export async function updateProviderWorkingSchedule(workingSchedule) {
+    return api('/provider-availability/me', {
+        method: 'PUT',
+        body: JSON.stringify({ working_schedule: workingSchedule }),
+    });
+}
+
 export async function getPendingProviderVerifications() {
     return api('/admin/provider-verifications');
 }

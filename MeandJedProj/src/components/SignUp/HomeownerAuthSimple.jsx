@@ -5,6 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../index.css';
 import background from '../../assets/images/hero-background.png';
 import { loginWithRole, register } from '../../services/api';
+import ConfirmDialog from '../ConfirmDialog';
 
 const HomeownerAuthSimple = () => {
     const navigate = useNavigate();
@@ -25,6 +26,8 @@ const HomeownerAuthSimple = () => {
 
     // Registration success modal
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showRegisterConfirm, setShowRegisterConfirm] = useState(false);
+    const [registering, setRegistering] = useState(false);
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -63,6 +66,13 @@ const HomeownerAuthSimple = () => {
             return;
         }
 
+        setShowRegisterConfirm(true);
+    };
+
+    const confirmRegister = async () => {
+        if (registering) return;
+        setRegistering(true);
+        setShowRegisterConfirm(false);
         try {
             setPasswordError('');
 
@@ -117,6 +127,8 @@ const HomeownerAuthSimple = () => {
                 error.message ||
                 'Hindi matagumpay ang registration. Pakisubukan ulit.'
             );
+        } finally {
+            setRegistering(false);
         }
     };
 
@@ -539,6 +551,15 @@ const HomeownerAuthSimple = () => {
                         </div>
                     </div>
                 )}
+            <ConfirmDialog
+                open={showRegisterConfirm}
+                title="Are you sure you want to submit?"
+                message={`Create a homeowner account for ${formData.fullName.trim()}?`}
+                confirmLabel="Yes, Submit"
+                busy={registering}
+                onConfirm={confirmRegister}
+                onCancel={() => setShowRegisterConfirm(false)}
+            />
             </div>
         </div>
     );

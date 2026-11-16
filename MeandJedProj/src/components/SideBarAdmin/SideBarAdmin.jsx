@@ -3,6 +3,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import logo from "../../assets/images/handyman-mark.svg";
 import "./SideBarAdmin.css";
+import ThemeToggle from "../ThemeToggle";
 
 function SideBarAdmin({
     activePage,
@@ -157,6 +158,8 @@ function SideBarAdmin({
             ================================================== */}
 
             <div className="admin-sidebar-bottom !border-white/10 !px-3 !py-4">
+
+                <ThemeToggle compact={!sidebarOpen} />
 
                 <button
                     type="button"

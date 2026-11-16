@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
     getProviderVerification,
-    updateProviderAvailabilitySlots,
+    updateProviderWorkingSchedule,
 } from '../../services/api';
 import './ProviderAvailability.css';
 
@@ -47,6 +47,7 @@ export default function ProviderAvailability({ onScheduleSaved }) {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [weeklyRefreshRequired, setWeeklyRefreshRequired] = useState(false);
 
     useEffect(() => {
         const intervalId = window.setInterval(() => setClock(new Date()), 30000);
@@ -63,9 +64,16 @@ export default function ProviderAvailability({ onScheduleSaved }) {
                     ? verification.availability_slots
                     : [];
                 const hasDateSpecificSchedule = savedSlots.length > 0;
-                const legacySchedule = Array.isArray(verification?.working_schedule)
-                    ? verification.working_schedule
-                    : [];
+                const legacySchedule = verification?.working_schedule || [];
+                const hasWeeklySchedule = !Array.isArray(legacySchedule)
+                    && Object.values(legacySchedule).some((row) => row && typeof row === 'object');
+                const hasCurrentDateSlot = savedSlots.some((slot) => slot.date >= todayValue && slot.date <= weekDays[6]?.date);
+                setWeeklyRefreshRequired(Boolean(
+                    (savedSlots.length || hasWeeklySchedule)
+                    && (hasWeeklySchedule
+                        ? legacySchedule._week_start !== weekDays[0]?.date
+                        : !hasCurrentDateSlot)
+                ));
 
                 const settings = Object.fromEntries(weekDays.map(({ date, day }) => {
                     const daySlots = savedSlots
@@ -80,11 +88,15 @@ export default function ProviderAvailability({ onScheduleSaved }) {
                         }];
                     }
 
-                    const oldDay = !hasDateSpecificSchedule && legacySchedule.find((item) => (item.day || item.weekday) === day);
+                    const oldDay = !hasDateSpecificSchedule
+                        ? Array.isArray(legacySchedule)
+                            ? legacySchedule.find((item) => (item.day || item.weekday) === day)
+                            : legacySchedule[day]
+                        : null;
                     return [date, {
-                        enabled: Boolean(oldDay),
-                        start_time: oldDay?.start_time || oldDay?.startTime || '08:00',
-                        end_time: oldDay?.end_time || oldDay?.endTime || '18:00',
+                        enabled: oldDay?.enabled === true || (Array.isArray(legacySchedule) && Boolean(oldDay)),
+                        start_time: oldDay?.start || oldDay?.start_time || oldDay?.startTime || '08:00',
+                        end_time: oldDay?.end || oldDay?.end_time || oldDay?.endTime || '18:00',
                     }];
                 }));
                 setDaySettings(settings);
@@ -118,36 +130,21 @@ export default function ProviderAvailability({ onScheduleSaved }) {
         setError('');
         setMessage('');
         try {
-            const today = formatDate(new Date());
-            const currentTime = new Date().toTimeString().slice(0, 5);
-            const slots = [];
-
-            weekDays.forEach(({ date }) => {
+            const schedule = Object.fromEntries(weekDays.map(({ day, date }) => {
                 const setting = daySettings[date];
-                if (!setting?.enabled) return;
-
-                const start = Number(setting.start_time.slice(0, 2)) * 60 + Number(setting.start_time.slice(3, 5));
-                const end = Number(setting.end_time.slice(0, 2)) * 60 + Number(setting.end_time.slice(3, 5));
-                for (let minutes = start; minutes + 60 <= end; minutes += 60) {
-                    const time = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
-                    if (date > today || (date === today && time > currentTime)) slots.push({ date, time });
-                }
-            });
-
-            const result = await updateProviderAvailabilitySlots(slots);
-            setMessage(slots.length ? "This week's availability has been saved." : 'This week is now closed for bookings.');
-            onScheduleSaved?.(result.availability_slots || []);
-            if (result.availability_slots?.length) {
-                setDaySettings((current) => {
-                    const next = { ...current };
-                    weekDays.forEach(({ date }) => {
-                        const daySlots = result.availability_slots.filter((slot) => slot.date === date).map((slot) => slot.time).sort();
-                        if (!daySlots.length) return;
-                        next[date] = { enabled: true, start_time: daySlots[0], end_time: addHour(daySlots[daySlots.length - 1]) };
-                    });
-                    return next;
-                });
-            }
+                return [day, {
+                    enabled: Boolean(setting?.enabled),
+                    start: setting?.start_time || '08:00',
+                    end: setting?.end_time || '18:00',
+                }];
+            }));
+            const hasEnabledDay = Object.values(schedule).some((day) => day.enabled);
+            const result = await updateProviderWorkingSchedule(schedule);
+            setWeeklyRefreshRequired(false);
+            setMessage(hasEnabledDay && result.availability_status === 'Available'
+                ? "This week's availability has been saved. It expires Sunday at 11:59 PM."
+                : 'This week is now closed for bookings.');
+            onScheduleSaved?.(result);
         } catch (saveError) {
             setError(saveError.message || 'Unable to save your availability.');
         } finally {
@@ -171,6 +168,11 @@ export default function ProviderAvailability({ onScheduleSaved }) {
 
             {error && <div className="provider-availability-alert error" role="alert">{error}</div>}
             {message && <div className="provider-availability-alert success" role="status">{message}</div>}
+            {weeklyRefreshRequired && (
+                <div className="provider-availability-alert" role="status">
+                    Last week’s availability expired Sunday at 11:59 PM. Review these hours and save them to go online this week.
+                </div>
+            )}
 
             {loading ? (
                 <div className="provider-availability-loading" role="status">Loading this week's schedule...</div>

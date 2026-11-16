@@ -9,6 +9,7 @@ from sqlalchemy import (
     DECIMAL,
     ForeignKey,
     Integer,
+    SmallInteger,
     String,
     Text,
     Time,
@@ -113,6 +114,7 @@ class ProviderService(Base):
     category_id = Column(BigInteger, ForeignKey("service_categories.id"))
     title = Column(String(150))
     rate = Column(DECIMAL(10, 2))
+    duration_minutes = Column(SmallInteger, nullable=False, default=60)
     category = relationship("Category")
 
 
@@ -135,6 +137,7 @@ class Booking(Base):
     service_name = Column(String(150), nullable=True)
     preferred_date = Column(Date)
     preferred_time = Column(Time)
+    service_duration_minutes = Column(SmallInteger, nullable=True)
     address = Column(Text)
     description = Column(Text)
     status = Column(String(50), default="Pending")

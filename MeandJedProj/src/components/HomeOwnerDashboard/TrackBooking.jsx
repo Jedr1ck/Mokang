@@ -226,9 +226,9 @@ const TrackBooking = () => {
             </section>
             <ConfirmDialog
                 open={showConfirmCompletion}
-                title="Confirm service completion?"
+                title="Are you sure you want to submit?"
                 message="Confirm only if the provider has finished the work. This will mark the booking as completed."
-                confirmLabel="Yes, confirm"
+                confirmLabel="Yes, Submit"
                 icon="bi-check-circle"
                 busy={confirmingCompletion}
                 onConfirm={handleConfirmCompletion}
