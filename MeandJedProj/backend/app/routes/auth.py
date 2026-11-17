@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from sqlalchemy import func, or_
 
 from app.common import (
@@ -13,10 +13,27 @@ from app.common import (
     user_out,
     validated,
 )
-from app.models import ProviderProfile, User
+from app.models import AuditLog, LoginHistory, ProviderProfile, User
 from app.schemas import AdminCredentials, Login, Register
 
 auth_bp = Blueprint("auth", __name__)
+
+
+def record_login(session, email, user, success):
+    session.add(LoginHistory(
+        user_id=user.id if user else None,
+        attempted_identifier=email[:255],
+        success=success,
+        ip_address=(request.remote_addr or "")[:45] or None,
+        user_agent=(request.user_agent.string or "")[:500] or None,
+    ))
+    session.add(AuditLog(
+        entity_type="authentication",
+        entity_id=str(user.id) if user else None,
+        action="login_success" if success else "login_failure",
+        actor_user_id=user.id if user and success else None,
+        details="{}",
+    ))
 
 
 @auth_bp.post("/auth/register")
@@ -73,7 +90,14 @@ def login_user(required_role):
             or not pwd.verify(data.password, user.password_hash)
             or (required_role and user.role != required_role)
         ):
+            record_login(session, data.email, user, False)
+            session.commit()
             raise ApiError("Invalid email or password", 401)
+        if not user.is_active:
+            record_login(session, data.email, user, False)
+            session.commit()
+            raise ApiError("Invalid email or password", 401)
+        record_login(session, data.email, user, True)
         user.last_login_at = datetime.utcnow()
         session.commit()
         session.refresh(user)
@@ -102,7 +126,10 @@ def login_admin():
             .first()
         )
         if not user or not pwd.verify(data.password, user.password_hash):
+            record_login(session, username, user, False)
+            session.commit()
             raise ApiError("Invalid admin username or password", 401)
+        record_login(session, user.email, user, True)
         user.last_login_at = datetime.utcnow()
         session.commit()
         session.refresh(user)

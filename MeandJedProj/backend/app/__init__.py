@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.exceptions import HTTPException
 
 from app.common import ApiError, api_error_handler
-from app.models import Category, Complaint, SystemSetting
+from app.models import AuditLog, Category, Complaint, LoginHistory, SystemSetting
 
 
 DEFAULT_SERVICE_CATEGORIES = (
@@ -111,6 +111,8 @@ def create_app(test_config=None):
 
     SystemSetting.__table__.create(engine, checkfirst=True)
     Complaint.__table__.create(engine, checkfirst=True)
+    LoginHistory.__table__.create(engine, checkfirst=True)
+    AuditLog.__table__.create(engine, checkfirst=True)
 
     if inspect(engine).has_table("users"):
         user_columns = {

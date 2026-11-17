@@ -371,3 +371,63 @@ ALTER TABLE `bookings`
     COMMENT 'Duration snapshot for this booking in minutes',
   ADD INDEX `idx_bookings_provider_date_status_time`
     (`provider_id`, `preferred_date`, `status`, `preferred_time`);
+
+-- Query indexes for common inbox, notification, and analytics access patterns.
+ALTER TABLE `messages`
+  ADD KEY `idx_messages_recipient_created` (`recipient_id`, `created_at`),
+  ADD KEY `idx_messages_booking_created` (`booking_id`, `created_at`);
+ALTER TABLE `notifications`
+  ADD KEY `idx_notifications_user_read_created` (`user_id`, `is_read`, `created_at`);
+ALTER TABLE `booking_status_history`
+  ADD KEY `idx_booking_history_created` (`booking_id`, `created_at`);
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `chk_reviews_rating` CHECK (`rating` BETWEEN 1 AND 5);
+ALTER TABLE `provider_services`
+  ADD CONSTRAINT `chk_provider_service_rate` CHECK (`rate` IS NULL OR `rate` >= 0),
+  ADD CONSTRAINT `chk_provider_service_duration` CHECK (`duration_minutes` > 0);
+ALTER TABLE `provider_profiles`
+  ADD CONSTRAINT `chk_provider_hourly_rate` CHECK (`hourly_rate` IS NULL OR `hourly_rate` >= 0),
+  ADD CONSTRAINT `chk_provider_experience` CHECK (`experience_years` >= 0);
+
+-- Authentication and security event history. Booking status audit trigger and
+-- these tables are also available as an upgrade migration for existing installs.
+CREATE TABLE `login_history` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `attempted_identifier` varchar(255) NOT NULL,
+  `success` boolean NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(500) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_login_history_user_created` (`user_id`, `created_at`),
+  KEY `idx_login_history_created` (`created_at`),
+  CONSTRAINT `login_history_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `audit_logs` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `entity_type` varchar(80) NOT NULL,
+  `entity_id` varchar(80) DEFAULT NULL,
+  `action` varchar(80) NOT NULL,
+  `actor_user_id` bigint DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_audit_entity` (`entity_type`, `entity_id`, `created_at`),
+  KEY `idx_audit_actor_created` (`actor_user_id`, `created_at`),
+  CONSTRAINT `audit_logs_actor_fk` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TRIGGER IF EXISTS `trg_bookings_status_audit`;
+DELIMITER //
+CREATE TRIGGER `trg_bookings_status_audit` AFTER UPDATE ON `bookings`
+FOR EACH ROW
+BEGIN
+  IF NOT (OLD.`status` <=> NEW.`status`) THEN
+    INSERT INTO `audit_logs` (`entity_type`, `entity_id`, `action`, `details`)
+    VALUES ('booking', CAST(NEW.`id` AS CHAR), 'status_changed',
+      JSON_OBJECT('old_status', OLD.`status`, 'new_status', NEW.`status`));
+  END IF;
+END//
+DELIMITER ;

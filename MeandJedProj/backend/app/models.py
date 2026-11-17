@@ -72,6 +72,30 @@ class SystemSetting(Base):
     value = Column(Text, nullable=False)
 
 
+class LoginHistory(Base):
+    __tablename__ = "login_history"
+
+    id = Column(ID_TYPE, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    attempted_identifier = Column(String(255), nullable=False)
+    success = Column(Boolean, nullable=False)
+    ip_address = Column(String(45), nullable=True)
+    user_agent = Column(String(500), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(ID_TYPE, primary_key=True)
+    entity_type = Column(String(80), nullable=False)
+    entity_id = Column(String(80), nullable=True)
+    action = Column(String(80), nullable=False)
+    actor_user_id = Column(BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    details = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+
 class ProviderProfile(Base):
     __tablename__ = "provider_profiles"
 
