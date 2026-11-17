@@ -1331,7 +1331,7 @@ body {
 
 .navbar-links {
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
   gap: clamp(18px, 2.5vw, 38px);
 }
 
@@ -1339,6 +1339,7 @@ body {
   color: var(--green-800);
   font-size: 14px;
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .navbar-links a:first-child {

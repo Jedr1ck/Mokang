@@ -19,6 +19,7 @@ import Messages from '../HomeOwnerDashboard/Messages';
 import ProviderNotifications from './ProviderNotifications';
 import ProviderAccountProfile from './ProviderAccountProfile';
 import ProviderServiceMap from './ProviderServiceMap';
+import { formatTime12Hour, getPhilippinesDateTime } from '../../utils/dateTime';
 import ProviderJobs from './ProviderJobs';
 import ProviderAvailability from './ProviderAvailability';
 
@@ -181,16 +182,14 @@ const ProviderDashboard = () => {
     const averageRating = reviews.length
         ? reviews.reduce((total, review) => total + Number(review.rating || 0), 0) / reviews.length
         : 0;
-    const localToday = new Date(availabilityClock);
-    localToday.setMinutes(localToday.getMinutes() - localToday.getTimezoneOffset());
-    const localTodayValue = localToday.toISOString().slice(0, 10);
-    const localWeekStart = new Date(availabilityClock);
-    localWeekStart.setDate(availabilityClock.getDate() - ((availabilityClock.getDay() + 6) % 7));
+    const { date: localTodayValue, time: localTimeValue } = getPhilippinesDateTime();
+    const localToday = new Date(`${localTodayValue}T12:00:00`);
+    const localWeekStart = new Date(localToday);
+    localWeekStart.setDate(localToday.getDate() - ((localToday.getDay() + 6) % 7));
     const localWeekStartValue = `${localWeekStart.getFullYear()}-${String(localWeekStart.getMonth() + 1).padStart(2, '0')}-${String(localWeekStart.getDate()).padStart(2, '0')}`;
-    const localWeekEnd = new Date(availabilityClock);
-    localWeekEnd.setDate(availabilityClock.getDate() + (6 - ((availabilityClock.getDay() + 6) % 7)));
+    const localWeekEnd = new Date(localToday);
+    localWeekEnd.setDate(localToday.getDate() + (6 - ((localToday.getDay() + 6) % 7)));
     const localWeekEndValue = `${localWeekEnd.getFullYear()}-${String(localWeekEnd.getMonth() + 1).padStart(2, '0')}-${String(localWeekEnd.getDate()).padStart(2, '0')}`;
-    const localTimeValue = availabilityClock.toTimeString().slice(0, 5);
     const hasDateSpecificAvailability = availabilityConfig.availability_slots.some((slot) => (
         slot.date >= localTodayValue && slot.date <= localWeekEndValue && (slot.date > localTodayValue || slot.time > localTimeValue)
     ));
@@ -449,7 +448,6 @@ const ProviderDashboard = () => {
 
                                     <div>
                                         <h3>
-                                            <i className="bi bi-calendar-event"></i>
                                             Booking Requests
                                         </h3>
 
@@ -474,7 +472,7 @@ const ProviderDashboard = () => {
                                     {actionableBookings.length === 0 ? <p>No new booking requests.</p> : actionableBookings.slice(0, 3).map((booking) => (
                                         <div className="provider-schedule-item" key={booking.id}>
                                             <div className="provider-time">
-                                                <strong>{booking.preferredTime}</strong>
+                                                <strong>{formatTime12Hour(booking.preferredTime)}</strong>
                                                 <span>{booking.preferredDate}</span>
                                             </div>
                                             <div className="provider-schedule-line"></div>
@@ -499,7 +497,6 @@ const ProviderDashboard = () => {
 
                                     <div>
                                         <h3>
-                                            <i className="bi bi-calendar-event"></i>
                                             Today's Schedule
                                         </h3>
 
@@ -526,7 +523,7 @@ const ProviderDashboard = () => {
                                 <div className="provider-schedule-list">
                                     {todaysBookings.length === 0 ? <p>No bookings scheduled for today.</p> : todaysBookings.slice(0, 3).map((booking) => (
                                         <div className="provider-schedule-item" key={booking.id}>
-                                            <div className="provider-time"><strong>{booking.preferredTime}</strong></div>
+                                            <div className="provider-time"><strong>{formatTime12Hour(booking.preferredTime)}</strong></div>
                                             <div className="provider-schedule-line"></div>
                                             <div className="provider-schedule-details">
                                                 <h4>{booking.serviceName || booking.category || 'Service request'}</h4>
@@ -659,7 +656,7 @@ const ProviderDashboard = () => {
                                         </div>
                                         <div className="provider-calendar-details">
                                             <h2>{booking.serviceName || booking.category || 'Service appointment'}</h2>
-                                            <p><i className="bi bi-clock"></i>{booking.preferredTime || 'Time not set'}</p>
+                                            <p><i className="bi bi-clock"></i>{formatTime12Hour(booking.preferredTime) || 'Time not set'}</p>
                                             <p><i className="bi bi-person"></i>{booking.customerName || 'Homeowner'}</p>
                                             <p><i className="bi bi-geo-alt"></i>{booking.address || 'Address not provided'}</p>
                                         </div>

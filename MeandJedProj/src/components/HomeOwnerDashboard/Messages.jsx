@@ -133,7 +133,8 @@ const Messages = ({ embedded = false, bookings }) => {
 
             const time = new Date(row.createdAt).toLocaleTimeString([], {
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                hour12: true,
             });
             conversation.messages.push({
                 id: row.id,

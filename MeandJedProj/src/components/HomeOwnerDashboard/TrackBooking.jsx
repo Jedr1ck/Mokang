@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { confirmBookingCompletion, getMyBookings } from '../../services/api';
 import ConfirmDialog from '../ConfirmDialog';
+import { formatTime12Hour } from '../../utils/dateTime';
 import './TrackBooking.css';
 
 const TrackBooking = () => {
@@ -150,7 +151,7 @@ const TrackBooking = () => {
 
                 <div className="tracking-booking-summary">
                     <strong>{bookingData.serviceName || bookingData.category || 'Service booking'}</strong>
-                    <span>{bookingData.preferredDate || 'Date to be confirmed'}{bookingData.preferredTime ? ` at ${bookingData.preferredTime}` : ''}</span>
+                    <span>{bookingData.preferredDate || 'Date to be confirmed'}{bookingData.preferredTime ? ` at ${formatTime12Hour(bookingData.preferredTime)}` : ''}</span>
                     {bookingData.providerName && <span>Provider: {bookingData.providerName}</span>}
                 </div>
 

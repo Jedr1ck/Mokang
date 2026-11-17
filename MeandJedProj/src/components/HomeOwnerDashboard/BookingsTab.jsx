@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
-import { api, confirmBookingCompletion, getMyBookings } from '../../services/api';
+import { api, confirmBookingCompletion, deleteCompletedBooking, getMyBookings } from '../../services/api';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import ConfirmDialog from '../ConfirmDialog';
+import { formatTime12Hour } from '../../utils/dateTime';
 
 const BOOKING_FILTERS = [
     { label: 'All', matches: () => true },
@@ -28,6 +29,8 @@ const BookingsTab = () => {
     const [bookingToCancel, setBookingToCancel] = useState(null);
     const [bookingToConfirm, setBookingToConfirm] = useState(null);
     const [confirmingId, setConfirmingId] = useState(null);
+    const [bookingToDelete, setBookingToDelete] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -101,6 +104,21 @@ const BookingsTab = () => {
         }
     };
 
+    const handleDeleteBooking = async () => {
+        if (!bookingToDelete) return;
+        setActionError('');
+        setDeletingId(bookingToDelete.id);
+        try {
+            await deleteCompletedBooking(bookingToDelete.id);
+            setBookings((current) => current.filter((item) => item.id !== bookingToDelete.id));
+            setBookingToDelete(null);
+        } catch (error) {
+            setActionError(error.message || 'Unable to delete this completed booking.');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     return (
         <div className="profile-page-container">
             <HomeownerSideBar />
@@ -165,7 +183,7 @@ const BookingsTab = () => {
                                                     <h6 className="fw-bold text-dark m-0">{booking.serviceName || booking.category || 'Service'}{booking.description ? ` - ${booking.description}` : ''}</h6>
                                                     <small className="text-muted d-flex flex-wrap align-items-center gap-2 mt-1">
                                                         <span><i className="bi bi-calendar3 me-1" />{booking.preferredDate || 'Date to be confirmed'}</span>
-                                                        {booking.preferredTime && <span><i className="bi bi-clock me-1" />{booking.preferredTime}</span>}
+                                                        {booking.preferredTime && <span><i className="bi bi-clock me-1" />{formatTime12Hour(booking.preferredTime)}</span>}
                                                     </small>
                                                     {booking.providerName && <small className="text-muted d-block mt-1">Provider: {booking.providerName}</small>}
                                                 </div>
@@ -180,6 +198,26 @@ const BookingsTab = () => {
                                                         onClick={() => setBookingToConfirm(booking)}
                                                     >
                                                         Confirm Completed
+                                                    </button>
+                                                )}
+                                                {status === 'Completed' && booking.hasReview && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold"
+                                                        disabled={deletingId === booking.id}
+                                                        onClick={() => setBookingToDelete(booking)}
+                                                    >
+                                                        <i className="bi bi-trash3 me-1" /> Delete
+                                                    </button>
+                                                )}
+                                                {status === 'Completed' && !booking.hasReview && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold"
+                                                        onClick={() => navigate('/history')}
+                                                        title="Leave a review before deleting this booking"
+                                                    >
+                                                        <i className="bi bi-star me-1" /> Leave Review to Delete
                                                     </button>
                                                 )}
                                                 {!isClosed && (
@@ -230,6 +268,17 @@ const BookingsTab = () => {
                 busy={Boolean(cancellingId)}
                 onConfirm={handleCancelBooking}
                 onCancel={() => setBookingToCancel(null)}
+            />
+            <ConfirmDialog
+                open={Boolean(bookingToDelete)}
+                title="Delete completed booking?"
+                message="This permanently deletes the completed booking and its review and messages. You can delete it only after leaving a review."
+                confirmLabel="Yes, Delete"
+                icon="bi-trash3"
+                tone="danger"
+                busy={Boolean(deletingId)}
+                onConfirm={handleDeleteBooking}
+                onCancel={() => setBookingToDelete(null)}
             />
         </div>
     );

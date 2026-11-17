@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { api, getCategories, getMyProfile, getProvider } from '../../services/api';
 import { isWithinEchague } from '../../services/echagueLocation';
 import ConfirmDialog from '../ConfirmDialog';
+import { formatTime12Hour, getPhilippinesDateTime } from '../../utils/dateTime';
 
 const EMPTY_PROVIDER_SERVICES = [];
 const timeToMinutes = (time = '') => {
@@ -20,19 +21,16 @@ const profileFieldLabels = {
 
 function slotsForWeeklySchedule(schedule) {
     if (!schedule || Array.isArray(schedule) || typeof schedule !== 'object') return [];
-    const now = new Date();
-    const today = new Date(now);
-    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    const todayValue = today.toISOString().slice(0, 10);
+    const { date: todayValue, time: currentTime } = getPhilippinesDateTime();
     const weekStart = new Date(`${todayValue}T12:00:00`);
     weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
     const weekStartValue = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
     if (schedule._week_start !== weekStartValue) return [];
-    const currentTime = now.toTimeString().slice(0, 5);
     const slots = [];
 
     for (let offset = 0; offset < 7; offset += 1) {
-        const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 12);
+        const date = new Date(`${todayValue}T12:00:00`);
+        date.setDate(date.getDate() + offset);
         const dateValue = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         const hours = schedule[date.toLocaleDateString('en-US', { weekday: 'long' })];
         if (!hours || hours.enabled !== true || !/^\d{2}:\d{2}$/.test(hours.start || '') || !/^\d{2}:\d{2}$/.test(hours.end || '')) continue;
@@ -71,13 +69,10 @@ const BookingModal = ({
     const [availabilitySlots, setAvailabilitySlots] = useState([]);
     const [bookedSlots, setBookedSlots] = useState([]);
     const [workingSchedule, setWorkingSchedule] = useState([]);
-    const today = new Date();
-    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    const todayValue = today.toISOString().slice(0, 10);
-    const weekEndDate = new Date();
+    const { date: todayValue, time: currentTime } = getPhilippinesDateTime();
+    const weekEndDate = new Date(`${todayValue}T12:00:00`);
     weekEndDate.setDate(weekEndDate.getDate() + (6 - ((weekEndDate.getDay() + 6) % 7)));
     const weekEndValue = `${weekEndDate.getFullYear()}-${String(weekEndDate.getMonth() + 1).padStart(2, '0')}-${String(weekEndDate.getDate()).padStart(2, '0')}`;
-    const currentTime = new Date().toTimeString().slice(0, 5);
     const selectedService = serviceOptions[Number(selectedServiceIndex)] || null;
     const requestedDuration = Math.max(1, Number(selectedService?.durationMinutes) || 60);
     const allAvailabilitySlots = availabilitySlots;
@@ -111,7 +106,6 @@ const BookingModal = ({
         preferredTime: '',
         address: '',
         description: '',
-        photo: null,
     });
     const availableTimes = effectiveAvailabilitySlots
         .filter((slot) => slot.date === formData.preferredDate)
@@ -338,24 +332,6 @@ const BookingModal = ({
         setFormData((previous) => ({
             ...previous,
             category: selectedService?.category || selectedService?.name || '',
-        }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
-            setFormError('Upload a valid image no larger than 5 MB.');
-            e.target.value = '';
-            return;
-        }
-
-        setFormError('');
-        setFormData((previous) => ({
-            ...previous,
-            photo: file,
         }));
     };
 
@@ -598,7 +574,7 @@ const BookingModal = ({
                                             disabled={!availableTimes.length}
                                         >
                                             <option value="">{availableTimes.length ? 'Select an available time' : 'Select a date first'}</option>
-                                            {availableTimes.map((time) => <option key={time} value={time}>{new Date(`2000-01-01T${time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</option>)}
+                                            {availableTimes.map((time) => <option key={time} value={time}>{formatTime12Hour(time)}</option>)}
                                         </select>
                                         {fieldErrors.preferredTime && <div className="invalid-feedback">{fieldErrors.preferredTime}</div>}
                                     </div>
@@ -712,28 +688,6 @@ const BookingModal = ({
                                         {fieldErrors.description && <div className="invalid-feedback">{fieldErrors.description}</div>}
                                     </div>
 
-                                    {/* Upload Photo (Optional) */}
-                                    <div className="col-12">
-                                        <label className="form-label fw-semibold small">
-                                            Upload Photo{' '}
-                                            <span className="text-muted fw-normal">
-                                                (Optional)
-                                            </span>
-                                        </label>
-
-                                        <input
-                                            type="file"
-                                            className="form-control rounded-3"
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                        />
-
-                                        <small className="text-muted extra-small">
-                                            Upload a photo to help service providers
-                                            understand the problem better.
-                                        </small>
-                                    </div>
-
                                     {formError && (
                                         <div className="col-12 text-danger small">
                                             {formError}
@@ -801,7 +755,7 @@ const BookingModal = ({
             <ConfirmDialog
                 open={showSubmitConfirm}
                 title="Are you sure you want to submit?"
-                message={`Submit a ${selectedService?.name || formData.category} booking for ${formData.preferredDate} at ${formData.preferredTime}?`}
+                message={`Submit a ${selectedService?.name || formData.category} booking for ${formData.preferredDate} at ${formatTime12Hour(formData.preferredTime)}?`}
                 confirmLabel="Yes, Submit"
                 busy={submittingBooking}
                 onConfirm={submitBooking}

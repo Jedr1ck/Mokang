@@ -4,6 +4,7 @@ import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 import { api } from '../../services/api';
+import { formatTime12Hour } from '../../utils/dateTime';
 
 const History = () => {
     const navigate = useNavigate();
@@ -198,7 +199,7 @@ const History = () => {
                                         </td>
                                         <td style={tdStyle}>
                                             <div>{item.date}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>{item.time}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>{formatTime12Hour(item.time)}</div>
                                         </td>
                                         <td style={tdStyle}>{item.provider}</td>
                                         <td style={{ ...tdStyle, fontWeight: 'bold', color: 'var(--theme-text)' }}>{item.amount}</td>

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { formatTime12Hour } from '../../utils/dateTime';
 import "./ProviderBookings.css";
 
 const ProviderBookingCard = ({ booking, homeownerName = 'Homeowner' }) => {
@@ -84,7 +85,7 @@ const ProviderBookingCard = ({ booking, homeownerName = 'Homeowner' }) => {
                             <span>Preferred Schedule</span>
                             <strong>
                                 {formatDate(date)}
-                                {time ? ` • ${time}` : ''}
+                                {time ? ` • ${formatTime12Hour(time)}` : ''}
                             </strong>
                         </div>
                     </div>

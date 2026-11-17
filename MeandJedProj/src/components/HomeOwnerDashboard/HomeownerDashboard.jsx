@@ -6,6 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
+import { formatTime12Hour } from '../../utils/dateTime';
 import {
     getMyBookings,
     getNotifications,
@@ -451,7 +452,7 @@ const HomeownerDashboard = () => {
                                             <i className="bi bi-calendar3" />
                                             {formatBookingDate(booking.preferredDate)}
                                             {booking.preferredTime
-                                                ? ` · ${booking.preferredTime}`
+                                                ? ` · ${formatTime12Hour(booking.preferredTime)}`
                                                 : ''}
                                         </small>
                                     </span>
@@ -506,7 +507,7 @@ const HomeownerDashboard = () => {
                                         <small>
                                             {formatBookingDate(booking.preferredDate)}
                                             {booking.preferredTime
-                                                ? ` · ${booking.preferredTime}`
+                                                ? ` · ${formatTime12Hour(booking.preferredTime)}`
                                                 : ''}
                                         </small>
                                     </span>

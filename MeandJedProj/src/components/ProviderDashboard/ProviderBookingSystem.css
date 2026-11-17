@@ -668,6 +668,11 @@
     gap: 8px;
 }
 
+.pbs-start-time-note {
+    color: var(--theme-text);
+    font-size: 11px;
+}
+
 .pbs-booking-actions button {
     display: flex;
     min-height: 36px;

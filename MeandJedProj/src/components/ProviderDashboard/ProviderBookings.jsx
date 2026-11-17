@@ -8,6 +8,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./ProviderBookings.css";
 import { getMyBookings, updateBookingStatus } from "../../services/api";
 import ConfirmDialog from "../ConfirmDialog";
+import { formatTime12Hour } from "../../utils/dateTime";
 
 
 const ProviderBookings = () => {
@@ -293,7 +294,7 @@ const ProviderBookings = () => {
                     location: booking.address,
                     fullAddress: booking.address,
                     date: new Date(`${booking.preferredDate}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-                    time: booking.preferredTime,
+                    time: formatTime12Hour(booking.preferredTime),
                     status: booking.status === 'Pending' ? 'New' : booking.status,
                     estimatedFee: 'Not specified',
                     description: booking.description,

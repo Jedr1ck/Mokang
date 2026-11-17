@@ -4,6 +4,7 @@ import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
 import { api } from '../../services/api';
+import { formatTime12Hour } from '../../utils/dateTime';
 
 const CalendarView = () => {
     const navigate = useNavigate();
@@ -188,7 +189,7 @@ const CalendarView = () => {
                                         <i className="bi bi-person"></i> {item.provider}
                                     </p>
                                     <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#9ca3af' }}>
-                                        <i className="bi bi-clock"></i> {item.time}
+                                        <i className="bi bi-clock"></i> {formatTime12Hour(item.time)}
                                     </p>
                                 </div>
                             ))

@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, jsonify
+from sqlalchemy import and_, or_
 from app.common import (
     ApiError,
     booking_out,
@@ -21,6 +22,7 @@ from app.common import (
 from app.models import (
     Booking,
     Category,
+    Complaint,
     Message,
     Notification,
     ProviderProfile,
@@ -36,6 +38,51 @@ ACTIVE_BOOKING_STATUSES = [
     "Awaiting Confirmation",
 ]
 DEFAULT_SERVICE_DURATION_MINUTES = 60
+PHILIPPINES_TZ = timezone(timedelta(hours=8))
+
+
+def _expire_overdue_pending_bookings(session):
+    """Cancel requests that are still pending after their scheduled start time (Philippines time)."""
+    now = datetime.now(PHILIPPINES_TZ)
+    overdue = (
+        session.query(Booking)
+        .filter(
+            Booking.status.in_(("Pending", "Matched")),
+            or_(
+                Booking.preferred_date < now.date(),
+                and_(
+                    Booking.preferred_date == now.date(),
+                    Booking.preferred_time <= now.time().replace(tzinfo=None),
+                ),
+            ),
+        )
+        .with_for_update()
+        .all()
+    )
+    for booking in overdue:
+        booking.status = "Cancelled"
+        category_name = booking.category.name if booking.category else "service"
+        session.add(Notification(
+            user_id=booking.homeowner_id,
+            title="Booking automatically cancelled",
+            body=(
+                f"Your {category_name} booking was automatically cancelled "
+                "because the requested date and time passed without provider acceptance."
+            ),
+            type="booking",
+        ))
+        if booking.provider:
+            session.add(Notification(
+                user_id=booking.provider.user_id,
+                title="Pending booking expired",
+                body=(
+                    f"A pending {category_name} booking was automatically cancelled "
+                    "because its requested date and time passed."
+                ),
+                type="booking",
+            ))
+    if overdue:
+        session.commit()
 
 
 def _duration_for_service(session, provider_id, category_id, service_name):
@@ -342,6 +389,7 @@ def create_booking():
 @require_auth
 def my_bookings():
     with get_session() as session:
+        _expire_overdue_pending_bookings(session)
         user = current_user(session)
         query = provider_booking_query(session.query(Booking), user, session)
         if query is None:
@@ -366,6 +414,7 @@ def my_bookings():
 @require_auth
 def cancel_homeowner_booking(booking_id):
     with get_session() as session:
+        _expire_overdue_pending_bookings(session)
         user = current_user(session)
         if user.role != "homeowner":
             raise ApiError("Homeowners only", 403)
@@ -413,11 +462,46 @@ def cancel_homeowner_booking(booking_id):
 @require_auth
 def admin_bookings():
     with get_session() as session:
+        _expire_overdue_pending_bookings(session)
         user = current_user(session)
         if user.role != "admin" or not user.is_active:
             raise ApiError("Admins only", 403)
         rows = session.query(Booking).order_by(Booking.created_at.desc()).all()
         return jsonify([booking_out(booking) for booking in rows])
+
+
+@bookings_bp.delete("/bookings/<int:booking_id>")
+@require_auth
+def delete_completed_booking(booking_id):
+    with get_session() as session:
+        user = current_user(session)
+        booking = session.get(Booking, booking_id)
+        if not booking:
+            raise ApiError("Booking not found", 404)
+        if booking.status != "Completed":
+            raise ApiError("Only completed bookings can be deleted.", 409)
+        review = session.query(Review.id).filter_by(booking_id=booking.id).first()
+        if user.role == "provider":
+            provider = session.query(ProviderProfile).filter_by(user_id=user.id).first()
+            if not provider:
+                raise ApiError("Provider profile not found", 404)
+            if booking.provider_id != provider.id:
+                raise ApiError("Not your booking", 403)
+        elif user.role == "homeowner":
+            if booking.homeowner_id != user.id:
+                raise ApiError("Not your booking", 403)
+            if not review:
+                raise ApiError("Please leave a review before deleting this completed booking.", 409)
+        else:
+            raise ApiError("Homeowners or providers only", 403)
+        if session.query(Complaint.id).filter_by(booking_id=booking.id).first():
+            raise ApiError("This booking has a complaint and cannot be deleted.", 409)
+
+        session.query(Message).filter_by(booking_id=booking.id).delete(synchronize_session=False)
+        session.query(Review).filter_by(booking_id=booking.id).delete(synchronize_session=False)
+        session.delete(booking)
+        session.commit()
+        return jsonify({"message": "Completed booking deleted."})
 
 
 @bookings_bp.patch("/admin/bookings/<int:booking_id>/status")
@@ -439,6 +523,7 @@ def admin_change_booking_status(booking_id):
         raise ApiError("Invalid booking status.", 422)
 
     with get_session() as session:
+        _expire_overdue_pending_bookings(session)
         user = current_user(session)
         if user.role != "admin" or not user.is_active:
             raise ApiError("Admins only", 403)
@@ -471,6 +556,7 @@ def admin_change_booking_status(booking_id):
 def change_status(booking_id):
     data = validated(StatusIn)
     with get_session() as session:
+        _expire_overdue_pending_bookings(session)
         user = current_user(session)
         booking = session.get(Booking, booking_id)
         if not booking:
@@ -540,6 +626,18 @@ def change_status(booking_id):
             )
         if booking.provider_id and booking.provider_id != provider.id:
             raise ApiError("Not your booking", 403)
+        if booking.status in {"Cancelled", "Rejected", "Completed"}:
+            raise ApiError("This booking is no longer active.", 409)
+        if data.status == "On the Way":
+            if booking.status not in {"Accepted", "Matched"}:
+                raise ApiError("Accept the booking before starting travel.", 409)
+            scheduled_start = datetime.combine(
+                booking.preferred_date, booking.preferred_time
+            )
+            if scheduled_start > datetime.now(PHILIPPINES_TZ).replace(tzinfo=None):
+                raise ApiError("You can start travel only when the scheduled date and time arrives.", 409)
+        if data.status == "In Progress" and booking.status != "On the Way":
+            raise ApiError("Start travel before starting the service.", 409)
         if booking.status == "Awaiting Confirmation" and data.status != booking.status:
             raise ApiError("Only the homeowner can confirm this service as completed.", 400)
         if data.status == "Cancelled" and booking.status in {"On the Way", "In Progress"}:
@@ -600,6 +698,39 @@ def change_status(booking_id):
         )
         session.commit()
         return jsonify(booking_out(booking))
+
+
+@bookings_bp.patch("/bookings/<int:booking_id>/remind-completion")
+@require_auth
+def remind_completion(booking_id):
+    with get_session() as session:
+        user = current_user(session)
+        if user.role != "provider":
+            raise ApiError("Providers only", 403)
+        provider = session.query(ProviderProfile).filter_by(user_id=user.id).first()
+        if not provider:
+            raise ApiError("Provider profile not found", 404)
+        booking = session.get(Booking, booking_id)
+        if not booking:
+            raise ApiError("Booking not found", 404)
+        if booking.provider_id != provider.id:
+            raise ApiError("Not your booking", 403)
+        if booking.status != "Awaiting Confirmation":
+            raise ApiError("This booking is not waiting for completion confirmation.", 400)
+
+        provider_name = provider.business_name or user.full_name
+        category_name = booking.category.name if booking.category else "service"
+        session.add(Notification(
+            user_id=booking.homeowner_id,
+            title="Reminder: Confirm completed service",
+            body=(
+                f"{provider_name} is reminding you to confirm the {category_name} "
+                f"service for booking {booking.booking_code}. Open My Bookings to confirm it."
+            ),
+            type="booking",
+        ))
+        session.commit()
+        return jsonify({"message": "Reminder sent."})
 
 
 @bookings_bp.patch("/bookings/<int:booking_id>/confirm-completion")
@@ -729,7 +860,7 @@ def reschedule_booking(booking_id):
                 body=(
                     f"Your {category_name} booking was rescheduled to "
                     f"{data.preferred_date.isoformat()} at "
-                    f"{data.preferred_time.strftime('%H:%M')}."
+                    f"{data.preferred_time.strftime('%I:%M %p')}."
                 ),
                 type="booking",
             )
@@ -739,7 +870,7 @@ def reschedule_booking(booking_id):
             session,
             "Provider rescheduled booking",
             f"Provider {provider_name} rescheduled a {category_name} booking to "
-            f"{data.preferred_date.isoformat()} at {data.preferred_time.strftime('%H:%M')}.",
+            f"{data.preferred_date.isoformat()} at {data.preferred_time.strftime('%I:%M %p')}.",
             "booking",
         )
         session.commit()

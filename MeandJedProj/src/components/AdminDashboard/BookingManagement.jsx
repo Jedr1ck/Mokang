@@ -5,6 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./AdminDashboard.css";
 import { api } from "../../services/api";
+import { formatTime12Hour } from "../../utils/dateTime";
 
 
 function BookingManagement() {
@@ -69,7 +70,7 @@ function BookingManagement() {
         providerName: booking.providerName,
         service: booking.category,
         date: booking.preferredDate,
-        time: booking.preferredTime,
+        time: formatTime12Hour(booking.preferredTime),
         location: booking.address,
         notes: booking.description,
         status: booking.status,

@@ -537,6 +537,262 @@ html[data-theme="dark"] .hp-map-location-error {
     color: #FCA5A5;
 }
 
+/* Keep text readable on screens whose component styles still use light-mode colors. */
+html[data-theme="dark"] :is(
+    .dashboard-wrapper,
+    .homeowner-dashboard,
+    .homeowner-profile-v2,
+    .find-services-page,
+    .provider-layout,
+    .provider-bookings-layout,
+    .provider-booking-system,
+    .admin-dashboard-page,
+    .admin-main-content,
+    .admin-page-content,
+    .admin-profile-page,
+    .admin-settings-page,
+    .reports-analytics-page,
+    .booking-insights-page,
+    .service-categories-page,
+    .reviews-complaints-page,
+    .admin-management-page
+) :is(
+    h1, h2, h3, h4, h5, h6, p, small, strong, span,
+    li, dt, dd, label, legend, a, .form-text, .form-label,
+    .text-dark, .text-body, .text-muted
+):not(button *):not(.btn *):not([class*="status"]):not([class*="status"] *):not([class*="badge"]):not([class*="badge"] *):not([class*="pill"]):not([class*="pill"] *):not([class*="success"]):not([class*="success"] *):not([class*="warning"]):not([class*="warning"] *):not([class*="danger"]):not([class*="danger"] *):not([class*="primary"]):not([class*="primary"] *):not(.bg-warning *):not(.bg-success *):not(.bg-danger *):not(.bg-primary *):not(.text-white) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    .dashboard-wrapper,
+    .homeowner-dashboard,
+    .homeowner-profile-v2,
+    .provider-layout,
+    .provider-bookings-layout,
+    .provider-booking-system,
+    .admin-dashboard-page,
+    .admin-main-content,
+    .admin-page-content
+) :is(
+    .form-control, .form-select, input:not([type="checkbox"]):not([type="radio"]),
+    select, textarea
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(
+    .dashboard-wrapper,
+    .homeowner-dashboard,
+    .homeowner-profile-v2,
+    .provider-layout,
+    .provider-bookings-layout,
+    .provider-booking-system,
+    .admin-dashboard-page,
+    .admin-main-content,
+    .admin-page-content
+) :is(input, textarea)::placeholder {
+    color: var(--app-secondary-text) !important;
+    opacity: .9;
+}
+
+html[data-theme="dark"] :is(.dropdown-menu, .popover, .tooltip, .list-group-item) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(.dropdown-item, .list-group-item-action) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(.dropdown-item, .list-group-item-action):hover,
+html[data-theme="dark"] :is(.dropdown-item, .list-group-item-action):focus {
+    background-color: var(--app-elevated) !important;
+}
+
+html[data-theme="light"] :is(body, #root, .app-route-transition) {
+    background-color: var(--app-background);
+    color: var(--app-text);
+}
+
+html[data-theme="light"] :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea, .form-control, .form-select) {
+    color: var(--app-text);
+}
+
+html[data-theme="dark"] .provider-my-jobs {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-my-jobs :is(
+    .my-jobs-search, .my-jobs-filters select, .my-jobs-date-filter,
+    .my-jobs-table-wrap, .my-jobs-stat, .my-jobs-pagination,
+    .job-details-modal, .message-modal
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-my-jobs :is(.my-jobs-date-filter input, .my-jobs-filters select, .my-jobs-search input) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-my-jobs :is(
+    .job-modal-header, .message-modal-header,
+    .job-modal-footer, .message-modal-footer,
+    .my-jobs-table th, .my-jobs-table td
+) {
+    border-color: var(--app-border) !important;
+}
+
+html[data-theme="dark"] .provider-my-jobs :is(
+    h1, h2, h3, p, small, strong, span, label, dt, dd, th, td
+):not(button *):not(.btn *):not([class*="status"]):not([class*="status"] *):not([class*="pill"]):not([class*="pill"] *):not([class*="success"]):not([class*="success"] *):not([class*="warning"]):not([class*="warning"] *):not([class*="danger"]):not([class*="danger"] *):not(.bg-warning *):not(.bg-success *):not(.bg-danger *) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-my-jobs :is(input, textarea)::placeholder {
+    color: var(--app-secondary-text) !important;
+}
+
+/* Provider's booking detail screen has standalone white surfaces outside the shared card classes. */
+html[data-theme="dark"] .provider-booking-system :is(
+    .pbs-topbar, .pbs-filter-tab, .pbs-booking-list, .pbs-booking-detail,
+    .pbs-booking-card, .pbs-customer-details > button, .pbs-reschedule-modal
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-topbar {
+    background-color: var(--app-elevated) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system :is(
+    .pbs-search, .pbs-filter-tabs, .pbs-status-pill,
+    .pbs-status-pill.confirmed, .pbs-status-pill.in-progress,
+    .pbs-status-pill.completed, .pbs-customer-details > button
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-soft-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab.active {
+    border-color: var(--app-primary) !important;
+    background-color: var(--app-primary) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system :is(.pbs-booking-card:hover, .pbs-booking-card.selected) {
+    border-color: var(--app-primary) !important;
+    background-color: var(--app-elevated) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system :is(
+    .pbs-detail-heading, .pbs-detail-section, .pbs-section-heading,
+    .pbs-icon-button, .pbs-profile-button, .pbs-profile-button small,
+    .pbs-search input, .pbs-card-copy > strong, .pbs-card-copy > span,
+    .pbs-card-copy small, .pbs-detail-heading h2, .pbs-detail-heading p,
+    .pbs-section-heading h3, .pbs-customer-details > div > strong,
+    .pbs-customer-details > div > span, .pbs-service-details dt,
+    .pbs-service-details dd, .pbs-status-timeline li,
+    .pbs-status-timeline li small, .pbs-start-time-note,
+    .pbs-list-state, .pbs-detail-empty, .pbs-reschedule-modal h2,
+    .pbs-reschedule-modal p, .pbs-reschedule-modal label
+) {
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system :is(
+    .pbs-reschedule-modal input, .pbs-search input
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-actions .secondary {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-primary-hover) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-actions .danger {
+    border-color: #F87171 !important;
+    background-color: var(--app-elevated) !important;
+    color: #FCA5A5 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-brand {
+    background-color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-brand img {
+    filter: none;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-status-timeline::before {
+    background: var(--app-border) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-timeline-dot {
+    border-color: var(--app-secondary-text) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-status-timeline li.done .pbs-timeline-dot {
+    border-color: var(--app-primary) !important;
+    background-color: var(--app-primary) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-page-heading > button,
+html[data-theme="dark"] .provider-booking-system .pbs-booking-actions .primary {
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .provider-layout :is(.provider-top-header, .provider-search-box, .provider-header-icon, .provider-stat-card, .provider-dashboard-card, .provider-quick-actions-card, .provider-service-card) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+}
+
+html[data-theme="dark"] .provider-layout :is(.provider-search-box input, .provider-profile-header, .provider-header-name) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-search-box input::placeholder {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-schedule-item {
+    border-color: var(--app-border) !important;
+}
+
+html[data-theme="dark"] .admin-main-content :is(
+    .admin-management-toolbar, .admin-management-filter-bar,
+    .admin-profile-account-card, .admin-settings-panel,
+    .admin-notification-panel, .admin-table-toolbar
+) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .admin-main-content :is(input, select, textarea, .form-control, .form-select) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html,
     body,

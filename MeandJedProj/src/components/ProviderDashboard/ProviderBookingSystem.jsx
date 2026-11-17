@@ -2,19 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     getMyBookings,
+    deleteCompletedBooking,
     rescheduleBooking,
     updateBookingStatus,
 } from '../../services/api';
 import ConfirmDialog from '../ConfirmDialog';
 import myLogo from '../../assets/images/handyman-mark.svg';
+import { formatTime12Hour, hasBookingTimeArrived } from '../../utils/dateTime';
 import './ProviderBookingSystem.css';
 
-const filters = ['All Bookings', 'Pending', 'Confirmed', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'];
+const filters = ['All Bookings', 'Pending', 'Confirmed', 'On the Way', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'];
 
 function getDisplayStatus(status) {
     if (status === 'Pending') return 'Pending';
     if (['Accepted', 'Matched'].includes(status)) return 'Confirmed';
-    if (['On the Way', 'In Progress'].includes(status)) return 'In Progress';
+    if (status === 'On the Way') return 'On the Way';
+    if (status === 'In Progress') return 'In Progress';
     if (status === 'Awaiting Confirmation') return 'Awaiting Confirmation';
     if (status === 'Completed') return 'Completed';
     if (['Cancelled', 'Rejected'].includes(status)) return 'Cancelled';
@@ -46,7 +49,9 @@ export default function ProviderBookingSystem() {
     const [error, setError] = useState('');
     const [actionError, setActionError] = useState('');
     const [busy, setBusy] = useState(false);
+    const [, setClock] = useState(Date.now());
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false);
     const [showReschedule, setShowReschedule] = useState(false);
     const [rescheduleDate, setRescheduleDate] = useState('');
@@ -77,6 +82,11 @@ export default function ProviderBookingSystem() {
         return () => {
             active = false;
         };
+    }, []);
+
+    useEffect(() => {
+        const timer = window.setInterval(() => setClock(Date.now()), 30_000);
+        return () => window.clearInterval(timer);
     }, []);
 
     const counts = useMemo(() => {
@@ -135,6 +145,23 @@ export default function ProviderBookingSystem() {
         }
     };
 
+    const deleteSelectedBooking = async () => {
+        if (!selectedBooking || busy) return;
+        setBusy(true);
+        setActionError('');
+        try {
+            await deleteCompletedBooking(selectedBooking.id);
+            const remaining = bookings.filter((booking) => booking.id !== selectedBooking.id);
+            setBookings(remaining);
+            setSelectedId(remaining[0]?.id ?? null);
+            setShowDeleteConfirm(false);
+        } catch (actionFailure) {
+            setActionError(actionFailure.message || 'Unable to delete this completed booking.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
     const saveReschedule = async (event) => {
         event.preventDefault();
         if (!selectedBooking || busy) return;
@@ -177,18 +204,24 @@ export default function ProviderBookingSystem() {
         }
     };
 
-    const statusStep = selectedStatus === 'Pending'
+    const rawStatus = selectedBooking?.status || '';
+    const canStartTravel = selectedBooking
+        ? hasBookingTimeArrived(selectedBooking.preferredDate, selectedBooking.preferredTime)
+        : false;
+    const statusStep = rawStatus === 'Pending'
         ? 0
-        : selectedStatus === 'Confirmed'
+        : ['Accepted', 'Matched'].includes(rawStatus)
             ? 1
-            : selectedStatus === 'In Progress'
+            : rawStatus === 'On the Way'
                 ? 2
-                    : selectedStatus === 'Awaiting Confirmation'
-                        ? 3
-                        : selectedStatus === 'Completed'
-                            ? 4
-                            : selectedStatus === 'Cancelled'
-                                ? 5
+                : rawStatus === 'In Progress'
+                    ? 3
+                    : rawStatus === 'Awaiting Confirmation'
+                        ? 4
+                        : rawStatus === 'Completed'
+                            ? 5
+                            : rawStatus === 'Cancelled'
+                                ? 6
                                 : 0;
 
     return (
@@ -292,7 +325,7 @@ export default function ProviderBookingSystem() {
                                 <span className="pbs-card-copy">
                                     <strong>{booking.serviceName || booking.category || 'Service request'}</strong>
                                     <span>{booking.customerName || 'Homeowner'}</span>
-                                    <small><i className="bi bi-calendar-event" />{formatDate(booking.preferredDate)} <b>·</b> {booking.preferredTime || 'Time not set'}</small>
+                                    <small><i className="bi bi-calendar-event" />{formatDate(booking.preferredDate)} <b>·</b> {formatTime12Hour(booking.preferredTime) || 'Time not set'}</small>
                                     <small><i className="bi bi-geo-alt" />{booking.address || 'Address not provided'}</small>
                                 </span>
                                 <span className={`pbs-status-pill ${displayStatus.toLowerCase().replaceAll(' ', '-')}`}>
@@ -320,7 +353,7 @@ export default function ProviderBookingSystem() {
                                     </span>
                                     <h2>{selectedBooking.category || 'Service request'}</h2>
                                     <p>Booking ID: #{selectedBooking.bookingCode || selectedBooking.id}</p>
-                                    <p><i className="bi bi-calendar-event" />{formatDate(selectedBooking.preferredDate)} <b>·</b> {selectedBooking.preferredTime || 'Time not set'}</p>
+                                    <p><i className="bi bi-calendar-event" />{formatDate(selectedBooking.preferredDate)} <b>·</b> {formatTime12Hour(selectedBooking.preferredTime) || 'Time not set'}</p>
                                     <p><i className="bi bi-geo-alt" />{selectedBooking.address || 'Address not provided'}</p>
                                 </div>
                             </header>
@@ -365,11 +398,11 @@ export default function ProviderBookingSystem() {
                                 </div>
                                 <div className="pbs-status-content">
                                     <ol className="pbs-status-timeline">
-                                        {['Request Sent', 'Accepted', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'].map((step, index) => {
+                                        {['Request Sent', 'Accepted', 'Start Travel', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'].map((step, index) => {
                                             const cancelled = selectedStatus === 'Cancelled';
-                                            const isCurrent = cancelled ? index === 5 : index === statusStep;
+                                            const isCurrent = cancelled ? index === 6 : index === statusStep;
                                             const isDone = !cancelled && index < statusStep;
-                                            const isFutureCancelled = index === 5 && !cancelled;
+                                            const isFutureCancelled = index === 6 && !cancelled;
                                             if (isFutureCancelled) return null;
                                             return (
                                                 <li className={`${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''} ${cancelled && index < 4 ? 'cancelled-before' : ''}`} key={step}>
@@ -377,7 +410,7 @@ export default function ProviderBookingSystem() {
                                                         {isDone ? <i className="bi bi-check-lg" /> : null}
                                                     </span>
                                                     <strong>{step}</strong>
-                                                    {isCurrent && <small>{formatDate(selectedBooking.preferredDate)} · {selectedBooking.preferredTime || ''}</small>}
+                                                    {isCurrent && <small>{formatDate(selectedBooking.preferredDate)} · {formatTime12Hour(selectedBooking.preferredTime)}</small>}
                                                 </li>
                                             );
                                         })}
@@ -388,7 +421,15 @@ export default function ProviderBookingSystem() {
                                                 <i className="bi bi-check-lg" /> Accept Booking
                                             </button>
                                         )}
-                                        {selectedStatus === 'Confirmed' && (
+                                        {['Accepted', 'Matched'].includes(rawStatus) && (
+                                            <button type="button" className="primary" onClick={() => changeStatus('On the Way')} disabled={busy || !canStartTravel}>
+                                                <i className="bi bi-truck" /> Start Travel
+                                            </button>
+                                        )}
+                                        {['Accepted', 'Matched'].includes(rawStatus) && !canStartTravel && (
+                                            <small className="pbs-start-time-note">Start Travel will be available on {formatDate(selectedBooking.preferredDate)} at {formatTime12Hour(selectedBooking.preferredTime)}.</small>
+                                        )}
+                                        {rawStatus === 'On the Way' && (
                                             <button type="button" className="primary" onClick={() => changeStatus('In Progress')} disabled={busy}>
                                                 <i className="bi bi-play-fill" /> Start Service
                                             </button>
@@ -398,7 +439,12 @@ export default function ProviderBookingSystem() {
                                                 <i className="bi bi-check-lg" /> Mark as Completed
                                             </button>
                                         )}
-                                        {!['In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'].includes(selectedStatus) && (
+                                        {selectedStatus === 'Completed' && (
+                                            <button type="button" className="danger" onClick={() => setShowDeleteConfirm(true)} disabled={busy}>
+                                                <i className="bi bi-trash3" /> Delete Completed Booking
+                                            </button>
+                                        )}
+                                        {!['On the Way', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled'].includes(selectedStatus) && (
                                             <>
                                                 <button type="button" className="secondary" onClick={startReschedule} disabled={busy}>
                                                     <i className="bi bi-calendar-event" /> Reschedule
@@ -466,6 +512,17 @@ export default function ProviderBookingSystem() {
                 busy={busy}
                 onConfirm={confirmReschedule}
                 onCancel={() => setShowRescheduleConfirm(false)}
+            />
+            <ConfirmDialog
+                open={showDeleteConfirm}
+                title="Delete completed booking?"
+                message="This permanently deletes the completed booking and its related messages and review. Bookings with complaints cannot be deleted."
+                confirmLabel="Yes, Delete"
+                tone="danger"
+                icon="bi-trash3"
+                busy={busy}
+                onConfirm={deleteSelectedBooking}
+                onCancel={() => setShowDeleteConfirm(false)}
             />
         </main>
     );

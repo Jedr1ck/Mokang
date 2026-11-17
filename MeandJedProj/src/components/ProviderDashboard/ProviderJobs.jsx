@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyBookings, sendMessage, updateBookingStatus } from '../../services/api';
+import { formatTime12Hour, hasBookingTimeArrived } from '../../utils/dateTime';
 import myLogo from '../../assets/images/handyman-mark.svg';
 import airconImage from '../../assets/services/aircon.jpg';
 import applianceRepairImage from '../../assets/services/appliance-repair.jpg';
@@ -22,9 +23,7 @@ const toDate = (date) => date ? new Date(`${date}T00:00:00`) : null;
 const displayDate = (date) => toDate(date)?.toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
 }) || 'Date not set';
-const displayTime = (time) => time ? new Date(`1970-01-01T${time}`).toLocaleTimeString('en-US', {
-    hour: 'numeric', minute: '2-digit',
-}) : 'Time not set';
+const displayTime = (time) => formatTime12Hour(time) || 'Time not set';
 const serviceImage = (service) => {
     const normalizedService = service.toLowerCase();
     return SERVICE_IMAGES.find(({ keywords }) => keywords.some((keyword) => normalizedService.includes(keyword)))?.image;
@@ -61,6 +60,7 @@ export default function ProviderJobs() {
     const [showMessage, setShowMessage] = useState(false);
     const [error, setError] = useState('');
     const [busyId, setBusyId] = useState(null);
+    const [, setClock] = useState(Date.now());
 
     const loadJobs = () => getMyBookings().then((bookings) => setJobs(bookings.map((booking) => ({
         id: booking.id,
@@ -72,6 +72,7 @@ export default function ProviderJobs() {
         location: booking.address || 'Location not provided',
         contact: booking.customerPhone || 'Not provided',
         dateValue: booking.preferredDate || '',
+        preferredTime: booking.preferredTime || '',
         date: displayDate(booking.preferredDate),
         time: displayTime(booking.preferredTime),
         status: booking.status || 'Pending',
@@ -79,6 +80,10 @@ export default function ProviderJobs() {
     })))).catch((loadError) => setError(loadError.message || 'Unable to load jobs.'));
 
     useEffect(() => { loadJobs(); }, []);
+    useEffect(() => {
+        const timer = window.setInterval(() => setClock(Date.now()), 30_000);
+        return () => window.clearInterval(timer);
+    }, []);
 
     const counts = useMemo(() => ({
         upcoming: jobs.filter((job) => statusGroup(job.status) === 'Upcoming').length,
@@ -237,7 +242,14 @@ export default function ProviderJobs() {
                         <h3>{selectedJob.service}</h3><p>{selectedJob.description || 'No additional job details provided.'}</p>
                         <dl className="job-details-list"><div><dt>Customer</dt><dd>{selectedJob.customerName}</dd></div><div><dt>Contact</dt><dd>{selectedJob.contact}</dd></div><div><dt>Date and time</dt><dd>{selectedJob.date} · {selectedJob.time}</dd></div><div><dt>Location</dt><dd>{selectedJob.location}</dd></div></dl>
                     </div>
-                    <footer className="job-modal-footer"><button type="button" className="btn btn-outline-success" onClick={() => setShowMessage(true)}>Message Customer</button>{selectedJob.status === 'Pending' ? <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, 'Accepted')}>Accept Request</button> : ['Accepted', 'On the Way', 'In Progress'].includes(selectedJob.status) && <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, selectedJob.status === 'Accepted' ? 'On the Way' : selectedJob.status === 'On the Way' ? 'In Progress' : 'Completed')}>{selectedJob.status === 'Accepted' ? 'Mark On the Way' : selectedJob.status === 'On the Way' ? 'Start Job' : 'Mark Completed'}</button>}</footer>
+                    <footer className="job-modal-footer">
+                        <button type="button" className="btn btn-outline-success" onClick={() => setShowMessage(true)}>Message Customer</button>
+                        {selectedJob.status === 'Pending' && <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, 'Accepted')}>Accept Request</button>}
+                        {['Accepted', 'Matched'].includes(selectedJob.status) && <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id || !hasBookingTimeArrived(selectedJob.dateValue, selectedJob.preferredTime)} onClick={() => updateStatus(selectedJob, 'On the Way')}>Start Travel</button>}
+                        {['Accepted', 'Matched'].includes(selectedJob.status) && !hasBookingTimeArrived(selectedJob.dateValue, selectedJob.preferredTime) && <small>Start Travel is available on {selectedJob.date} at {selectedJob.time}.</small>}
+                        {selectedJob.status === 'On the Way' && <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, 'In Progress')}>Start Service</button>}
+                        {selectedJob.status === 'In Progress' && <button type="button" className="btn btn-success" disabled={busyId === selectedJob.id} onClick={() => updateStatus(selectedJob, 'Completed')}>Mark Completed</button>}
+                    </footer>
                 </section>
             </div>}
 
