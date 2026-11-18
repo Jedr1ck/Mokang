@@ -190,6 +190,12 @@
     justify-content: flex-end;
 }
 
+.homeowner-calendar-header {
+    justify-content: space-between;
+    width: 100%;
+    min-height: 48px;
+}
+
 .profile-header h2 {
     font-size: 1.8rem;
     color: var(--theme-text);
@@ -2648,7 +2654,7 @@
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
     gap: 20px;
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 .homeowner-history-filters {

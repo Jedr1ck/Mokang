@@ -95,7 +95,6 @@ const CalendarView = () => {
                         {/* Month Navigation */}
                         <div className="homeowner-calendar-month-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <div className="homeowner-calendar-month-heading">
-                                <i className="bi bi-calendar-event" aria-hidden="true" />
                                 <h3 style={{ margin: 0, color: '#303030' }}>
                                 {monthNames[month]} {year}
                                 </h3>
