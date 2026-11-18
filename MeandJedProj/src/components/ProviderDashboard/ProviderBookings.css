@@ -109,7 +109,18 @@
 
 
 .booking-header-button:hover {
-    background: var(--theme-soft-blue);
+    border-color: #ff6900;
+    background: #fff0e6;
+    color: #ff6900;
+}
+
+.booking-header-button:active,
+.booking-header-button:focus-visible {
+    border-color: #ff6900;
+    background: #fff0e6;
+    color: #ff6900;
+    outline: 2px solid rgba(255, 105, 0, .2);
+    outline-offset: 2px;
 }
 
 

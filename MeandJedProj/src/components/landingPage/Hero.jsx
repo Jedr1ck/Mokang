@@ -9,6 +9,20 @@ function Hero() {
     const [trustedProviders, setTrustedProviders] = useState([]);
     const navigate = useNavigate();
 
+    const handleAmbientPointerMove = (event) => {
+        if (event.pointerType === "touch") return;
+
+        const pointerX = (event.clientX / window.innerWidth - 0.5) * 140;
+        const pointerY = (event.clientY / window.innerHeight - 0.5) * 120;
+        event.currentTarget.style.setProperty("--hero-ambient-x", `${pointerX}px`);
+        event.currentTarget.style.setProperty("--hero-ambient-y", `${pointerY}px`);
+    };
+
+    const resetAmbientPointer = (event) => {
+        event.currentTarget.style.removeProperty("--hero-ambient-x");
+        event.currentTarget.style.removeProperty("--hero-ambient-y");
+    };
+
     useEffect(() => {
         getPublicStats()
             .then(({ userCount: count }) => setUserCount(count))
@@ -34,6 +48,8 @@ function Hero() {
             id="home"
             className={`hero-section ${showPanel ? "panel-open" : ""}`}
             style={{ backgroundImage: `url(${background})` }}
+            onPointerMove={handleAmbientPointerMove}
+            onPointerLeave={resetAmbientPointer}
         >
             {/* Dark overlay */}
             <div className="hero-overlay"></div>

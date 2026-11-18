@@ -3,6 +3,7 @@ import {
     approveProviderVerification,
     getPendingProviderVerifications,
     getProviderVerificationDocument,
+    rejectProviderVerification,
 } from "../../services/api";
 import ConfirmDialog from "../ConfirmDialog";
 import "./AdminVerificationReviews.css";
@@ -17,6 +18,8 @@ function ProviderVerificationReviews({ onBack }) {
     const [success, setSuccess] = useState("");
     const [approvingId, setApprovingId] = useState(null);
     const [requestToApprove, setRequestToApprove] = useState(null);
+    const [requestToReject, setRequestToReject] = useState(null);
+    const [rejectionReason, setRejectionReason] = useState("");
 
     const loadRequests = useCallback(async () => {
         setLoading(true);
@@ -119,6 +122,30 @@ function ProviderVerificationReviews({ onBack }) {
         }
     };
 
+    const confirmReject = async (event) => {
+        event.preventDefault();
+        if (!requestToReject || !rejectionReason.trim()) return;
+        setApprovingId(requestToReject.providerId);
+        setError("");
+        setSuccess("");
+        try {
+            await rejectProviderVerification(
+                requestToReject.providerId,
+                rejectionReason.trim()
+            );
+            setRequests((current) => current.filter(
+                (item) => item.providerId !== requestToReject.providerId
+            ));
+            setSuccess(`${requestToReject.fullName}'s verification was rejected. The provider can now correct and resubmit.`);
+            setRequestToReject(null);
+            setRejectionReason("");
+        } catch (rejectError) {
+            setError(rejectError?.message || "Could not reject this provider verification.");
+        } finally {
+            setApprovingId(null);
+        }
+    };
+
     return (
         <section className="verification-reviews">
             <header className="verification-reviews-header">
@@ -162,6 +189,20 @@ function ProviderVerificationReviews({ onBack }) {
                 onConfirm={confirmApprove}
                 onCancel={() => setRequestToApprove(null)}
             />
+            {requestToReject && (
+                <div className="verification-reject-backdrop" role="presentation">
+                    <form className="verification-reject-dialog" onSubmit={confirmReject} role="dialog" aria-modal="true" aria-labelledby="verification-reject-title">
+                        <h3 id="verification-reject-title">Reject verification</h3>
+                        <p>Tell {requestToReject.fullName} what needs to be corrected. They will see this note and can submit again.</p>
+                        <label htmlFor="verification-reject-reason">Reason for rejection</label>
+                        <textarea id="verification-reject-reason" value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} maxLength={1000} required rows={4} placeholder="Example: The ID image is blurry. Please upload a clear photo of both sides." />
+                        <div className="verification-reject-dialog-actions">
+                            <button type="button" onClick={() => { setRequestToReject(null); setRejectionReason(""); }} disabled={Boolean(approvingId)}>Cancel</button>
+                            <button type="submit" disabled={Boolean(approvingId) || !rejectionReason.trim()}>{approvingId ? "Rejecting..." : "Reject verification"}</button>
+                        </div>
+                    </form>
+                </div>
+            )}
 
             {loading ? (
                 <div className="verification-empty">Loading review requests...</div>
@@ -312,6 +353,15 @@ function ProviderVerificationReviews({ onBack }) {
                                         {approvingId === request.providerId
                                             ? "Approving..."
                                             : "Approve provider"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="verification-reject-button"
+                                        disabled={approvingId === request.providerId}
+                                        onClick={() => { setRequestToReject(request); setRejectionReason(""); }}
+                                    >
+                                        <i className="bi bi-x-circle" aria-hidden="true"></i>
+                                        Reject
                                     </button>
                                 </div>
                             </article>

@@ -11,7 +11,7 @@
     /* Gitna vertically sa gilid ng screen */
     position: fixed;
     top: 50%;
-    left: 0;
+    left: 12px;
     transform: translateY(-50%);
     z-index: 1000;
 
@@ -221,4 +221,118 @@
     cursor: pointer;
     text-align: left;
     font-family: inherit;
+}
+
+/* Floating capsule sidebar inspired by the supplied reference. */
+.green-wavy-sidebar {
+    width: 64px;
+    height: min(90vh, 840px);
+    min-height: min(620px, calc(100vh - 24px));
+    max-height: calc(100vh - 24px);
+    padding: 18px 0;
+    align-items: center;
+    left: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 32px;
+    background: var(--theme-primary);
+    box-shadow: 0 8px 18px rgba(37, 37, 37, 0.12);
+    overflow: hidden !important;
+}
+
+.green-wavy-sidebar .sidebar-content {
+    height: 100%;
+    align-items: center;
+    gap: 16px;
+}
+
+.green-wavy-sidebar .top-brand-icon {
+    margin: 0;
+    flex: 0 0 42px;
+    border-radius: 14px;
+}
+
+.green-wavy-sidebar .nav-items-container {
+    flex: 1;
+    min-height: 0;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+}
+
+.green-wavy-sidebar .sidebar-btn,
+.green-wavy-sidebar .sidebar-btn:hover,
+.green-wavy-sidebar .sidebar-btn.active:hover {
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: none;
+    transform: none;
+}
+
+.green-wavy-sidebar .sidebar-btn i {
+    min-width: 20px;
+    justify-content: center;
+    font-size: 19px;
+}
+
+.green-wavy-sidebar .sidebar-btn .link-text {
+    display: none;
+}
+
+.green-wavy-sidebar .sidebar-btn:hover {
+    border-color: rgba(255, 255, 255, 0.82);
+    background: #fff;
+    color: var(--theme-primary);
+}
+
+.green-wavy-sidebar .sidebar-btn.active,
+.green-wavy-sidebar .sidebar-btn.active:hover {
+    border-color: rgba(255, 255, 255, 0.82);
+    background: #fff;
+    color: var(--theme-primary);
+    box-shadow: 0 2px 7px rgba(37, 37, 37, 0.12);
+}
+
+.green-wavy-sidebar .theme-toggle-compact {
+    position: relative;
+    width: 44px;
+    margin-top: auto;
+    padding: 14px 2px 3px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.green-wavy-sidebar .theme-toggle-compact::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 4px;
+    right: 4px;
+    height: 1px;
+    background: rgba(207, 218, 255, 0.24);
+}
+
+.green-wavy-sidebar .theme-toggle-compact .theme-toggle-button {
+    color: rgba(255, 255, 255, 0.84);
+}
+
+.green-wavy-sidebar .theme-toggle-compact .theme-toggle-button.active {
+    color: var(--theme-primary);
+    box-shadow: 0 2px 6px rgba(37, 37, 37, 0.12);
+}
+
+.green-wavy-sidebar .homeowner-logout-btn {
+    margin-top: 0;
+}
+
+@media (max-width: 560px) {
+    .green-wavy-sidebar {
+        width: 64px;
+    }
 }

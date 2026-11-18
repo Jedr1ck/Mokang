@@ -102,7 +102,7 @@ const initialVerification = {
     id_type: '',
     clearance_type: '',
     qualifications: '',
-    service_area: '',
+    service_area: 'Echague, Isabela',
 };
 
 const idTypes = [
@@ -398,6 +398,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     const [clearanceUploaded, setClearanceUploaded] = useState(false);
 
     const [status, setStatus] = useState('incomplete');
+    const [rejectionNotes, setRejectionNotes] = useState('');
     const [loading, setLoading] = useState(true);
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
@@ -461,6 +462,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
                 if (verificationResult.status === 'fulfilled') {
                     const verificationData = verificationResult.value;
+                    setRejectionNotes(verificationData?.verification_review_notes || '');
                     setClearanceUploaded(Boolean(verificationData?.clearance_uploaded));
                     setVerification((previous) => ({
                         ...previous,
@@ -478,6 +480,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                 previous[key],
                             ])
                         ),
+                        service_area: 'Echague, Isabela',
                     }));
 
                     setExperience(
@@ -1027,12 +1030,12 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
         }
 
         if (step === 2) {
-            if (
-                !verification.business_name.trim() ||
-                experience === '' ||
-                !verification.service_area.trim()
-            ) {
-                setError('Enter your business name, years of experience, and service area.');
+            if (!verification.business_name.trim()) {
+                setError('Business name is required. Enter your registered business or service name.');
+                return;
+            }
+            if (experience === '' || !/^\d+$/.test(experience)) {
+                setError('Years of experience is required. Enter a whole number, such as 0 or 3.');
                 return;
             }
 
@@ -1336,6 +1339,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                 services: serviceSelections,
                 experience_years: experience ? Number(experience) : null,
                 work_samples: workSamples,
+                service_area: 'Echague, Isabela',
             });
 
             onProfileUpdated?.({
@@ -1350,6 +1354,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
 
             await submitProviderVerification();
             setStatus('pending');
+            setRejectionNotes('');
             setMessage(
                 'Your provider application has been submitted for review.'
             );
@@ -1899,7 +1904,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                 <p>Complete your information to become a verified service provider.</p>
             </div>
 
-            {error && <div className="alert alert-danger" role="alert">{error}</div>}
             {message && <div className="alert alert-success" role="status">{message}</div>}
 
             {status === 'pending' ? (
@@ -1908,13 +1912,16 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                     <p>Your provider application has been submitted and is awaiting review.</p>
                     <p>You will be able to manage your provider profile after approval.</p>
                 </div>
-            ) : status === 'rejected' ? (
-                <div className="provider-application-card">
-                    <h3>Application Needs Attention</h3>
-                    <p>Your application was not approved. Please review your information and resubmit if the system allows it.</p>
-                </div>
             ) : (
                 <>
+                    {status === 'rejected' && (
+                        <div className="alert alert-warning" role="alert">
+                            <strong>Changes needed before approval</strong>
+                            <p className="mb-1">The admin reviewed your verification and requested corrections:</p>
+                            <p className="mb-2">{rejectionNotes || 'Please review your submitted information and documents.'}</p>
+                            <span>Update the relevant details or documents below, then submit your application again.</span>
+                        </div>
+                    )}
                     <div className="provider-step-progress">
                         {steps.map((label, index) => (
                             <div
@@ -2183,9 +2190,10 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                                         className="form-control"
                                         name="service_area"
                                         rows="3"
-                                        value={verification.service_area}
-                                        onChange={changeVerification}
+                                        value="Echague, Isabela"
+                                        readOnly
                                     />
+                                    <small className="provider-field-hint">Service area is currently set to Echague, Isabela.</small>
                                 </div>
 
                                 <div className="mb-3">
@@ -2409,6 +2417,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                             )}
 
                         </div>
+                        {error && <div className="alert alert-danger provider-verification-error mt-3 mb-0" role="alert">{error}</div>}
                     </div>
                 </>
             )}

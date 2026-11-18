@@ -1,10 +1,10 @@
 from datetime import datetime
 from pathlib import Path
 
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, request, send_file
 
 from app.common import ApiError, current_user, get_session, require_auth
-from app.models import ProviderProfile, ProviderService, User
+from app.models import Notification, ProviderProfile, ProviderService, User
 
 admin_verifications_bp = Blueprint(
     "admin_verifications",
@@ -188,6 +188,47 @@ def approve_verification(provider_id):
         session.commit()
         return jsonify(
             message="Provider verification approved",
+            providerId=provider.id,
+            verificationStatus=provider.verification_status,
+            isVerified=provider.is_verified,
+        )
+
+
+@admin_verifications_bp.post("/<int:provider_id>/reject")
+@require_auth
+def reject_verification(provider_id):
+    data = request.get_json(silent=True) or {}
+    reason = str(data.get("reason", "")).strip()
+    if not reason:
+        raise ApiError("Please explain what the provider needs to correct.", 400)
+    if len(reason) > 1000:
+        raise ApiError("Rejection reason must be 1000 characters or fewer.", 400)
+
+    with get_session() as session:
+        admin = current_user(session)
+        require_admin(admin)
+        provider = session.get(ProviderProfile, provider_id)
+        if not provider:
+            raise ApiError("Provider verification not found", 404)
+        if provider.verification_status != "pending":
+            raise ApiError("This provider verification is no longer pending", 409)
+
+        provider.is_verified = False
+        provider.verification_status = "rejected"
+        provider.verification_reviewed_at = datetime.utcnow()
+        provider.verification_reviewed_by = admin.id
+        provider.verification_review_notes = reason
+        session.add(
+            Notification(
+                user_id=provider.user_id,
+                title="Provider verification needs correction",
+                body=f"Your verification was not approved. Please correct and resubmit: {reason}",
+                type="verification",
+            )
+        )
+        session.commit()
+        return jsonify(
+            message="Provider verification rejected",
             providerId=provider.id,
             verificationStatus=provider.verification_status,
             isVerified=provider.is_verified,

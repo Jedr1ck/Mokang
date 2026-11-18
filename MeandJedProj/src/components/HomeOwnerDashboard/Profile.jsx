@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
-import { api, getMyBookings } from '../../services/api';
+import { api, getMyBookings, getNotifications } from '../../services/api';
 import HomeAddressMap from './HomeAddressMap';
 import { reverseGeocodeLocation } from './addressGeocoding';
 import { isWithinEchague } from '../../services/echagueLocation';
@@ -32,6 +32,10 @@ const normalizeProfile = (data = {}) => ({
 
 const statusOf = (booking) =>
     booking.status || booking.booking_status || booking.bookingStatus || 'Pending';
+
+const ACTIVE_BOOKING_STATUSES = new Set([
+    'pending', 'matched', 'accepted', 'on the way', 'in progress', 'awaiting confirmation'
+]);
 
 const titleOf = (booking) =>
     booking.serviceName || booking.service_name || booking.category || 'Service Request';
@@ -81,6 +85,7 @@ export default function Profile() {
     const [profile, setProfile] = useState(EMPTY_PROFILE);
     const [draft, setDraft] = useState(EMPTY_PROFILE);
     const [bookings, setBookings] = useState([]);
+    const [notifications, setNotifications] = useState([]);
 
     const [editing, setEditing] = useState(false);
     const [editingAddress, setEditingAddress] = useState(false);
@@ -88,6 +93,7 @@ export default function Profile() {
     const [saving, setSaving] = useState(false);
     const [savingPhoto, setSavingPhoto] = useState(false);
     const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+    const [bookingToRemove, setBookingToRemove] = useState(null);
 
     const [error, setError] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
@@ -107,6 +113,10 @@ export default function Profile() {
     });
 
     const memberDate = memberSince ? prettyDate(memberSince) : 'Not available';
+    const activeBookingCount = bookings.filter((booking) =>
+        ACTIVE_BOOKING_STATUSES.has(String(statusOf(booking)).toLowerCase())
+    ).length;
+    const unreadNotificationCount = notifications.filter((notification) => !notification.isRead).length;
 
     useEffect(() => {
         let active = true;
@@ -114,9 +124,10 @@ export default function Profile() {
         const loadProfilePage = async () => {
             setLoading(true);
 
-            const [profileResult, bookingsResult] = await Promise.allSettled([
+            const [profileResult, bookingsResult, notificationsResult] = await Promise.allSettled([
                 api('/profile/me'),
                 getMyBookings(),
+                getNotifications(),
             ]);
 
             if (!active) return;
@@ -140,6 +151,13 @@ export default function Profile() {
                 );
             } else {
                 setBookings([]);
+            }
+
+            if (notificationsResult.status === 'fulfilled') {
+                const data = notificationsResult.value;
+                setNotifications(Array.isArray(data) ? data : []);
+            } else {
+                setNotifications([]);
             }
 
             setLoading(false);
@@ -374,6 +392,12 @@ export default function Profile() {
         );
     }, [bookings, bookingFilter]);
 
+    const removeBookingFromList = () => {
+        if (!bookingToRemove) return;
+        setBookings((current) => current.filter((booking) => booking !== bookingToRemove));
+        setBookingToRemove(null);
+    };
+
     const startEdit = (addressOnly = false) => {
         setDraft(profile);
         setCoords(null);
@@ -398,32 +422,7 @@ export default function Profile() {
 
             <main className="profile-main-content homeowner-profile-main">
                 <header className="profile-header homeowner-profile-header">
-                    <div>
-                        <h2>My Profile</h2>
-                        <p>Manage your homeowner account and profile.</p>
-                    </div>
-
                     <div className="header-actions profile-header-actions">
-                        <button
-                            type="button"
-                            className="profile-header-icon-btn"
-                            title="Messages"
-                            aria-label="Messages"
-                            onClick={() => navigate('/messages')}
-                        >
-                            <i className="bi bi-chat-dots" />
-                        </button>
-
-                        <button
-                            type="button"
-                            className="profile-header-icon-btn"
-                            title="Notifications"
-                            aria-label="Notifications"
-                            onClick={() => navigate('/notifications')}
-                        >
-                            <i className="bi bi-bell" />
-                        </button>
-
                         <div className="profile-header-user">
                             {profile.profilePicture ? (
                                 <img src={profile.profilePicture} alt="" />
@@ -436,6 +435,47 @@ export default function Profile() {
                                 <small>Homeowner</small>
                             </span>
                         </div>
+
+                        <button
+                            type="button"
+                            className="profile-header-icon-btn"
+                            title="My Bookings"
+                            aria-label={`My Bookings${activeBookingCount ? `, ${activeBookingCount} active` : ''}`}
+                            onClick={() => navigate('/bookings')}
+                        >
+                            <i className="bi bi-truck" />
+                            {activeBookingCount > 0 && (
+                                <span className="profile-header-icon-badge">
+                                    {activeBookingCount > 9 ? '9+' : activeBookingCount}
+                                </span>
+                            )}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="profile-header-icon-btn"
+                            title="Notifications"
+                            aria-label={`Notifications${unreadNotificationCount ? `, ${unreadNotificationCount} unread` : ''}`}
+                            onClick={() => navigate('/notifications')}
+                        >
+                            <i className="bi bi-bell" />
+                            {unreadNotificationCount > 0 && (
+                                <span className="profile-header-icon-badge">
+                                    {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
+                                </span>
+                            )}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="profile-header-icon-btn"
+                            title="Messages"
+                            aria-label="Messages"
+                            onClick={() => navigate('/messages')}
+                        >
+                            <i className="bi bi-chat-dots" />
+                        </button>
+
                     </div>
                 </header>
 
@@ -461,7 +501,7 @@ export default function Profile() {
                         <div className="homeowner-profile-left">
                             <section className="profile-card hp-panel hp-overview">
                                 <div className="hp-section-heading">
-                                    <h3><i className="bi bi-person-fill" /> Profile Overview</h3>
+                                    <h3>Profile Overview</h3>
 
                                     <div className="hp-overview-actions">
                                     {editing && draft.profilePicture !== profile.profilePicture && (
@@ -522,7 +562,7 @@ export default function Profile() {
 
                             <section className="profile-card hp-panel">
                                 <div className="hp-section-heading">
-                                    <h3><i className="bi bi-person-lines-fill" /> Personal Information</h3>
+                                    <h3>Personal Information</h3>
 
                                     {!editing && !editingAddress && (
                                         <button
@@ -656,8 +696,7 @@ export default function Profile() {
                             <section className="profile-card hp-panel hp-address-panel">
                                 <div className="hp-section-heading">
                                     <div>
-                                        <h3><i className="bi bi-geo-alt-fill" /> Home Address &amp; Location</h3>
-                                        <p>Set your home address so providers can locate you easily.</p>
+                                        <h3>Home Address &amp; Location</h3>
                                     </div>
 
                                     {!editingAddress && !editing && (
@@ -732,11 +771,26 @@ export default function Profile() {
                                 </div>
                             </section>
 
+
+                        </div>
+
+                        <aside className="homeowner-profile-right">
+                            <section className="profile-card hp-panel hp-status-card">
+                                <div className="hp-status-heading">
+                                    <span>Account Status</span>
+                                    <b>Active</b>
+                                </div>
+                                <p>Your account is active and ready to book home services.</p>
+                                <div className="hp-member-since">
+                                    <i className="bi bi-calendar-event" />
+                                    <span><small>Member Since</small><strong>{memberDate}</strong></span>
+                                </div>
+                            </section>
+
                             <section className="dashboard-box activities-box hp-panel hp-bookings">
                                 <div className="hp-section-heading">
                                     <div>
-                                        <h3><i className="bi bi-file-earmark-text-fill" /> My Service Requests</h3>
-                                        <p>Track and manage your home service bookings.</p>
+                                        <h3>My Service Requests</h3>
                                     </div>
 
                                     <button
@@ -788,6 +842,7 @@ export default function Profile() {
                                     <div className="activity-list">
                                         {filteredBookings.map((booking, index) => {
                                             const status = statusOf(booking);
+                                            const canRemove = ['completed', 'cancelled'].includes(statusKey(status));
 
                                             return (
                                                 <article className="activity-item" key={booking.id ?? booking.booking_id ?? index}>
@@ -799,28 +854,26 @@ export default function Profile() {
                                                             {dateOf(booking) ? ` · ${prettyDate(dateOf(booking))}` : ''}
                                                         </p>
                                                     </div>
-                                                    <span className={`status-badge ${statusKey(status)}`}>{status}</span>
+                                                    <div className="hp-booking-actions">
+                                                        <span className={`status-badge ${statusKey(status)}`}>{status}</span>
+                                                        {canRemove && (
+                                                            <button
+                                                                type="button"
+                                                                className="hp-booking-remove"
+                                                                aria-label={`Remove ${titleOf(booking)} request`}
+                                                                title="Remove request"
+                                                                onClick={() => setBookingToRemove(booking)}
+                                                            >
+                                                                <i className="bi bi-trash3" aria-hidden="true" />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </article>
                                             );
                                         })}
                                     </div>
                                 )}
                             </section>
-                        </div>
-
-                        <aside className="homeowner-profile-right">
-                            <section className="profile-card hp-panel hp-status-card">
-                                <div className="hp-status-heading">
-                                    <span><i className="bi bi-check-circle-fill" /> Account Status</span>
-                                    <b>Active</b>
-                                </div>
-                                <p>Your account is active and ready to book home services.</p>
-                                <div className="hp-member-since">
-                                    <i className="bi bi-calendar-event" />
-                                    <span><small>Member Since</small><strong>{memberDate}</strong></span>
-                                </div>
-                            </section>
-
                         </aside>
                     </div>
                 )}
@@ -835,6 +888,17 @@ export default function Profile() {
                 busy={saving}
                 onConfirm={confirmSaveProfile}
                 onCancel={() => setShowSaveConfirm(false)}
+            />
+            <ConfirmDialog
+                open={Boolean(bookingToRemove)}
+                title="Remove this service request?"
+                message={`Remove the ${titleOf(bookingToRemove || {})} request from your list?`}
+                confirmLabel="Yes, Remove"
+                cancelLabel="Cancel"
+                icon="bi-trash3"
+                tone="danger"
+                onConfirm={removeBookingFromList}
+                onCancel={() => setBookingToRemove(null)}
             />
         </div>
     );

@@ -7,7 +7,7 @@ import {
     updateBookingStatus,
 } from '../../services/api';
 import ConfirmDialog from '../ConfirmDialog';
-import myLogo from '../../assets/images/handyman-mark.svg';
+import myLogo from '../../assets/images/logo.png';
 import { formatTime12Hour, hasBookingTimeArrived } from '../../utils/dateTime';
 import './ProviderBookingSystem.css';
 

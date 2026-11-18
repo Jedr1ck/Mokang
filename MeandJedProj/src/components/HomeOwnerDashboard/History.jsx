@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../HomeownerDashboard.css';
-import { api } from '../../services/api';
+import { api, getProvider } from '../../services/api';
 import { formatTime12Hour } from '../../utils/dateTime';
 
 const History = () => {
@@ -21,19 +21,42 @@ const History = () => {
 
     useEffect(() => {
         api('/bookings/my')
-            .then((bookings) => setHistoryData(bookings.map((booking) => ({
-                id: booking.bookingCode || `REQ-${booking.id}`,
-                bookingId: booking.id,
-                type: 'Service Request',
-                title: booking.serviceName || booking.category || 'Service Request',
-                detail: booking.description || 'No description provided',
-                date: booking.preferredDate,
-                time: booking.preferredTime,
-                amount: '-',
-                status: booking.status,
-                provider: booking.providerName || 'Not assigned',
-                hasReview: Boolean(booking.hasReview)
-            }))))
+            .then(async (bookings) => {
+                const providerIds = [...new Set(bookings.map((booking) => booking.providerId).filter(Boolean))];
+                const providerRows = await Promise.all(providerIds.map(async (providerId) => {
+                    try {
+                        return [String(providerId), await getProvider(providerId)];
+                    } catch {
+                        return [String(providerId), null];
+                    }
+                }));
+                const providersById = Object.fromEntries(providerRows);
+
+                setHistoryData(bookings.map((booking) => {
+                    const provider = providersById[String(booking.providerId)];
+                    const serviceName = booking.serviceName || booking.category || '';
+                    const service = provider?.services?.find((item) =>
+                        item.name?.trim().toLowerCase() === serviceName.trim().toLowerCase()
+                    ) || provider?.services?.find((item) =>
+                        item.category?.trim().toLowerCase() === String(booking.category || '').trim().toLowerCase()
+                    );
+                    const amount = booking.amount ?? booking.price ?? booking.servicePrice ?? service?.price ?? provider?.rate;
+
+                    return {
+                        id: booking.bookingCode || `REQ-${booking.id}`,
+                        bookingId: booking.id,
+                        type: 'Service Request',
+                        title: serviceName || 'Service Request',
+                        detail: booking.description || 'No description provided',
+                        date: booking.preferredDate,
+                        time: booking.preferredTime,
+                        amount: amount == null ? 'Not set' : `₱${Number(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                        status: booking.status,
+                        provider: booking.providerName || 'Not assigned',
+                        hasReview: Boolean(booking.hasReview)
+                    };
+                }));
+            })
             .catch((error) => setLoadError(error.message || 'Unable to load service history.'))
             .finally(() => setLoading(false));
     }, []);
@@ -119,10 +142,9 @@ const History = () => {
             <HomeownerSideBar />
 
             {/* Main Content Area */}
-            <main className="profile-main-content">
+            <main className="profile-main-content homeowner-history-main">
                 {/* Header */}
-                <header className="profile-header">
-                    <h2>Activity & Request History</h2>
+                <header className="profile-header homeowner-history-header">
                     <div className="header-actions">
                         <div className="search-box">
                             <i className="bi bi-search"></i>
@@ -150,6 +172,7 @@ const History = () => {
                         {['All', 'Pending', 'Accepted', 'In Progress', 'Awaiting Confirmation', 'Completed', 'Cancelled', 'Rejected'].map((type) => (
                             <button
                                 key={type}
+                                className={`homeowner-history-filter ${filterType === type ? 'active' : ''}`}
                                 onClick={() => setFilterType(type)}
                                 style={{
                                     ...filterBtnStyle,
@@ -211,18 +234,24 @@ const History = () => {
                                         <td style={tdStyle}>
                                             <div className="homeowner-history-feedback-actions">
                                             {item.status === 'Completed' && !item.hasReview && (
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm btn-outline-warning"
-                                                    onClick={() => {
-                                                        setFeedbackBooking(item);
-                                                        setFeedbackType('review');
-                                                        setRating(0);
-                                                        setFeedbackError('');
-                                                    }}
-                                                >
-                                                    Review
-                                                </button>
+                                                <>
+                                                    <span className="badge text-bg-warning rounded-pill px-3 py-2" aria-label="Review not submitted">
+                                                        Not Reviewed
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-outline-warning"
+                                                        aria-label={`Review ${item.title}`}
+                                                        onClick={() => {
+                                                            setFeedbackBooking(item);
+                                                            setFeedbackType('review');
+                                                            setRating(0);
+                                                            setFeedbackError('');
+                                                        }}
+                                                    >
+                                                        Review
+                                                    </button>
+                                                </>
                                             )}
                                             {item.status === 'Completed' && item.hasReview && (
                                                 <span className="badge text-bg-success rounded-pill px-3 py-2" aria-label="Review submitted">

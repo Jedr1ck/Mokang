@@ -446,9 +446,9 @@ def update_provider_verification():
             "street_address",
             "postal_code",
             "id_type",
-            "service_area",
         ):
             setattr(provider, field, getattr(data, field))
+        provider.service_area = "Echague, Isabela"
         provider.hourly_rate = None
         provider.qualifications = data.bio
 

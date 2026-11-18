@@ -69,10 +69,9 @@ const CalendarView = () => {
             <HomeownerSideBar />
 
             {/* Main Content */}
-            <main className="profile-main-content">
+            <main className="profile-main-content homeowner-calendar-main">
                 {/* Header */}
-                <header className="profile-header">
-                    <h2>Schedule & Calendar</h2>
+                    <header className="profile-header homeowner-calendar-header">
                     <div className="header-actions">
                         <button
                             type="button"
@@ -88,7 +87,7 @@ const CalendarView = () => {
                 <div className="homeowner-calendar-layout">
 
                     {/* Left Side: Calendar Grid */}
-                    <section className="dashboard-box" style={{ padding: '20px' }}>
+                    <section className="dashboard-box homeowner-calendar-month-panel" style={{ padding: '20px' }}>
                         {/* Month Navigation */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <h3 style={{ margin: 0, color: '#303030' }}>
@@ -103,7 +102,7 @@ const CalendarView = () => {
                         {/* Day Names Header */}
                         <div style={gridHeaderStyle}>
                             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                                <div key={d} style={{ fontWeight: 'bold', color: '#6b7280', textAlign: 'center' }}>{d}</div>
+                                <div key={d} className="homeowner-calendar-day-label" style={{ fontWeight: 'bold', color: '#6b7280', textAlign: 'center' }}>{d}</div>
                             ))}
                         </div>
 
@@ -126,6 +125,7 @@ const CalendarView = () => {
                                 return (
                                     <button
                                         type="button"
+                                        className="homeowner-calendar-day"
                                         key={dayNum}
                                         onClick={() => setSelectedDate(dateStr)}
                                         aria-label={`${dateStr}${dayEvents.length ? `, ${dayEvents.length} scheduled ${dayEvents.length === 1 ? 'booking' : 'bookings'}: ${statusNames.join(', ')}` : ''}`}
@@ -156,7 +156,7 @@ const CalendarView = () => {
                                 );
                             })}
                         </div>
-                        <div role="group" aria-label="Booking status color legend" style={statusLegendStyle}>
+                        <div className="homeowner-calendar-legend" role="group" aria-label="Booking status color legend" style={statusLegendStyle}>
                             {statusLegend.map((status) => (
                                 <span key={status.label} style={legendItemStyle}>
                                     <span aria-hidden="true" style={{ ...legendDotStyle, backgroundColor: status.color }} />
@@ -167,14 +167,14 @@ const CalendarView = () => {
                     </section>
 
                     {/* Right Side: Selected Date Schedules */}
-                    <section className="dashboard-box" style={{ padding: '20px' }}>
+                    <section className="dashboard-box homeowner-calendar-events-panel" style={{ padding: '20px' }}>
                         <h4 style={{ margin: '0 0 15px 0', color: '#303030' }}>
                             Events on {selectedDate}
                         </h4>
 
                         {selectedEvents.length > 0 ? (
                             selectedEvents.map((item) => (
-                                <div key={item.id} style={{ ...eventCardStyle, borderLeftColor: getStatusStyle(item.status).color }}>
+                                <div key={item.id} className="homeowner-calendar-event-card" style={{ ...eventCardStyle, borderLeftColor: getStatusStyle(item.status).color }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={typeBadgeStyle}>{item.type}</span>
                                         <span
@@ -194,7 +194,7 @@ const CalendarView = () => {
                                 </div>
                             ))
                         ) : (
-                            <div style={{ textAlign: 'center', color: '#9ca3af', padding: '30px 0' }}>
+                            <div className="homeowner-calendar-empty" style={{ textAlign: 'center', color: '#9ca3af', padding: '30px 0' }}>
                                 <i className="bi bi-calendar-x" style={{ fontSize: '2rem' }}></i>
                                 <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>
                                     {loading ? 'Loading bookings...' : loadError || 'No scheduled bookings for this date.'}

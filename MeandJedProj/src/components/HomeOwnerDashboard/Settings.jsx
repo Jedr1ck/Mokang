@@ -108,10 +108,6 @@ const Settings = () => {
         <div className="profile-page-container">
             <HomeownerSideBar />
             <main className="profile-main-content">
-                <header className="profile-header">
-                    <h2>Account Settings</h2>
-                </header>
-
                 <div className="homeowner-settings-layout">
                     <nav className="dashboard-box homeowner-settings-nav" aria-label="Settings sections">
                         {SETTINGS_TABS.map((tab) => (

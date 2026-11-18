@@ -114,6 +114,15 @@
     font-size: 19px;
     cursor: pointer;
     padding-right: 14px;
+    transition: color .18s ease, background-color .18s ease;
+}
+
+.pbs-icon-button:hover,
+.pbs-icon-button:active,
+.pbs-icon-button:focus-visible {
+    background: #fff0e6;
+    color: #ff6900;
+    outline: none;
 }
 
 .pbs-icon-button span {

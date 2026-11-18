@@ -1,4 +1,4 @@
-import logo from "../../assets/images/handyman-logo.svg";
+import logo from "../../assets/images/logo.png";
 
 function Footer() {
     return (

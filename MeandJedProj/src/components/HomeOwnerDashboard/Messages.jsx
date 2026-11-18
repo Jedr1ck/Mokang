@@ -216,11 +216,9 @@ const Messages = ({ embedded = false, bookings }) => {
 
             {/* Main Content Area */}
             <main className={embedded ? 'messages-embedded-main' : 'profile-main-content'} style={embedded ? { width: '100%', padding: 0 } : undefined}>
-                <header className="profile-header">
-                    <h2>Messages</h2>
-                </header>
-
-                <div style={embedded ? { ...chatContainerStyle, marginTop: 0, height: 'calc(100vh - 210px)' } : chatContainerStyle}>
+                <div className="messages-chat-container" style={embedded
+                    ? { ...chatContainerStyle, marginTop: 0, height: 'calc(100vh - 210px)' }
+                    : { ...chatContainerStyle, marginTop: 0, height: 'calc(100vh - 60px)' }}>
 
                     {/* Left Panel: Contact List */}
                     <div style={sidebarListStyle}>

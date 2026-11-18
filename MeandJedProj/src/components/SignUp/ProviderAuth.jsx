@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import background from '../../assets/images/hero-background.png';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -195,7 +196,15 @@ const ProviderAuth = () => {
     };
 
     return (
-        <div className="auth-body d-flex justify-content-center align-items-center">
+        <div
+            className="auth-body d-flex justify-content-center align-items-center"
+            style={{
+                backgroundImage: `url(${background})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+            }}
+        >
             <div
                 className={`auth-container ${isSignUp ? 'right-panel-active' : ''
                     }`}

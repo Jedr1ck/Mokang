@@ -57,7 +57,7 @@
     width: 42px;
     height: 42px;
 
-    border: none;
+    border: 1px solid transparent;
     border-radius: 50%;
 
     background: #ffffff;
@@ -76,9 +76,19 @@
 
 .provider-header-icon:hover {
     transform: translateY(-1px);
+    border-color: #ff6900;
+    background: #fff0e6;
+    color: #ff6900;
+    box-shadow: 0 5px 15px rgba(255, 105, 0, 0.14);
+}
 
-    box-shadow:
-        0 5px 15px rgba(37, 37, 37, 0.10);
+.provider-header-icon:active,
+.provider-header-icon:focus-visible {
+    border-color: #ff6900;
+    background: #fff0e6;
+    color: #ff6900;
+    outline: 2px solid rgba(255, 105, 0, .2);
+    outline-offset: 2px;
 }
 
 .provider-availability-toggle {

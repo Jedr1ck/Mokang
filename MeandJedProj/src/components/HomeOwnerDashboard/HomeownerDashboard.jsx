@@ -206,24 +206,31 @@ const HomeownerDashboard = () => {
             <HomeownerSideBar />
             <main className="homeowner-dashboard">
             <header className="homeowner-dashboard-header">
-                <form
-                    className="homeowner-dashboard-search"
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        navigate('/services');
-                    }}
+                <button
+                    type="button"
+                    className="homeowner-dashboard-wordmark"
+                    onClick={() => navigate('/homeowner-dashboard')}
+                    aria-label="HandyMan homeowner dashboard"
                 >
-                    <i className="bi bi-search" aria-hidden="true" />
-                    <input
-                        type="search"
-                        aria-label="Search services and providers"
-                        placeholder="Search for services, providers, or bookings..."
-                        value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                    />
-                </form>
-
-                <div className="homeowner-dashboard-header-actions">
+                    HANDY<span>MAN</span>
+                </button>
+                <div className="homeowner-dashboard-search-group">
+                    <form
+                        className="homeowner-dashboard-search"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            navigate('/services');
+                        }}
+                    >
+                        <i className="bi bi-search" aria-hidden="true" />
+                        <input
+                            type="search"
+                            aria-label="Search services and providers"
+                            placeholder="Search for services, providers, or bookings..."
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                        />
+                    </form>
                     <button
                         type="button"
                         className="homeowner-dashboard-icon-button"
@@ -238,6 +245,9 @@ const HomeownerDashboard = () => {
                             </span>
                         )}
                     </button>
+                </div>
+
+                <div className="homeowner-dashboard-header-actions">
                     <div className="homeowner-dashboard-notification-wrap">
                         <button
                             type="button"

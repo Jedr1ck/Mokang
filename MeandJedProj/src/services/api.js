@@ -252,3 +252,10 @@ export async function approveProviderVerification(providerId) {
         { method: 'POST' }
     );
 }
+
+export async function rejectProviderVerification(providerId, reason) {
+    return api(
+        `/admin/provider-verifications/${providerId}/reject`,
+        { method: 'POST', body: JSON.stringify({ reason }) }
+    );
+}

@@ -793,6 +793,144 @@ html[data-theme="dark"] .admin-main-content :is(input, select, textarea, .form-c
     color: var(--app-text) !important;
 }
 
+/* Homeowner dark mode: preserve the warm orange brand while replacing
+   remaining light-only inline surfaces and text colors. */
+html[data-theme="dark"] .homeowner-dashboard-wordmark {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-dashboard-wordmark span {
+    color: var(--app-primary) !important;
+}
+
+html[data-theme="dark"] .homeowner-dashboard :is(.homeowner-dashboard-booking, .homeowner-dashboard-activity) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+}
+
+html[data-theme="dark"] .homeowner-dashboard :is(.homeowner-dashboard-booking-copy strong, .homeowner-dashboard-activity strong) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-dashboard :is(.homeowner-dashboard-booking-copy small, .homeowner-dashboard-activity small) {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 :is(.hp-button-outline, .hp-button-muted) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs button:not(.active) {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs button span {
+    background-color: var(--app-elevated) !important;
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .profile-page-container :is(.search-box, .icon-btn) {
+    border: 1px solid var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .profile-page-container .homeowner-notification-button:is(:hover, :focus-visible, :active) {
+    border-color: var(--app-primary) !important;
+    background-color: color-mix(in srgb, var(--app-primary) 16%, var(--app-elevated)) !important;
+    color: var(--app-primary) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table :is(th, td) {
+    border-color: var(--app-border) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(3) > div:first-child {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(3) > div:nth-child(2),
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(4) > div:nth-child(2) {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-filter:not(.active) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-filter.active {
+    border-color: var(--app-primary) !important;
+    background-color: var(--app-primary) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .btn-outline-secondary {
+    border-color: var(--app-secondary-text) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day-label,
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-legend {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="false"] {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="true"] {
+    border-color: var(--app-primary) !important;
+    background-color: var(--app-primary) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main :is(.homeowner-calendar-month-panel, .homeowner-calendar-events-panel) {
+    border-color: var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main :is(.homeowner-calendar-month-panel h3, .homeowner-calendar-events-panel h4) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-month-panel button:not([aria-pressed]) {
+    border: 1px solid var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card {
+    border-top: 1px solid var(--app-border) !important;
+    border-right: 1px solid var(--app-border) !important;
+    border-bottom: 1px solid var(--app-border) !important;
+    background-color: var(--app-elevated) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card > div:first-child > span:first-child {
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card :is(h5, p) {
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card p:last-child {
+    color: var(--app-secondary-text) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-empty {
+    color: var(--app-secondary-text) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html,
     body,

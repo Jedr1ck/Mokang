@@ -35,10 +35,13 @@
 @keyframes find-services-brand-glow { 0%, 100% { box-shadow: 0 0 0 2px #fff, 0 0 10px 2px #ff690040; } 50% { box-shadow: 0 0 0 2px #fff, 0 0 17px 5px #ff690070; } }
 @media (prefers-reduced-motion: reduce) { .find-services-brand { animation: none; } }
 .find-services-global-search { width: min(100%, 620px); height: 40px; display: flex; align-items: center; gap: 9px; padding: 0 14px; border-radius: 10px; background: var(--theme-soft-blue); color: var(--theme-text); }
+.find-services-account .find-services-global-search { width: min(42vw, 620px); min-width: 220px; flex: 0 1 620px; }
+.find-services-global-search input { min-width: 0; }
 .find-services-global-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--theme-text); font-size: 13px; }
 .find-services-global-search input::placeholder { color: #8c9aa1; }
 .find-services-account { display: flex; align-items: center; gap: 15px; margin-left: auto; }
-.find-services-bell { position: relative; width: 35px; height: 35px; border: 0; background: transparent; color: var(--theme-text); font-size: 17px; }
+.find-services-bell { position: relative; width: 35px; height: 35px; border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--theme-text); font-size: 17px; transition: background-color .18s ease, border-color .18s ease, color .18s ease; }
+.find-services-bell:hover, .find-services-bell:active, .find-services-bell:focus-visible { border-color: #ff6900; background: #fff0e6; color: #ff6900; outline: none; }
 .find-services-bell span { position: absolute; top: 6px; right: 5px; width: 8px; height: 8px; border: 1px solid white; border-radius: 50%; background: var(--theme-gold); }
 .find-services-user { display: flex; align-items: center; gap: 9px; padding: 0 0 0 13px; border: 0; border-left: 1px solid var(--theme-soft-blue); background: transparent; text-align: left; }
 .find-services-user img, .find-services-user-fallback { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 50%; object-fit: cover; background: var(--theme-soft-blue); color: var(--theme-text); font-weight: 750; }
@@ -237,6 +240,8 @@
     .find-services-topbar { min-height: 48px; gap: 8px; padding: 7px 10px; }
     .find-services-brand { width: 36px; height: 36px; flex-basis: 36px; }
     .find-services-global-search { width: auto; flex: 1; }
+    .find-services-account { min-width: 0; flex: 1; }
+    .find-services-account .find-services-global-search { width: auto; min-width: 0; flex: 1 1 0; }
     .find-services-global-search input { font-size: 11px; }
     .find-services-account { gap: 3px; }
     .find-services-user { gap: 5px; padding-left: 7px; }

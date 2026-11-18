@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./ProviderSideBar.css";
 
-import myLogo from "../../assets/images/handyman-mark.svg";
+import myLogo from "../../assets/images/logo.png";
 import ThemeToggle from "../ThemeToggle";
 
 const ProviderSideBar = () => {

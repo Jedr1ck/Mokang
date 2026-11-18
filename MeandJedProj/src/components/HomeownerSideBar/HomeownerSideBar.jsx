@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './HomeownerSideBar.css';
 
-import myLogo from '../../assets/images/handyman-mark.svg';
+import myLogo from '../../assets/images/logo.png';
 import ConfirmDialog from '../ConfirmDialog';
 import ThemeToggle from '../ThemeToggle';
 

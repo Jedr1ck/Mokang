@@ -4,7 +4,7 @@ import { getMyProfile, getNotifications, getProviders, getProvider, token } from
 import { SERVICE_CATALOG } from '../../data/serviceCatalog';
 import { ECHAGUE_BARANGAYS } from '../../data/echagueBarangays';
 import './FindService.css';
-import myLogo from '../../assets/images/handyman-mark.svg';
+import myLogo from '../../assets/images/logo.png';
 import cleaningImage from '../../assets/services/deep-cleaner.jpg';
 import plumbingImage from '../../assets/services/plumber.jpg';
 import airconImage from '../../assets/services/aircon.jpg';
@@ -263,9 +263,10 @@ export default function FindService() {
                 <button type="button" className="find-services-brand" onClick={() => navigate(isHomeowner ? '/homeowner-dashboard' : '/')} aria-label={isHomeowner ? 'Return to homeowner dashboard' : 'Return to home page'} title={isHomeowner ? 'Click to return to dashboard' : 'Return home'}>
                     <img src={myLogo} alt="" />
                 </button>
-                <label className="find-services-global-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for services (e.g. cleaning, plumbing, electrical...)" /></label>
+                {!isHomeowner && <label className="find-services-global-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for services (e.g. cleaning, plumbing, electrical...)" /></label>}
                 <div className="find-services-account">
                     {isHomeowner ? <>
+                        <label className="find-services-global-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search for services (e.g. cleaning, plumbing, electrical...)" /></label>
                         <button type="button" className="find-services-bell" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} onClick={() => navigate('/notifications')}><i className="bi bi-bell" />{unreadCount > 0 && <span />}</button>
                         <button type="button" className="find-services-user" onClick={() => navigate('/profile')}>
                             {user.profilePicture ? <img src={user.profilePicture} alt="" /> : <span className="find-services-user-fallback">{user.fullName.charAt(0).toUpperCase()}</span>}
