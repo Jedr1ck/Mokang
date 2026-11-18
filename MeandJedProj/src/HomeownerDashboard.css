@@ -2106,6 +2106,8 @@
 
 .homeowner-profile-v2 .hp-address-fields {
     display: grid;
+    align-self: start;
+    height: fit-content;
     gap: 8px;
     padding: 12px;
     background: var(--theme-soft-blue);

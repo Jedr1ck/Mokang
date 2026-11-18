@@ -23,13 +23,6 @@ function ManageHomeowners() {
     const [selectedHomeowner, setSelectedHomeowner] = useState(null);
     const [modalType, setModalType] = useState(null);
 
-    const [editForm, setEditForm] = useState({
-        fullName: "",
-        email: "",
-        contact: "",
-        location: "",
-    });
-
     const itemsPerPage = 5;
     const activeHomeowners = homeowners.filter(
         (homeowner) => homeowner.status === "Active"
@@ -146,51 +139,6 @@ function ManageHomeowners() {
     };
 
     // =====================================================
-    // EDIT
-    // =====================================================
-
-    const handleEdit = (homeowner) => {
-        setSelectedHomeowner(homeowner);
-
-        setEditForm({
-            fullName: homeowner.fullName,
-            email: homeowner.email,
-            contact: homeowner.contact,
-            location: homeowner.location,
-        });
-
-        setModalType("edit");
-    };
-
-    // =====================================================
-    // SAVE EDIT
-    // =====================================================
-
-    const handleSaveEdit = (event) => {
-        event.preventDefault();
-
-        if (!selectedHomeowner) {
-            return;
-        }
-
-        setHomeowners((previous) =>
-            previous.map((homeowner) =>
-                homeowner.id === selectedHomeowner.id
-                    ? {
-                        ...homeowner,
-                        fullName: editForm.fullName,
-                        email: editForm.email,
-                        contact: editForm.contact,
-                        location: editForm.location,
-                    }
-                    : homeowner
-            )
-        );
-
-        closeModal();
-    };
-
-    // =====================================================
     // BLOCK / UNBLOCK
     // =====================================================
 
@@ -273,12 +221,6 @@ function ManageHomeowners() {
         setSelectedHomeowner(null);
         setModalType(null);
 
-        setEditForm({
-            fullName: "",
-            email: "",
-            contact: "",
-            location: "",
-        });
     };
 
     // =====================================================
@@ -538,20 +480,6 @@ function ManageHomeowners() {
                                                         title="View"
                                                     >
                                                         <i className="bi bi-eye"></i>
-                                                    </button>
-
-                                                    {/* Edit */}
-                                                    <button
-                                                        type="button"
-                                                        className="admin-action-button edit"
-                                                        onClick={() =>
-                                                            handleEdit(
-                                                                homeowner
-                                                            )
-                                                        }
-                                                        title="Edit"
-                                                    >
-                                                        <i className="bi bi-pencil"></i>
                                                     </button>
 
                                                     {/* Block / Unblock */}
@@ -828,176 +756,9 @@ function ManageHomeowners() {
                                     Close
                                 </button>
 
-                                <button
-                                    type="button"
-                                    className="admin-modal-primary-button"
-                                    onClick={() =>
-                                        handleEdit(
-                                            selectedHomeowner
-                                        )
-                                    }
-                                >
-                                    <i className="bi bi-pencil"></i>
-                                    Edit Account
-                                </button>
-
                             </div>
 
                         </div>
-
-                    </div>
-                )}
-
-            {/* =================================================
-                        EDIT MODAL
-            ================================================== */}
-
-            {modalType === "edit" &&
-                selectedHomeowner && (
-                    <div
-                        className="admin-modal-overlay"
-                        onMouseDown={(event) => {
-                            if (
-                                event.target ===
-                                event.currentTarget
-                            ) {
-                                closeModal();
-                            }
-                        }}
-                    >
-
-                        <form
-                            className="admin-modal"
-                            onSubmit={handleSaveEdit}
-                        >
-
-                            <div className="admin-modal-header">
-
-                                <div>
-                                    <span>
-                                        ACCOUNT MANAGEMENT
-                                    </span>
-
-                                    <h3>
-                                        Edit Homeowner
-                                    </h3>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    onClick={closeModal}
-                                    aria-label="Close"
-                                >
-                                    <i className="bi bi-x-lg"></i>
-                                </button>
-
-                            </div>
-
-                            <div className="admin-form-grid">
-
-                                <div className="admin-form-group full">
-                                    <label>
-                                        Full Name
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        value={editForm.fullName}
-                                        onChange={(event) =>
-                                            setEditForm({
-                                                ...editForm,
-                                                fullName:
-                                                    event.target
-                                                        .value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                <div className="admin-form-group">
-                                    <label>
-                                        Email
-                                    </label>
-
-                                    <input
-                                        type="email"
-                                        value={editForm.email}
-                                        onChange={(event) =>
-                                            setEditForm({
-                                                ...editForm,
-                                                email:
-                                                    event.target
-                                                        .value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                <div className="admin-form-group">
-                                    <label>
-                                        Contact
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        value={editForm.contact}
-                                        onChange={(event) =>
-                                            setEditForm({
-                                                ...editForm,
-                                                contact:
-                                                    event.target
-                                                        .value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                <div className="admin-form-group full">
-                                    <label>
-                                        Location
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        value={editForm.location}
-                                        onChange={(event) =>
-                                            setEditForm({
-                                                ...editForm,
-                                                location:
-                                                    event.target
-                                                        .value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                            </div>
-
-                            <div className="admin-modal-footer">
-
-                                <button
-                                    type="button"
-                                    className="admin-modal-secondary"
-                                    onClick={closeModal}
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    className="admin-modal-primary"
-                                >
-                                    <i className="bi bi-check-lg"></i>
-                                    Save Changes
-                                </button>
-
-                            </div>
-
-                        </form>
 
                     </div>
                 )}

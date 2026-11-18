@@ -1311,7 +1311,7 @@
 }
 
 .verified-profile-page .provider-profile-hero-status span {
-    color: var(--theme-text);
+    color: #16834a;
     font-size: 12px;
     font-weight: 800;
 }

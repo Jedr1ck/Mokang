@@ -145,12 +145,19 @@ const History = () => {
             <main className="profile-main-content homeowner-history-main">
                 {/* Header */}
                 <header className="profile-header homeowner-history-header">
+                    <div className="homeowner-history-title">
+                        <i className="bi bi-clock-history" aria-hidden="true" />
+                        <span>
+                            <h1>Service History</h1>
+                            <p>Track and manage all your service requests.</p>
+                        </span>
+                    </div>
                     <div className="header-actions">
                         <div className="search-box">
                             <i className="bi bi-search"></i>
                             <input
                                 type="text"
-                                placeholder="Search history ID, title..."
+                                placeholder="Search history ID, title, or service..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />

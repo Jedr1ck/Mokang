@@ -616,3 +616,43 @@
         width: 64px;
     }
 }
+
+/* Dark mode: keep every nav glyph legible on the orange provider rail. */
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn {
+    opacity: 1 !important;
+    filter: none !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn i,
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn i::before {
+    opacity: 1 !important;
+    color: inherit !important;
+}
+
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn:is(.active, :hover, :focus-visible) {
+    border-color: #fff !important;
+    background: #fff !important;
+    color: #f47b20 !important;
+    box-shadow: 0 2px 7px rgba(76, 38, 8, .2) !important;
+}
+
+/* Explicitly color the icon glyph itself so active and hovered links never
+   inherit a washed-out white from another provider page stylesheet. */
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn:is(.active, :hover, :focus-visible) :is(i, svg),
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn:is(.active, :hover, :focus-visible) i::before {
+    color: #f47b20 !important;
+    fill: #f47b20 !important;
+    opacity: 1 !important;
+    filter: none !important;
+    -webkit-text-fill-color: #f47b20 !important;
+}
+
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn:not(:is(.active, :hover, :focus-visible)) :is(i, svg),
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn:not(:is(.active, :hover, :focus-visible)) i::before {
+    color: #fff !important;
+    fill: #fff !important;
+    opacity: 1 !important;
+    filter: none !important;
+    -webkit-text-fill-color: #fff !important;
+}

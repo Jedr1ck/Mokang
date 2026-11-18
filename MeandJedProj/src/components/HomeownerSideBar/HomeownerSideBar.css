@@ -298,6 +298,27 @@
     box-shadow: 0 2px 7px rgba(37, 37, 37, 0.12);
 }
 
+.green-wavy-sidebar .sidebar-btn:is(:hover, :focus-visible),
+.green-wavy-sidebar .sidebar-btn.active,
+.green-wavy-sidebar .sidebar-btn.active:is(:hover, :focus-visible) {
+    border-color: rgba(255, 255, 255, .9);
+    background: #fff;
+    color: #ff7900 !important;
+    box-shadow: 0 2px 7px rgba(37, 37, 37, .12);
+}
+
+.green-wavy-sidebar .sidebar-btn:is(:hover, :focus-visible) i,
+.green-wavy-sidebar .sidebar-btn.active i {
+    color: #ff7900 !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+.green-wavy-sidebar .sidebar-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, .88);
+    outline-offset: 2px;
+}
+
 .green-wavy-sidebar .theme-toggle-compact {
     position: relative;
     width: 44px;
@@ -329,6 +350,25 @@
 
 .green-wavy-sidebar .homeowner-logout-btn {
     margin-top: 0;
+}
+
+/* Keep homeowner nav icons visible and orange in the white hover/active pill. */
+.green-wavy-sidebar .sidebar-btn:is(:hover, :focus-visible, .active),
+.green-wavy-sidebar .sidebar-btn.active:is(:hover, :focus-visible) {
+    border-color: rgba(255, 255, 255, .92) !important;
+    background: #fff !important;
+    color: #ff7900 !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: 0 2px 7px rgba(37, 37, 37, .12) !important;
+}
+
+.green-wavy-sidebar .sidebar-btn:is(:hover, :focus-visible, .active) i,
+.green-wavy-sidebar .sidebar-btn.active:is(:hover, :focus-visible) i {
+    color: #ff7900 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
 }
 
 @media (max-width: 560px) {

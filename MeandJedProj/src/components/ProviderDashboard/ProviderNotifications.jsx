@@ -25,6 +25,7 @@ const ProviderNotifications = ({ onUnreadCountChange }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [actionError, setActionError] = useState('');
+    const [filter, setFilter] = useState('all');
 
     const loadNotifications = useCallback(async () => {
         try {
@@ -121,14 +122,24 @@ const ProviderNotifications = ({ onUnreadCountChange }) => {
     };
 
     const unreadCount = notifications.filter((notification) => !notification.isRead).length;
+    const filteredNotifications = notifications.filter((notification) => {
+        const isMessage = String(notification.type || '').toLowerCase().includes('message');
+        if (filter === 'unread') return !notification.isRead;
+        if (filter === 'bookings') return !isMessage;
+        if (filter === 'messages') return isMessage;
+        return true;
+    });
 
     return (
         <section className="provider-notifications-page">
-            <div className="notifications-heading">
-                <div>
-                    <h1>Notifications</h1>
+            <div className="notifications-hero">
+                <div className="notifications-hero-icon"><i className="bi bi-bell-fill" aria-hidden="true" /></div>
+                <div className="notifications-heading">
+                    <div>
+                        <h1>Notifications</h1>
+                        <p>Updates about your bookings and messages.</p>
+                    </div>
                 </div>
-
                 <button
                     type="button"
                     className="mark-all-read-btn"
@@ -146,14 +157,24 @@ const ProviderNotifications = ({ onUnreadCountChange }) => {
                 </div>
             )}
 
-            <div className="notifications-summary">
-                <div className="notification-summary-icon">
-                    <i className="bi bi-bell"></i>
-                </div>
-                <div>
-                    <strong>{unreadCount} unread</strong>
-                    <p>{notifications.length} total notifications</p>
-                </div>
+            <div className="notifications-filters" role="tablist" aria-label="Filter notifications">
+                {[
+                    ['all', 'All'],
+                    ['unread', 'Unread', unreadCount],
+                    ['bookings', 'Bookings'],
+                    ['messages', 'Messages'],
+                ].map(([key, label, count]) => (
+                    <button
+                        key={key}
+                        type="button"
+                        role="tab"
+                        aria-selected={filter === key}
+                        className={filter === key ? 'is-active' : ''}
+                        onClick={() => setFilter(key)}
+                    >
+                        {label}{count > 0 && <span>{count}</span>}
+                    </button>
+                ))}
             </div>
 
             {error && (
@@ -170,16 +191,16 @@ const ProviderNotifications = ({ onUnreadCountChange }) => {
                     <div className="notifications-empty" role="status">
                         Loading notifications...
                     </div>
-                ) : notifications.length === 0 && !error ? (
+                ) : filteredNotifications.length === 0 && !error ? (
                     <div className="notifications-empty">
                         <div className="notifications-empty-icon">
                             <i className="bi bi-bell-slash"></i>
                         </div>
-                        <h3>No notifications yet</h3>
-                        <p>New booking requests and chat messages will appear here.</p>
+                        <h3>{notifications.length ? 'No matching notifications' : 'No notifications yet'}</h3>
+                        <p>{notifications.length ? 'Try another notification filter.' : 'New booking requests and chat messages will appear here.'}</p>
                     </div>
                 ) : (
-                    notifications.map((notification) => {
+                    filteredNotifications.map((notification) => {
                         const isRead = Boolean(notification.isRead);
                         const isMessage = String(notification.type || '')
                             .toLowerCase()

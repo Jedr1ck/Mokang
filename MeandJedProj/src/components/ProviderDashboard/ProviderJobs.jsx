@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyBookings, sendMessage, updateBookingStatus } from '../../services/api';
 import { formatTime12Hour, hasBookingTimeArrived } from '../../utils/dateTime';
-import myLogo from '../../assets/images/logo.png';
+import ProviderSideBar from '../ProviderSideBar/ProviderSideBar';
 import airconImage from '../../assets/services/aircon.jpg';
 import applianceRepairImage from '../../assets/services/appliance-repair.jpg';
 import deepCleanerImage from '../../assets/services/deep-cleaner.jpg';
@@ -139,10 +139,11 @@ export default function ProviderJobs() {
     const showDetails = (job) => setSelectedJob(job);
 
     return (
-        <section className="provider-my-jobs">
+        <section className="provider-my-jobs provider-page-shell">
+            <ProviderSideBar />
             <header className="my-jobs-topbar">
                 <button type="button" className="my-jobs-brand" aria-label="Return to provider dashboard" title="Click to return to dashboard" onClick={() => navigate('/provider-dashboard')}>
-                    <img src={myLogo} alt="" />
+                    HANDY<span>MAN</span>
                 </button>
                 <label className="my-jobs-topbar-search">
                     <i className="bi bi-search" />
@@ -162,7 +163,9 @@ export default function ProviderJobs() {
 
             <header className="my-jobs-heading">
                 <div>
-                    <h1>My Jobs</h1>
+                    <div className="my-jobs-title">
+                        <h1>My Jobs</h1>
+                    </div>
                 </div>
                 <button type="button" className="my-jobs-availability" onClick={() => navigate('/provider-availability')}>
                     <i className="bi bi-calendar2-week" /> Set Availability <i className="bi bi-arrow-right" />
@@ -197,7 +200,7 @@ export default function ProviderJobs() {
             {error && <div className="my-jobs-error" role="alert">{error}</div>}
             <div className="my-jobs-table-wrap">
                 <table className="my-jobs-table">
-                    <thead><tr><th>#</th><th>Service Details</th><th>Customer</th><th>Date &amp; Time</th></tr></thead>
+                    <thead><tr><th>#</th><th>Service Details</th><th>Customer</th><th>Date &amp; Time</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody>{visibleJobs.map((job) => <Fragment key={job.id}><tr
                         className={`job-row-clickable${expandedJobId === job.id ? ' job-row-selected' : ''}`}
                         tabIndex={0}
@@ -216,9 +219,11 @@ export default function ProviderJobs() {
                         <td><div className="job-service-cell">{serviceImage(job.service) ? <img className="job-service-image" src={serviceImage(job.service)} alt="" /> : <span className="job-service-icon"><i className="bi bi-tools" /></span>}<div><strong>{job.service}</strong><small>{job.service}</small></div></div></td>
                         <td><div className="job-customer-cell">{job.customerPhoto ? <img src={job.customerPhoto} alt="" /> : <span className="job-customer-initial">{job.customerName.charAt(0).toUpperCase()}</span>}<div><strong>{job.customerName}</strong><small>{job.contact}</small></div></div></td>
                         <td><div className="job-datetime"><span><i className="bi bi-calendar3" />{job.date}</span><span><i className="bi bi-clock" />{job.time}</span></div></td>
+                        <td><span className={statusClass(statusGroup(job.status))}>{statusGroup(job.status)}</span></td>
+                        <td><button type="button" className="job-view-icon-button" aria-label={`View ${job.service} details`} onClick={(event) => { event.stopPropagation(); showDetails(job); }}><i className="bi bi-eye" /></button></td>
                     </tr>
                     {expandedJobId === job.id && <tr className="job-expanded-row" id={`job-expanded-${job.id}`}>
-                        <td colSpan="4">
+                        <td colSpan="6">
                             <div className="job-expanded-details">
                                 <div className="job-expanded-location"><small>Location</small><span className="job-location-cell"><i className="bi bi-geo-alt" />{job.location}</span></div>
                                 <div className="job-expanded-status"><small>Status</small><span className={statusClass(job.status)}>{job.status === 'Accepted' || job.status === 'Matched' ? 'Upcoming' : job.status}</span></div>

@@ -133,7 +133,10 @@ const TrackBooking = () => {
                 <Link to="/homeowner-dashboard" className="text-decoration-none text-dark fw-bold d-flex align-items-center gap-2">
                     <i className="bi bi-arrow-left fs-5"></i> Back to Dashboard
                 </Link>
-                <h1>Track Booking</h1>
+                <h1 className="tracking-title">
+                    <i className="bi bi-geo-alt-fill" aria-hidden="true" />
+                    <span>Track <em>Booking</em></span>
+                </h1>
             </div>
 
             {/* Main Card */}
@@ -145,14 +148,18 @@ const TrackBooking = () => {
                         <strong>{bookingData.bookingCode || bookingData.id}</strong>
                     </div>
                     <span className={`tracking-status tracking-status-${statusTone}`}>
+                        <i className={`bi ${isCompleted ? 'bi-check-circle-fill' : isClosed ? 'bi-x-circle-fill' : 'bi-clock'}`} aria-hidden="true" />
                         {isClosed ? bookingData.status : steps[activeIndex].label}
                     </span>
                 </div>
 
                 <div className="tracking-booking-summary">
-                    <strong>{bookingData.serviceName || bookingData.category || 'Service booking'}</strong>
-                    <span>{bookingData.preferredDate || 'Date to be confirmed'}{bookingData.preferredTime ? ` at ${formatTime12Hour(bookingData.preferredTime)}` : ''}</span>
-                    {bookingData.providerName && <span>Provider: {bookingData.providerName}</span>}
+                    <span className="tracking-service-icon"><i className="bi bi-tools" aria-hidden="true" /></span>
+                    <div className="tracking-service-details">
+                        <strong>{bookingData.serviceName || bookingData.category || 'Service booking'}</strong>
+                        <span><i className="bi bi-calendar-event" aria-hidden="true" /> {bookingData.preferredDate || 'Date to be confirmed'}{bookingData.preferredTime ? ` at ${formatTime12Hour(bookingData.preferredTime)}` : ''}</span>
+                        {bookingData.providerName && <span><i className="bi bi-person-fill" aria-hidden="true" /> Provider: {bookingData.providerName}</span>}
+                    </div>
                 </div>
 
                 {/* Stepper Bar */}
@@ -174,7 +181,7 @@ const TrackBooking = () => {
 
                         return (
                             <Fragment key={index}>
-                                <div className="tracking-step">
+                                <div className={`tracking-step ${isCurrent ? 'current' : isPassed ? 'passed' : 'upcoming'}`}>
                                     <div
                                         className="tracking-step-icon"
                                         style={{
@@ -207,12 +214,16 @@ const TrackBooking = () => {
 
                 {/* Status Message */}
                 <div className={`tracking-status-message tracking-status-message-${statusTone}`}>
-                    <h2>
-                        {isClosed ? `Booking ${bookingData.status.toLowerCase()}` : getStatusText(activeIndex).title}
-                    </h2>
-                    <p>
-                        {isClosed ? 'This booking is no longer active.' : getStatusText(activeIndex).desc}
-                    </p>
+                    <i className="bi bi-info-circle tracking-status-info-icon" aria-hidden="true" />
+                    <div className="tracking-status-copy">
+                        <h2>
+                            {isClosed ? `Booking ${bookingData.status.toLowerCase()}` : getStatusText(activeIndex).title}
+                        </h2>
+                        <p>
+                            {isClosed ? 'This booking is no longer active.' : getStatusText(activeIndex).desc}
+                        </p>
+                    </div>
+                    <i className="bi bi-calendar2-check tracking-status-art" aria-hidden="true" />
                 </div>
                 {bookingData.status === 'Awaiting Confirmation' && (
                     <div className="mt-4 text-center">

@@ -71,7 +71,10 @@ const CalendarView = () => {
             {/* Main Content */}
             <main className="profile-main-content homeowner-calendar-main">
                 {/* Header */}
-                    <header className="profile-header homeowner-calendar-header">
+                <header className="profile-header homeowner-calendar-header">
+                    <div className="homeowner-calendar-brand" aria-label="HandyMan">
+                        <span>HANDY</span><strong>MAN</strong>
+                    </div>
                     <div className="header-actions">
                         <button
                             type="button"
@@ -80,6 +83,7 @@ const CalendarView = () => {
                             onClick={() => navigate('/notifications')}
                         >
                             <i className="bi bi-bell"></i>
+                            <span className="homeowner-calendar-notification-dot" aria-hidden="true" />
                         </button>
                     </div>
                 </header>
@@ -89,13 +93,16 @@ const CalendarView = () => {
                     {/* Left Side: Calendar Grid */}
                     <section className="dashboard-box homeowner-calendar-month-panel" style={{ padding: '20px' }}>
                         {/* Month Navigation */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h3 style={{ margin: 0, color: '#303030' }}>
+                        <div className="homeowner-calendar-month-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <div className="homeowner-calendar-month-heading">
+                                <i className="bi bi-calendar-event" aria-hidden="true" />
+                                <h3 style={{ margin: 0, color: '#303030' }}>
                                 {monthNames[month]} {year}
-                            </h3>
+                                </h3>
+                            </div>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                                <button onClick={handlePrevMonth} style={navBtnStyle}><i className="bi bi-chevron-left"></i></button>
-                                <button onClick={handleNextMonth} style={navBtnStyle}><i className="bi bi-chevron-right"></i></button>
+                                <button className="homeowner-calendar-nav-button" aria-label="Previous month" onClick={handlePrevMonth} style={navBtnStyle}><i className="bi bi-chevron-left"></i></button>
+                                <button className="homeowner-calendar-nav-button" aria-label="Next month" onClick={handleNextMonth} style={navBtnStyle}><i className="bi bi-chevron-right"></i></button>
                             </div>
                         </div>
 
@@ -168,7 +175,7 @@ const CalendarView = () => {
 
                     {/* Right Side: Selected Date Schedules */}
                     <section className="dashboard-box homeowner-calendar-events-panel" style={{ padding: '20px' }}>
-                        <h4 style={{ margin: '0 0 15px 0', color: '#303030' }}>
+                        <h4 className="homeowner-calendar-events-heading" style={{ margin: '0 0 15px 0', color: '#303030' }}>
                             Events on {selectedDate}
                         </h4>
 
@@ -176,7 +183,7 @@ const CalendarView = () => {
                             selectedEvents.map((item) => (
                                 <div key={item.id} className="homeowner-calendar-event-card" style={{ ...eventCardStyle, borderLeftColor: getStatusStyle(item.status).color }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={typeBadgeStyle}>{item.type}</span>
+                                        <span className="homeowner-calendar-event-type" style={typeBadgeStyle}><i className="bi bi-tools" aria-hidden="true" /> {item.type}</span>
                                         <span
                                             style={{ ...statusBadgeStyle, ...getStatusStyle(item.status) }}
                                             aria-label={`Booking status: ${item.status || 'Unknown'}`}

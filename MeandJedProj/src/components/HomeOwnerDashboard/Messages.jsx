@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HomeownerSideBar from '../HomeownerSideBar/HomeownerSideBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -24,6 +24,7 @@ const Messages = ({ embedded = false, bookings }) => {
     const [activeChatId, setActiveChatId] = useState(null);
     const [newMessage, setNewMessage] = useState('');
     const [messageError, setMessageError] = useState('');
+    const chatBodyRef = useRef(null);
 
     useEffect(() => {
         let isCurrent = true;
@@ -154,11 +155,22 @@ const Messages = ({ embedded = false, bookings }) => {
         conversations.find((conversation) => conversation.id === activeChatId) ||
         conversations[0] ||
         null;
+    const latestMessageId = activeChat?.messages.at(-1)?.id;
     const activeBooking = activeChat?.bookingId
         ? bookingRows.find(
             (booking) => Number(booking.id) === Number(activeChat.bookingId)
         )
         : null;
+
+    useEffect(() => {
+        const chatBody = chatBodyRef.current;
+        if (!chatBody || !latestMessageId) return undefined;
+
+        const frameId = window.requestAnimationFrame(() => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        });
+        return () => window.cancelAnimationFrame(frameId);
+    }, [activeChat?.id, latestMessageId]);
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -325,7 +337,7 @@ const Messages = ({ embedded = false, bookings }) => {
                                 </div>
 
                                 {/* Chat Body / Message History */}
-                                <div style={chatBodyStyle}>
+                                <div ref={chatBodyRef} style={chatBodyStyle}>
                                     {activeChat.messages.length === 0 && (
                                         <p style={{ margin: 'auto', color: '#6b7280', textAlign: 'center' }}>
                                             No messages yet. Send a message to start talking about this booking.

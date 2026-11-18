@@ -113,9 +113,12 @@ const Notifications = () => {
             <HomeownerSideBar />
             <main className="profile-main-content homeowner-notifications-page">
                 <header className="profile-header homeowner-notifications-header">
-                    <div>
-                        <h2>Notifications</h2>
-                        <p>Updates about your bookings and messages.</p>
+                    <div className="homeowner-notifications-title">
+                        <i className="bi bi-bell-fill" aria-hidden="true" />
+                        <span>
+                            <h2>Notifications</h2>
+                            <p>Updates about your bookings and messages.</p>
+                        </span>
                     </div>
                     {unreadCount > 0 && (
                         <button

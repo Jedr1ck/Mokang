@@ -122,11 +122,10 @@ const BookingsTab = () => {
     return (
         <div className="profile-page-container">
             <HomeownerSideBar />
-            <main className="profile-main-content">
-                <header className="profile-header">
+            <main className="profile-main-content homeowner-bookings-page">
+                <header className="profile-header homeowner-bookings-header">
                     <div>
                         <h2>My Bookings</h2>
-                        <p className="text-muted mb-0">Check requests, track service progress, and view completed services.</p>
                     </div>
                     <button type="button" className="btn homeowner-book-service rounded-pill px-3" onClick={() => navigate('/services')}>
                         <i className="bi bi-plus-lg me-2" />Book a Service

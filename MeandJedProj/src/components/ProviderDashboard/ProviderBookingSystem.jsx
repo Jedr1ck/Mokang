@@ -7,7 +7,7 @@ import {
     updateBookingStatus,
 } from '../../services/api';
 import ConfirmDialog from '../ConfirmDialog';
-import myLogo from '../../assets/images/logo.png';
+import ProviderSideBar from '../ProviderSideBar/ProviderSideBar';
 import { formatTime12Hour, hasBookingTimeArrived } from '../../utils/dateTime';
 import './ProviderBookingSystem.css';
 
@@ -225,16 +225,17 @@ export default function ProviderBookingSystem() {
                                 : 0;
 
     return (
-        <main className="provider-booking-system">
+        <main className="provider-booking-system provider-page-shell">
+            <ProviderSideBar />
             <header className="pbs-topbar">
                 <button
                     type="button"
-                    className="pbs-brand"
+                    className="pbs-brand-wordmark"
                     aria-label="Return to provider dashboard"
                     title="Click to return to dashboard"
                     onClick={() => navigate('/provider-dashboard')}
                 >
-                    <img src={myLogo} alt="" />
+                    HANDY<span>MAN</span>
                 </button>
                 <label className="pbs-search">
                     <i className="bi bi-search" />
@@ -269,17 +270,6 @@ export default function ProviderBookingSystem() {
                     <i className="bi bi-chevron-down" />
                 </button>
             </header>
-
-            <section className="pbs-page-heading">
-                <div>
-                    <h1>My Bookings</h1>
-                </div>
-                <button type="button" onClick={() => navigate('/provider-schedule')}>
-                    <i className="bi bi-calendar-event" />
-                    Set Availability
-                    <i className="bi bi-arrow-right" />
-                </button>
-            </section>
 
             {error && <div className="alert alert-danger" role="alert">{error}</div>}
 

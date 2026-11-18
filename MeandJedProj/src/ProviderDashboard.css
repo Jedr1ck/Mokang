@@ -1713,7 +1713,16 @@
     align-items: center;
     justify-content: flex-end;
     gap: 12px;
+    margin-left: auto;
     flex-shrink: 0;
+}
+
+.provider-header-availability {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 1 auto;
+    min-width: 0;
 }
 
 .provider-profile-header {
@@ -1756,6 +1765,12 @@
 .provider-top-header > .provider-search-box {
     max-width: 410px;
     margin-right: auto;
+}
+
+.provider-header-actions > .provider-search-box {
+    width: min(410px, 34vw);
+    max-width: 410px;
+    flex: 0 1 410px;
 }
 
 .provider-welcome-card {
@@ -2270,6 +2285,12 @@ button.provider-stat-card:hover {
         max-width: none;
     }
 
+    .provider-header-actions > .provider-search-box {
+        width: 100%;
+        flex: 1 1 100%;
+        order: -1;
+    }
+
     .provider-header-actions {
         justify-content: flex-end;
     }
@@ -2292,6 +2313,193 @@ button.provider-stat-card:hover {
 .provider-notifications-page {
     padding: 8px 0 30px;
     color: var(--theme-text);
+}
+
+html[data-theme="dark"] .provider-notifications-page {
+    background: transparent !important;
+}
+
+.notifications-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 92px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid #eadfd5;
+    border-radius: 18px;
+    background: linear-gradient(110deg, #fff 0%, #fffaf6 58%, #fff0df 100%);
+}
+
+.notifications-hero-icon {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    place-items: center;
+    border: 1px solid #ff9b45;
+    border-radius: 15px;
+    background: #fff0df;
+    color: #f56b12;
+    font-size: 27px;
+}
+
+.notifications-hero .notifications-heading {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    margin: 0;
+}
+
+.notifications-hero .notifications-heading h1 {
+    margin: 0;
+}
+
+.notifications-hero .notifications-heading p {
+    margin-top: 3px;
+}
+
+.notifications-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 14px;
+}
+
+.notifications-filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 8px 16px;
+    border: 1px solid #dedbd7;
+    border-radius: 999px;
+    background: #fff;
+    color: #30343a;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.notifications-filters button span {
+    display: inline-grid;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 5px;
+    place-items: center;
+    border-radius: 999px;
+    background: #f56b12;
+    color: #fff;
+    font-size: 11px;
+}
+
+.notifications-filters button:hover,
+.notifications-filters button.is-active {
+    border-color: #ff7800;
+    background: #ff7800;
+    color: #fff;
+}
+
+.notifications-hero .mark-all-read-btn {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    border-radius: 999px;
+}
+
+html[data-theme="dark"] .notifications-hero {
+    border-color: #3b3e45;
+    background:
+        radial-gradient(ellipse at 76% 115%, rgb(255 112 0 / 21%), transparent 40%),
+        linear-gradient(110deg, #17191e 0%, #151619 62%, #1d1916 100%);
+    box-shadow: inset 0 1px rgb(255 255 255 / 3%);
+}
+
+html[data-theme="dark"] .notifications-hero-icon {
+    border-color: #f56b12;
+    background: linear-gradient(145deg, #4a2914, #211a16);
+    color: #ff8a18;
+    box-shadow: 0 0 20px rgb(255 111 0 / 28%);
+}
+
+html[data-theme="dark"] .notifications-hero .notifications-heading h1 {
+    color: #f7f7f8;
+}
+
+html[data-theme="dark"] .notifications-hero .notifications-heading p {
+    color: #c2c4ca;
+}
+
+html[data-theme="dark"] .notifications-hero .mark-all-read-btn {
+    border-color: #ff7900;
+    background: #17191e;
+    color: #f7f7f8;
+}
+
+html[data-theme="dark"] .notifications-hero .mark-all-read-btn:hover:not(:disabled) {
+    background: #382313;
+}
+
+html[data-theme="dark"] .notifications-filters button {
+    border-color: #41444b;
+    background: #181a1f;
+    color: #f1f2f4;
+}
+
+html[data-theme="dark"] .notifications-filters button:hover,
+html[data-theme="dark"] .notifications-filters button.is-active {
+    border-color: #ff7800;
+    background: #ff7800;
+    color: #151515;
+}
+
+html[data-theme="dark"] .notification-card {
+    border-color: #35383f;
+    background: linear-gradient(110deg, #17191e, #14161a);
+    color: #f4f5f7;
+}
+
+html[data-theme="dark"] .notification-card.is-unread {
+    border-color: #98500f;
+    border-left: 5px solid #ff7900;
+    background: linear-gradient(110deg, #382313, #211a16 72%, #17191e);
+    box-shadow: 0 0 18px rgb(255 112 0 / 12%);
+}
+
+html[data-theme="dark"] .notification-card.is-read {
+    opacity: 1;
+}
+
+html[data-theme="dark"] .notification-card-icon {
+    background: #2c2119;
+    color: #ff9a45;
+}
+
+html[data-theme="dark"] .notification-card-content > p,
+html[data-theme="dark"] .notification-meta {
+    color: #c0c4cc;
+}
+
+html[data-theme="dark"] .notification-status {
+    background: #382313;
+    color: #ffb469;
+}
+
+html[data-theme="dark"] .notification-menu-trigger {
+    color: #f1f2f4;
+}
+
+html[data-theme="dark"] .notification-menu-trigger:hover {
+    background: #30333a;
+    color: #ff9a45;
+}
+
+html[data-theme="dark"] .notification-open-button {
+    color: #ff941f;
 }
 
 .notification-open-button {
@@ -2603,6 +2811,21 @@ button.provider-stat-card:hover {
 }
 
 @media (max-width: 600px) {
+    .notifications-hero {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .notifications-hero .notifications-heading {
+        flex-basis: calc(100% - 74px);
+    }
+
+    .notifications-hero .mark-all-read-btn {
+        margin-left: 70px;
+    }
+
     .notifications-heading {
         align-items: flex-start;
         flex-direction: column;
@@ -2626,4 +2849,48 @@ button.provider-stat-card:hover {
     .notification-title-row h3 {
         font-size: 12px;
     }
+}
+
+/* Carry the homeowner dashboard's warm ambient backdrop into the provider view. */
+.provider-layout {
+    background-color: #FFFCF7;
+    background-image:
+        radial-gradient(ellipse at 4% 8%, rgba(255, 224, 199, 0.42), transparent 36%),
+        radial-gradient(ellipse at 96% 12%, rgba(255, 241, 189, 0.48), transparent 34%),
+        radial-gradient(ellipse at 72% 100%, rgba(255, 193, 143, 0.2), transparent 42%),
+        linear-gradient(135deg, #FFFCF7 12%, #FFFFFF 54%, #FFFCF7 100%);
+    background-attachment: fixed;
+}
+
+/* Dark provider pages share one seamless canvas; cards keep their own surfaces. */
+html[data-theme="dark"] .provider-layout,
+html[data-theme="dark"] .provider-layout .provider-main-content {
+    background: #0c0e13 !important;
+    background-image: none !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-top-header {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .provider-layout :is(
+    .provider-calendar-page,
+    .provider-profile-page,
+    .provider-notifications-page,
+    .provider-my-jobs,
+    .provider-booking-system,
+    .provider-service-map-page
+) {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .provider-layout .provider-profile-header {
+    border-color: #343944 !important;
+    background: linear-gradient(145deg, #171a20, #12151b) !important;
+    color: #f5f6f8 !important;
 }

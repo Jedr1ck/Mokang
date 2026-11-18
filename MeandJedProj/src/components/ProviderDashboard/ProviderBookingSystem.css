@@ -12,7 +12,7 @@
     --theme-text: var(--app-text);
     --theme-charcoal: var(--app-text);
     min-height: 100vh;
-    padding: 0 24px 32px;
+    padding: 0 24px 32px 104px;
     background: var(--theme-soft-blue);
     color: var(--theme-text);
     font-family: 'Poppins', Arial, sans-serif;
@@ -32,6 +32,26 @@
     padding: 8px 24px;
     border-bottom: 1px solid var(--theme-soft-blue);
     background: #fff;
+}
+
+.pbs-topbar > .pbs-brand-wordmark {
+    order: 0;
+    margin-right: auto;
+}
+
+.pbs-topbar > .pbs-icon-button {
+    order: 1;
+    margin-left: 0;
+}
+
+.pbs-topbar > .pbs-search {
+    order: 2;
+    flex: 0 1 min(440px, 55vw);
+    margin: 0;
+}
+
+.pbs-topbar > .pbs-profile-button {
+    order: 3;
 }
 
 .pbs-brand {
@@ -84,6 +104,7 @@
     align-items: center;
     gap: 10px;
     width: min(440px, 55vw);
+    margin-left: auto;
     height: 36px;
     margin-right: auto;
     padding: 0 12px;
@@ -857,9 +878,16 @@
         gap: 10px;
     }
 
+    .pbs-topbar > .pbs-search {
+        width: auto;
+        flex: 1 1 auto;
+        margin: 0;
+    }
+
     .pbs-search {
         width: auto;
         flex: 1;
+        margin-left: 0;
     }
 
     .pbs-profile-button {
@@ -964,4 +992,396 @@
 
 .provider-booking-system .pbs-booking-card.selected {
     @apply border-orange-500 bg-orange-50;
+}
+
+/* Dark booking workspace: keep the dashboard backdrop continuous and use
+   graphite surfaces with the existing orange brand accents. */
+html[data-theme="dark"] .provider-booking-system {
+    background:
+        radial-gradient(ellipse at 78% 0%, rgb(255 112 0 / 5%), transparent 38%),
+        #0c0e13 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .pbs-topbar {
+    border-bottom-color: #292c33;
+    background: transparent;
+}
+
+html[data-theme="dark"] .pbs-brand-wordmark {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    flex: 0 0 auto;
+    color: #f7f7f8;
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -.8px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+html[data-theme="dark"] .pbs-brand-wordmark span {
+    color: #ff7900;
+}
+
+html[data-theme="dark"] .pbs-search {
+    border: 1px solid #3c4049;
+    border-radius: 22px;
+    background: linear-gradient(110deg, #1b1e24, #17191e);
+    color: #f0f1f3;
+}
+
+html[data-theme="dark"] .pbs-search input {
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-search input::placeholder {
+    color: #aeb3bd;
+}
+
+html[data-theme="dark"] .pbs-icon-button,
+html[data-theme="dark"] .pbs-profile-button {
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-icon-button {
+    border: 1px solid #343841;
+    border-radius: 50%;
+    background: #17191e;
+}
+
+html[data-theme="dark"] .pbs-icon-button:hover,
+html[data-theme="dark"] .pbs-icon-button:focus-visible {
+    border-color: #ff7900;
+    background: #302116;
+    color: #ff941f;
+}
+
+html[data-theme="dark"] .pbs-profile-button {
+    padding: 4px 10px 4px 5px;
+    border: 1px solid #363941;
+    border-radius: 999px;
+    background: linear-gradient(145deg, #1b1e24, #14161b);
+}
+
+html[data-theme="dark"] .pbs-profile-button small {
+    color: #b9bec7;
+}
+
+html[data-theme="dark"] .pbs-profile-button img,
+html[data-theme="dark"] .pbs-avatar-fallback {
+    border: 1px solid #555a64;
+    background: #252830;
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-page-heading {
+    margin-top: 4px;
+    margin-bottom: 16px;
+}
+
+html[data-theme="dark"] .pbs-heading-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+html[data-theme="dark"] .pbs-heading-icon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    place-items: center;
+    border: 1px solid #a84f00;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #382314, #211a16);
+    color: #ff8500;
+    font-size: 25px;
+}
+
+html[data-theme="dark"] .pbs-page-heading h1 {
+    color: #f7f7f8 !important;
+    font-size: 25px;
+}
+
+html[data-theme="dark"] .pbs-page-heading p {
+    margin: 2px 0 0;
+    color: #c4c7ce;
+    font-size: 12px;
+}
+
+html[data-theme="dark"] .pbs-page-heading > button {
+    background: linear-gradient(110deg, #ff7900, #ff8900);
+    color: #fff;
+}
+
+html[data-theme="dark"] .pbs-filter-tab {
+    border-color: #383b42;
+    background: linear-gradient(145deg, #1b1d22, #17191e);
+    color: #f2f3f5;
+}
+
+html[data-theme="dark"] .pbs-filter-tab span {
+    background: #2b2e35;
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-filter-tab.active {
+    border-color: #ff8500;
+    background: linear-gradient(110deg, #ff7900, #ff9200);
+    color: #171717;
+}
+
+html[data-theme="dark"] .pbs-filter-tab.pending:not(.active) {
+    color: #ffc247;
+}
+
+html[data-theme="dark"] .pbs-filter-tab.confirmed:not(.active),
+html[data-theme="dark"] .pbs-filter-tab.in-progress:not(.active) {
+    color: #f4f5f7;
+}
+
+html[data-theme="dark"] .pbs-filter-tab.completed:not(.active) {
+    color: #26c46b;
+}
+
+html[data-theme="dark"] .pbs-filter-tab.cancelled:not(.active) {
+    border-color: #4d292d;
+    background: #24191c;
+    color: #ff6470;
+}
+
+html[data-theme="dark"] .pbs-booking-list,
+html[data-theme="dark"] .pbs-booking-detail {
+    border-color: #363941;
+    background: linear-gradient(145deg, #17191e, #121419);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 16%);
+}
+
+html[data-theme="dark"] .pbs-booking-card {
+    border-bottom-color: #30333a;
+    background: transparent;
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-booking-card:hover {
+    background: #202228;
+}
+
+html[data-theme="dark"] .pbs-booking-card.selected {
+    border: 1px solid #ff7900;
+    border-radius: 10px;
+    background: linear-gradient(110deg, #382313, #211a16 80%);
+    box-shadow: 0 0 18px rgb(255 112 0 / 13%);
+}
+
+html[data-theme="dark"] .pbs-card-copy > strong,
+html[data-theme="dark"] .pbs-card-copy > span,
+html[data-theme="dark"] .pbs-card-copy small,
+html[data-theme="dark"] .pbs-card-copy small i,
+html[data-theme="dark"] .pbs-card-chevron {
+    color: #f1f2f4;
+}
+
+html[data-theme="dark"] .pbs-customer-image {
+    border: 1px solid #484c54;
+    background: #252830;
+}
+
+html[data-theme="dark"] .pbs-status-pill {
+    background: #423019;
+    color: #ffc247;
+}
+
+html[data-theme="dark"] .pbs-status-pill.confirmed,
+html[data-theme="dark"] .pbs-status-pill.completed {
+    background: #126a37;
+    color: #fff;
+}
+
+html[data-theme="dark"] .pbs-status-pill.in-progress {
+    background: #174c88;
+    color: #fff;
+}
+
+html[data-theme="dark"] .pbs-status-pill.cancelled {
+    background: #5a252b;
+    color: #ffd5d8;
+}
+
+html[data-theme="dark"] .pbs-list-state,
+html[data-theme="dark"] .pbs-detail-empty,
+html[data-theme="dark"] .pbs-list-state strong,
+html[data-theme="dark"] .pbs-detail-empty h2,
+html[data-theme="dark"] .pbs-detail-empty p {
+    color: #c2c6ce;
+}
+
+html[data-theme="dark"] .pbs-detail-heading,
+html[data-theme="dark"] .pbs-detail-section {
+    border-bottom-color: #353840;
+}
+
+html[data-theme="dark"] .pbs-detail-heading h2,
+html[data-theme="dark"] .pbs-detail-heading p,
+html[data-theme="dark"] .pbs-detail-heading p i,
+html[data-theme="dark"] .pbs-section-heading h3,
+html[data-theme="dark"] .pbs-customer-details > div > strong,
+html[data-theme="dark"] .pbs-customer-details > div > span,
+html[data-theme="dark"] .pbs-customer-details > div > span i,
+html[data-theme="dark"] .pbs-service-details dt,
+html[data-theme="dark"] .pbs-service-details dd,
+html[data-theme="dark"] .pbs-start-time-note,
+html[data-theme="dark"] .pbs-status-timeline li.done,
+html[data-theme="dark"] .pbs-status-timeline li.current,
+html[data-theme="dark"] .pbs-status-timeline li small {
+    color: #f1f2f4;
+}
+
+html[data-theme="dark"] .pbs-section-heading > i {
+    color: #ff8500;
+}
+
+html[data-theme="dark"] .pbs-customer-details > button {
+    border: 1px solid #a84f00;
+    background: #211a16;
+    color: #ff9a45;
+}
+
+html[data-theme="dark"] .pbs-status-timeline::before {
+    background: #555963;
+}
+
+html[data-theme="dark"] .pbs-status-timeline li {
+    color: #9fa5af;
+}
+
+html[data-theme="dark"] .pbs-timeline-dot {
+    border-color: #777d87;
+    background: #191b20;
+    color: #fff;
+}
+
+html[data-theme="dark"] .pbs-status-timeline li.done .pbs-timeline-dot {
+    border-color: #18a957;
+    background: #18a957;
+}
+
+html[data-theme="dark"] .pbs-status-timeline li.current .pbs-timeline-dot {
+    border-color: #ff8500;
+    box-shadow: inset 0 0 0 3px #17191e;
+    background: #ff8500;
+}
+
+html[data-theme="dark"] .pbs-booking-actions .primary {
+    background: linear-gradient(110deg, #ff7900, #ff9000);
+    color: #fff;
+}
+
+html[data-theme="dark"] .pbs-booking-actions .secondary {
+    border-color: #ff7900;
+    background: #211a16;
+    color: #ff9a45;
+}
+
+html[data-theme="dark"] .pbs-booking-actions .danger {
+    border-color: #b8444c;
+    background: #321d21;
+    color: #ff9ba2;
+}
+
+html[data-theme="dark"] .pbs-reschedule-modal {
+    border: 1px solid #3c4049;
+    background: #17191e;
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-reschedule-modal h2,
+html[data-theme="dark"] .pbs-reschedule-modal p {
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .pbs-reschedule-modal input {
+    border-color: #41454e;
+    background: #202228;
+    color: #f5f6f8;
+}
+
+@media (max-width: 650px) {
+    html[data-theme="dark"] .pbs-brand-wordmark {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .provider-booking-system {
+        padding-left: 88px;
+    }
+}
+
+@media (max-width: 560px) {
+    .provider-booking-system {
+        padding-left: 82px;
+    }
+}
+
+/* Dark booking view: keep the filter area open and use one consistent surface
+   for the selected booking details instead of flat gray/black slabs. */
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tabs {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab {
+    border: 1px solid #343943 !important;
+    background: linear-gradient(145deg, #191c22, #14171d) !important;
+    color: #edf0f4 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab.active {
+    border-color: #ff8a00 !important;
+    background: linear-gradient(110deg, #ff7900, #ff9000) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-list {
+    border: 0 !important;
+    border-radius: 14px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-detail {
+    border: 1px solid #303640 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(145deg, #151820, #11141a) !important;
+    box-shadow: 0 10px 28px rgb(0 0 0 / 16%) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-detail-heading,
+html[data-theme="dark"] .provider-booking-system .pbs-detail-section {
+    border-bottom-color: rgb(255 255 255 / 12%) !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card {
+    border-bottom: 1px solid rgb(255 255 255 / 11%) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card:hover {
+    background: rgb(255 255 255 / 4%) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card.selected {
+    border: 1px solid #ff8500 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(110deg, rgb(255 112 0 / 14%), rgb(255 112 0 / 5%) 78%, transparent) !important;
+    box-shadow: 0 0 18px rgb(255 112 0 / 9%) !important;
 }

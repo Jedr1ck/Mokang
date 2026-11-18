@@ -495,10 +495,16 @@ html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields {
 }
 
 html[data-theme="dark"] .homeowner-profile-v2 .hp-map-column {
-    padding: 12px;
-    border: 1px solid var(--app-border);
-    border-radius: 12px;
-    background: var(--app-surface);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .homeowner-profile-header {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 html[data-theme="dark"] .homeowner-profile-v2 .hp-info-item small,
@@ -831,6 +837,508 @@ html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs button span {
     color: var(--app-secondary-text) !important;
 }
 
+/* Homeowner dashboard: clean charcoal surfaces with crisp orange accents. */
+html[data-theme="dark"] .dashboard-wrapper {
+    --app-background: #0c0e13;
+    --app-surface: #12151c;
+    --app-elevated: #191d25;
+    --app-soft-surface: #20242d;
+    --app-text: #f5f6f8;
+    --app-secondary-text: #aeb5c1;
+    --app-border: #303641;
+    --theme-background: var(--app-background);
+    --theme-surface: var(--app-surface);
+    --theme-soft-blue: var(--app-soft-surface);
+    --theme-border: var(--app-border);
+    --theme-muted: var(--app-secondary-text);
+    --theme-text: var(--app-text);
+    background: radial-gradient(ellipse at 72% 0%, rgba(255, 120, 0, .055), transparent 38%), #0c0e13 !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar) {
+    background: #f47b20 !important;
+    background-color: #f47b20 !important;
+}
+
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar) .theme-toggle-compact {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar) .theme-toggle-compact .theme-toggle-button {
+    border-color: transparent !important;
+    background: transparent !important;
+    color: rgba(255, 255, 255, .92) !important;
+}
+
+html[data-theme="dark"] :is(.green-wavy-sidebar, .provider-sidebar) .theme-toggle-compact .theme-toggle-button.active {
+    border-color: rgba(255, 255, 255, .95) !important;
+    border-radius: 11px !important;
+    background: #fff !important;
+    color: #f47b20 !important;
+    box-shadow: 0 2px 7px rgba(76, 38, 8, .2) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard {
+    background: transparent !important;
+    color: var(--app-text) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard-panel {
+    background: linear-gradient(145deg, #151922, #11141a) !important;
+    border-color: #303641 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .16) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard-header {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-panel-heading h2,
+    .homeowner-dashboard-booking-copy strong,
+    .homeowner-dashboard-activity strong,
+    .homeowner-dashboard-provider strong,
+    .homeowner-dashboard-profile-label strong
+) {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-booking-copy small,
+    .homeowner-dashboard-activity small,
+    .homeowner-dashboard-provider small,
+    .homeowner-dashboard-profile-label small
+) {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-booking,
+    .homeowner-dashboard-activity
+) {
+    border-top-color: #303641 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-booking:hover,
+    .homeowner-dashboard-activity:hover
+) {
+    background: rgba(255, 120, 0, .07) !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-provider,
+    .homeowner-dashboard-search,
+    .homeowner-dashboard-profile-button,
+    .homeowner-dashboard-icon-button
+) {
+    background-color: #171b23 !important;
+    border-color: #303641 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard-provider-link {
+    background: rgba(255, 120, 0, .09) !important;
+    border-color: rgba(255, 120, 0, .25) !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-search input,
+    .homeowner-dashboard-search input::placeholder
+) {
+    color: #d5d9e0 !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard :is(
+    .homeowner-dashboard-panel-heading > button,
+    .homeowner-dashboard-wordmark span
+) {
+    color: #ff861f !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper .homeowner-dashboard-icon-button:is(:hover, :focus-visible, :active) {
+    background: rgba(255, 120, 0, .14) !important;
+    border-color: #ff861f !important;
+    color: #ff9a4d !important;
+}
+
+/* Provider profile keeps the same information layout in dark mode, with
+   legible contrast and restrained orange highlights. */
+html[data-theme="dark"] .verified-profile-page {
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-title-row :is(h1, p),
+html[data-theme="dark"] .verified-profile-page .provider-profile-breadcrumb,
+html[data-theme="dark"] .verified-profile-page .provider-profile-breadcrumb strong,
+html[data-theme="dark"] .verified-profile-page .provider-profile-name-row h2,
+html[data-theme="dark"] .verified-profile-page .provider-profile-contact-row span,
+html[data-theme="dark"] .verified-profile-page .provider-profile-contact-row i {
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-hero-status span {
+    color: #63d991 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-hero {
+    border-color: #343944 !important;
+    background: radial-gradient(ellipse at 88% 100%, rgba(255, 120, 0, .14), transparent 42%), linear-gradient(120deg, #151922, #11141a) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .18) !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(.provider-profile-panel, .provider-profile-side-card) {
+    border-color: #303641 !important;
+    background: linear-gradient(145deg, #151922, #11141a) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .16) !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(
+    .provider-panel-heading h3,
+    .provider-profile-side-card h3,
+    .provider-profile-read-grid span,
+    .provider-profile-read-grid strong,
+    .provider-profile-form-grid .form-label
+) {
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-panel-heading {
+    position: relative;
+    gap: 13px;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-panel-heading::before,
+html[data-theme="dark"] .verified-profile-page .provider-profile-side-card > h3::before {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 25px;
+    flex: 0 0 5px;
+    border-radius: 999px;
+    background: #ff7900;
+    box-shadow: 0 0 12px rgba(255, 121, 0, .22);
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-side-card > h3 {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(.provider-panel-heading p, .provider-profile-hero-status small, .provider-service-editor-hint, .provider-field-hint) {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-role-pill {
+    background: rgba(255, 120, 0, .12) !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(.provider-profile-read-grid > div, .provider-service-category-option, .provider-service-task-option) {
+    border-color: #303641 !important;
+    background: #191d25 !important;
+    color: #e8eaf0 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(.provider-profile-form-grid .form-control, .provider-profile-form-grid .form-select, input, select, textarea) {
+    border-color: #3a414e !important;
+    background-color: #191d25 !important;
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(input, textarea)::placeholder {
+    color: #9ba3b1 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-tabs {
+    border-bottom-color: #303641 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-tabs button {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-tabs button:is(.active, :hover) {
+    border-bottom-color: #ff861f !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-edit-details-button {
+    border-color: rgba(255, 120, 0, .45) !important;
+    background: rgba(255, 120, 0, .1) !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-save-button {
+    border-color: #f47b20 !important;
+    background: #f47b20 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-profile-cancel-button {
+    border-color: #444b57 !important;
+    background: #20242d !important;
+    color: #e8eaf0 !important;
+}
+
+/* Homeowner profile reference styling: black canvas, graphite panels, orange details. */
+html[data-theme="dark"] .homeowner-profile-v2 {
+    --app-background: #0b0d11;
+    --app-surface: #14161b;
+    --app-elevated: #1b1e24;
+    --app-soft-surface: #202329;
+    --app-text: #f5f6f8;
+    --app-secondary-text: #b7bdc7;
+    --app-border: #34373e;
+    --theme-background: var(--app-background);
+    --theme-surface: var(--app-surface);
+    --theme-soft-blue: var(--app-soft-surface);
+    --theme-border: var(--app-border);
+    --theme-muted: var(--app-secondary-text);
+    --theme-text: var(--app-text);
+    background: #0b0d11 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .homeowner-profile-main {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-panel {
+    border-color: #34373e !important;
+    background: linear-gradient(145deg, #17191e, #111318) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .2) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-overview {
+    border-color: rgba(255, 120, 0, .32) !important;
+    background: radial-gradient(ellipse at 88% 110%, rgba(255, 112, 0, .28), transparent 36%), linear-gradient(120deg, #191a1f, #111318 68%, #17130f) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-section-heading h3,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-status-heading > span {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-section-heading h3::before,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-status-heading > span::before {
+    content: "";
+    width: 5px;
+    height: 25px;
+    flex: 0 0 5px;
+    border-radius: 999px;
+    background: #ff7900;
+    box-shadow: 0 0 12px rgba(255, 121, 0, .22);
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-avatar {
+    border-color: #ff7900 !important;
+    box-shadow: 0 0 0 4px rgba(255, 121, 0, .12), 0 0 24px rgba(255, 121, 0, .18) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-role-pill {
+    background: rgba(255, 121, 0, .14) !important;
+    color: #ffad68 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-overview-details p,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-overview-details p i {
+    color: #e7e9ed !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-overview-details p i {
+    color: #ff8a25 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 :is(.hp-info-item small, .hp-address-fields small, .hp-status-card > p, .hp-member-since small, .hp-map-note, .hp-section-heading p) {
+    color: #aeb5c0 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 :is(.hp-info-item strong, .hp-address-fields strong, .hp-member-since strong) {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-info-item {
+    border-bottom-color: #30343c !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-info-icon,
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields > div > i {
+    background: rgba(255, 121, 0, .16) !important;
+    color: #ff9a42 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields {
+    align-self: start;
+    min-height: 162px;
+    align-content: center;
+    border: 1px solid rgba(255, 121, 0, .68) !important;
+    background: radial-gradient(ellipse at 100% 110%, rgba(255, 112, 0, .24), transparent 45%), linear-gradient(130deg, #211a16, #17181d 68%) !important;
+    box-shadow: inset 0 0 22px rgba(255, 112, 0, .045), 0 0 18px rgba(255, 112, 0, .04) !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-layout {
+    grid-template-columns: minmax(0, .78fr) minmax(0, 1.1fr);
+    align-items: start;
+    gap: 18px;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields > div > i {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    place-items: center;
+    margin: 0;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #ff8a1c, #df5900) !important;
+    color: #fff !important;
+    font-size: 22px;
+    box-shadow: 0 7px 18px rgba(255, 112, 0, .2);
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields small {
+    margin-bottom: 4px;
+    color: #f0c8a7 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-fields strong {
+    color: #fff !important;
+    line-height: 1.45;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-map-column > label {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-location-button {
+    min-height: 48px;
+    border: 1px solid #ff7900 !important;
+    background: rgba(255, 121, 0, .1) !important;
+    color: #ffad68 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-location-button:disabled {
+    opacity: 1;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-address-edit-form textarea {
+    border-color: #343943 !important;
+    background: #1b1e24 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-map-frame {
+    border-color: #343943 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-map-frame.hp-leaflet-frame {
+    height: clamp(300px, 30vw, 460px);
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-location-button:hover:not(:disabled) {
+    background: rgba(255, 121, 0, .2) !important;
+    border-color: #ff9a42 !important;
+    color: #ffd0a8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-member-since {
+    border-top-color: #34373e !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-status-heading b {
+    background: #147a48 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-bookings .activity-item {
+    border: 1px solid #272b32 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(110deg, #1b1e23, #171a1f) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-bookings .activity-icon {
+    border-radius: 12px !important;
+    background: rgba(255, 121, 0, .12) !important;
+    color: #ff7900 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-bookings .activity-details :is(h5, p) {
+    color: #f1f2f5 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-bookings .activity-details p {
+    color: #b6bdc8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs {
+    border-bottom-color: #34373e !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs button:not(.active) {
+    color: #b6bdc8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs button.active {
+    border-bottom-color: #ff7900 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-tabs button.active span {
+    background: #ff7900 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .status-badge.accepted {
+    background: #167a49 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .status-badge.completed {
+    background: #3a4657 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .status-badge.pending {
+    background: #8a5b12 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .status-badge.cancelled {
+    background: #762f36 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .hp-booking-remove {
+    border-color: #563238 !important;
+    background: #2a1b1f !important;
+    color: #ff8b83 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 :is(.profile-header-icon-btn, .hp-button-outline, .hp-button-muted) {
+    border-color: #343943 !important;
+    background: #1a1d23 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-profile-v2 .profile-header-icon-btn:is(:hover, :focus-visible, :active) {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .14) !important;
+    color: #ff9a42 !important;
+}
+
 html[data-theme="dark"] .profile-page-container :is(.search-box, .icon-btn) {
     border: 1px solid var(--app-border) !important;
     background-color: var(--app-elevated) !important;
@@ -931,6 +1439,1076 @@ html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-empty {
     color: var(--app-secondary-text) !important;
 }
 
+/* Services page dark mode follows the black, graphite, and orange reference. */
+html[data-theme="dark"] .find-services-page {
+    --app-background: #0b0d11;
+    --app-surface: #14161b;
+    --app-elevated: #1b1e24;
+    --app-soft-surface: #202329;
+    --app-text: #f5f6f8;
+    --app-secondary-text: #b7bdc7;
+    --app-border: #34373e;
+    --theme-background: #0b0d11;
+    --theme-surface: #14161b;
+    --theme-soft-blue: #202329;
+    --theme-border: #34373e;
+    --theme-text: #f5f6f8;
+    background: radial-gradient(ellipse at 78% 0%, rgba(255, 112, 0, .08), transparent 34%), #0b0d11 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-topbar {
+    border-bottom-color: #292c33 !important;
+    background: rgba(12, 14, 18, .96) !important;
+}
+
+html[data-theme="dark"] .find-services-brand {
+    border-color: rgba(255, 121, 0, .6) !important;
+    background: #17191e !important;
+    box-shadow: 0 0 0 2px #111318, 0 0 17px 3px rgba(255, 105, 0, .34) !important;
+}
+
+html[data-theme="dark"] .find-services-brand:hover {
+    box-shadow: 0 0 0 2px #111318, 0 0 23px 6px rgba(255, 105, 0, .5) !important;
+}
+
+html[data-theme="dark"] .find-services-global-search {
+    border: 1px solid #373a43 !important;
+    border-radius: 24px !important;
+    background: linear-gradient(110deg, #191b21, #22242b) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-global-search input::placeholder,
+html[data-theme="dark"] .find-services-user small {
+    color: #aeb5c0 !important;
+}
+
+html[data-theme="dark"] .find-services-bell {
+    border-color: #34373e !important;
+    background: #171a20 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-bell:is(:hover, :focus-visible, :active) {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .14) !important;
+    color: #ff922e !important;
+}
+
+html[data-theme="dark"] .find-services-user {
+    border-left-color: #34373e !important;
+}
+
+html[data-theme="dark"] .find-services-user > i {
+    color: #b7bdc7 !important;
+}
+
+html[data-theme="dark"] .find-services-category-arrow {
+    border-color: #373a43 !important;
+    background: #171a20 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-category-arrow:hover {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .14) !important;
+    color: #ff922e !important;
+}
+
+html[data-theme="dark"] .find-services-categories > button {
+    border-color: #30333a !important;
+    border-radius: 15px !important;
+    background: linear-gradient(145deg, #1b1d22, #15171b) !important;
+    color: #f5f6f8 !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.025), 0 5px 16px rgba(0,0,0,.16) !important;
+}
+
+html[data-theme="dark"] .find-services-categories > button .category-icon {
+    background: transparent !important;
+    color: #ff7900 !important;
+    font-size: 23px;
+}
+
+html[data-theme="dark"] .find-services-categories > button small {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-categories > button:hover {
+    border-color: rgba(255, 121, 0, .72) !important;
+    background: linear-gradient(145deg, #24211e, #191a1f) !important;
+}
+
+html[data-theme="dark"] .find-services-categories > button.selected {
+    border-color: #ff7900 !important;
+    background: linear-gradient(145deg, #332317, #1b1c21) !important;
+    box-shadow: 0 0 0 1px rgba(255, 121, 0, .22), 0 0 22px rgba(255, 112, 0, .12) !important;
+}
+
+html[data-theme="dark"] .find-services-results,
+html[data-theme="dark"] .find-service-details,
+html[data-theme="dark"] .find-services-subservices {
+    border-color: #30333a !important;
+    border-radius: 16px !important;
+    background: radial-gradient(ellipse at 100% 100%, rgba(255, 112, 0, .065), transparent 28%), linear-gradient(145deg, #17191e, #121419) !important;
+    color: #f5f6f8 !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.2) !important;
+}
+
+html[data-theme="dark"] .find-services-results-heading h2 {
+    position: relative;
+    padding-left: 17px;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-results-heading h2::before {
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    left: 0;
+    width: 6px;
+    border-radius: 8px;
+    background: linear-gradient(#ff9b28, #ff6900);
+    box-shadow: 0 0 14px rgba(255, 112, 0, .4);
+    content: "";
+}
+
+html[data-theme="dark"] .find-services-sort,
+html[data-theme="dark"] .find-services-inline-search {
+    border-color: #41444d !important;
+    background: #1b1e24 !important;
+    color: #e7e9ed !important;
+}
+
+html[data-theme="dark"] .find-services-sort select,
+html[data-theme="dark"] .find-services-inline-search input {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-services-inline-search > i,
+html[data-theme="dark"] .find-service-offer-kicker i,
+html[data-theme="dark"] .find-service-offer-kicker,
+html[data-theme="dark"] .find-service-offer-body > strong {
+    color: #ff8a1c !important;
+}
+
+html[data-theme="dark"] .find-service-offer-card {
+    position: relative;
+    isolation: isolate;
+    border-color: #383a40 !important;
+    border-radius: 17px !important;
+    background: linear-gradient(145deg, #1b1d22, #14161a) !important;
+    box-shadow: 0 7px 20px rgba(0,0,0,.22) !important;
+}
+
+html[data-theme="dark"] .find-service-offer-card::after {
+    position: absolute;
+    z-index: -1;
+    right: -58px;
+    bottom: -74px;
+    width: 210px;
+    height: 180px;
+    border-top: 1px solid rgba(255, 121, 0, .75);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 70% 35%, rgba(255, 112, 0, .2), transparent 68%);
+    content: "";
+    pointer-events: none;
+}
+
+html[data-theme="dark"] .find-service-offer-card:hover {
+    border-color: rgba(255, 121, 0, .72) !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,.3), 0 0 18px rgba(255,112,0,.08) !important;
+}
+
+html[data-theme="dark"] .find-service-offer-image,
+html[data-theme="dark"] .find-service-card-image,
+html[data-theme="dark"] .find-service-detail-image {
+    position: relative;
+    z-index: 1;
+}
+
+html[data-theme="dark"] .find-service-offer-body {
+    position: relative;
+    z-index: 1;
+}
+
+html[data-theme="dark"] .find-service-offer-body h3,
+html[data-theme="dark"] .find-service-card-title h3,
+html[data-theme="dark"] .find-service-detail-body h2,
+html[data-theme="dark"] .find-service-detail-list dt,
+html[data-theme="dark"] .find-service-detail-list dd,
+html[data-theme="dark"] .find-service-review-comment,
+html[data-theme="dark"] .find-service-review-heading {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-service-book,
+html[data-theme="dark"] .find-service-detail-book {
+    background: linear-gradient(100deg, #ff7900, #ff8b00) !important;
+    color: #fff !important;
+    box-shadow: 0 5px 14px rgba(255, 105, 0, .17);
+}
+
+html[data-theme="dark"] .find-service-book:hover:not(:disabled),
+html[data-theme="dark"] .find-service-detail-book:hover:not(:disabled) {
+    background: linear-gradient(100deg, #ff8b00, #ffa11b) !important;
+}
+
+html[data-theme="dark"] .find-service-book:disabled,
+html[data-theme="dark"] .find-service-detail-book:disabled {
+    background: #7f4a25 !important;
+    color: #d2c2b5 !important;
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .find-service-card,
+html[data-theme="dark"] .find-service-open,
+html[data-theme="dark"] .find-service-review,
+html[data-theme="dark"] .find-services-subservice {
+    border-color: #34373e !important;
+    background-color: #191c22 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-service-open:hover,
+html[data-theme="dark"] .find-services-subservice:hover:not(:disabled) {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .12) !important;
+    color: #ff9a42 !important;
+}
+
+html[data-theme="dark"] .find-service-verified,
+html[data-theme="dark"] .find-service-detail-image > button {
+    border: 1px solid #454850 !important;
+    background: rgba(24, 26, 31, .92) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .find-service-verified i,
+html[data-theme="dark"] .find-service-detail-list dt i,
+html[data-theme="dark"] .find-service-review-heading i {
+    color: #ff8a1c !important;
+}
+
+html[data-theme="dark"] .find-service-detail-tabs {
+    border-bottom-color: #34373e !important;
+}
+
+html[data-theme="dark"] .find-service-detail-tabs button.active {
+    border-bottom-color: #ff7900 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .find-service-provider-avatar {
+    border-color: #ff7900 !important;
+}
+
+html[data-theme="dark"] .find-service-subservice {
+    border-color: #3b3e45 !important;
+    background: #1b1e24 !important;
+    color: #f5f6f8 !important;
+}
+
+/* Service History dark page styling. */
+html[data-theme="dark"] .homeowner-history-main {
+    gap: 18px !important;
+    padding: 18px 26px 28px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-header {
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 20px;
+    min-height: 82px;
+    padding: 12px 16px !important;
+    border: 1px solid #3a3d45 !important;
+    border-radius: 15px !important;
+    background: radial-gradient(ellipse at 25% 50%, rgba(255, 112, 0, .035), transparent 45%), linear-gradient(110deg, #121419, #101217) !important;
+    background-color: #111318 !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.025) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-title {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+html[data-theme="dark"] .homeowner-history-title > i {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 121, 0, .13);
+    color: #ff7900;
+    font-size: 25px;
+    filter: drop-shadow(0 0 8px rgba(255, 112, 0, .45));
+}
+
+html[data-theme="dark"] .homeowner-history-title h1 {
+    margin: 0;
+    color: #f5f6f8 !important;
+    font-size: clamp(19px, 1.8vw, 24px);
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+html[data-theme="dark"] .homeowner-history-title p {
+    margin: 3px 0 0;
+    color: #b7bdc7 !important;
+    font-size: 13px;
+}
+
+html[data-theme="dark"] .homeowner-history-main .header-actions {
+    gap: 12px;
+}
+
+html[data-theme="dark"] .homeowner-history-main .search-box {
+    width: min(27vw, 365px);
+    min-width: 230px;
+    min-height: 40px;
+    border: 1px solid #64666d !important;
+    border-radius: 24px !important;
+    background: linear-gradient(110deg, #191b21, #22242b) !important;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.025) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .search-box > i {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .search-box input {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .search-box input::placeholder {
+    color: #b7bdc7 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .homeowner-notification-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #272a31 !important;
+    background: #171a20 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .homeowner-notification-button:is(:hover, :focus-visible, :active) {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .14) !important;
+    color: #ff922e !important;
+}
+
+html[data-theme="dark"] .homeowner-history-filters {
+    gap: 10px !important;
+}
+
+html[data-theme="dark"] .homeowner-history-filter {
+    min-height: 38px;
+    padding: 7px 17px !important;
+    border: 1px solid #484a51 !important;
+    border-radius: 22px !important;
+    background: linear-gradient(110deg, #1b1d22, #24262b) !important;
+    color: #f3f4f6 !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.035);
+}
+
+html[data-theme="dark"] .homeowner-history-filter:not(.active):hover {
+    border-color: #ff7900 !important;
+    color: #ffad68 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-filter.active {
+    border-color: #ff7900 !important;
+    background: linear-gradient(110deg, #ff7900, #ff9600) !important;
+    color: #171717 !important;
+    box-shadow: 0 5px 15px rgba(255, 112, 0, .22) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box {
+    margin-top: 0 !important;
+    padding: 10px 12px !important;
+    border: 1px solid #4a4c53 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #17191e, #111318) !important;
+    box-shadow: none !important;
+    scrollbar-color: #555860 #17191e;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table {
+    min-width: 1120px;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table thead tr {
+    border-bottom: 2px solid #ff7900 !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table th {
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
+    color: #f5f6f8 !important;
+    white-space: nowrap;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table tbody tr {
+    border-bottom: 1px solid #393c43 !important;
+    background: transparent !important;
+    transition: background-color .16s ease;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table tbody tr:hover {
+    background: rgba(255, 121, 0, .045) !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td {
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
+    color: #f2f3f5 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(2) span {
+    border-radius: 20px !important;
+    background: #f5e7d8 !important;
+    color: #211b17 !important;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(3) > div:first-child,
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(4) > div:first-child,
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(5),
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(6) {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(3) > div:nth-child(2),
+html[data-theme="dark"] .homeowner-history-main .dashboard-box table td:nth-child(4) > div:nth-child(2) {
+    color: #b7bdc7 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box .btn-outline-secondary {
+    border-color: #ff7900 !important;
+    border-radius: 8px !important;
+    background: rgba(255, 121, 0, .045) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-main .dashboard-box .btn-outline-secondary:hover {
+    background: #ff7900 !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .homeowner-history-feedback-actions .badge.text-bg-warning {
+    color: #231b0a !important;
+}
+
+/* Homeowner calendar: graphite calendar with warm orange focus states. */
+html[data-theme="dark"] .homeowner-calendar-main {
+    background: transparent !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-header {
+    display: flex;
+    justify-content: space-between !important;
+    align-items: center !important;
+    min-height: 36px;
+    padding: 4px 2px 8px !important;
+    border: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .profile-page-container .profile-main-content.homeowner-calendar-main .profile-header.homeowner-calendar-header {
+    border: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-brand {
+    color: #f5f6f8;
+    font-size: clamp(22px, 2.1vw, 29px);
+    font-weight: 850;
+    letter-spacing: -.8px;
+    line-height: 1;
+}
+
+html[data-theme="dark"] .homeowner-calendar-brand strong {
+    color: #ff7900;
+    font-weight: inherit;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-notification-button {
+    position: relative;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-notification-button:is(:hover, :focus-visible, :active) {
+    border: 0 !important;
+    background: rgba(255, 121, 0, .12) !important;
+    color: #ff922e !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-notification-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 8px;
+    height: 8px;
+    border: 1px solid #0b0d11;
+    border-radius: 50%;
+    background: #ff7900;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-layout {
+    gap: 24px;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main :is(.homeowner-calendar-month-panel, .homeowner-calendar-events-panel) {
+    overflow: hidden;
+    border: 1px solid #353840 !important;
+    border-radius: 26px !important;
+    background: radial-gradient(ellipse at 72% 0%, rgba(255, 112, 0, .09), transparent 30%), linear-gradient(145deg, #15171d, #101217) !important;
+    color: #f5f6f8 !important;
+    box-shadow: 0 14px 36px rgba(0,0,0,.2) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-month-toolbar {
+    position: relative;
+    min-height: 72px;
+    margin-bottom: 24px !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-month-toolbar::after {
+    position: absolute;
+    z-index: 0;
+    top: -22px;
+    right: 16%;
+    width: 46%;
+    height: 76px;
+    border-bottom: 2px solid rgba(255, 121, 0, .7);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 65% 100%, rgba(255, 112, 0, .11), transparent 70%);
+    content: "";
+    pointer-events: none;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-month-heading {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-month-heading > i {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border: 1px solid rgba(255, 121, 0, .55);
+    border-radius: 17px;
+    background: linear-gradient(145deg, rgba(255, 121, 0, .22), rgba(255, 121, 0, .08));
+    color: #ff8a1c;
+    font-size: 29px;
+    box-shadow: 0 0 20px rgba(255, 112, 0, .17), inset 0 0 16px rgba(255, 112, 0, .08);
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-month-toolbar h3 {
+    color: #f5f6f8 !important;
+    font-size: clamp(22px, 2.5vw, 32px);
+    font-weight: 800;
+    letter-spacing: -.5px;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-nav-button {
+    position: relative;
+    z-index: 1;
+    width: 54px;
+    height: 54px;
+    padding: 0 !important;
+    border: 1px solid rgba(255, 121, 0, .65) !important;
+    border-radius: 15px !important;
+    background: #17191f !important;
+    color: #f5f6f8 !important;
+    font-size: 19px;
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-nav-button:hover {
+    background: #ff7900 !important;
+    color: #151515 !important;
+    box-shadow: 0 0 18px rgba(255, 112, 0, .26);
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day-label {
+    color: #d9dce2 !important;
+    font-size: 15px;
+    padding-bottom: 5px;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="false"] {
+    height: 68px !important;
+    border: 1px solid #353840 !important;
+    border-radius: 13px !important;
+    background: linear-gradient(145deg, #1b1d23, #17191e) !important;
+    color: #f0f1f4 !important;
+    font-size: 17px;
+    font-weight: 650;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="false"]:hover {
+    transform: translateY(-2px);
+    border-color: #ff7900 !important;
+    background: linear-gradient(145deg, #282018, #1c1d22) !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="true"] {
+    height: 68px !important;
+    border: 1px solid #ff9a22 !important;
+    border-radius: 13px !important;
+    background: linear-gradient(145deg, #ff8a13, #ff6900) !important;
+    color: #fff !important;
+    font-size: 17px;
+    font-weight: 800;
+    box-shadow: 0 0 20px rgba(255, 112, 0, .32);
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-legend {
+    gap: 12px 18px !important;
+    margin-top: 20px !important;
+    padding: 13px 16px;
+    border: 1px solid #353840;
+    border-radius: 17px;
+    background: rgba(28, 30, 36, .72);
+    color: #d9dce2 !important;
+    font-size: 12px !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-events-heading {
+    position: relative;
+    margin: 4px 0 22px !important;
+    padding-left: 18px;
+    color: #f5f6f8 !important;
+    font-size: clamp(20px, 2vw, 27px);
+    font-weight: 800;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-events-heading::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 7px;
+    border-radius: 8px;
+    background: linear-gradient(#ff9b28, #ff6900);
+    box-shadow: 0 0 13px rgba(255, 112, 0, .32);
+    content: "";
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #ff7900 !important;
+    border-left-width: 1px !important;
+    border-radius: 17px !important;
+    background: radial-gradient(ellipse at 100% 100%, rgba(255, 112, 0, .2), transparent 45%), linear-gradient(145deg, #1d1c1b, #15171c) !important;
+    color: #f5f6f8 !important;
+    box-shadow: 0 0 17px rgba(255, 112, 0, .08), inset 0 0 20px rgba(255, 112, 0, .025);
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-type {
+    border: 1px solid rgba(255, 121, 0, .48);
+    border-radius: 20px !important;
+    background: rgba(255, 121, 0, .13) !important;
+    color: #ffd0a8 !important;
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-type i,
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card p i {
+    color: #ff8a1c !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card h5 {
+    color: #f5f6f8 !important;
+    font-size: 18px !important;
+    font-weight: 750;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-event-card p {
+    color: #d0d3d9 !important;
+}
+
+html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-empty {
+    color: #b7bdc7 !important;
+}
+
+html[data-theme="dark"] .homeowner-bookings-page .homeowner-bookings-header {
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 20px;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .homeowner-bookings-header h2 {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-bookings-header p {
+    color: #b7bdc7 !important;
+}
+
+@media (max-width: 560px) {
+    html[data-theme="dark"] .homeowner-bookings-page .homeowner-bookings-header {
+        align-items: flex-start !important;
+        flex-direction: column;
+    }
+}
+
+/* Keep auth forms readable when the application is in dark mode. */
+html[data-theme="dark"] .auth-body .auth-container {
+    border: 1px solid #383b42;
+    background: #15171c !important;
+    box-shadow: 0 18px 50px rgba(0,0,0,.38) !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container {
+    background: #15171c !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container :is(h1, h2) {
+    color: #ff8a1c !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container :is(p, span, label, small, .text-muted) {
+    color: #b7bdc7 !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container input,
+html[data-theme="dark"] .auth-body .auth-container .form-container select,
+html[data-theme="dark"] .auth-body .auth-container .form-container textarea,
+html[data-theme="dark"] .auth-body .auth-container .form-container .form-control {
+    border: 1px solid #3a3e47 !important;
+    background: #242830 !important;
+    color: #f5f6f8 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container :is(input, textarea)::placeholder {
+    color: #aeb5c0 !important;
+    opacity: 1;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container .password-toggle {
+    color: #c0c6d0 !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container .password-toggle:hover {
+    background: rgba(255, 121, 0, .12) !important;
+    color: #ff9a42 !important;
+}
+
+html[data-theme="dark"] .auth-body .auth-container .form-container .btn-theme {
+    border: 1px solid #ff8a1c !important;
+    background: linear-gradient(110deg, #ff7900, #ff8d19) !important;
+    color: #fff !important;
+}
+
+/* Notifications page: warm orange glow on a clean graphite surface. */
+html[data-theme="dark"] .homeowner-notifications-page {
+    gap: 16px !important;
+    padding: 20px 28px 28px !important;
+    background: transparent !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-header {
+    position: relative;
+    min-height: 84px;
+    overflow: hidden;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 16px;
+    padding: 14px 16px !important;
+    border: 1px solid #393c44 !important;
+    border-radius: 17px !important;
+    background: radial-gradient(ellipse at 68% 100%, rgba(255, 112, 0, .13), transparent 35%), linear-gradient(110deg, #17191e, #111318) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.025), 0 8px 24px rgba(0,0,0,.16) !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-header::after {
+    position: absolute;
+    right: 10%;
+    bottom: -28px;
+    width: 48%;
+    height: 80px;
+    border-bottom: 2px solid rgba(255, 121, 0, .78);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 65% 0%, rgba(255,112,0,.13), transparent 68%);
+    content: "";
+    pointer-events: none;
+}
+
+html[data-theme="dark"] .homeowner-notifications-title {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+html[data-theme="dark"] .homeowner-notifications-title > i {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    place-items: center;
+    border: 1px solid rgba(255, 121, 0, .7);
+    border-radius: 15px;
+    background: linear-gradient(145deg, rgba(255, 121, 0, .24), rgba(255, 121, 0, .08));
+    color: #ff8a1c;
+    font-size: 27px;
+    filter: drop-shadow(0 0 8px rgba(255, 112, 0, .4));
+}
+
+html[data-theme="dark"] .homeowner-notifications-header h2 {
+    color: #f5f6f8 !important;
+    font-size: clamp(20px, 2vw, 25px);
+    font-weight: 800;
+}
+
+html[data-theme="dark"] .homeowner-notifications-header p {
+    color: #b7bdc7 !important;
+    font-size: 13px;
+}
+
+html[data-theme="dark"] .homeowner-notifications-mark-all {
+    position: relative;
+    z-index: 1;
+    padding: 9px 15px;
+    border: 1px solid #ff7900 !important;
+    border-radius: 22px !important;
+    background: rgba(255, 121, 0, .06) !important;
+    color: #f5f6f8 !important;
+    transition: background .18s ease, box-shadow .18s ease, color .18s ease;
+}
+
+html[data-theme="dark"] .homeowner-notifications-mark-all:hover {
+    background: #ff7900 !important;
+    color: #171717 !important;
+    box-shadow: 0 0 16px rgba(255, 112, 0, .24);
+}
+
+html[data-theme="dark"] .homeowner-notifications-tabs {
+    gap: 9px;
+    margin: 0;
+    padding: 0 1px 2px;
+}
+
+html[data-theme="dark"] .homeowner-notifications-tabs button {
+    min-height: 42px;
+    padding: 8px 17px;
+    border: 1px solid #3b3e46 !important;
+    border-radius: 24px !important;
+    background: linear-gradient(110deg, #191b20, #22242a) !important;
+    color: #f2f3f5 !important;
+    transition: border-color .16s ease, background .16s ease, color .16s ease;
+}
+
+html[data-theme="dark"] .homeowner-notifications-tabs button:hover:not(.active) {
+    border-color: #ff7900 !important;
+    color: #ffad68 !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-tabs button.active {
+    border-color: #ff7900 !important;
+    background: linear-gradient(110deg, #ff7900, #ff9600) !important;
+    color: #171717 !important;
+    box-shadow: 0 5px 15px rgba(255, 112, 0, .2);
+}
+
+html[data-theme="dark"] .homeowner-notifications-tabs button span {
+    background: #ff7900 !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-tabs button.active span {
+    background: rgba(25,25,25,.17) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-list {
+    padding: 3px 10px;
+    border: 1px solid #3b3e46 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #15171c, #111318) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.18) !important;
+}
+
+html[data-theme="dark"] .homeowner-notification-item {
+    position: relative;
+    min-height: 82px;
+    gap: 16px;
+    padding: 14px 16px !important;
+    border-bottom: 1px solid #34373e !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #f5f6f8 !important;
+    transition: border .16s ease, background .16s ease, box-shadow .16s ease;
+}
+
+html[data-theme="dark"] .homeowner-notification-item.unread {
+    width: 100%;
+    margin: 0 0 2px;
+    border: 1px solid rgba(255, 121, 0, .58) !important;
+    border-radius: 15px !important;
+    background: radial-gradient(ellipse at 72% 110%, rgba(255, 112, 0, .17), transparent 50%), linear-gradient(110deg, #211b16, #17181d) !important;
+    box-shadow: inset 0 0 18px rgba(255, 112, 0, .04), 0 0 14px rgba(255, 112, 0, .1);
+}
+
+html[data-theme="dark"] .homeowner-notification-item.unread::before {
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 5px;
+    border-radius: 0 5px 5px 0;
+    background: linear-gradient(#ff9b28, #ff6900);
+    content: "";
+}
+
+html[data-theme="dark"] .homeowner-notification-item:is(:hover, :focus-visible) {
+    border-color: rgba(255, 121, 0, .68) !important;
+    background-color: rgba(255, 121, 0, .07) !important;
+    outline: none;
+}
+
+html[data-theme="dark"] .homeowner-notification-icon {
+    width: 50px;
+    height: 50px;
+    flex-basis: 50px;
+    border-radius: 14px !important;
+    background: #25272d !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-notification-item.unread .homeowner-notification-icon {
+    background: rgba(255, 121, 0, .16) !important;
+    color: #ff9a42 !important;
+}
+
+html[data-theme="dark"] .homeowner-notification-copy strong {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-notification-copy > span {
+    color: #d1d4da !important;
+}
+
+html[data-theme="dark"] .homeowner-notification-copy small {
+    color: #aeb5c0 !important;
+}
+
+html[data-theme="dark"] .homeowner-notification-new {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: linear-gradient(110deg, #ff7900, #ff9600) !important;
+    color: #171717 !important;
+    font-size: 12px;
+}
+
+html[data-theme="dark"] .homeowner-notifications-empty {
+    color: #b7bdc7 !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-empty :is(i, strong) {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .homeowner-notifications-error {
+    border: 1px solid #793b3d;
+    border-radius: 12px;
+    background: #2b1b1d !important;
+    color: #ffb4ad !important;
+}
+
+@media (max-width: 760px) {
+    html[data-theme="dark"] .homeowner-notifications-page {
+        padding: 14px 12px 20px !important;
+    }
+
+    html[data-theme="dark"] .homeowner-notifications-header {
+        align-items: flex-start !important;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 760px) {
+    html[data-theme="dark"] .homeowner-calendar-main :is(.homeowner-calendar-month-panel, .homeowner-calendar-events-panel) {
+        padding: 16px !important;
+        border-radius: 20px !important;
+    }
+
+    html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="false"],
+    html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-day[aria-pressed="true"] {
+        height: 52px !important;
+        border-radius: 10px !important;
+    }
+
+    html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-legend {
+        padding: 11px;
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 760px) {
+    html[data-theme="dark"] .homeowner-history-main {
+        padding: 14px 12px 20px !important;
+    }
+
+    html[data-theme="dark"] .homeowner-history-header {
+        align-items: flex-start !important;
+        flex-direction: column;
+    }
+
+    html[data-theme="dark"] .homeowner-history-main .header-actions,
+    html[data-theme="dark"] .homeowner-history-main .search-box {
+        width: 100%;
+    }
+
+    html[data-theme="dark"] .homeowner-history-main .search-box {
+        min-width: 0;
+    }
+
+}
+
 @media (prefers-reduced-motion: reduce) {
     html,
     body,
@@ -938,5 +2516,1265 @@ html[data-theme="dark"] .homeowner-calendar-main .homeowner-calendar-empty {
     *::before,
     *::after {
         transition-duration: .01ms !important;
+    }
+}
+
+/* Provider dashboard dark mode follows the warm graphite and orange reference. */
+html[data-theme="dark"] .provider-layout {
+    background: radial-gradient(ellipse at 72% 0%, rgba(255, 120, 0, .055), transparent 38%), #0c0e13 !important;
+    background-attachment: fixed !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-top-header {
+    min-height: 48px;
+    height: auto;
+    align-items: center;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-profile-header {
+    border: 1px solid #343944 !important;
+    background: linear-gradient(145deg, #1b1e25, #14161b) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-profile-header:is(:hover, :focus-visible) {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .12) !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-profile-header > .bi-chevron-down {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-profile-page {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-remove-photo-button {
+    border-color: #3a414e !important;
+    background: #20242d !important;
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-remove-photo-button:disabled {
+    opacity: .72;
+    color: #87909e !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-remove-photo-button:not(:disabled):is(:hover, :focus-visible) {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .12) !important;
+    color: #ff9a4d !important;
+}
+
+/* Dark provider weekly scheduling surface. */
+html[data-theme="dark"] .provider-layout .provider-availability-page {
+    max-width: none;
+    margin: 0;
+    padding: 0 0 18px;
+    overflow: hidden;
+    border: 1px solid #34363c;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #15171d, #101216);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, .24);
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-heading {
+    min-height: 94px;
+    margin: 0 0 14px;
+    padding: 18px 22px;
+    border-bottom: 1px solid #30333a;
+    background: radial-gradient(ellipse at 78% 100%, rgba(255, 105, 0, .19), transparent 48%), linear-gradient(110deg, #17191f, #111318);
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-heading-icon {
+    border: 1px solid #ff7900;
+    background: linear-gradient(145deg, #7b3f0b, #3a2314);
+    color: #ff970f;
+    box-shadow: 0 0 22px rgba(255, 121, 0, .2);
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-heading h1 {
+    color: #f7f7f8;
+    font-size: 27px;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-heading p {
+    color: #c2c5cc;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-days {
+    gap: 8px;
+    padding: 0 18px;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-day {
+    grid-template-columns: minmax(300px, .7fr) minmax(0, 1.3fr);
+    min-height: 68px;
+    border-color: #44464b;
+    border-radius: 14px;
+    background: linear-gradient(110deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .012));
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-day.is-active {
+    border-color: #ff7900;
+    background: radial-gradient(ellipse at 12% 50%, rgba(255, 105, 0, .12), transparent 58%), linear-gradient(110deg, #211a15, #15171b);
+    box-shadow: 0 0 14px rgba(255, 121, 0, .08);
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-day.is-past {
+    border-color: #34363c;
+    background: #181a1e;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-day-name {
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-day-name small,
+html[data-theme="dark"] .provider-layout .provider-availability-day-off,
+html[data-theme="dark"] .provider-layout .provider-availability-time-range label span,
+html[data-theme="dark"] .provider-layout .provider-availability-time-separator,
+html[data-theme="dark"] .provider-layout .provider-availability-note {
+    color: #aeb5c1;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-day-name input {
+    accent-color: #ff8a00;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-time-range input {
+    border-color: #62666d;
+    background: linear-gradient(110deg, #191b20, #111318);
+    color: #f5f6f8;
+    color-scheme: dark;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-time-range input:focus {
+    border-color: #ff861f;
+    outline-color: rgba(255, 121, 0, .22);
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-note {
+    margin: 14px 20px;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-save {
+    display: block;
+    min-width: 190px;
+    min-height: 48px;
+    margin: 14px 20px 0 auto;
+    border-radius: 12px;
+    background: linear-gradient(110deg, #ff7900, #ff9100);
+    box-shadow: 0 7px 18px rgba(255, 105, 0, .2);
+    font-size: 15px;
+    font-weight: 750;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-save:hover:not(:disabled) {
+    background: linear-gradient(110deg, #ff8a13, #ffa01d);
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-alert.error {
+    border: 1px solid #7f3034;
+    background: #2c1a1e;
+    color: #ffb4b8;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-alert.success {
+    border: 1px solid #276544;
+    background: #14271e;
+    color: #8ee1ad;
+}
+
+html[data-theme="dark"] .provider-layout .provider-availability-loading {
+    background: #191d25;
+    color: #aeb5c1;
+}
+
+@media (max-width: 640px) {
+    html[data-theme="dark"] .provider-layout .provider-availability-page {
+        border-radius: 16px;
+    }
+
+    html[data-theme="dark"] .provider-layout .provider-availability-heading {
+        padding: 15px;
+    }
+
+    html[data-theme="dark"] .provider-layout .provider-availability-days {
+        padding: 0 12px;
+    }
+
+    html[data-theme="dark"] .provider-layout .provider-availability-day {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    html[data-theme="dark"] .provider-layout .provider-availability-note {
+        margin-right: 14px;
+        margin-left: 14px;
+    }
+
+    html[data-theme="dark"] .provider-layout .provider-availability-save {
+        margin-right: 14px;
+    }
+}
+
+html[data-theme="dark"] .provider-layout .provider-header-availability {
+    align-items: center;
+    flex-direction: row;
+    gap: 0;
+}
+
+html[data-theme="dark"] .provider-layout :is(.provider-stat-card, .provider-dashboard-card, .provider-quick-actions-card, .provider-service-card) {
+    border-color: #34363c !important;
+    background:
+        radial-gradient(ellipse at 84% 120%, rgba(255, 105, 0, .2), transparent 42%),
+        linear-gradient(145deg, #17191f, #111318) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .24), inset 0 1px rgba(255, 255, 255, .025) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-service-card {
+    border-color: rgba(255, 121, 0, .62) !important;
+}
+
+html[data-theme="dark"] .provider-layout :is(.provider-card-header h3, .provider-stat-card small, .provider-stat-card > i:last-child, .provider-service-card-heading h4, .provider-service-card-heading small, .provider-service-capabilities span, .provider-schedule-details h4, .provider-schedule-details p) {
+    color: #f1f2f4 !important;
+}
+
+html[data-theme="dark"] .provider-layout :is(.provider-schedule-list > p, .provider-services-empty, .provider-services-empty p) {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .provider-layout .stat-green strong {
+    color: #ff861f !important;
+}
+
+html[data-theme="dark"] .provider-layout .stat-yellow strong {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-card-header button {
+    color: #ff861f !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-service-capabilities span {
+    background: rgba(255, 255, 255, .13) !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-service-edit {
+    border-color: #ff7900 !important;
+    background: rgba(255, 121, 0, .08) !important;
+    color: #ffb35f !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-service-icon {
+    background: #ffd9a1 !important;
+    color: #282019 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-stat-icon {
+    background: linear-gradient(145deg, #75400c, #43260f) !important;
+    color: #fff2d8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .stat-orange .provider-stat-icon {
+    background: #138a43 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-layout .stat-orange strong {
+    color: #35d66f !important;
+}
+
+@media (max-width: 600px) {
+    html[data-theme="dark"] .provider-layout .provider-top-header {
+        align-items: stretch;
+    }
+
+    html[data-theme="dark"] .provider-layout .provider-header-availability {
+        align-items: flex-start;
+    }
+}
+
+/* Provider calendar dark mode: keep the page wrapper transparent and make
+   appointments readable without white cards against the graphite background. */
+html[data-theme="dark"] .provider-layout .provider-calendar-page {
+    background: transparent !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-item {
+    border-color: #373a42 !important;
+    background:
+        radial-gradient(ellipse at 88% 115%, rgb(255 112 0 / 13%), transparent 43%),
+        linear-gradient(145deg, #191b20, #14161b) !important;
+    box-shadow: 0 10px 25px rgb(0 0 0 / 15%), inset 0 1px rgb(255 255 255 / 3%) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-date {
+    border-right-color: rgb(255 255 255 / 16%) !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-date strong,
+html[data-theme="dark"] .provider-layout .provider-calendar-details h2 {
+    color: #f7f7f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-date span,
+html[data-theme="dark"] .provider-layout .provider-calendar-details p {
+    color: #c2c7d0 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-details p i {
+    color: #ff8a18 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-status {
+    border: 1px solid rgb(255 255 255 / 9%);
+    background: #33363d !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-status.accepted,
+html[data-theme="dark"] .provider-layout .provider-calendar-status.confirmed,
+html[data-theme="dark"] .provider-layout .provider-calendar-status.completed {
+    background: #126a37 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-status.pending {
+    background: #493017 !important;
+    color: #ffc247 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-status.in-progress,
+html[data-theme="dark"] .provider-layout .provider-calendar-status.on-the-way {
+    background: #234269 !important;
+    color: #d7e9ff !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-status.cancelled,
+html[data-theme="dark"] .provider-layout .provider-calendar-status.rejected {
+    background: #5a252b !important;
+    color: #ffd5d8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-empty {
+    border-color: #444851 !important;
+    background: linear-gradient(145deg, #191b20, #14161b) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-calendar-empty :is(h2, p, > i) {
+    color: #e6e8ec !important;
+}
+
+/* Keep the provider booking page visually continuous: avoid nested charcoal
+   rectangles that compete with the shared dark dashboard background. */
+html[data-theme="dark"] .provider-booking-system {
+    background:
+        radial-gradient(ellipse at 76% 0%, rgb(255 112 0 / 5%), transparent 38%),
+        linear-gradient(135deg, #0b0d11 0%, #101216 54%, #0b0d11 100%) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-topbar {
+    border-bottom-color: rgb(255 255 255 / 12%) !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-page-heading {
+    justify-content: flex-end;
+    margin-top: 8px;
+    margin-bottom: 14px;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-workspace {
+    gap: 18px;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tabs {
+    gap: 4px 8px;
+    padding: 0;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab {
+    border-color: transparent !important;
+    border-radius: 999px;
+    background: transparent !important;
+    color: #e5e7eb !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab span {
+    background: rgb(255 255 255 / 10%) !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab.active {
+    background: linear-gradient(110deg, #ff7900, #ff9000) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tab.active span {
+    background: rgb(0 0 0 / 18%) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-list,
+html[data-theme="dark"] .provider-booking-system .pbs-booking-detail {
+    border: 0 !important;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-detail {
+    padding-left: 20px;
+    border-left: 1px solid rgb(255 255 255 / 13%) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card {
+    border-bottom-color: rgb(255 255 255 / 12%) !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card:hover {
+    background: rgb(255 255 255 / 4%) !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card.selected {
+    border: 1px solid #ff7900 !important;
+    border-radius: 12px;
+    background: linear-gradient(100deg, rgb(255 112 0 / 15%), rgb(255 112 0 / 5%) 75%, transparent) !important;
+    box-shadow: 0 0 20px rgb(255 112 0 / 10%);
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-detail-heading,
+html[data-theme="dark"] .provider-booking-system .pbs-detail-section {
+    border-bottom-color: rgb(255 255 255 / 14%) !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-customer-details > button {
+    border-color: #ff7900 !important;
+    border-radius: 999px;
+    background: rgb(255 112 0 / 9%) !important;
+    color: #ffad63 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-status-pill {
+    border: 0 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-page-heading > button {
+    background: linear-gradient(110deg, #ff7900, #ff9000) !important;
+    color: #171717 !important;
+}
+
+/* Keep provider navigation icons crisp and consistently highlighted in dark mode. */
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn {
+    opacity: 1 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn i {
+    color: inherit !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="dark"] .provider-sidebar .provider-sidebar-btn:is(.active, :hover, :focus-visible) {
+    border-color: rgba(255, 255, 255, .95) !important;
+    background: #fff !important;
+    color: #f47b20 !important;
+    box-shadow: 0 2px 7px rgba(76, 38, 8, .2) !important;
+}
+
+@media (max-width: 800px) {
+    html[data-theme="dark"] .provider-booking-system .pbs-booking-detail {
+        padding-left: 0;
+        border-top: 1px solid rgb(255 255 255 / 13%) !important;
+        border-left: 0 !important;
+    }
+}
+
+/* Provider dark pages use one continuous canvas; keep controls/cards legible
+   without gray slabs spanning the page. */
+html[data-theme="dark"] .provider-layout,
+html[data-theme="dark"] .provider-layout .provider-main-content,
+html[data-theme="dark"] .provider-layout .provider-top-header,
+html[data-theme="dark"] .provider-booking-system {
+    background: #0c0e13 !important;
+    background-image: none !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-filter-tabs,
+html[data-theme="dark"] .provider-booking-system .pbs-booking-workspace,
+html[data-theme="dark"] .provider-booking-system .pbs-booking-list,
+html[data-theme="dark"] .provider-booking-system .pbs-booking-detail {
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-detail {
+    padding-left: 0 !important;
+    border-left: 0 !important;
+}
+
+html[data-theme="dark"] .provider-booking-system :is(.pbs-detail-heading, .pbs-detail-section) {
+    border-bottom: 0 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-booking-system .pbs-booking-card {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-reviews-page {
+    background: transparent !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-rating-summary,
+html[data-theme="dark"] .provider-layout .provider-review-card {
+    border: 1px solid #303640 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(145deg, #171a20, #11141a) !important;
+    box-shadow: none !important;
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-rating-summary > strong,
+html[data-theme="dark"] .provider-layout .provider-review-card-heading strong,
+html[data-theme="dark"] .provider-layout .provider-review-card > p {
+    color: #f5f6f8 !important;
+}
+
+html[data-theme="dark"] .provider-layout :is(
+    .provider-rating-summary > small,
+    .provider-review-card-heading span,
+    .provider-review-card-heading time,
+    .provider-reviews-state
+) {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .provider-layout .provider-review-list {
+    background: transparent !important;
+}
+
+/* Shared provider page frame and header rhythm. */
+.provider-page-shell {
+    box-sizing: border-box;
+    width: calc(100% - 88px);
+    max-width: none;
+    margin: 0 0 0 88px;
+    padding: 16px 32px 32px;
+}
+
+.provider-page-shell > :is(.provider-top-header, .my-jobs-topbar, .pbs-topbar) {
+    box-sizing: border-box;
+    height: 64px;
+    min-height: 64px;
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent;
+}
+
+.provider-page-shell > :is(.my-jobs-heading, .pbs-page-heading) {
+    margin-top: 0 !important;
+}
+
+.provider-page-shell > .my-jobs-heading {
+    margin-bottom: 20px !important;
+}
+
+.provider-page-shell > .pbs-page-heading {
+    min-height: 42px;
+    margin-bottom: 16px !important;
+}
+
+.provider-main-content > :is(
+    .provider-calendar-page,
+    .provider-reviews-page,
+    .provider-profile-page,
+    .provider-notifications-page,
+    .provider-service-map-page
+) {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+@media (max-width: 800px) {
+    .provider-page-shell {
+        width: calc(100% - 76px);
+        margin-left: 76px;
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .provider-page-shell {
+        width: calc(100% - 76px);
+        margin-left: 76px;
+        padding-right: 14px;
+        padding-left: 14px;
+    }
+}
+
+/* Provider booking system: match the balanced two-panel dark booking view. */
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell {
+    width: calc(100% - 88px) !important;
+    max-width: none !important;
+    margin: 0 0 0 88px !important;
+    padding: 16px 32px 32px !important;
+    background: #0c0e13 !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell > .pbs-topbar {
+    height: 64px !important;
+    min-height: 64px !important;
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #0c0e13 !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell > .pbs-page-heading {
+    min-height: 42px;
+    margin: 0 0 16px !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell > .pbs-filter-tabs {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 !important;
+    margin: 0 0 18px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-filter-tab {
+    min-height: 42px;
+    border: 1px solid #343943 !important;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #191c22, #14171d) !important;
+    color: #edf0f4 !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-filter-tab.active {
+    border-color: #ff8a00 !important;
+    background: linear-gradient(110deg, #ff7900, #ff9000) !important;
+    color: #171717 !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-booking-workspace {
+    grid-template-columns: minmax(0, .98fr) minmax(0, 1.02fr);
+    gap: 18px;
+    min-height: 520px;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell :is(.pbs-booking-list, .pbs-booking-detail) {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #303640 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(145deg, #151820, #11141a) !important;
+    box-shadow: 0 10px 28px rgb(0 0 0 / 15%) !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-booking-detail {
+    padding: 18px !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-booking-card {
+    border: 0 !important;
+    border-bottom: 1px solid rgb(255 255 255 / 11%) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-booking-card.selected {
+    border: 1px solid #ff8500 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(110deg, rgb(255 112 0 / 15%), rgb(255 112 0 / 5%) 78%, transparent) !important;
+    box-shadow: 0 0 16px rgb(255 112 0 / 9%) !important;
+}
+
+html[data-theme="dark"] main.provider-booking-system.provider-page-shell :is(.pbs-detail-heading, .pbs-detail-section) {
+    border-bottom-color: rgb(255 255 255 / 13%) !important;
+    background: transparent !important;
+}
+
+@media (max-width: 800px) {
+    html[data-theme="dark"] main.provider-booking-system.provider-page-shell {
+        width: calc(100% - 76px) !important;
+        margin-left: 76px !important;
+        padding-right: 20px !important;
+        padding-left: 20px !important;
+    }
+
+    html[data-theme="dark"] main.provider-booking-system.provider-page-shell .pbs-booking-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    html[data-theme="dark"] main.provider-booking-system.provider-page-shell {
+        padding-right: 14px !important;
+        padding-left: 14px !important;
+    }
+
+    html[data-theme="dark"] main.provider-booking-system.provider-page-shell > .pbs-filter-tabs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Light provider booking system: warm, even surfaces without a filter slab. */
+html[data-theme="light"] main.provider-booking-system.provider-page-shell {
+    background: #f7f5f0 !important;
+    color: #1f2937 !important;
+}
+
+html[data-theme="light"] main.provider-booking-system.provider-page-shell > .pbs-topbar {
+    border-bottom: 1px solid #e7e2d9 !important;
+    background: transparent !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-brand-wordmark {
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0;
+    background: transparent !important;
+    color: #172033 !important;
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -.8px;
+    white-space: nowrap;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-brand-wordmark span {
+    color: #f47b20 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-brand-wordmark:focus-visible {
+    border-radius: 6px;
+    outline: 2px solid #f47b20 !important;
+    outline-offset: 4px;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-search {
+    border: 1px solid #e6e1d8 !important;
+    border-radius: 999px;
+    background: #fff !important;
+    color: #566170 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-search input {
+    background: transparent !important;
+    color: #1f2937 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-search input::placeholder {
+    color: #7a8491 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-icon-button {
+    padding-right: 0;
+    border: 1px solid #e6e1d8 !important;
+    border-radius: 50%;
+    background: #fff !important;
+    color: #172033 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-icon-button:is(:hover, :focus-visible) {
+    border-color: #f47b20 !important;
+    background: #fff3e8 !important;
+    color: #e96d16 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-profile-button {
+    padding: 4px 12px 4px 5px;
+    border: 1px solid #e6e1d8 !important;
+    border-radius: 999px;
+    background: #fff !important;
+    color: #172033 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-profile-button small {
+    color: #718096 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-page-heading > button {
+    border: 0 !important;
+    border-radius: 11px;
+    background: linear-gradient(110deg, #f47b20, #ff8b1a) !important;
+    color: #fff !important;
+}
+
+html[data-theme="light"] main.provider-booking-system.provider-page-shell > .pbs-filter-tabs {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-filter-tab {
+    border: 1px solid #e8e3da !important;
+    border-radius: 12px;
+    background: #fff !important;
+    color: #344054 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-filter-tab span {
+    background: #f3f0ea !important;
+    color: #344054 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-filter-tab.active {
+    border-color: #f47b20 !important;
+    background: linear-gradient(110deg, #f47b20, #ff8b1a) !important;
+    color: #fff !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-filter-tab.active span {
+    background: rgb(255 255 255 / 22%) !important;
+    color: #fff !important;
+}
+
+html[data-theme="light"] main.provider-booking-system.provider-page-shell :is(.pbs-booking-list, .pbs-booking-detail) {
+    border: 1px solid #e8e3da !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    box-shadow: 0 8px 24px rgb(35 42 52 / 6%) !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-booking-card {
+    border-bottom: 1px solid #eeeae3 !important;
+    background: transparent !important;
+    color: #1f2937 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-booking-card:hover {
+    background: #faf7f2 !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-booking-card.selected {
+    border: 1px solid #f47b20 !important;
+    border-radius: 13px !important;
+    background: #fff6ed !important;
+    box-shadow: 0 4px 14px rgb(244 123 32 / 10%) !important;
+}
+
+html[data-theme="light"] .provider-booking-system :is(.pbs-detail-heading, .pbs-detail-section) {
+    border-bottom-color: #eeeae3 !important;
+    background: transparent !important;
+}
+
+html[data-theme="light"] .provider-booking-system .pbs-customer-details > button {
+    border-color: #f2d8c5 !important;
+    background: #fff7f0 !important;
+    color: #c65b12 !important;
+}
+
+/* Provider profile service editor: keep all nested controls on dark surfaces. */
+html[data-theme="dark"] .verified-profile-page .provider-service-task-selection {
+    border-color: #303641 !important;
+    border-radius: 12px !important;
+    background: #151922 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(
+    .provider-service-category-option,
+    .provider-service-task-option
+) {
+    border-color: #343b47 !important;
+    border-radius: 10px !important;
+    background: #191d25 !important;
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(
+    .provider-service-category-option:has(input:checked),
+    .provider-service-task-option.selected
+) {
+    border-color: rgba(255, 134, 31, .55) !important;
+    background: linear-gradient(145deg, #20232a, #191d25) !important;
+}
+
+html[data-theme="dark"] .verified-profile-page :is(
+    .provider-service-category-option input[type="checkbox"],
+    .provider-service-task-option input[type="checkbox"]
+) {
+    accent-color: #ff861f !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-service-editor-category,
+html[data-theme="dark"] .verified-profile-page .provider-service-task-option > label {
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-service-price {
+    border-color: #3a414e !important;
+    border-radius: 8px !important;
+    background: #20242d !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-service-price input[type="number"] {
+    border: 0 !important;
+    background: transparent !important;
+    color: #f4f5f7 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-add-service-row .form-control {
+    border-color: #3a414e !important;
+    background: #191d25 !important;
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-add-service-button {
+    border-color: rgba(255, 134, 31, .5) !important;
+    background: rgba(255, 120, 0, .12) !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-add-service-button:hover:not(:disabled) {
+    background: rgba(255, 120, 0, .2) !important;
+}
+
+html[data-theme="dark"] .verified-profile-page .provider-add-service-button:disabled {
+    border-color: #3a414e !important;
+    background: #20242d !important;
+    color: #8f97a5 !important;
+}
+
+/* Provider logout confirmation: readable dark dialog and secondary action. */
+html[data-theme="dark"] .provider-logout-modal-overlay {
+    background: rgba(5, 7, 11, .68) !important;
+    backdrop-filter: blur(3px);
+}
+
+html[data-theme="dark"] .provider-logout-modal {
+    border-color: #343944 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #1a1d24, #13161c) !important;
+    color: #f4f5f7 !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .48) !important;
+}
+
+html[data-theme="dark"] .provider-logout-modal-content h3 {
+    color: #f7f8fa !important;
+}
+
+html[data-theme="dark"] .provider-logout-modal-content p {
+    color: #c2c7d0 !important;
+}
+
+html[data-theme="dark"] .provider-logout-confirm-btn {
+    border: 1px solid #ff861f !important;
+    background: linear-gradient(135deg, #ff861f, #f47b20) !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-logout-cancel-btn {
+    border: 1px solid #454c58 !important;
+    background: #242832 !important;
+    color: #e7eaf0 !important;
+}
+
+html[data-theme="dark"] .provider-logout-cancel-btn:is(:hover, :focus-visible) {
+    border-color: #ff861f !important;
+    background: rgba(255, 134, 31, .12) !important;
+    color: #ffb16f !important;
+    outline: none;
+}
+
+/* Provider verification wizard: readable steps, rejection notice, and form. */
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) {
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-heading :is(span, h2, p) {
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-heading > span {
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .alert-warning {
+    border: 1px solid #76501a !important;
+    border-radius: 14px !important;
+    background: linear-gradient(120deg, #292315, #211d17) !important;
+    color: #f4d99b !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .alert-warning :is(strong, p, span) {
+    color: #f4d99b !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .alert-warning strong {
+    color: #ffe7ad !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-step {
+    border-color: #303641 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(145deg, #171b22, #13161c) !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-step > span {
+    border-color: #454c58 !important;
+    background: #252a33 !important;
+    color: #d8dce3 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-step small {
+    color: #aeb5c1 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-step:is(.active, .completed) {
+    border-color: rgba(255, 134, 31, .65) !important;
+    background: linear-gradient(145deg, #24201b, #171a20) !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-step:is(.active, .completed) > span {
+    border-color: #ff861f !important;
+    background: #f47b20 !important;
+    color: #fff !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-step:is(.active, .completed) small {
+    color: #ffb16f !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card {
+    border-color: #303641 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #171a20, #12151b) !important;
+    color: #f4f5f7 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .2) !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card > h3 {
+    border-bottom-color: #303641 !important;
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card :is(.form-label, label, .form-check-label) {
+    color: #e8eaf0 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card :is(.form-control, .form-select, textarea) {
+    border-color: #3a414e !important;
+    background-color: #1c2028 !important;
+    color: #f4f5f7 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card :is(input, textarea)::placeholder {
+    color: #9ba3b1 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card .row.mb-3 .form-check {
+    border-color: #343b47 !important;
+    background: #191d25 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card .row.mb-3 .form-check:has(.form-check-input:checked) {
+    border-color: rgba(255, 134, 31, .55) !important;
+    background: #20232a !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-application-card .form-check-input {
+    accent-color: #ff861f !important;
+}
+
+/* Match the provider dashboard canvas on the standalone My Jobs page. */
+html[data-theme="light"] .provider-my-jobs {
+    background-color: #fffcf7 !important;
+    background-image:
+        radial-gradient(ellipse at 4% 8%, rgba(255, 224, 199, .42), transparent 36%),
+        radial-gradient(ellipse at 96% 12%, rgba(255, 241, 189, .48), transparent 34%),
+        radial-gradient(ellipse at 72% 100%, rgba(255, 193, 143, .2), transparent 42%),
+        linear-gradient(135deg, #fffcf7 12%, #fff 54%, #fffcf7 100%) !important;
+    background-attachment: fixed !important;
+}
+
+html[data-theme="dark"] .provider-my-jobs {
+    background-color: #0c0e13 !important;
+    background-image: radial-gradient(ellipse at 72% 0%, rgba(255, 120, 0, .055), transparent 38%) !important;
+    background-attachment: fixed !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) :is(
+    .provider-service-category-option,
+    .provider-service-task-option
+) {
+    border-color: #343b47 !important;
+    border-radius: 10px !important;
+    background: #191d25 !important;
+    color: #e8eaf0 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-task-selection {
+    border-color: #303641 !important;
+    background: #151922 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-category-option:has(input:checked),
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-task-option.selected {
+    border-color: rgba(255, 134, 31, .6) !important;
+    background: linear-gradient(145deg, #24201b, #191d25) !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-category-option input[type="checkbox"],
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-task-option input[type="checkbox"] {
+    accent-color: #ff861f !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-task-option > label {
+    color: #e8eaf0 !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-price {
+    border-color: #3a414e !important;
+    background: #20242d !important;
+    color: #ff9a4d !important;
+}
+
+html[data-theme="dark"] .provider-profile-page:has(.provider-application-heading) .provider-service-price input[type="number"] {
+    border: 0 !important;
+    background: transparent !important;
+    color: #f4f5f7 !important;
+    box-shadow: none !important;
+}
+
+/* Keep the light-mode availability action aligned to the right edge. */
+html[data-theme="light"] main.provider-booking-system.provider-page-shell > .pbs-page-heading {
+    display: flex !important;
+    width: 100%;
+    justify-content: flex-end !important;
+    align-items: center;
+}
+
+/* Extend the booking canvas behind the fixed sidebar so no gray gutter shows. */
+html[data-theme="dark"]:has(main.provider-booking-system),
+html[data-theme="dark"]:has(main.provider-booking-system) body,
+html[data-theme="dark"]:has(main.provider-booking-system) #root,
+html[data-theme="dark"]:has(main.provider-booking-system) .app-route-transition {
+    background-color: #0c0e13 !important;
+}
+
+/* Homeowner pages share one dark canvas and one content starting rhythm. */
+html[data-theme="dark"]:has(.profile-page-container),
+html[data-theme="dark"]:has(.profile-page-container) body,
+html[data-theme="dark"]:has(.profile-page-container) #root,
+html[data-theme="dark"]:has(.profile-page-container) .app-route-transition,
+html[data-theme="dark"]:has(.dashboard-wrapper),
+html[data-theme="dark"]:has(.dashboard-wrapper) body,
+html[data-theme="dark"]:has(.dashboard-wrapper) #root,
+html[data-theme="dark"]:has(.dashboard-wrapper) .app-route-transition {
+    background-color: #0b0d11 !important;
+}
+
+html[data-theme="dark"] :is(
+    .profile-page-container,
+    .profile-page-container > .profile-main-content,
+    .dashboard-wrapper,
+    .dashboard-wrapper > .homeowner-dashboard,
+    .find-services-page,
+    .tracking-page
+) {
+    background-color: #0b0d11 !important;
+    background-image: none !important;
+}
+
+html[data-theme="dark"] .profile-page-container {
+    min-height: 100vh;
+}
+
+html[data-theme="dark"] .profile-page-container > .profile-main-content {
+    min-width: 0;
+    margin-left: 80px;
+    padding: 20px clamp(18px, 2vw, 30px) 28px !important;
+    gap: 18px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .profile-page-container > .profile-main-content > .profile-header {
+    min-height: 62px;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .homeowner-dashboard-header {
+    min-height: 62px;
+    margin-bottom: 18px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] .dashboard-wrapper,
+html[data-theme="dark"] .profile-page-container,
+html[data-theme="dark"] .find-services-page,
+html[data-theme="dark"] .tracking-page {
+    color: #f4f5f7 !important;
+}
+
+/* Keep homeowner search fields grouped before their notification/action icons. */
+html[data-theme="dark"] .homeowner-history-main .header-actions {
+    order: 1;
+    margin-left: auto;
+}
+
+html[data-theme="dark"] .homeowner-history-header {
+    justify-content: space-between !important;
+}
+
+html[data-theme="dark"] .homeowner-dashboard-search-group {
+    margin-left: auto !important;
+}
+
+@media (max-width: 760px) {
+    html[data-theme="dark"] .profile-page-container > .profile-main-content {
+        margin-left: 72px;
+        padding: 16px 14px 24px !important;
+    }
+
+    html[data-theme="dark"] .profile-page-container > .profile-main-content > .profile-header {
+        min-height: 54px;
     }
 }

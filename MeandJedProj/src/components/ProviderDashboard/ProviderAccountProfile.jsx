@@ -1412,15 +1412,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                 {error && <div className="alert alert-danger" role="alert">{error}</div>}
                 {message && <div className="alert alert-success" role="status">{message}</div>}
 
-                <header className="provider-profile-title-row">
-                    <div>
-                        <h1>My Profile</h1>
-                    </div>
-                    <div className="provider-profile-breadcrumb">
-                        <span>Home</span><span>›</span><strong>Profile</strong>
-                    </div>
-                </header>
-
                 <section className="provider-profile-hero">
                     <div className="provider-profile-hero-avatar">
                         {profilePhoto
@@ -1475,12 +1466,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                         onClick={() => document.getElementById('provider-service-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                     >
                         <i className="bi bi-briefcase-fill" /> Service Information
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => document.getElementById('provider-security-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                    >
-                        <i className="bi bi-lock-fill" /> Account Security
                     </button>
                 </nav>
 
@@ -1821,21 +1806,6 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
                             )}
                         </section>
 
-                        <section id="provider-security-panel" className="provider-profile-panel">
-                            <div className="provider-panel-heading">
-                                <i className="bi bi-shield-lock provider-heading-icon" />
-                                <div>
-                                    <h3>Account Security</h3>
-                                </div>
-                            </div>
-                            <div className="provider-security-status-box">
-                                <i className="bi bi-check-circle-fill" />
-                                <div>
-                                    <strong>Verified Provider</strong>
-                                    <span>Your account has been verified.</span>
-                                </div>
-                            </div>
-                        </section>
                     </div>
 
                     <aside className="provider-profile-side-column">
@@ -1899,9 +1869,7 @@ export default function ProviderAccountProfile({ onProfileUpdated }) {
     return (
         <section className="provider-profile-page">
             <div className="provider-application-heading">
-                <span>HANDYMAN SERVICES</span>
                 <h2>Provider Verification</h2>
-                <p>Complete your information to become a verified service provider.</p>
             </div>
 
             {message && <div className="alert alert-success" role="status">{message}</div>}

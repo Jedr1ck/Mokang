@@ -15,7 +15,8 @@ const HomeownerSideBar = () => {
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = (path) =>
+        location.pathname === path || location.pathname.startsWith(`${path}/`);
 
     const confirmLogout = () => {
         localStorage.removeItem('user');
@@ -47,6 +48,7 @@ const HomeownerSideBar = () => {
                     <Link
                         to="/homeowner-dashboard"
                         title="Dashboard"
+                        aria-current={isActive('/homeowner-dashboard') ? 'page' : undefined}
                         className={`sidebar-btn ${isActive('/homeowner-dashboard') ? 'active' : ''
                             }`}
                     >
@@ -57,6 +59,7 @@ const HomeownerSideBar = () => {
                     <Link
                         to="/services"
                         title="Services"
+                        aria-current={isActive('/services') ? 'page' : undefined}
                         className={`sidebar-btn ${isActive('/services') ? 'active' : ''
                             }`}
                     >
@@ -67,6 +70,7 @@ const HomeownerSideBar = () => {
                     <Link
                         to="/history"
                         title="History"
+                        aria-current={isActive('/history') ? 'page' : undefined}
                         className={`sidebar-btn ${isActive('/history') ? 'active' : ''
                             }`}
                     >
@@ -77,6 +81,7 @@ const HomeownerSideBar = () => {
                     <Link
                         to="/messages"
                         title="Messages"
+                        aria-current={isActive('/messages') ? 'page' : undefined}
                         className={`sidebar-btn ${isActive('/messages') ? 'active' : ''
                             }`}
                     >
@@ -87,6 +92,7 @@ const HomeownerSideBar = () => {
                     <Link
                         to="/calendar"
                         title="Calendar"
+                        aria-current={isActive('/calendar') ? 'page' : undefined}
                         className={`sidebar-btn ${isActive('/calendar') ? 'active' : ''
                             }`}
                     >
@@ -97,6 +103,7 @@ const HomeownerSideBar = () => {
                     <Link
                         to="/settings"
                         title="Settings"
+                        aria-current={isActive('/settings') ? 'page' : undefined}
                         className={`sidebar-btn ${isActive('/settings') ? 'active' : ''
                             }`}
                     >

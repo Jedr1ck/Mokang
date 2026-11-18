@@ -207,6 +207,94 @@
     line-height: 1.5;
 }
 
+/* Keep the map overlays readable and consistent with the provider dark theme. */
+html[data-theme="dark"] .provider-service-map-page {
+    background: transparent !important;
+    color: #f7f7f8;
+}
+
+html[data-theme="dark"] .provider-service-map-heading p {
+    color: #b5bac4;
+}
+
+html[data-theme="dark"] .provider-service-map-area {
+    border-color: #5a351a;
+    background: #28211d;
+    color: #ffad63;
+}
+
+html[data-theme="dark"] .provider-service-map-card {
+    border-color: #343840;
+    background: linear-gradient(145deg, #191b20, #111317 72%);
+    box-shadow: 0 12px 34px rgb(0 0 0 / 24%);
+}
+
+html[data-theme="dark"] .provider-service-map-location span,
+html[data-theme="dark"] .provider-service-map-legend,
+html[data-theme="dark"] .provider-service-map-note {
+    color: #b7bdc8;
+}
+
+html[data-theme="dark"] .provider-service-map-location strong {
+    color: #f5f6f8;
+}
+
+html[data-theme="dark"] .provider-service-map-location-icon {
+    background: #382517;
+    color: #ff851f;
+}
+
+html[data-theme="dark"] .provider-service-map-frame {
+    border-top-color: #343840;
+}
+
+html[data-theme="dark"] .provider-service-map-coverage-label {
+    border-color: rgb(255 126 20 / 50%);
+    background: rgb(23 24 28 / 94%);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+    backdrop-filter: blur(10px);
+}
+
+html[data-theme="dark"] .provider-service-map-coverage-label strong {
+    color: #fff;
+}
+
+html[data-theme="dark"] .provider-service-map-coverage-label small {
+    color: #ffc18d;
+}
+
+html[data-theme="dark"] .provider-service-map-reset {
+    border-color: #4a4d55;
+    background: rgb(25 27 32 / 95%);
+    color: #f7f7f8;
+    box-shadow: 0 5px 16px rgb(0 0 0 / 35%);
+}
+
+html[data-theme="dark"] .provider-service-map-reset:hover {
+    border-color: #f56b12;
+    background: #302219;
+}
+
+html[data-theme="dark"] .provider-service-leaflet-map .leaflet-control-zoom a {
+    border-color: #4a4d55;
+    background: #191b20;
+    color: #f7f7f8;
+}
+
+html[data-theme="dark"] .provider-service-leaflet-map .leaflet-control-zoom a:hover {
+    background: #302219;
+    color: #ff9a45;
+}
+
+html[data-theme="dark"] .provider-service-leaflet-map .leaflet-control-attribution {
+    background: rgb(20 22 26 / 88%);
+    color: #d0d3d9;
+}
+
+html[data-theme="dark"] .provider-service-leaflet-map .leaflet-control-attribution a {
+    color: #ff9a45;
+}
+
 @media (max-width: 700px) {
     .provider-service-map-page {
         padding-top: 2px;

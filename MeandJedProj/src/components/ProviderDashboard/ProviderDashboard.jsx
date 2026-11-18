@@ -305,7 +305,7 @@ const ProviderDashboard = () => {
                 MAIN CONTENT
             ====================================== */}
 
-            <main className="provider-main-content">
+            <main className="provider-main-content provider-page-shell">
 
 
                 {/* =====================================
@@ -313,16 +313,7 @@ const ProviderDashboard = () => {
                 ====================================== */}
 
                 <div className="provider-top-header">
-                    <div className="provider-search-box">
-                        <i className="bi bi-search"></i>
-                        <input
-                            type="search"
-                            placeholder="Search bookings, customers, or services..."
-                            aria-label="Search dashboard"
-                        />
-                    </div>
-
-                    <div className="provider-header-actions">
+                    <div className="provider-header-availability">
                         {availabilityError && <span className="provider-availability-error" role="status">{availabilityError}</span>}
                         <button
                             type="button"
@@ -337,6 +328,18 @@ const ProviderDashboard = () => {
                             <span className="provider-availability-switch" aria-hidden="true"><span /></span>
                             <span>{availabilitySaving ? 'Saving' : availabilityIsOn ? 'ON' : 'OFF'}</span>
                         </button>
+
+                    </div>
+
+                    <div className="provider-header-actions">
+                        <div className="provider-search-box">
+                            <i className="bi bi-search"></i>
+                            <input
+                                type="search"
+                                placeholder="Search bookings, customers, or services..."
+                                aria-label="Search dashboard"
+                            />
+                        </div>
 
                         <button
                             type="button"
@@ -541,7 +544,7 @@ const ProviderDashboard = () => {
                         <section className="provider-dashboard-card provider-my-services">
                             <div className="provider-card-header">
                                 <div>
-                                    <h3><i className="bi bi-wrench-adjustable"></i>My Services</h3>
+                                    <h3>My Services</h3>
                                 </div>
                                 <button type="button" onClick={() => goToSection('profile', '/provider-profile')}>
                                     Manage Services
@@ -615,9 +618,6 @@ const ProviderDashboard = () => {
                 {activeSection === 'schedule' && (
                     <section className="provider-calendar-page">
                         <header className="provider-calendar-heading">
-                            <div>
-                                <h1>Calendar &amp; Schedule</h1>
-                            </div>
                             <button
                                 type="button"
                                 onClick={() => goToSection('bookings', '/provider-bookings')}

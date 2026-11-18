@@ -3,7 +3,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import logo from "../../assets/images/logo.png";
 import "./SideBarAdmin.css";
-import ThemeToggle from "../ThemeToggle";
 
 function SideBarAdmin({
     activePage,
@@ -158,9 +157,6 @@ function SideBarAdmin({
             ================================================== */}
 
             <div className="admin-sidebar-bottom !border-white/10 !px-3 !py-4">
-
-                <ThemeToggle compact={!sidebarOpen} />
-
                 <button
                     type="button"
                     className="admin-logout-button !min-h-12 !rounded-xl !border-orange-500/20 !bg-orange-500/10 !px-3 !font-semibold !text-orange-200 !transition-all hover:!border-orange-500 hover:!bg-orange-500 hover:!text-white"
